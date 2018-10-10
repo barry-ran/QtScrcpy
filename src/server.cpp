@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QTimer>
 
 #include "server.h"
 
@@ -8,6 +9,13 @@
 Server::Server(QObject *parent) : QObject(parent)
 {
     connect(&m_workProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
+
+    connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
+        m_deviceSocket = m_serverSocket.nextPendingConnection();
+        connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
+        connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
+    });
+
 }
 
 const QString& Server::getServerPath()
@@ -131,10 +139,41 @@ bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, qu
 
 void Server::connectTo()
 {
-    if (!m_tunnelForward) {
-        //m_deviceSocket
+    if (m_tunnelForward) {
+        m_deviceSocket = new QTcpSocket(this);
+        connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
+        connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
+        m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
     }
 
+    QTimer::singleShot(300, this, [this](){
+        if (!m_deviceSocket) {
+            emit connectToResult(false);
+            return;
+        }
+
+        bool success = false;
+        if (m_tunnelForward) {
+            if (m_deviceSocket->isValid()) {
+                if (m_deviceSocket->read(1)) {
+                    success = true;
+                } else {
+                    success = false;
+                }
+            } else {
+                m_deviceSocket->deleteLater();
+                success = false;
+            }
+        } else {
+            if (m_deviceSocket->isValid()) {
+                success = true;
+            } else {
+                m_deviceSocket->deleteLater();
+                success = false;
+            }
+        }
+        emit connectToResult(success);
+    });
 }
 
 void Server::stop()
@@ -151,8 +190,10 @@ void Server::stop()
     if (m_serverCopiedToDevice) {
         removeServer();
     }
-    m_serverSocket.close();
-    m_deviceSocket.close();
+    m_serverSocket.disconnect();
+    if (m_deviceSocket) {
+        m_deviceSocket->disconnectFromHost();
+    }
 }
 
 bool Server::startServerByStep()
@@ -178,7 +219,7 @@ bool Server::startServerByStep()
                 // client listens and the server connects to the client. That way, the
                 // client can listen before starting the server app, so there is no need to
                 // try to connect until the server socket is listening on the device.
-                m_serverSocket.setMaxPendingConnections(1);
+                m_serverSocket.setMaxPendingConnections(1);                
                 if (!m_serverSocket.listen(QHostAddress::LocalHost, m_localPort)) {
                     qCritical(QString("Could not listen on port %1").arg(m_localPort).toStdString().c_str());
                     m_serverStartStep = SSS_NULL;

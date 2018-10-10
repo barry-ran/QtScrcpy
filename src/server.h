@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QTcpServer>
+#include <QPointer>
 
 #include "adbprocess.h"
 
@@ -27,6 +28,7 @@ public:
 
 signals:
     void serverStartResult(bool success);
+    void connectToResult(bool success);
 
 private slots:
     void onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult);
@@ -47,7 +49,7 @@ private:
     QString m_serial = "";
     AdbProcess m_serverProcess;
     QTcpServer m_serverSocket; // only used if !tunnel_forward
-    QTcpSocket m_deviceSocket;
+    QPointer<QTcpSocket> m_deviceSocket = Q_NULLPTR;
     quint16 m_localPort = 0;
     bool m_tunnelEnabled = false;
     bool m_tunnelForward = false; // use "adb forward" instead of "adb reverse"
