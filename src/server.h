@@ -22,24 +22,24 @@ public:
     explicit Server(QObject *parent = nullptr);
 
     bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop);
+    void connectTo();
+    void stop();
 
+signals:
+    void serverStartResult(bool success);
+
+private slots:
+    void onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult);
+
+private:
+    const QString& getServerPath();
     bool pushServer();
     bool removeServer();
     bool enableTunnelReverse();
     bool disableTunnelReverse();
     bool enableTunnelForward();
     bool disableTunnelForward();
-
     bool execute();
-
-signals:
-    void serverStartResult(bool success);
-
-public slots:
-    void onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult);
-
-private:
-    const QString& getServerPath();
     bool startServerByStep();
 
     QString m_serverPath = "";

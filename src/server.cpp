@@ -32,10 +32,14 @@ bool Server::pushServer()
 
 bool Server::removeServer()
 {
-    if (m_workProcess.isRuning()) {
-        m_workProcess.kill();
+    AdbProcess* adb = new AdbProcess();
+    if (!adb) {
+        return false;
     }
-    m_workProcess.removePath(m_serial, DEVICE_SERVER_PATH);
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+        sender()->deleteLater();
+    });
+    adb->removePath(m_serial, DEVICE_SERVER_PATH);
     return true;
 }
 
@@ -50,10 +54,14 @@ bool Server::enableTunnelReverse()
 
 bool Server::disableTunnelReverse()
 {
-    if (m_workProcess.isRuning()) {
-        m_workProcess.kill();
+    AdbProcess* adb = new AdbProcess();
+    if (!adb) {
+        return false;
     }
-    m_workProcess.reverseRemove(m_serial, SOCKET_NAME);
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+        sender()->deleteLater();
+    });
+    adb->reverseRemove(m_serial, SOCKET_NAME);
     return true;
 }
 
@@ -67,18 +75,21 @@ bool Server::enableTunnelForward()
 }
 bool Server::disableTunnelForward()
 {
-    if (m_workProcess.isRuning()) {
-        m_workProcess.kill();
+    AdbProcess* adb = new AdbProcess();
+    if (!adb) {
+        return false;
     }
-    m_workProcess.forwardRemove(m_serial, m_localPort);
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+        sender()->deleteLater();
+    });
+    adb->forwardRemove(m_serial, m_localPort);
     return true;
 }
 
 bool Server::execute()
 {
-    AdbProcess* adb = new AdbProcess();
-    if (!adb) {
-        return false;
+    if (m_workProcess.isRuning()) {
+        m_workProcess.kill();
     }
     QStringList args;
     args << "shell";
@@ -89,15 +100,17 @@ bool Server::execute()
     args << QString::number(m_maxSize);
     args << QString::number(m_bitRate);
     args << (m_tunnelForward ? "true" : "false");
-    args << (m_crop.isEmpty() ? "" : m_crop);
+    if (!m_crop.isEmpty()) {
+        args << m_crop;
+    }
 
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-        if (AdbProcess::AER_SUCCESS == processResult) {
+//    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+//        if (AdbProcess::AER_SUCCESS == processResult) {
 
-        }
-        sender()->deleteLater();
-    });
-    adb->execute(m_serial, args);
+//        }
+//        sender()->deleteLater();
+//    });
+    m_workProcess.execute(m_serial, args);
     return true;
 }
 
@@ -116,23 +129,50 @@ bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, qu
     return startServerByStep();
 }
 
+void Server::connectTo()
+{
+    if (!m_tunnelForward) {
+        //m_deviceSocket
+    }
+
+}
+
+void Server::stop()
+{
+    // ignore failure
+    m_workProcess.terminate();
+    if (m_tunnelEnabled) {
+        if (m_tunnelForward) {
+            disableTunnelForward();
+        } else {
+            disableTunnelReverse();
+        }
+    }
+    if (m_serverCopiedToDevice) {
+        removeServer();
+    }
+    m_serverSocket.close();
+    m_deviceSocket.close();
+}
+
 bool Server::startServerByStep()
 {
+    bool stepSuccess = false;
     // push, enable tunnel et start the server
     if (SSS_NULL != m_serverStartStep) {
         switch (m_serverStartStep) {
         case SSS_PUSH:
-            return pushServer();
+            stepSuccess = pushServer();
         case SSS_ENABLE_TUNNEL_REVERSE:
-            return enableTunnelReverse();
+            stepSuccess = enableTunnelReverse();
             break;
         case SSS_ENABLE_TUNNEL_FORWARD:
-            return enableTunnelForward();
+            stepSuccess = enableTunnelForward();
             break;
         case SSS_EXECUTE_SERVER:
             // if "adb reverse" does not work (e.g. over "adb connect"), it fallbacks to
             // "adb forward", so the app socket is the client
-            if (m_tunnelForward) {
+            if (!m_tunnelForward) {
                 // At the application level, the device part is "the server" because it
                 // serves video stream and control. However, at the network level, the
                 // client listens and the server connects to the client. That way, the
@@ -152,13 +192,17 @@ bool Server::startServerByStep()
                 }
             }
             // server will connect to our server socket
-            return execute();
+            stepSuccess = execute();
             break;
         default:
             break;
         }
     }
-    return true;
+
+    if (!stepSuccess) {
+        emit serverStartResult(false);
+    }
+    return stepSuccess;
 }
 
 void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
