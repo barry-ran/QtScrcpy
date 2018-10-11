@@ -38,10 +38,10 @@ void AdbProcess::initSignals()
     connect(this, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this,
           [this](int exitCode, QProcess::ExitStatus exitStatus){
         if (NormalExit == exitStatus && 0 == exitCode) {
-            emit adbProcessResult(AER_SUCCESS);
+            emit adbProcessResult(AER_SUCCESS_EXEC);
         } else {
             //P7C0218510000537        unauthorized ,手机端此时弹出调试认证，要允许调试
-            emit adbProcessResult(AER_ERROR_CMD);
+            emit adbProcessResult(AER_ERROR_EXEC);
         }
 
         qDebug() << ">>>>>>>>" << __FUNCTION__;
@@ -73,7 +73,7 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::started, this,
             [this](){
-
+        emit adbProcessResult(AER_SUCCESS_START);
     });
 }
 
