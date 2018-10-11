@@ -13,7 +13,11 @@ Server::Server(QObject *parent) : QObject(parent)
     connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
         m_deviceSocket = m_serverSocket.nextPendingConnection();
         connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
-        connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
+        //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
+        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
+            qDebug() << "ready read";
+            m_deviceSocket->readAll();
+        });
     });
 
 }
@@ -128,6 +132,7 @@ bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, qu
         return false;
     }
 
+    m_serial = serial;
     m_localPort = localPort;
     m_maxSize = maxSize;
     m_bitRate = bitRate;
@@ -142,7 +147,11 @@ void Server::connectTo()
     if (m_tunnelForward) {
         m_deviceSocket = new QTcpSocket(this);
         connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
-        connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
+        //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
+        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
+            qDebug() << "ready read";
+            m_deviceSocket->readAll();
+        });
         m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
     }
 
@@ -155,7 +164,8 @@ void Server::connectTo()
         bool success = false;
         if (m_tunnelForward) {
             if (m_deviceSocket->isValid()) {
-                if (m_deviceSocket->read(1)) {
+                QByteArray ar = m_deviceSocket->read(1);
+                if (!ar.isEmpty()) {
                     success = true;
                 } else {
                     success = false;
@@ -166,10 +176,24 @@ void Server::connectTo()
             }
         } else {
             if (m_deviceSocket->isValid()) {
+                // we don't need the server socket anymore
+                // just m_deviceSocket is ok
+                m_serverSocket.close();
                 success = true;
             } else {
                 m_deviceSocket->deleteLater();
                 success = false;
+            }
+        }
+        if (success) {
+            // the server is started, we can clean up the jar from the temporary folder
+            removeServer();
+            m_serverCopiedToDevice = false;
+            // we don't need the adb tunnel anymore
+            if (m_tunnelForward) {
+                disableTunnelForward();
+            } else {
+                disableTunnelReverse();
             }
         }
         emit connectToResult(success);
@@ -190,7 +214,7 @@ void Server::stop()
     if (m_serverCopiedToDevice) {
         removeServer();
     }
-    m_serverSocket.disconnect();
+    m_serverSocket.close();
     if (m_deviceSocket) {
         m_deviceSocket->disconnectFromHost();
     }
@@ -204,6 +228,7 @@ bool Server::startServerByStep()
         switch (m_serverStartStep) {
         case SSS_PUSH:
             stepSuccess = pushServer();
+            break;
         case SSS_ENABLE_TUNNEL_REVERSE:
             stepSuccess = enableTunnelReverse();
             break;
