@@ -40,6 +40,7 @@ void AdbProcess::initSignals()
         if (NormalExit == exitStatus && 0 == exitCode) {
             emit adbProcessResult(AER_SUCCESS);
         } else {
+            //P7C0218510000537        unauthorized ,手机端此时弹出调试认证，要允许调试
             emit adbProcessResult(AER_ERROR_CMD);
         }
 
@@ -49,7 +50,7 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::errorOccurred, this,
             [this](QProcess::ProcessError error){
-        if (QProcess::FailedToStart == error) {
+        if (QProcess::FailedToStart == error) {            
             emit adbProcessResult(AER_ERROR_MISSING_BINARY);
         } else {
             emit adbProcessResult(AER_ERROR_START);
@@ -83,7 +84,7 @@ void AdbProcess::execute(const QString& serial, const QStringList& args)
         adbArgs << "-s" << serial;
     }
     adbArgs << args;
-    qDebug() << adbArgs.join(" ");
+    qDebug() << getAdbPath() << adbArgs.join(" ");
     start(getAdbPath(), adbArgs);
     //start("C:\\Users\\Barry\\Desktop\\sockettool.exe", Q_NULLPTR);
 }

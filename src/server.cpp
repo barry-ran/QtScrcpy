@@ -4,7 +4,8 @@
 #include "server.h"
 
 #define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
-#define SOCKET_NAME "qtscrcpy"
+//#define SOCKET_NAME "qtscrcpy" //jar需要同步修改
+#define SOCKET_NAME "scrcpy"
 
 Server::Server(QObject *parent) : QObject(parent)
 {
@@ -15,8 +16,11 @@ Server::Server(QObject *parent) : QObject(parent)
         connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
         //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
         connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
-            qDebug() << "ready read";
-            m_deviceSocket->readAll();
+            static quint64 count = 0;
+            qDebug() << count <<  "ready read";
+            count++;
+            QByteArray ar = m_deviceSocket->readAll();
+            //m_deviceSocket->write(ar);
         });
     });
 
@@ -122,6 +126,8 @@ bool Server::execute()
 //        }
 //        sender()->deleteLater();
 //    });
+    // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
+    // 这条adb命令是阻塞运行的，workProcess不会退出了
     m_workProcess.execute(m_serial, args);
     return true;
 }
@@ -164,6 +170,8 @@ void Server::connectTo()
         bool success = false;
         if (m_tunnelForward) {
             if (m_deviceSocket->isValid()) {
+                // connect will success even if devices offline, recv data is real connect success
+                // because connect is to pc adb server
                 QByteArray ar = m_deviceSocket->read(1);
                 if (!ar.isEmpty()) {
                     success = true;
