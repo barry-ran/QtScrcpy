@@ -18,12 +18,38 @@
     <rect>
      <x>30</x>
      <y>20</y>
-     <width>93</width>
+     <width>111</width>
      <height>28</height>
     </rect>
    </property>
    <property name="text">
-    <string>PushButton</string>
+    <string>adbProcess</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="startServerBtn">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>60</y>
+     <width>111</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>startServer</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="stopServerBtn">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>100</y>
+     <width>111</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>stopServer</string>
    </property>
   </widget>
  </widget>

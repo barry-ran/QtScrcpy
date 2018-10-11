@@ -83,6 +83,7 @@ void AdbProcess::execute(const QString& serial, const QStringList& args)
         adbArgs << "-s" << serial;
     }
     adbArgs << args;
+    qDebug() << adbArgs.join(" ");
     start(getAdbPath(), adbArgs);
     //start("C:\\Users\\Barry\\Desktop\\sockettool.exe", Q_NULLPTR);
 }

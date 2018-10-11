@@ -2,11 +2,13 @@
 #include "ui_dialog.h"
 #include "adbprocess.h"
 
+
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    server = new Server();
 }
 
 Dialog::~Dialog()
@@ -21,4 +23,14 @@ void Dialog::on_adbProcess_clicked()
         sender()->deleteLater();
     });
     adb->execute("", QStringList() << "devices");
+}
+
+void Dialog::on_startServerBtn_clicked()
+{
+    server->start("P7C0218510000537", 27183, 0, 8000000, "");
+}
+
+void Dialog::on_stopServerBtn_clicked()
+{
+    server->stop();
 }

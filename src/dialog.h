@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "server.h"
+
 namespace Ui {
 class Dialog;
 }
@@ -18,8 +20,13 @@ public:
 private slots:
     void on_adbProcess_clicked();
 
+    void on_startServerBtn_clicked();
+
+    void on_stopServerBtn_clicked();
+
 private:
     Ui::Dialog *ui;
+    Server* server;
 };
 
 #endif // DIALOG_H
