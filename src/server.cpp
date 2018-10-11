@@ -10,6 +10,7 @@
 Server::Server(QObject *parent) : QObject(parent)
 {
     connect(&m_workProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
+    connect(&m_serverProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
 
     connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
         m_deviceSocket = m_serverSocket.nextPendingConnection();
@@ -53,7 +54,9 @@ bool Server::removeServer()
         return false;
     }
     connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-        sender()->deleteLater();
+        if (AdbProcess::AER_SUCCESS_START != processResult) {
+            sender()->deleteLater();
+        }
     });
     adb->removePath(m_serial, DEVICE_SERVER_PATH);
     return true;
@@ -75,7 +78,9 @@ bool Server::disableTunnelReverse()
         return false;
     }
     connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-        sender()->deleteLater();
+        if (AdbProcess::AER_SUCCESS_START != processResult) {
+            sender()->deleteLater();
+        }
     });
     adb->reverseRemove(m_serial, SOCKET_NAME);
     return true;
@@ -96,7 +101,9 @@ bool Server::disableTunnelForward()
         return false;
     }
     connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-        sender()->deleteLater();
+        if (AdbProcess::AER_SUCCESS_START != processResult) {
+            sender()->deleteLater();
+        }
     });
     adb->forwardRemove(m_serial, m_localPort);
     return true;
@@ -104,8 +111,8 @@ bool Server::disableTunnelForward()
 
 bool Server::execute()
 {
-    if (m_workProcess.isRuning()) {
-        m_workProcess.kill();
+    if (m_serverProcess.isRuning()) {
+        m_serverProcess.kill();
     }
     QStringList args;
     args << "shell";
@@ -120,15 +127,9 @@ bool Server::execute()
         args << m_crop;
     }
 
-//    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-//        if (AdbProcess::AER_SUCCESS == processResult) {
-
-//        }
-//        sender()->deleteLater();
-//    });
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
-    // 这条adb命令是阻塞运行的，workProcess不会退出了
-    m_workProcess.execute(m_serial, args);
+    // 这条adb命令是阻塞运行的，m_serverProcess进程不会退出了
+    m_serverProcess.execute(m_serial, args);
     return true;
 }
 
@@ -211,7 +212,7 @@ void Server::connectTo()
 void Server::stop()
 {
     // ignore failure
-    m_workProcess.terminate();
+    m_serverProcess.kill();
     if (m_tunnelEnabled) {
         if (m_tunnelForward) {
             disableTunnelForward();
@@ -281,42 +282,53 @@ bool Server::startServerByStep()
 
 void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
 {
-    if (SSS_NULL != m_serverStartStep) {
-        switch (m_serverStartStep) {
-        case SSS_PUSH:
-            if (AdbProcess::AER_SUCCESS != processResult) {
-                qCritical("adb push");
+    if (sender() == &m_workProcess) {
+        if (SSS_NULL != m_serverStartStep) {
+            switch (m_serverStartStep) {
+            case SSS_PUSH:
+                if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                    m_serverCopiedToDevice = true;
+                    m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
+                    startServerByStep();
+                } else if (AdbProcess::AER_SUCCESS_START != processResult){
+                    qCritical("adb push");
+                    m_serverStartStep = SSS_NULL;
+                    emit serverStartResult(false);
+                }
+                break;
+            case SSS_ENABLE_TUNNEL_REVERSE:
+                if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                    m_serverStartStep = SSS_EXECUTE_SERVER;
+                    startServerByStep();
+                } else if (AdbProcess::AER_SUCCESS_START != processResult){
+                    qCritical("adb reverse");
+                    m_tunnelForward = true;
+                    m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
+                    startServerByStep();
+                }
+                break;
+            case SSS_ENABLE_TUNNEL_FORWARD:
+                if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                    m_serverStartStep = SSS_EXECUTE_SERVER;
+                    startServerByStep();
+                } else if (AdbProcess::AER_SUCCESS_START != processResult){
+                    qCritical("adb forward");
+                    m_serverStartStep = SSS_NULL;
+                    emit serverStartResult(false);
+                }
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    if (sender() == &m_serverProcess) {
+        if (SSS_EXECUTE_SERVER == m_serverStartStep) {
+            if (AdbProcess::AER_SUCCESS_START == processResult) {
                 m_serverStartStep = SSS_NULL;
-                emit serverStartResult(false);
-            } else {
-                m_serverCopiedToDevice = true;
-                m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
-                startServerByStep();
-            }
-            break;
-        case SSS_ENABLE_TUNNEL_REVERSE:
-            if (AdbProcess::AER_SUCCESS != processResult) {
-                qCritical("adb reverse");
-                m_tunnelForward = true;
-                m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
-                startServerByStep();
-            } else {
-                m_serverStartStep = SSS_EXECUTE_SERVER;
-                startServerByStep();
-            }
-            break;
-        case SSS_ENABLE_TUNNEL_FORWARD:
-            if (AdbProcess::AER_SUCCESS != processResult) {
-                qCritical("adb forward");
-                m_serverStartStep = SSS_NULL;
-                emit serverStartResult(false);
-            } else {
-                m_serverStartStep = SSS_EXECUTE_SERVER;
-                startServerByStep();
-            }
-            break;
-        case SSS_EXECUTE_SERVER:
-            if (AdbProcess::AER_SUCCESS != processResult) {
+                m_tunnelEnabled = true;
+                emit serverStartResult(true);
+            } else if (AdbProcess::AER_ERROR_START == processResult){
                 if (!m_tunnelForward) {
                     m_serverSocket.close();
                     disableTunnelReverse();
@@ -326,14 +338,8 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 qCritical("adb shell start server failed");
                 m_serverStartStep = SSS_NULL;
                 emit serverStartResult(false);
-            } else {
-                m_serverStartStep = SSS_NULL;
-                m_tunnelEnabled = true;
-                emit serverStartResult(true);
             }
-            break;
-        default:
-            break;
         }
     }
+
 }
