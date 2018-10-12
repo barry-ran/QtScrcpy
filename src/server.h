@@ -18,12 +18,13 @@ class Server : public QObject
         SSS_ENABLE_TUNNEL_REVERSE,
         SSS_ENABLE_TUNNEL_FORWARD,
         SSS_EXECUTE_SERVER,
+        SSS_RUNNING,
     };
 public:
     explicit Server(QObject *parent = nullptr);
 
     bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop);
-    void connectTo();
+    bool connectTo();
     void stop();
 
 signals:
@@ -44,6 +45,7 @@ private:
     bool execute();
     bool startServerByStep();
 
+private:
     QString m_serverPath = "";
     AdbProcess m_workProcess;
     QString m_serial = "";

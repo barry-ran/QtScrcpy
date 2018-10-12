@@ -9,6 +9,11 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
     server = new Server();
+    connect(server, &Server::serverStartResult, this, [this](bool success){
+        if (success) {
+            server->connectTo();
+        }
+    });
 }
 
 Dialog::~Dialog()
@@ -28,6 +33,7 @@ void Dialog::on_adbProcess_clicked()
 void Dialog::on_startServerBtn_clicked()
 {
     server->start("P7C0218510000537", 27183, 0, 8000000, "");
+    //server->start("P7CDU17C23010875", 27183, 0, 8000000, "");
 }
 
 void Dialog::on_stopServerBtn_clicked()
