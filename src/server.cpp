@@ -149,20 +149,31 @@ bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, qu
     return startServerByStep();
 }
 
-void Server::connectTo()
+bool Server::connectTo()
 {
+    if (SSS_RUNNING != m_serverStartStep) {
+        qWarning("server not run");
+        return false;
+    }
     if (m_tunnelForward) {
         m_deviceSocket = new QTcpSocket(this);
         connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
         //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
         connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
-            qDebug() << "ready read";
-            m_deviceSocket->readAll();
+            static quint64 count = 0;
+            qDebug() << count <<  "ready read";
+            count++;
         });
-        m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+
+        // wait for devices server start
+        QTimer::singleShot(1000, this, [this](){
+            if (m_deviceSocket) {
+                m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+            }
+        });
     }
 
-    QTimer::singleShot(300, this, [this](){
+    QTimer::singleShot(1200, this, [this](){
         if (!m_deviceSocket) {
             emit connectToResult(false);
             return;
@@ -204,9 +215,11 @@ void Server::connectTo()
             } else {
                 disableTunnelReverse();
             }
+            m_tunnelEnabled = false;
         }
         emit connectToResult(success);
     });
+    return true;
 }
 
 void Server::stop()
@@ -219,9 +232,12 @@ void Server::stop()
         } else {
             disableTunnelReverse();
         }
+        m_tunnelForward = false;
+        m_tunnelEnabled = false;
     }
     if (m_serverCopiedToDevice) {
         removeServer();
+        m_serverCopiedToDevice = false;
     }
     m_serverSocket.close();
     if (m_deviceSocket) {
@@ -325,7 +341,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
     if (sender() == &m_serverProcess) {
         if (SSS_EXECUTE_SERVER == m_serverStartStep) {
             if (AdbProcess::AER_SUCCESS_START == processResult) {
-                m_serverStartStep = SSS_NULL;
+                m_serverStartStep = SSS_RUNNING;
                 m_tunnelEnabled = true;
                 emit serverStartResult(true);
             } else if (AdbProcess::AER_ERROR_START == processResult){
