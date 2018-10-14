@@ -20,7 +20,7 @@ Dialog::Dialog(QWidget *parent) :
     connect(server, &Server::connectToResult, this, [this](bool success){
         if (success) {
             decoder.setDeviceSocket(server->getDeviceSocketByThread(&decoder));
-            decoder.start();
+            decoder.startDecode();
         }
     });
 }
@@ -48,5 +48,6 @@ void Dialog::on_startServerBtn_clicked()
 
 void Dialog::on_stopServerBtn_clicked()
 {
+    decoder.stopDecode();
     server->stop();
 }

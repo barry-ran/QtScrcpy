@@ -253,7 +253,6 @@ void Server::stop()
         m_serverCopiedToDevice = false;
     }
     m_serverSocket.close();
-    qDebug() << "current thread"<< QThread::currentThread();
     if (m_deviceSocket) {
         m_deviceSocket->close();
         m_deviceSocket->deleteLater();

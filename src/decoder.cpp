@@ -44,14 +44,35 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
         return 0;
     }
     if (m_deviceSocket) {
-        while (m_deviceSocket->bytesAvailable() < bufSize) {
-            m_deviceSocket->waitForReadyRead();
+        while (!m_quit && m_deviceSocket->bytesAvailable() < bufSize) {
+            if (!m_deviceSocket->waitForReadyRead(300)
+                    && QTcpSocket::SocketTimeoutError != m_deviceSocket->error()) {
+                break;
+            }
+            if (QTcpSocket::SocketTimeoutError == m_deviceSocket->error()) {
+                qDebug() << "QTcpSocket::SocketTimeoutError";
+            }
         }
-        qint64 a = m_deviceSocket->read((char*)buf, bufSize);
-        qDebug() << "++++++++++recv data " << a;
-        return a;
+        qDebug() << "recv data " << bufSize;
+        return m_deviceSocket->read((char*)buf, bufSize);
     }
     return 0;
+}
+
+bool Decoder::startDecode()
+{
+    if (!m_deviceSocket) {
+        return false;
+    }
+    m_quit = false;
+    start();
+    return true;
+}
+
+void Decoder::stopDecode()
+{
+    m_quit = true;
+    wait();
 }
 
 void Decoder::run()
@@ -123,7 +144,7 @@ void Decoder::run()
     packet.data = Q_NULLPTR;
     packet.size = 0;
 
-    while (!av_read_frame(formatCtx, &packet)) {
+    while (!m_quit && !av_read_frame(formatCtx, &packet)) {
         // the new decoding/encoding API has been introduced by:
         // <http://git.videolan.org/?p=ffmpeg.git;a=commitdiff;h=7fc329e2dd6226dfecaa4a1d7adf353bf2773726>
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 37, 0)
@@ -179,6 +200,11 @@ runQuit:
         }
         if (codecCtx) {
             avcodec_free_context(&codecCtx);
+        }
+
+        if (m_deviceSocket) {
+            m_deviceSocket->disconnectFromHost();
+            delete m_deviceSocket;
         }
         //notify_stopped();
 }
