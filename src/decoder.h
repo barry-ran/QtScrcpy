@@ -23,12 +23,15 @@ public:
 
     void setDeviceSocket(QTcpSocket* deviceSocket);
     qint32 recvData(quint8* buf, qint32 bufSize);
+    bool startDecode();
+    void stopDecode();
 
 protected:
     void run();
 
 private:
     QPointer<QTcpSocket> m_deviceSocket = Q_NULLPTR;
+    bool m_quit = false;
 };
 
 #endif // DECODER_H
