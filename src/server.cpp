@@ -16,13 +16,14 @@ Server::Server(QObject *parent) : QObject(parent)
         m_deviceSocket = m_serverSocket.nextPendingConnection();
         connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
         //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
-        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
-            static quint64 count = 0;
-            qDebug() << count <<  "ready read";
-            count++;
-            QByteArray ar = m_deviceSocket->readAll();
-            //m_deviceSocket->write(ar);
-        });
+
+//        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
+//            static quint64 count = 0;
+//            qDebug() << count <<  "ready read";
+//            count++;
+//            QByteArray ar = m_deviceSocket->readAll();
+//            //m_deviceSocket->write(ar);
+//        });
     });
 
 }
@@ -159,11 +160,11 @@ bool Server::connectTo()
         m_deviceSocket = new QTcpSocket(this);
         connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
         //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
-        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
-            static quint64 count = 0;
-            qDebug() << count <<  "ready read";
-            count++;
-        });
+//        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
+//            static quint64 count = 0;
+//            qDebug() << count <<  "ready read";
+//            count++;
+//        });
 
         // wait for devices server start
         QTimer::singleShot(1000, this, [this](){
@@ -220,6 +221,21 @@ bool Server::connectTo()
         emit connectToResult(success);
     });
     return true;
+}
+
+qint32 Server::recvData(quint8* buf, qint32 bufSize)
+{
+    if (!buf) {
+        return 0;
+    }
+    if (m_deviceSocket) {
+        while (m_deviceSocket->bytesAvailable() < bufSize) {
+            if (m_deviceSocket->waitForReadyRead()) {
+                return m_deviceSocket->read((char*)buf, bufSize);
+            }
+        }
+    }
+    return 0;
 }
 
 void Server::stop()
