@@ -8,16 +8,26 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    Decoder::init();
+
     server = new Server();
     connect(server, &Server::serverStartResult, this, [this](bool success){
         if (success) {
             server->connectTo();
         }
     });
+
+    connect(server, &Server::connectToResult, this, [this](bool success){
+        if (success) {
+            decoder.setDeviceSocket(server->getDeviceSocketByThread(&decoder));
+            decoder.start();
+        }
+    });
 }
 
 Dialog::~Dialog()
 {
+    Decoder::deInit();
     delete ui;
 }
 

@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QTimer>
+#include <QThread>
 
 #include "server.h"
 
@@ -14,9 +15,7 @@ Server::Server(QObject *parent) : QObject(parent)
 
     connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
         m_deviceSocket = m_serverSocket.nextPendingConnection();
-        connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
-        //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
-
+        m_deviceSocket->setParent(Q_NULLPTR);
 //        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
 //            static quint64 count = 0;
 //            qDebug() << count <<  "ready read";
@@ -157,9 +156,7 @@ bool Server::connectTo()
         return false;
     }
     if (m_tunnelForward) {
-        m_deviceSocket = new QTcpSocket(this);
-        connect(m_deviceSocket, &QTcpSocket::disconnected, m_deviceSocket, &QTcpSocket::deleteLater);
-        //connect(m_deviceSocket, &QTcpSocket::error, m_deviceSocket, &QTcpSocket::deleteLater);
+        m_deviceSocket = new QTcpSocket();
 //        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
 //            static quint64 count = 0;
 //            qDebug() << count <<  "ready read";
@@ -185,8 +182,8 @@ bool Server::connectTo()
             if (m_deviceSocket->isValid()) {
                 // connect will success even if devices offline, recv data is real connect success
                 // because connect is to pc adb server
-                QByteArray ar = m_deviceSocket->read(1);
-                if (!ar.isEmpty()) {
+                QByteArray data = m_deviceSocket->read(1);
+                if (!data.isEmpty()) {
                     success = true;
                 } else {
                     success = false;
@@ -223,19 +220,19 @@ bool Server::connectTo()
     return true;
 }
 
-qint32 Server::recvData(quint8* buf, qint32 bufSize)
+QTcpSocket* Server::getDeviceSocketByThread(QThread* thread)
 {
-    if (!buf) {
-        return 0;
+    if (!m_deviceSocket || QThread::currentThread() != m_deviceSocket->thread()) {
+        return Q_NULLPTR;
     }
-    if (m_deviceSocket) {
-        while (m_deviceSocket->bytesAvailable() < bufSize) {
-            if (m_deviceSocket->waitForReadyRead()) {
-                return m_deviceSocket->read((char*)buf, bufSize);
-            }
-        }
+
+    if (thread) {
+        m_deviceSocket->moveToThread(thread);
     }
-    return 0;
+    QTcpSocket* devicesSocket = m_deviceSocket;
+    m_deviceSocket = Q_NULLPTR;
+
+    return devicesSocket;
 }
 
 void Server::stop()
@@ -256,8 +253,10 @@ void Server::stop()
         m_serverCopiedToDevice = false;
     }
     m_serverSocket.close();
+    qDebug() << "current thread"<< QThread::currentThread();
     if (m_deviceSocket) {
-        m_deviceSocket->disconnectFromHost();
+        m_deviceSocket->close();
+        m_deviceSocket->deleteLater();
     }
 }
 
