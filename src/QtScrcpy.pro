@@ -27,13 +27,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         dialog.cpp \
-    adbprocess.cpp \
-    server.cpp
+        adbprocess.cpp \
+        decoder.cpp \
+        server.cpp
 
 HEADERS += \
         dialog.h \
-    adbprocess.h \
-    server.h
+        adbprocess.h \
+        decoder.h \
+        server.h
 
 FORMS += \
         dialog.ui
+
+INCLUDEPATH += \
+        $$PWD/ffmpeg/include
+
+LIBS += \
+        -L$$PWD/ffmpeg/lib -lavcodec \
+        -L$$PWD/ffmpeg/lib -lavformat \
+        -L$$PWD/ffmpeg/lib -lavutil
+

@@ -4,6 +4,7 @@
 #include <QDialog>
 
 #include "server.h"
+#include "decoder.h"
 
 namespace Ui {
 class Dialog;
@@ -27,6 +28,7 @@ private slots:
 private:
     Ui::Dialog *ui;
     Server* server;
+    Decoder decoder;
 };
 
 #endif // DIALOG_H
