@@ -23,8 +23,9 @@ class Server : public QObject
 public:
     explicit Server(QObject *parent = nullptr);
 
-    bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop);
+    bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop);    
     bool connectTo();
+    qint32 recvData(quint8* buf, qint32 bufSize);
     void stop();
 
 signals:
