@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include <QPointer>
 
+#include "convert.h"
 extern "C"
 {
 #include "libavcodec/avcodec.h"
@@ -33,6 +34,7 @@ protected:
 private:
     QPointer<QTcpSocket> m_deviceSocket = Q_NULLPTR;
     bool m_quit = false;
+    Convert m_conver;
 };
 
 #endif // DECODER_H

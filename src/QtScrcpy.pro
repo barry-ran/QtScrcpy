@@ -48,5 +48,6 @@ INCLUDEPATH += \
 LIBS += \
         -L$$PWD/ffmpeg/lib -lavcodec \
         -L$$PWD/ffmpeg/lib -lavformat \
-        -L$$PWD/ffmpeg/lib -lavutil
+        -L$$PWD/ffmpeg/lib -lavutil \
+        -L$$PWD/ffmpeg/lib -lswscale
 

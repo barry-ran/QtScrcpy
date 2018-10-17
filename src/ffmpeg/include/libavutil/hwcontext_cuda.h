@@ -41,7 +41,6 @@ typedef struct AVCUDADeviceContextInternal AVCUDADeviceContextInternal;
  */
 typedef struct AVCUDADeviceContext {
     CUcontext cuda_ctx;
-    CUstream stream;
     AVCUDADeviceContextInternal *internal;
 } AVCUDADeviceContext;
 

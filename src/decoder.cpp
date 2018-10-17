@@ -55,7 +55,7 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
                 break;
             }
             if (QTcpSocket::SocketTimeoutError == m_deviceSocket->error()) {
-                qDebug() << "QTcpSocket::SocketTimeoutError";
+                //qDebug() << "QTcpSocket::SocketTimeoutError";
             }
         }
         qDebug() << "recv data " << bufSize;
@@ -89,8 +89,10 @@ void Decoder::run()
     AVCodecContext *codecCtx = Q_NULLPTR;
 
     // frame is stand alone
-    AVFrame* decoderFrame = Q_NULLPTR;
-    decoderFrame = av_frame_alloc();
+    AVFrame* yuvDecoderFrame = Q_NULLPTR;
+    AVFrame* rgbDecoderFrame = Q_NULLPTR;
+    yuvDecoderFrame = av_frame_alloc();
+    rgbDecoderFrame = av_frame_alloc();
 
     bool isFormatCtxOpen = false;
     bool isCodecCtxOpen = false;
@@ -158,9 +160,15 @@ void Decoder::run()
             qCritical("Could not send video packet: %d", ret);
             goto runQuit;
         }
-        ret = avcodec_receive_frame(codecCtx, decoderFrame);
+        ret = avcodec_receive_frame(codecCtx, yuvDecoderFrame);
         if (!ret) {
             // a frame was received
+            if (!m_conver.isInit()) {
+                m_conver.setSrcFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_YUV420P);
+                m_conver.setDstFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_RGB24);
+                m_conver.init();
+            }
+            m_conver.convert(yuvDecoderFrame, rgbDecoderFrame);
             //push_frame(decoder);
         } else if (ret != AVERROR(EAGAIN)) {
             qCritical("Could not receive video frame: %d", ret);
@@ -170,7 +178,7 @@ void Decoder::run()
 #else
         while (packet.size > 0) {
             int gotPicture = 0;
-            int len = avcodec_decode_video2(codecCtx, decoderFrame, &gotpicture, &packet);
+            int len = avcodec_decode_video2(codecCtx, yuvDecoderFrame, &gotpicture, &packet);
             if (len < 0) {
                 qCritical("Could not decode video packet: %d", len);
                 goto runQuit;
@@ -207,6 +215,14 @@ runQuit:
             avcodec_free_context(&codecCtx);
         }
 
+        if (yuvDecoderFrame) {
+         av_free(yuvDecoderFrame);
+        }
+        if (rgbDecoderFrame) {
+         av_free(rgbDecoderFrame);
+        }
+
+        m_conver.deInit();
         if (m_deviceSocket) {
             m_deviceSocket->disconnectFromHost();
             delete m_deviceSocket;
