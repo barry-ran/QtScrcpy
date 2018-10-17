@@ -27,6 +27,11 @@ Server::Server(QObject *parent) : QObject(parent)
 
 }
 
+Server:: ~Server()
+{
+
+}
+
 const QString& Server::getServerPath()
 {
     if (m_serverPath.isEmpty()) {

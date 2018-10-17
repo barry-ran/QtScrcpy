@@ -16,6 +16,7 @@ class Decoder : public QThread
     Q_OBJECT
 public:
     Decoder();
+    virtual ~Decoder();
 
 public:
     static bool init();
