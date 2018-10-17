@@ -23,6 +23,14 @@ Dialog::Dialog(QWidget *parent) :
             decoder.startDecode();
         }
     });
+
+    // must be Qt::QueuedConnection, ui update must be main thread
+    connect(&decoder, &Decoder::getOneImage, this, [this](QImage img){
+        // 将图像按比例缩放成和窗口一样大小
+        QImage img2 = img.scaled(ui->imgLabel->size(), Qt::IgnoreAspectRatio);
+        ui->imgLabel->setPixmap(QPixmap::fromImage(img2));
+        qDebug() << "getOneImage";
+    }, Qt::QueuedConnection);
 }
 
 Dialog::~Dialog()

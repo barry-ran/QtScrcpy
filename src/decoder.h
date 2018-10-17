@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QPointer>
+#include <QImage>
 
 #include "convert.h"
 extern "C"
@@ -28,6 +29,8 @@ public:
     bool startDecode();
     void stopDecode();
 
+signals:
+    void getOneImage(QImage img);
 protected:
     void run();
 

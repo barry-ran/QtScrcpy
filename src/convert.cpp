@@ -72,8 +72,7 @@ bool Convert::convert(AVFrame* srcFrame, AVFrame* dstFrame)
     if(!m_convertCtx || !srcFrame || !dstFrame) {
         return false;
     }
-    qint32 ret = sws_scale(m_convertCtx, (const uint8_t* const*)srcFrame->data, srcFrame->linesize, 0, m_srcHeight, dstFrame->data, dstFrame->linesize);
-    qDebug() << "Convert::convert sws_scale return " << ret;
+    qint32 ret = sws_scale(m_convertCtx, (const uint8_t* const*)srcFrame->data, srcFrame->linesize, 0, m_srcHeight, dstFrame->data, dstFrame->linesize);    
     if (0 == ret) {
         return false;
     }

@@ -93,6 +93,7 @@ void Decoder::run()
     AVFrame* rgbDecoderFrame = Q_NULLPTR;
     yuvDecoderFrame = av_frame_alloc();
     rgbDecoderFrame = av_frame_alloc();
+    quint8 *outBuffer = Q_NULLPTR;
 
     bool isFormatCtxOpen = false;
     bool isCodecCtxOpen = false;
@@ -164,12 +165,19 @@ void Decoder::run()
         if (!ret) {
             // a frame was received
             if (!m_conver.isInit()) {
+                qDebug() << "decoder frame format" << yuvDecoderFrame->format;
                 m_conver.setSrcFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_YUV420P);
-                m_conver.setDstFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_RGB24);
+                m_conver.setDstFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_RGB32);
                 m_conver.init();
             }
+            if (!outBuffer) {
+                outBuffer=new quint8[avpicture_get_size(AV_PIX_FMT_RGB32, codecCtx->width, codecCtx->height)];
+                avpicture_fill((AVPicture *)rgbDecoderFrame, outBuffer, AV_PIX_FMT_RGB32, codecCtx->width, codecCtx->height);
+            }
             m_conver.convert(yuvDecoderFrame, rgbDecoderFrame);
-            //push_frame(decoder);
+            QImage tmpImg((uchar *)outBuffer, codecCtx->width, codecCtx->height, QImage::Format_RGB32);
+            QImage image = tmpImg.copy(); //把图像复制一份 传递给界面显示
+            emit getOneImage(image);
         } else if (ret != AVERROR(EAGAIN)) {
             qCritical("Could not receive video frame: %d", ret);
             av_packet_unref(&packet);
@@ -215,6 +223,9 @@ runQuit:
             avcodec_free_context(&codecCtx);
         }
 
+        if (outBuffer) {
+            delete[] outBuffer;
+        }
         if (yuvDecoderFrame) {
          av_free(yuvDecoderFrame);
         }
