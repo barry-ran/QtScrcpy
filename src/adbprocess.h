@@ -17,7 +17,7 @@ public:
     };
 
     explicit AdbProcess(QObject *parent = nullptr);
-    ~AdbProcess();
+    virtual ~AdbProcess();
 
     void execute(const QString& serial, const QStringList& args);
     void forward(const QString& serial, quint16 localPort, const QString& deviceSocketName);

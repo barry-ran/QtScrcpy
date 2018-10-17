@@ -9,6 +9,11 @@ Decoder::Decoder()
 
 }
 
+Decoder::~Decoder()
+{
+
+}
+
 bool Decoder::init()
 {
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)

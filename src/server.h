@@ -22,6 +22,7 @@ class Server : public QObject
     };
 public:
     explicit Server(QObject *parent = nullptr);
+    virtual ~Server();
 
     bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop);    
     bool connectTo();

@@ -29,13 +29,15 @@ SOURCES += \
         dialog.cpp \
         adbprocess.cpp \
         decoder.cpp \
-        server.cpp
+        server.cpp \
+    convert.cpp
 
 HEADERS += \
         dialog.h \
         adbprocess.h \
         decoder.h \
-        server.h
+        server.h \
+    convert.h
 
 FORMS += \
         dialog.ui
