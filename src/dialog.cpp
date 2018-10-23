@@ -1,6 +1,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "adbprocess.h"
+#include "glyuvwidget.h"
 
 
 Dialog::Dialog(QWidget *parent) :
@@ -8,6 +9,10 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+
+    GLYuvWidget* w = new GLYuvWidget(this);
+    w->resize(ui->imgLabel->size());
+    w->move(230, 20);
     Decoder::init();
 
     server = new Server();
@@ -25,12 +30,23 @@ Dialog::Dialog(QWidget *parent) :
     });
 
     // must be Qt::QueuedConnection, ui update must be main thread
+    QObject::connect(&decoder, &Decoder::getOneFrame,w,&GLYuvWidget::slotShowYuv,
+                     Qt::QueuedConnection);
+
+    /*
+    // must be Qt::QueuedConnection, ui update must be main thread
     connect(&decoder, &Decoder::getOneImage, this, [this](QImage img){
+        qDebug() << "getOneImage";
+
+        return;
+        //18% cpu
         // 将图像按比例缩放成和窗口一样大小
         QImage img2 = img.scaled(ui->imgLabel->size(), Qt::IgnoreAspectRatio);
         ui->imgLabel->setPixmap(QPixmap::fromImage(img2));
-        qDebug() << "getOneImage";
+        //24% cpu
+
     }, Qt::QueuedConnection);
+    */
 }
 
 Dialog::~Dialog()

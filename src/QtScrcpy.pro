@@ -30,14 +30,16 @@ SOURCES += \
         adbprocess.cpp \
         decoder.cpp \
         server.cpp \
-    convert.cpp
+    convert.cpp \
+    glyuvwidget.cpp
 
 HEADERS += \
         dialog.h \
         adbprocess.h \
         decoder.h \
         server.h \
-    convert.h
+    convert.h \
+    glyuvwidget.h
 
 FORMS += \
         dialog.ui
