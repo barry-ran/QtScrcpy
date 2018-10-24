@@ -80,31 +80,6 @@ void Decoder::stopDecode()
     wait();
 }
 
-void saveAVFrame_YUV_ToTempFile(AVFrame *pFrame, QByteArray& buffer)
-{
-    int t_frameWidth = pFrame->width;
-    int t_frameHeight = pFrame->height;
-    int t_yPerRowBytes = pFrame->linesize[0];
-    int t_uPerRowBytes = pFrame->linesize[1];
-    int t_vPerRowBytes = pFrame->linesize[2];
-
-    for(int i = 0;i< t_frameHeight ;i++)
-    {
-        buffer.append((char*)(pFrame->data[0]+i*t_yPerRowBytes), t_frameWidth);
-    }
-
-    for(int i = 0;i< t_frameHeight/2 ;i++)
-    {
-        buffer.append((char*)(pFrame->data[1]+i*t_uPerRowBytes), t_frameWidth/2);
-    }
-
-    for(int i = 0;i< t_frameHeight/2 ;i++)
-    {
-        buffer.append((char*)(pFrame->data[2]+i*t_vPerRowBytes), t_frameWidth/2);
-    }
-
-}
-
 void Decoder::run()
 {
     unsigned char *decoderBuffer = Q_NULLPTR;
@@ -118,7 +93,6 @@ void Decoder::run()
     AVFrame* rgbDecoderFrame = Q_NULLPTR;
     yuvDecoderFrame = av_frame_alloc();
     rgbDecoderFrame = av_frame_alloc();
-    quint8 *outBuffer = Q_NULLPTR;
 
     bool isFormatCtxOpen = false;
     bool isCodecCtxOpen = false;
@@ -189,10 +163,13 @@ void Decoder::run()
         ret = avcodec_receive_frame(codecCtx, yuvDecoderFrame);
         if (!ret) {            
             // a frame was received
-            QByteArray buffer;
-            saveAVFrame_YUV_ToTempFile(yuvDecoderFrame, buffer);
-            emit getOneFrame(buffer, codecCtx->width, codecCtx->height);
+            emit getOneFrame(yuvDecoderFrame->data[0], yuvDecoderFrame->data[1], yuvDecoderFrame->data[2],
+                    yuvDecoderFrame->linesize[0], yuvDecoderFrame->linesize[1], yuvDecoderFrame->linesize[2]);
+            qDebug() << "emit getOneFrame";
+
             /*
+            // m_conver转换yuv为rgb是使用cpu转的，占用cpu太高，改用opengl渲染yuv
+            // QImage的copy也非常占用内存，此方案不考虑
             if (!m_conver.isInit()) {
                 qDebug() << "decoder frame format" << yuvDecoderFrame->format;
                 m_conver.setSrcFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_YUV420P);
@@ -202,15 +179,10 @@ void Decoder::run()
             if (!outBuffer) {
                 outBuffer=new quint8[avpicture_get_size(AV_PIX_FMT_RGB32, codecCtx->width, codecCtx->height)];
                 avpicture_fill((AVPicture *)rgbDecoderFrame, outBuffer, AV_PIX_FMT_RGB32, codecCtx->width, codecCtx->height);
-            }
-            // tc games 3% ???
-            // scrcpy 7% cpu
-            // 5% cpu
-            //m_conver.convert(yuvDecoderFrame, rgbDecoderFrame);
-            // 8% cpu
+            }            
+            m_conver.convert(yuvDecoderFrame, rgbDecoderFrame);
             //QImage tmpImg((uchar *)outBuffer, codecCtx->width, codecCtx->height, QImage::Format_RGB32);
-            //QImage image = tmpImg.copy(); //把图像复制一份 传递给界面显示
-            // 16% cpu
+            //QImage image = tmpImg.copy();
             //emit getOneImage(image);
             */
         } else if (ret != AVERROR(EAGAIN)) {
@@ -258,9 +230,6 @@ runQuit:
             avcodec_free_context(&codecCtx);
         }
 
-        if (outBuffer) {
-            delete[] outBuffer;
-        }
         if (yuvDecoderFrame) {
          av_free(yuvDecoderFrame);
         }

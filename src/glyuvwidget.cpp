@@ -21,25 +21,15 @@ GLYuvWidget::~GLYuvWidget()
     doneCurrent();
 }
 
-void GLYuvWidget::slotShowYuv(QByteArray buffer, uint width, uint height)
+void GLYuvWidget::slotShowYuv(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV)
 {
-    m_videoWidth = width;
-    m_videoHeight = height;
-
-    QFile *file = new QFile;
-    file->setFileName("android.yuv");
-    bool ok = file->open(QIODevice::WriteOnly | QIODevice::Append);
-    if(ok) {
-        QDataStream out(file);
-        //out.setVersion(QDataStream::Qt_5_7);
-        out << buffer;
-        file->close();
-        delete(file);
-    }
-
-    m_buffer.setRawData(buffer, buffer.size());
-    m_yuvPtr = m_buffer.data();
-
+    qDebug() << "slotShowYuv";
+    m_bufferY = bufferY;
+    m_bufferU = bufferU;
+    m_bufferV = bufferV;
+    m_linesizeY = linesizeY;
+    m_linesizeU = linesizeU;
+    m_linesizeV = linesizeV;
     update();
 }
 
@@ -146,8 +136,9 @@ void GLYuvWidget::inittexture()
 
     glActiveTexture(GL_TEXTURE0);  //激活纹理单元GL_TEXTURE0,系统里面的
     glBindTexture(GL_TEXTURE_2D, m_idY); //绑定y分量纹理对象id到激活的纹理单元
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_linesizeY);
     //使用内存中的数据创建真正的y分量纹理数据
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth, m_videoHeight, 0, GL_RED, GL_UNSIGNED_BYTE, m_yuvPtr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth, m_videoHeight, 0, GL_RED, GL_UNSIGNED_BYTE, m_bufferY);
     //https://blog.csdn.net/xipiaoyouzi/article/details/53584798 纹理参数解析
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -156,8 +147,9 @@ void GLYuvWidget::inittexture()
 
     glActiveTexture(GL_TEXTURE1); //激活纹理单元GL_TEXTURE1
     glBindTexture(GL_TEXTURE1, m_idU);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_linesizeU);
     //使用内存中的数据创建真正的u分量纹理数据
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RED, m_videoWidth >> 1, m_videoHeight >> 1, 0, GL_RED, GL_UNSIGNED_BYTE, m_yuvPtr + m_videoWidth * m_videoHeight);
+    glTexImage2D(GL_TEXTURE_2D,0,GL_RED, m_videoWidth >> 1, m_videoHeight >> 1, 0, GL_RED, GL_UNSIGNED_BYTE, m_bufferU);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -165,8 +157,9 @@ void GLYuvWidget::inittexture()
 
     glActiveTexture(GL_TEXTURE2); //激活纹理单元GL_TEXTURE2
     glBindTexture(GL_TEXTURE_2D, m_idV);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, m_linesizeV);
     //使用内存中的数据创建真正的v分量纹理数据
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth >> 1, m_videoHeight >> 1, 0, GL_RED, GL_UNSIGNED_BYTE, m_yuvPtr + m_videoWidth * m_videoHeight * 5 / 4);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_videoWidth >> 1, m_videoHeight >> 1, 0, GL_RED, GL_UNSIGNED_BYTE, m_bufferV);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -175,6 +168,7 @@ void GLYuvWidget::inittexture()
 
 void GLYuvWidget::paintGL()
 {
+    qDebug() << "paintGL()";
     inittexture();
     //指定y纹理要使用新值
     glUniform1i(m_textureUniformY, 0);

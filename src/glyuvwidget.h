@@ -18,7 +18,7 @@ public:
 
 public slots:
     //显示一帧Yuv图像
-    void slotShowYuv(QByteArray buffer, uint width, uint height);
+    void slotShowYuv(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
@@ -45,11 +45,15 @@ private:
     GLuint m_idV = 0;
 
     // 视频宽高
-    quint32 m_videoWidth;
-    quint32 m_videoHeight;
+    quint32 m_videoWidth = 1080;
+    quint32 m_videoHeight = 2160;    
 
-    char *m_yuvPtr = Q_NULLPTR;
-    QByteArray m_buffer;
+    quint8* m_bufferY = Q_NULLPTR;
+    quint8* m_bufferU = Q_NULLPTR;
+    quint8* m_bufferV = Q_NULLPTR;
+    quint32 m_linesizeY = 0;
+    quint32 m_linesizeU = 0;
+    quint32 m_linesizeV = 0;
 };
 
 #endif // GLYUVWIDGET_H
