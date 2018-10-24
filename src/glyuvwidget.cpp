@@ -2,7 +2,8 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QDebug>
-#include <QFile>
+#include <QTime>
+
 #define VERTEXIN 0
 #define TEXTUREIN 1
 
@@ -30,7 +31,9 @@ void GLYuvWidget::slotShowYuv(quint8* bufferY, quint8* bufferU, quint8* bufferV,
     m_linesizeY = linesizeY;
     m_linesizeU = linesizeU;
     m_linesizeV = linesizeV;
-    update();
+    //update(); // 不实时
+    //repaint(); // 同上
+    paintEvent(nullptr);// 最实时的方案
 }
 
 void GLYuvWidget::initializeGL()
@@ -167,7 +170,7 @@ void GLYuvWidget::inittexture()
 }
 
 void GLYuvWidget::paintGL()
-{
+{    
     qDebug() << "paintGL()";
     inittexture();
     //指定y纹理要使用新值
