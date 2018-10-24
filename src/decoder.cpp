@@ -1,6 +1,7 @@
 #include <QDebug>
 
 #include "decoder.h"
+#include "frames.h"
 
 #define BUFSIZE 0x10000
 
@@ -28,6 +29,11 @@ bool Decoder::init()
 void Decoder::deInit()
 {
     avformat_network_deinit(); // ignore failure
+}
+
+void Decoder::setFrames(Frames *frames)
+{
+    m_frames = frames;
 }
 
 static qint32 readPacket(void *opaque, quint8 *buf, qint32 bufSize) {
@@ -77,6 +83,9 @@ bool Decoder::startDecode()
 void Decoder::stopDecode()
 {
     m_quit = true;
+    if (m_frames) {
+        m_frames->stop();
+    }
     wait();
 }
 
@@ -87,13 +96,6 @@ void Decoder::run()
     AVFormatContext *formatCtx = Q_NULLPTR;
     AVCodec *codec = Q_NULLPTR;
     AVCodecContext *codecCtx = Q_NULLPTR;
-
-    // frame is stand alone
-    AVFrame* yuvDecoderFrame = Q_NULLPTR;
-    AVFrame* rgbDecoderFrame = Q_NULLPTR;
-    yuvDecoderFrame = av_frame_alloc();
-    rgbDecoderFrame = av_frame_alloc();
-
     bool isFormatCtxOpen = false;
     bool isCodecCtxOpen = false;
 
@@ -152,6 +154,7 @@ void Decoder::run()
     packet.size = 0;
 
     while (!m_quit && !av_read_frame(formatCtx, &packet)) {
+        AVFrame* decodingFrame = m_frames->decodingFrame();
         // the new decoding/encoding API has been introduced by:
         // <http://git.videolan.org/?p=ffmpeg.git;a=commitdiff;h=7fc329e2dd6226dfecaa4a1d7adf353bf2773726>
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 37, 0)
@@ -160,18 +163,21 @@ void Decoder::run()
             qCritical("Could not send video packet: %d", ret);
             goto runQuit;
         }
-        ret = avcodec_receive_frame(codecCtx, yuvDecoderFrame);
+        if (decodingFrame) {
+            ret = avcodec_receive_frame(codecCtx, decodingFrame);
+        }
         if (!ret) {            
             // a frame was received
-            emit getOneFrame(yuvDecoderFrame->data[0], yuvDecoderFrame->data[1], yuvDecoderFrame->data[2],
-                    yuvDecoderFrame->linesize[0], yuvDecoderFrame->linesize[1], yuvDecoderFrame->linesize[2]);
-            qDebug() << "emit getOneFrame";
+            pushFrame();
+
+            //emit getOneFrame(yuvDecoderFrame->data[0], yuvDecoderFrame->data[1], yuvDecoderFrame->data[2],
+            //        yuvDecoderFrame->linesize[0], yuvDecoderFrame->linesize[1], yuvDecoderFrame->linesize[2]);
 
             /*
             // m_conver转换yuv为rgb是使用cpu转的，占用cpu太高，改用opengl渲染yuv
             // QImage的copy也非常占用内存，此方案不考虑
             if (!m_conver.isInit()) {
-                qDebug() << "decoder frame format" << yuvDecoderFrame->format;
+                qDebug() << "decoder frame format" << decodingFrame->format;
                 m_conver.setSrcFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_YUV420P);
                 m_conver.setDstFrameInfo(codecCtx->width, codecCtx->height, AV_PIX_FMT_RGB32);
                 m_conver.init();
@@ -180,7 +186,7 @@ void Decoder::run()
                 outBuffer=new quint8[avpicture_get_size(AV_PIX_FMT_RGB32, codecCtx->width, codecCtx->height)];
                 avpicture_fill((AVPicture *)rgbDecoderFrame, outBuffer, AV_PIX_FMT_RGB32, codecCtx->width, codecCtx->height);
             }            
-            m_conver.convert(yuvDecoderFrame, rgbDecoderFrame);
+            m_conver.convert(decodingFrame, rgbDecoderFrame);
             //QImage tmpImg((uchar *)outBuffer, codecCtx->width, codecCtx->height, QImage::Format_RGB32);
             //QImage image = tmpImg.copy();
             //emit getOneImage(image);
@@ -193,13 +199,16 @@ void Decoder::run()
 #else
         while (packet.size > 0) {
             int gotPicture = 0;
-            int len = avcodec_decode_video2(codecCtx, yuvDecoderFrame, &gotpicture, &packet);
+            int len = -1;
+            if (decodingFrame) {
+                len = avcodec_decode_video2(codecCtx, decodingFrame, &gotpicture, &packet);
+            }
             if (len < 0) {
                 qCritical("Could not decode video packet: %d", len);
                 goto runQuit;
             }
             if (gotPicture) {
-                //push_frame(decoder);
+                pushFrame();
             }
             packet.size -= len;
             packet.data += len;
@@ -230,17 +239,18 @@ runQuit:
             avcodec_free_context(&codecCtx);
         }
 
-        if (yuvDecoderFrame) {
-         av_free(yuvDecoderFrame);
-        }
-        if (rgbDecoderFrame) {
-         av_free(rgbDecoderFrame);
-        }
-
-        m_conver.deInit();
         if (m_deviceSocket) {
             m_deviceSocket->disconnectFromHost();
             delete m_deviceSocket;
         }
-        //notify_stopped();
+}
+
+void Decoder::pushFrame()
+{
+    bool previousFrameConsumed = m_frames->offerDecodedFrame();
+    if (!previousFrameConsumed) {
+        // the previous newFrame will consume this frame
+        return;
+    }
+    emit newFrame();
 }

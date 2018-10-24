@@ -22,7 +22,13 @@ GLYuvWidget::~GLYuvWidget()
     doneCurrent();
 }
 
-void GLYuvWidget::slotShowYuv(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV)
+void GLYuvWidget::setVideoSize(quint32 videoWidth, quint32 videoHeight)
+{
+    m_videoWidth = videoWidth;
+    m_videoHeight = videoHeight;
+}
+
+void GLYuvWidget::updateTexture(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV)
 {
     qDebug() << "slotShowYuv";
     m_bufferY = bufferY;
@@ -34,6 +40,7 @@ void GLYuvWidget::slotShowYuv(quint8* bufferY, quint8* bufferU, quint8* bufferV,
     //update(); // 不实时
     //repaint(); // 同上
     paintEvent(nullptr);// 最实时的方案
+    update();
 }
 
 void GLYuvWidget::initializeGL()

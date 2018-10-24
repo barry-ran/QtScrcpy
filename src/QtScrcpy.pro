@@ -31,7 +31,8 @@ SOURCES += \
         decoder.cpp \
         server.cpp \
     convert.cpp \
-    glyuvwidget.cpp
+    glyuvwidget.cpp \
+    frames.cpp
 
 HEADERS += \
         dialog.h \
@@ -39,7 +40,8 @@ HEADERS += \
         decoder.h \
         server.h \
     convert.h \
-    glyuvwidget.h
+    glyuvwidget.h \
+    frames.h
 
 FORMS += \
         dialog.ui

@@ -16,9 +16,10 @@ public:
     GLYuvWidget(QWidget *parent = 0);
     ~GLYuvWidget();
 
-public slots:
+public:
+    void setVideoSize(quint32 videoWidth, quint32 videoHeight);
     //显示一帧Yuv图像
-    void slotShowYuv(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV);
+    void updateTexture(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV);
 
 protected:
     void initializeGL() Q_DECL_OVERRIDE;
