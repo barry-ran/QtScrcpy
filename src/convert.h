@@ -25,7 +25,6 @@ public:
     bool isInit();
     void deInit();
     bool convert(AVFrame* srcFrame, AVFrame* dstFrame);
-    //int srcW, int srcH, enum AVPixelFormat srcFormat,int dstW, int dstH, enum AVPixelFormat dstFormat,
 
 private:
     quint32 m_srcWidth = 0;

@@ -10,10 +10,14 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    GLYuvWidget* w = new GLYuvWidget(this);
+    w = new GLYuvWidget(this);
     w->resize(ui->imgLabel->size());
     w->move(230, 20);
+
     Decoder::init();
+
+    frames.init();
+    decoder.setFrames(&frames);
 
     server = new Server();
     connect(server, &Server::serverStartResult, this, [this](bool success){
@@ -30,28 +34,25 @@ Dialog::Dialog(QWidget *parent) :
     });
 
     // must be Qt::QueuedConnection, ui update must be main thread
-    QObject::connect(&decoder, &Decoder::getOneFrame,w,&GLYuvWidget::slotShowYuv,
-                     Qt::QueuedConnection);
-
-    /*
-    // must be Qt::QueuedConnection, ui update must be main thread
-    connect(&decoder, &Decoder::getOneImage, this, [this](QImage img){
-        qDebug() << "getOneImage";
-
-        return;
-        //18% cpu
-        // 将图像按比例缩放成和窗口一样大小
-        QImage img2 = img.scaled(ui->imgLabel->size(), Qt::IgnoreAspectRatio);
-        ui->imgLabel->setPixmap(QPixmap::fromImage(img2));
-        //24% cpu
-
-    }, Qt::QueuedConnection);
-    */
+    QObject::connect(&decoder, &Decoder::newFrame, this, [this](){
+        frames.lock();
+        const AVFrame *frame = frames.consumeRenderedFrame();
+            w->setVideoSize(frame->width, frame->height);
+            /*
+            if (!prepare_for_frame(screen, new_frame_size)) {
+                mutex_unlock(frames->mutex);
+                return SDL_FALSE;
+            }
+            */
+            w->updateTexture(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+        frames.unLock();
+    },Qt::QueuedConnection);
 }
 
 Dialog::~Dialog()
 {
     Decoder::deInit();
+    frames.deInit();
     delete ui;
 }
 

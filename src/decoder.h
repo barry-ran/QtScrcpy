@@ -4,14 +4,17 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QPointer>
-#include <QImage>
+#include <QMutex>
 
-#include "convert.h"
+//#include "convert.h"
+
 extern "C"
 {
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
 }
+
+class Frames;
 
 class Decoder : public QThread
 {
@@ -24,21 +27,24 @@ public:
     static bool init();
     static void deInit();    
 
+    void setFrames(Frames* frames);
     void setDeviceSocket(QTcpSocket* deviceSocket);
     qint32 recvData(quint8* buf, qint32 bufSize);
     bool startDecode();
     void stopDecode();
 
 signals:
-    void getOneFrame(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV);
+    void newFrame();
 
 protected:
     void run();
+    void pushFrame();
 
 private:
-    QPointer<QTcpSocket> m_deviceSocket = Q_NULLPTR;
+    QPointer<QTcpSocket> m_deviceSocket = Q_NULLPTR;    
+    QMutex m_mutex;
     bool m_quit = false;
-    Convert m_conver;
+    Frames* m_frames;
 };
 
 #endif // DECODER_H

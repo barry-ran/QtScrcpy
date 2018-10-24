@@ -5,11 +5,13 @@
 
 #include "server.h"
 #include "decoder.h"
+#include "frames.h"
 
 namespace Ui {
 class Dialog;
 }
 
+class GLYuvWidget;
 class Dialog : public QDialog
 {
     Q_OBJECT
@@ -29,6 +31,8 @@ private:
     Ui::Dialog *ui;
     Server* server;
     Decoder decoder;
+    Frames frames;
+    GLYuvWidget* w;
 };
 
 #endif // DIALOG_H
