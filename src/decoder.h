@@ -30,7 +30,8 @@ public:
     void stopDecode();
 
 signals:
-    void getOneFrame(QByteArray buffer, quint32 width, quint32 height);
+    void getOneFrame(quint8* bufferY, quint8* bufferU, quint8* bufferV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV);
+
 protected:
     void run();
 
