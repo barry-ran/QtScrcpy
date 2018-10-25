@@ -46,8 +46,8 @@ private:
     GLuint m_idV = 0;
 
     // 视频宽高
-    quint32 m_videoWidth = 1080;
-    quint32 m_videoHeight = 2160;    
+    quint32 m_videoWidth = 2160;
+    quint32 m_videoHeight = 1080;
 
     quint8* m_bufferY = Q_NULLPTR;
     quint8* m_bufferU = Q_NULLPTR;

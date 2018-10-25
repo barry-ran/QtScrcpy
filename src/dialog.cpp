@@ -1,8 +1,11 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "adbprocess.h"
-#include "glyuvwidget.h"
 
+#include "glyuvwidget.h"
+#include "yuvglwidget.h"
+
+//#define OPENGL_PLAN2
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -10,9 +13,16 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+#ifdef OPENGL_PLAN2
+    w2 = new YUVGLWidget(this);
+    w2->resize(ui->imgLabel->size());
+    w2->move(230, 20);
+#else
     w = new GLYuvWidget(this);
     w->resize(ui->imgLabel->size());
     w->move(230, 20);
+#endif
+
 
     Decoder::init();
 
@@ -37,14 +47,23 @@ Dialog::Dialog(QWidget *parent) :
     QObject::connect(&decoder, &Decoder::newFrame, this, [this](){
         frames.lock();
         const AVFrame *frame = frames.consumeRenderedFrame();
-            w->setVideoSize(frame->width, frame->height);
-            /*
-            if (!prepare_for_frame(screen, new_frame_size)) {
-                mutex_unlock(frames->mutex);
-                return SDL_FALSE;
-            }
-            */
-            w->updateTexture(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+#ifdef OPENGL_PLAN2
+        w2->setFrameSize(frame->width, frame->height);
+        w2->setYPixels(frame->data[0], frame->linesize[0]);
+        w2->setUPixels(frame->data[1], frame->linesize[1]);
+        w2->setVPixels(frame->data[2], frame->linesize[2]);
+        w2->update();
+#else
+        w->setVideoSize(frame->width, frame->height);
+        /*
+        if (!prepare_for_frame(screen, new_frame_size)) {
+            mutex_unlock(frames->mutex);
+            return SDL_FALSE;
+        }
+        */
+        w->updateTexture(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+#endif
+
         frames.unLock();
     },Qt::QueuedConnection);
 }
