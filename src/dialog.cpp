@@ -1,3 +1,6 @@
+#include <QFile>
+#include <QTime>
+
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "adbprocess.h"
@@ -5,7 +8,40 @@
 #include "glyuvwidget.h"
 #include "yuvglwidget.h"
 
-//#define OPENGL_PLAN2
+#define OPENGL_PLAN2
+
+void saveAVFrame_YUV_ToTempFile(const AVFrame *pFrame)
+{
+    int t_frameWidth = pFrame->width;
+    int t_frameHeight = pFrame->height;
+    int t_yPerRowBytes = pFrame->linesize[0];
+    int t_uPerRowBytes = pFrame->linesize[1];
+    int t_vPerRowBytes = pFrame->linesize[2];
+    qDebug()<<"robin:saveAVFrame_YUV_ToTempFile info:"<<t_frameWidth<<t_frameHeight<<"||"<<t_yPerRowBytes<<t_uPerRowBytes<<t_vPerRowBytes;
+    QFile t_file("E:\\receive_Frame.yuv");
+    t_file.open(QIODevice::WriteOnly | QIODevice::Append);
+    //t_file.write((char *)pFrame->data[0],t_frameWidth * t_frameHeight);
+    //t_file.write((char *)pFrame->data[1],(t_frameWidth/2) * t_frameHeight / 2);
+    //t_file.write((char *)pFrame->data[2],(t_frameWidth/2) * t_frameHeight / 2);
+
+    for(int i = 0;i< t_frameHeight ;i++)
+    {
+        t_file.write((char*)(pFrame->data[0]+i*t_yPerRowBytes),t_frameWidth);
+    }
+
+    for(int i = 0;i< t_frameHeight/2 ;i++)
+    {
+        t_file.write((char*)(pFrame->data[1]+i*t_uPerRowBytes),t_frameWidth/2);
+    }
+
+    for(int i = 0;i< t_frameHeight/2 ;i++)
+    {
+        t_file.write((char*)(pFrame->data[2]+i*t_vPerRowBytes),t_frameWidth/2);
+    }
+
+    t_file.flush();
+
+}
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -47,12 +83,14 @@ Dialog::Dialog(QWidget *parent) :
     QObject::connect(&decoder, &Decoder::newFrame, this, [this](){
         frames.lock();
         const AVFrame *frame = frames.consumeRenderedFrame();
+        //saveAVFrame_YUV_ToTempFile(frame);
 #ifdef OPENGL_PLAN2
         w2->setFrameSize(frame->width, frame->height);
         w2->setYPixels(frame->data[0], frame->linesize[0]);
         w2->setUPixels(frame->data[1], frame->linesize[1]);
         w2->setVPixels(frame->data[2], frame->linesize[2]);
-        w2->update();
+        //w2->update();
+        w2->repaint();
 #else
         w->setVideoSize(frame->width, frame->height);
         /*
