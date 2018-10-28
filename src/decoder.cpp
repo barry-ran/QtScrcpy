@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QTime>
 
 #include "decoder.h"
 #include "frames.h"
@@ -55,18 +56,17 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
         return 0;
     }
     if (m_deviceSocket) {
-        while (!m_quit && m_deviceSocket->bytesAvailable() < bufSize) {
+        while (!m_quit && m_deviceSocket->bytesAvailable() <= 0) {
             if (!m_deviceSocket->waitForReadyRead(300)
                     && QTcpSocket::SocketTimeoutError != m_deviceSocket->error()) {
-                break;
-            }
-            if (QTcpSocket::SocketTimeoutError == m_deviceSocket->error()) {
-                //qDebug() << "QTcpSocket::SocketTimeoutError";
+                qDebug() << "waitForReadyRead error " << m_deviceSocket->error();
+                break;                
             }
         }
-        qDebug() << "recv data " << bufSize;
-        return m_deviceSocket->read((char*)buf, bufSize);
-    }
+        qint64 readSize = qMin(m_deviceSocket->bytesAvailable(), (qint64)bufSize);
+        qDebug() << "ready recv data " << readSize;
+        return m_deviceSocket->read((char*)buf, readSize);
+    }    
     return 0;
 }
 
@@ -165,7 +165,7 @@ void Decoder::run()
         }
         if (decodingFrame) {
             ret = avcodec_receive_frame(codecCtx, decodingFrame);
-        }
+        }        
         if (!ret) {            
             // a frame was received
             pushFrame();
@@ -252,5 +252,6 @@ void Decoder::pushFrame()
         // the previous newFrame will consume this frame
         return;
     }
+    //qDebug() << "------------>" << QTime::currentTime();
     emit newFrame();
 }
