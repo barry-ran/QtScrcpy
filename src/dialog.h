@@ -11,7 +11,6 @@ namespace Ui {
 class Dialog;
 }
 
-class GLYuvWidget;
 class YUVGLWidget;
 class Dialog : public QDialog
 {
@@ -33,7 +32,6 @@ private:
     Server* server;
     Decoder decoder;
     Frames frames;
-    GLYuvWidget* w;
     YUVGLWidget* w2;
 };
 

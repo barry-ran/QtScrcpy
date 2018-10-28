@@ -32,7 +32,6 @@ SOURCES += \
         decoder.cpp \
         server.cpp \
     convert.cpp \
-    glyuvwidget.cpp \
     frames.cpp \
     yuvglwidget.cpp
 
@@ -42,7 +41,6 @@ HEADERS += \
         decoder.h \
         server.h \
     convert.h \
-    glyuvwidget.h \
     frames.h \
     yuvglwidget.h
 
