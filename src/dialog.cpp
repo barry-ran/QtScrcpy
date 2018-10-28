@@ -45,7 +45,7 @@ Dialog::Dialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    w2 = new YUVGLWidget(this);
+    w2 = new YUVGLWidget(this);    
     w2->resize(ui->imgLabel->size());
     w2->move(230, 20);
 
@@ -73,12 +73,8 @@ Dialog::Dialog(QWidget *parent) :
         frames.lock();
         const AVFrame *frame = frames.consumeRenderedFrame();
         //saveAVFrame_YUV_ToTempFile(frame);
-        w2->setFrameSize(frame->width, frame->height);
-        w2->setYPixels(frame->data[0], frame->linesize[0]);
-        w2->setUPixels(frame->data[1], frame->linesize[1]);
-        w2->setVPixels(frame->data[2], frame->linesize[2]);
-        w2->update();
-
+        w2->setFrameSize(QSize(frame->width, frame->height));
+        w2->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
         frames.unLock();
     },Qt::QueuedConnection);
 }

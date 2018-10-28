@@ -2,11 +2,11 @@
 #define YUVGLWIDGET_H
 
 #include <QOpenGLFunctions>
-#include <QOpenGLShaderProgram>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLWidget>
-#include <QSurfaceFormat>
+//#include <QSurfaceFormat>
 
+class QOpenGLShaderProgram;
 class YUVGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -17,39 +17,40 @@ public:
     QSize minimumSizeHint() const override;
     QSize sizeHint() const override;
 
-    void setFrameSize(unsigned int width, unsigned int height);
-
-    void setYPixels(uint8_t* pixels, int stride);
-    void setUPixels(uint8_t* pixels, int stride);
-    void setVPixels(uint8_t* pixels, int stride);
+    void setFrameSize(const QSize& frameSize);
+    void updateTextures(quint8* dataY, quint8* dataU, quint8* dataV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV);
 
 protected:
     void initializeGL() override;
     void paintGL() override;
-    //void resizeGL(int width, int height) override;
+    void resizeGL(int width, int height) override;
 
 private:
     enum YUVTextureType {
-        YTexture,
-        UTexture,
-        VTexture
+        Texture_NULL = -1,
+        Texture_Y,
+        Texture_U,
+        Texture_V,
+        Texture_Size
     };
 
-    void initializeTextures();
-    void bindPixelTexture(GLuint texture, YUVTextureType textureType, uint8_t* pixels, int stride);
+    void initShader();
+    void initTexture(qint32 textureType);
+    void initTextures();
+    void deInitTextures();
+    void calcTextureSize(qint32 textureType, QSize& size);
 
-    QOpenGLShaderProgram m_program;
+    void bindPixelTexture(GLuint texture, YUVTextureType textureType, quint8* pixels, quint32 stride);
+
+private:
+    QSize m_frameSize = {0, 0};
+    bool m_needInit = false;
+
+    QOpenGLShaderProgram* m_program = Q_NULLPTR;
     QOpenGLVertexArrayObject m_vao;
-
-    //unsigned int m_frameWidth {3840}; // 4k
-    //unsigned int m_frameHeight {2160};
-    unsigned int m_frameWidth {2160};
-    unsigned int m_frameHeight {1080};
-
-    GLuint y_tex {0};
-    GLuint u_tex {0};
-    GLuint v_tex {0};
-    GLint u_pos {0};
+    // yuv texture
+    GLuint m_texture[Texture_Size] = {0};
+    GLint m_drawPos = -1;
 };
 
 #endif // YUVGLWIDGET_H

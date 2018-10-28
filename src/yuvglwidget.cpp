@@ -1,50 +1,8 @@
+#include <QOpenGLShaderProgram>
+
 #include "yuvglwidget.h"
 
-YUVGLWidget::YUVGLWidget(QWidget *parent) :
-    QOpenGLWidget(parent)
-{
-    // 设置opengl兼容性格式为CoreProfile
-    QSurfaceFormat defaultFormat = QSurfaceFormat::defaultFormat();
-    defaultFormat.setProfile(QSurfaceFormat::CoreProfile);
-    defaultFormat.setVersion(3, 3); // Adapt to your system
-    QSurfaceFormat::setDefaultFormat(defaultFormat);
-
-    setFormat(defaultFormat);
-}
-
-YUVGLWidget::~YUVGLWidget()
-{
-    makeCurrent();
-    if (y_tex) glDeleteTextures(1, &y_tex);
-    if (u_tex) glDeleteTextures(1, &u_tex);
-    if (v_tex) glDeleteTextures(1, &v_tex);
-    doneCurrent();
-}
-
-QSize YUVGLWidget::minimumSizeHint() const
-{
-    return QSize(50, 50);
-}
-
-QSize YUVGLWidget::sizeHint() const
-{
-    return QSize(3840, 2160); // 4k video
-}
-
-void YUVGLWidget::setFrameSize(unsigned int width, unsigned int height)
-{
-    m_frameWidth = width;
-    m_frameHeight = height;
-}
-
-void YUVGLWidget::initializeGL()
-{
-    initializeOpenGLFunctions();
-    glDisable(GL_DEPTH_TEST);
-
-    initializeTextures();
-
-    QString vert = R"(
+static QString vertShader = R"(
                    #version 150 core
                    uniform mat4 u_pm;
                    uniform vec4 draw_pos;
@@ -75,7 +33,7 @@ void YUVGLWidget::initializeGL()
                    }
                    )";
 
-    QString frag = R"(
+    static QString fragShader = R"(
                    #version 150 core
                    uniform sampler2D y_tex;
                    uniform sampler2D u_tex;
@@ -101,23 +59,49 @@ void YUVGLWidget::initializeGL()
                      fragcolor.b = dot(yuv, B_cf);
                    }
                    )";
-    // Setup shaders
-    m_program.addShaderFromSourceCode(QOpenGLShader::Vertex, vert);
-    m_program.addShaderFromSourceCode(QOpenGLShader::Fragment, frag);
 
-//    m_program.bindAttributeLocation("y_tex", 0);
-//    m_program.bindAttributeLocation("u_tex", 1);
-//    m_program.bindAttributeLocation("v_tex", 2);
+YUVGLWidget::YUVGLWidget(QWidget *parent) :
+    QOpenGLWidget(parent)
+{
+    /*
+    // 设置opengl兼容性格式为CoreProfile
+    QSurfaceFormat defaultFormat = QSurfaceFormat::defaultFormat();
+    defaultFormat.setProfile(QSurfaceFormat::CoreProfile);
+    defaultFormat.setVersion(3, 3); // Adapt to your system
+    QSurfaceFormat::setDefaultFormat(defaultFormat);
+    setFormat(defaultFormat);
+    */
+}
 
-    m_program.link();
-    m_program.bind();
+YUVGLWidget::~YUVGLWidget()
+{
+    makeCurrent();
+    deInitTextures();
+    doneCurrent();
+}
 
-    m_program.setUniformValue("y_tex", 0);
-    m_program.setUniformValue("u_tex", 1);
-    m_program.setUniformValue("v_tex", 2);
+QSize YUVGLWidget::minimumSizeHint() const
+{
+    return QSize(50, 50);
+}
 
-    u_pos = m_program.uniformLocation("draw_pos");
+QSize YUVGLWidget::sizeHint() const
+{
+    return size();
+}
 
+void YUVGLWidget::setFrameSize(const QSize& frameSize)
+{
+    if (m_frameSize != frameSize) {
+        m_frameSize = frameSize;
+        m_needInit = true;
+    }
+}
+
+void YUVGLWidget::initializeGL()
+{
+    initializeOpenGLFunctions();
+    glDisable(GL_DEPTH_TEST);
     m_vao.create();
 }
 
@@ -125,86 +109,120 @@ void YUVGLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // init
+    if (m_needInit) {
+        initShader();
+        initTextures();
+        m_needInit = false;
+    }
     m_vao.bind();
-
-    QMatrix4x4 m;
-    m.ortho(0, width(), height(), 0, 0.0, 100.0f);
-
-    m_program.setUniformValue("u_pm", m);
-
-    glUniform4f(u_pos, 0, 0, width(), height());
+    if (m_program) {
+        QMatrix4x4 matrix;
+        matrix.ortho(0, width(), height(), 0, 0.0, 100.0f);
+        m_program->setUniformValue("u_pm", matrix);
+        glUniform4f(m_drawPos, 0, 0, width(), height());
+    }
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, y_tex);
+    glBindTexture(GL_TEXTURE_2D, m_texture[Texture_Y]);
 
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, u_tex);
+    glBindTexture(GL_TEXTURE_2D, m_texture[Texture_U]);
 
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, v_tex);
+    glBindTexture(GL_TEXTURE_2D, m_texture[Texture_V]);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-
-void YUVGLWidget::setYPixels(uint8_t* pixels, int stride)
+void YUVGLWidget::resizeGL(int width, int height)
 {
-    bindPixelTexture(y_tex, YTexture, pixels, stride);
+    glViewport(0, 0, width, height);
 }
 
-void YUVGLWidget::setUPixels(uint8_t* pixels, int stride)
+void YUVGLWidget::initShader()
 {
-    bindPixelTexture(u_tex, UTexture, pixels, stride);
+    if (m_program) {
+        m_program->release();
+        delete m_program;
+        m_program = Q_NULLPTR;
+    }
+    m_program = new QOpenGLShaderProgram(this);
+    // Setup shaders
+    m_program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertShader);
+    m_program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragShader);
+    m_program->link();
+    m_program->bind();
+    m_program->setUniformValue("y_tex", Texture_Y);
+    m_program->setUniformValue("u_tex", Texture_U);
+    m_program->setUniformValue("v_tex", Texture_V);
+    m_drawPos = m_program->uniformLocation("draw_pos");
 }
 
-void YUVGLWidget::setVPixels(uint8_t* pixels, int stride)
+void YUVGLWidget::updateTextures(quint8 *dataY, quint8 *dataU, quint8 *dataV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV)
 {
-    bindPixelTexture(v_tex, VTexture, pixels, stride);
+    bindPixelTexture(m_texture[Texture_Y], Texture_Y, dataY, linesizeY);
+    bindPixelTexture(m_texture[Texture_U], Texture_U, dataU, linesizeU);
+    bindPixelTexture(m_texture[Texture_V], Texture_V, dataV, linesizeV);
+    update();
 }
 
-
-void YUVGLWidget::initializeTextures()
-{
-    //TODO: use FBO?
-
-    // Setup textures
-    glGenTextures(1, &y_tex);
-    glBindTexture(GL_TEXTURE_2D, y_tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_frameWidth, m_frameHeight, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
-
-    glGenTextures(1, &u_tex);
-    glBindTexture(GL_TEXTURE_2D, u_tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_frameWidth/2, m_frameHeight/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
-
-    glGenTextures(1, &v_tex);
-    glBindTexture(GL_TEXTURE_2D, v_tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_frameWidth/2, m_frameHeight/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
-}
-
-void YUVGLWidget::bindPixelTexture(GLuint texture, YUVGLWidget::YUVTextureType textureType, uint8_t* pixels, int stride)
+void YUVGLWidget::bindPixelTexture(GLuint texture, YUVTextureType textureType, quint8* pixels, quint32 stride)
 {
     if (!pixels)
         return;
 
-    unsigned int const width = textureType == YTexture ? m_frameWidth : m_frameWidth/2;
-    unsigned int const height = textureType == YTexture ? m_frameHeight : m_frameHeight/2;
+    QSize size(0, 0);
+    calcTextureSize(textureType, size);
 
     makeCurrent();
     glBindTexture(GL_TEXTURE_2D, texture);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RED, GL_UNSIGNED_BYTE, pixels);
-    //glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, m_frameWidth/2, m_frameHeight/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.width(), size.height(), GL_RED, GL_UNSIGNED_BYTE, pixels);
     doneCurrent();
+}
+
+void YUVGLWidget::initTexture(qint32 textureType)
+{
+    if (Texture_NULL >= textureType || Texture_Size <= textureType) {
+        return;
+    }
+    glGenTextures(1, &m_texture[textureType]);
+    glBindTexture(GL_TEXTURE_2D, m_texture[textureType]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    QSize size(0, 0);
+    calcTextureSize(textureType, size);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, size.width(), size.height(), 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+}
+
+void YUVGLWidget::initTextures()
+{
+    //TODO: use FBO?
+
+    deInitTextures();
+    for (int i = Texture_Y; i < Texture_Size; i++) {
+        initTexture(i);
+    }
+}
+
+void YUVGLWidget::deInitTextures()
+{
+    glDeleteTextures(3, m_texture);
+    memset(m_texture, 0, Texture_Size);
+}
+
+void YUVGLWidget::calcTextureSize(qint32 textureType, QSize &size)
+{
+    if (Texture_NULL >= textureType || Texture_Size <= textureType) {
+        return;
+    }
+    if (Texture_Y == textureType) {
+        size = m_frameSize;
+    } else {
+        size = m_frameSize / 2;
+    }
 }
