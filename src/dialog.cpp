@@ -47,7 +47,7 @@ Dialog::Dialog(QWidget *parent) :
 
     w2 = new YUVGLWidget(this);    
     w2->resize(ui->imgLabel->size());
-    w2->move(230, 20);
+    w2->move(ui->imgLabel->pos());
 
     Decoder::init();
 
