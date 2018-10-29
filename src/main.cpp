@@ -7,9 +7,8 @@
 
 int main(int argc, char *argv[])
 {
+    // only support AA_UseDesktopOpenGL
     QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-    //QApplication::setAttribute(Qt::AA_UseOpenGLES);
-    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 
     QApplication a(argc, argv);
 
