@@ -33,7 +33,8 @@ SOURCES += \
         server.cpp \
     convert.cpp \
     frames.cpp \
-    yuvglwidget.cpp
+    yuvglwidget.cpp \
+    fpscounter.cpp
 
 HEADERS += \
         dialog.h \
@@ -42,7 +43,8 @@ HEADERS += \
         server.h \
     convert.h \
     frames.h \
-    yuvglwidget.h
+    yuvglwidget.h \
+    fpscounter.h
 
 FORMS += \
         dialog.ui
