@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1309</width>
-    <height>707</height>
+    <width>1100</width>
+    <height>712</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,8 +29,8 @@
   <widget class="QPushButton" name="startServerBtn">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>60</y>
+     <x>160</x>
+     <y>20</y>
      <width>111</width>
      <height>28</height>
     </rect>
@@ -42,8 +42,8 @@
   <widget class="QPushButton" name="stopServerBtn">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>100</y>
+     <x>290</x>
+     <y>20</y>
      <width>111</width>
      <height>28</height>
     </rect>
@@ -55,8 +55,8 @@
   <widget class="QLabel" name="imgLabel">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>20</y>
+     <x>20</x>
+     <y>60</y>
      <width>1051</width>
      <height>621</height>
     </rect>
