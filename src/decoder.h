@@ -6,8 +6,6 @@
 #include <QPointer>
 #include <QMutex>
 
-//#include "convert.h"
-
 extern "C"
 {
 #include "libavcodec/avcodec.h"
