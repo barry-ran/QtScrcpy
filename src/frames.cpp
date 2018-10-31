@@ -30,6 +30,8 @@ bool Frames::init()
     // there is initially no rendering frame, so consider it has already been
     // consumed
     m_renderingFrameConsumed = true;
+
+    m_fpsCounter.start();
     return true;
 
 error:
@@ -47,6 +49,7 @@ void Frames::deInit()
         av_frame_free(&m_renderingframe);
         m_renderingframe = Q_NULLPTR;
     }
+    m_fpsCounter.stop();
 }
 
 void Frames::lock()
@@ -73,9 +76,11 @@ bool Frames::offerDecodedFrame()
     // frame to be consumed
     while (!m_renderingFrameConsumed && !m_stopped) {
         m_renderingFrameConsumedCond.wait(&m_mutex);
-    }
+    }    
 #else
-
+    if (m_fpsCounter.isStarted() && !m_renderingFrameConsumed) {
+        m_fpsCounter.addSkippedFrame();
+    }
 #endif
 
     swap();
@@ -89,7 +94,9 @@ const AVFrame *Frames::consumeRenderedFrame()
 {
     Q_ASSERT(!m_renderingFrameConsumed);
     m_renderingFrameConsumed = true;
-
+    if (m_fpsCounter.isStarted()) {
+        m_fpsCounter.addRenderedFrame();
+    }
 #ifndef SKIP_FRAMES
     // if SKIP_FRAMES is disabled, then notify the decoder the current frame is
     // consumed, so that it may push a new one

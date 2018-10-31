@@ -55,7 +55,7 @@ void AdbProcess::initSignals()
         } else {
             emit adbProcessResult(AER_ERROR_START);
             QString err = QString("qprocess start error:%1 %2").arg(program()).arg(arguments().join(" "));
-            qCritical(err.toStdString().c_str());            
+            qCritical(err.toStdString().c_str());
         }
     });
 
