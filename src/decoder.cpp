@@ -64,7 +64,7 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
             }
         }
         qint64 readSize = qMin(m_deviceSocket->bytesAvailable(), (qint64)bufSize);
-        qDebug() << "ready recv data " << readSize;
+        //qDebug() << "ready recv data " << readSize;
         return m_deviceSocket->read((char*)buf, readSize);
     }    
     return 0;
@@ -90,14 +90,14 @@ void Decoder::stopDecode()
 }
 
 void Decoder::run()
-{
+{    
     unsigned char *decoderBuffer = Q_NULLPTR;
     AVIOContext *avioCtx = Q_NULLPTR;
     AVFormatContext *formatCtx = Q_NULLPTR;
     AVCodec *codec = Q_NULLPTR;
     AVCodecContext *codecCtx = Q_NULLPTR;
     bool isFormatCtxOpen = false;
-    bool isCodecCtxOpen = false;
+    bool isCodecCtxOpen = false;    
 
     // decoder buffer
     decoderBuffer = (unsigned char*)av_malloc(BUFSIZE);
@@ -151,7 +151,7 @@ void Decoder::run()
     AVPacket packet;
     av_init_packet(&packet);
     packet.data = Q_NULLPTR;
-    packet.size = 0;
+    packet.size = 0;    
 
     while (!m_quit && !av_read_frame(formatCtx, &packet)) {
         AVFrame* decodingFrame = m_frames->decodingFrame();
@@ -220,7 +220,7 @@ void Decoder::run()
             break;
         }
     }
-    qDebug() << "End of frames";
+    qDebug() << "End of frames";  
 
 runQuit:
         if (avioCtx) {
@@ -251,7 +251,6 @@ void Decoder::pushFrame()
     if (!previousFrameConsumed) {
         // the previous newFrame will consume this frame
         return;
-    }
-    //qDebug() << "------------>" << QTime::currentTime();
+    }    
     emit newFrame();
 }

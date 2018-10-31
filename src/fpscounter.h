@@ -1,32 +1,35 @@
 #ifndef FPSCOUNTER_H
 #define FPSCOUNTER_H
-#include <QTime>
+#include <QObject>
 
-class FpsCounter
+class FpsCounter : public QObject
 {
+    Q_OBJECT
 public:
-    FpsCounter();
+    FpsCounter(QObject* parent = Q_NULLPTR);
     virtual ~FpsCounter();
 
-    void fpsCounterInit();
-    void fpsCounterStart();
-    void fpsCounterStop();
-    void fpsCounterAddRenderedFrame();
-#ifdef SKIP_FRAMES
-    void fpsCounterAddSkippedFrame();
-#endif
+    void start();
+    void stop();
+    bool isStarted();
+    void addRenderedFrame();
+    void addSkippedFrame();
+
+protected:
+    virtual void timerEvent(QTimerEvent *event);
 
 private:
-    void checkExpired();
-    void displayFps();
+    void startCounterTimer();
+    void stopCounterTimer();
+    void resetCounter();
 
-private:
-    bool m_started = false;
-    QTime m_timeCounter;
+private:    
+    quint32 m_counterTimer = 0;
+    quint32 m_curRendered = 0;
+    quint32 m_curSkipped = 0;
+
     quint32 m_rendered = 0;
-#ifdef SKIP_FRAMES
     quint32 m_skipped = 0;
-#endif
 };
 
 #endif // FPSCOUNTER_H

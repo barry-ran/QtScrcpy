@@ -3,6 +3,8 @@
 #include <QMutex>
 #include <QWaitCondition>
 
+#include "fpscounter.h"
+
 // forward declarations
 typedef struct AVFrame AVFrame;
 
@@ -40,10 +42,11 @@ private:
     AVFrame* m_renderingframe = Q_NULLPTR;
     QMutex m_mutex;
     bool m_renderingFrameConsumed = true;
+    FpsCounter m_fpsCounter;
 
 #ifndef SKIP_FRAMES
     QWaitCondition m_renderingFrameConsumedCond;
-    bool m_stopped = true;
+    bool m_stopped = true;    
 #endif
 };
 
