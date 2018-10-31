@@ -178,7 +178,7 @@ void YUVGLWidget::bindPixelTexture(GLuint texture, YUVTextureType textureType, q
     makeCurrent();
     glBindTexture(GL_TEXTURE_2D, texture);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, stride);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.width(), size.height(), GL_RED, GL_UNSIGNED_BYTE, pixels);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.width(), size.height(), GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
     doneCurrent();
 }
 
@@ -196,7 +196,7 @@ void YUVGLWidget::initTexture(qint32 textureType)
 
     QSize size(0, 0);
     calcTextureSize(textureType, size);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, size.width(), size.height(), 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, size.width(), size.height(), 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, NULL);
 }
 
 void YUVGLWidget::initTextures()
