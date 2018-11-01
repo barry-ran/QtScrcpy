@@ -34,7 +34,8 @@ SOURCES += \
     convert.cpp \
     frames.cpp \
     yuvglwidget.cpp \
-    fpscounter.cpp
+    fpscounter.cpp \
+    qyuvopenglwidget.cpp
 
 HEADERS += \
         dialog.h \
@@ -44,7 +45,8 @@ HEADERS += \
     convert.h \
     frames.h \
     yuvglwidget.h \
-    fpscounter.h
+    fpscounter.h \
+    qyuvopenglwidget.h
 
 FORMS += \
         dialog.ui

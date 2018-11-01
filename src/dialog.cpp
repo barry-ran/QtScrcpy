@@ -5,6 +5,7 @@
 #include "ui_dialog.h"
 #include "adbprocess.h"
 #include "yuvglwidget.h"
+#include "qyuvopenglwidget.h"
 
 void saveAVFrame_YUV_ToTempFile(const AVFrame *pFrame)
 {
@@ -38,16 +39,23 @@ void saveAVFrame_YUV_ToTempFile(const AVFrame *pFrame)
     t_file.flush();
 
 }
-
+#define OPENGL_EX
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
     ui->setupUi(this);
+    setWindowFlags(windowFlags()
+                   | Qt::WindowMaximizeButtonHint
+                   | Qt::WindowMinimizeButtonHint);
+#ifdef OPENGL_EX
+    w = new QYUVOpenGLWidget(this);
+    ui->verticalLayout->addWidget(w);
+#else
+    w2 = new YUVGLWidget(this);
+    ui->verticalLayout->addWidget(w2);
+#endif
 
-    w2 = new YUVGLWidget(this);    
-    w2->resize(ui->imgLabel->size());
-    w2->move(ui->imgLabel->pos());
 
     Decoder::init();
 
@@ -73,8 +81,13 @@ Dialog::Dialog(QWidget *parent) :
         frames.lock();
         const AVFrame *frame = frames.consumeRenderedFrame();
         //saveAVFrame_YUV_ToTempFile(frame);
+#ifdef OPENGL_EX
+        w->setFrameSize(QSize(frame->width, frame->height));
+        w->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+#else
         w2->setFrameSize(QSize(frame->width, frame->height));
         w2->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+#endif
         frames.unLock();
     },Qt::QueuedConnection);
 }
