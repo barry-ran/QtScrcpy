@@ -12,6 +12,7 @@ class Dialog;
 }
 
 class YUVGLWidget;
+class QYUVOpenGLWidget;
 class Dialog : public QDialog
 {
     Q_OBJECT
@@ -32,6 +33,7 @@ private:
     Server* server;
     Decoder decoder;
     Frames frames;
+    QYUVOpenGLWidget* w;
     YUVGLWidget* w2;
 };
 
