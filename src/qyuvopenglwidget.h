@@ -5,7 +5,7 @@
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-//QT_FORWARD_DECLARE_CLASS(QOpenGLTexture) //TODO先不用QOpenGLTexture，Texture先使用opengl原生方式
+QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 class QYUVOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -42,9 +42,9 @@ private:
     QOpenGLShaderProgram m_shaderProgram;
 
     // YUV纹理，用于生成纹理贴图
-    //QOpenGLTexture* m_textrueY = Q_NULLPTR;
-    //QOpenGLTexture* m_textrueU = Q_NULLPTR;
-    //QOpenGLTexture* m_textrueV = Q_NULLPTR;
+    QOpenGLTexture* m_textureY = Q_NULLPTR;
+    QOpenGLTexture* m_textureU = Q_NULLPTR;
+    QOpenGLTexture* m_textureV = Q_NULLPTR;
 
     // YUV纹理，用于生成纹理贴图
     GLuint m_texture[3] = {0};
