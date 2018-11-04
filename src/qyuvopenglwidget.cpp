@@ -1,6 +1,5 @@
 #include <QCoreApplication>
 #include <QOpenGLTexture>
-#include <QOpenGLPixelTransferOptions>
 
 #include "qyuvopenglwidget.h"
 
@@ -65,9 +64,7 @@ static QString s_fragShader = R"(
 
 QYUVOpenGLWidget::QYUVOpenGLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
-    m_textureY = new QOpenGLTexture(QOpenGLTexture::Target2D);
-    m_textureU = new QOpenGLTexture(QOpenGLTexture::Target2D);
-    m_textureV = new QOpenGLTexture(QOpenGLTexture::Target2D);
+
 }
 
 QYUVOpenGLWidget::~QYUVOpenGLWidget()
@@ -75,19 +72,6 @@ QYUVOpenGLWidget::~QYUVOpenGLWidget()
     makeCurrent();
     m_vbo.destroy();
     deInitTextures();
-
-    if (m_textureY) {
-        delete m_textureY;
-        m_textureY = Q_NULLPTR;
-    }
-    if (m_textureU) {
-        delete m_textureU;
-        m_textureU = Q_NULLPTR;
-    }
-    if (m_textureV) {
-        delete m_textureV;
-        m_textureV = Q_NULLPTR;
-    }
     doneCurrent();
 }
 
@@ -106,28 +90,14 @@ void QYUVOpenGLWidget::setFrameSize(const QSize &frameSize)
     if (m_frameSize != frameSize) {
         m_frameSize = frameSize;
         m_needUpdate = true;
-        repaint();
     }
 }
 
 void QYUVOpenGLWidget::updateTextures(quint8 *dataY, quint8 *dataU, quint8 *dataV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV)
 {
-    if (m_frameSize.isEmpty()) {
-        return;
-    }
-    QOpenGLPixelTransferOptions options;
-    if (m_textureY->isStorageAllocated()) {
-        options.setRowLength(linesizeY);
-        m_textureY->setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8,dataY, &options);
-    }
-    if (m_textureU->isStorageAllocated()) {
-        options.setRowLength(linesizeU);
-        m_textureU->setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8,dataU, &options);
-    }
-    if (m_textureV->isStorageAllocated()) {
-        options.setRowLength(linesizeV);
-        m_textureV->setData(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8,dataV, &options);
-    }
+    updateTexture(m_texture[0], 0, dataY, linesizeY);
+    updateTexture(m_texture[1], 1, dataU, linesizeU);
+    updateTexture(m_texture[2], 2, dataV, linesizeV);
     update();
 }
 
@@ -149,23 +119,21 @@ void QYUVOpenGLWidget::initializeGL()
 
 void QYUVOpenGLWidget::paintGL()
 {    
-    if (m_frameSize.isEmpty()) {
-        return;
-    }
     if (m_needUpdate) {
-        initTextures();        
+        //TODO 需要deInitTextures吗
+        deInitTextures();
+        initTextures();
         m_needUpdate = false;
     }
 
-    if (m_textureY->isStorageAllocated()) {
-        m_textureY->bind(0);        
-    }
-    if (m_textureU->isStorageAllocated()) {
-        m_textureU->bind(1);
-    }
-    if (m_textureV->isStorageAllocated()) {
-        m_textureV->bind(2);
-    }
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture[0]);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_texture[1]);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_texture[2]);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -210,55 +178,42 @@ void QYUVOpenGLWidget::initShader()
 }
 
 void QYUVOpenGLWidget::initTextures()
-{
-    deInitTextures();
-    if (m_textureY) {
-        m_textureY->create();
-        m_textureY->setSize(m_frameSize.width(), m_frameSize.height());
-        // 设置纹理缩放时的策略
-        m_textureY->setMinificationFilter(QOpenGLTexture::Linear);
-        m_textureY->setMagnificationFilter(QOpenGLTexture::Linear);
-        // 设置所有方向上纹理超出坐标时的显示策略（也可单个方向单独设置）
-        m_textureY->setWrapMode(QOpenGLTexture::ClampToEdge);
-        m_textureY->setMipLevels(1);
-        m_textureY->setFormat(QOpenGLTexture::LuminanceFormat);
-        m_textureY->allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8);
-    }
+{    
+    // 创建纹理
+    glGenTextures(1, &m_texture[0]);
+    glBindTexture(GL_TEXTURE_2D, m_texture[0]);
+    // 设置纹理缩放时的策略
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 设置st方向上纹理超出坐标时的显示策略
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width(), m_frameSize.height(), 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
-    if (m_textureU) {
-        m_textureU->create();
-        m_textureU->setSize(m_frameSize.width()/2, m_frameSize.height()/2);
-        m_textureU->setMinificationFilter(QOpenGLTexture::Linear);
-        m_textureU->setMagnificationFilter(QOpenGLTexture::Linear);
-        m_textureU->setWrapMode(QOpenGLTexture::ClampToEdge);
-        m_textureU->setMipLevels(1);
-        m_textureU->setFormat(QOpenGLTexture::LuminanceFormat);
-        m_textureU->allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8);
-    }
+    glGenTextures(1, &m_texture[1]);
+    glBindTexture(GL_TEXTURE_2D, m_texture[1]);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width()/2, m_frameSize.height()/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
-    if (m_textureV) {
-        m_textureV->create();
-        m_textureV->setSize(m_frameSize.width()/2, m_frameSize.height()/2);
-        m_textureV->setMinificationFilter(QOpenGLTexture::Linear);
-        m_textureV->setMagnificationFilter(QOpenGLTexture::Linear);
-        m_textureV->setWrapMode(QOpenGLTexture::ClampToEdge);
-        m_textureV->setMipLevels(1);
-        m_textureV->setFormat(QOpenGLTexture::LuminanceFormat);
-        m_textureV->allocateStorage(QOpenGLTexture::Luminance, QOpenGLTexture::UInt8);
-    }
+    glGenTextures(1, &m_texture[2]);
+    glBindTexture(GL_TEXTURE_2D, m_texture[2]);
+    // 设置纹理缩放时的策略
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 设置st方向上纹理超出坐标时的显示策略
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width()/2, m_frameSize.height()/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+
 }
 
 void QYUVOpenGLWidget::deInitTextures()
 {
-    if (m_textureY) {
-        m_textureY->destroy();
-    }
-    if (m_textureU) {
-        m_textureU->destroy();
-    }
-    if (m_textureV) {
-        m_textureV->destroy();
-    }
+    glDeleteTextures(3, m_texture);
+    memset(m_texture, 0, 3);
 }
 
 void QYUVOpenGLWidget::updateTexture(GLuint texture, quint32 textureType, quint8 *pixels, quint32 stride)
