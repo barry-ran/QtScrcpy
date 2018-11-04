@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+    //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     //QApplication::setAttribute(Qt::AA_UseOpenGLES);
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
     qputenv("QTSCRCPY_SERVER_PATH", "G:\\mygitcode\\QtScrcpy\\src\\scrcpy-server.jar");
 
     Dialog w;
-    w.move(50, 930);
+    //w.move(50, 930);
     w.show();
 
     return a.exec();
