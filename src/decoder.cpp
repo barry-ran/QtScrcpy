@@ -239,6 +239,8 @@ runQuit:
             avcodec_free_context(&codecCtx);
         }
 
+        emit onDecodeStop();
+
         if (m_deviceSocket) {
             m_deviceSocket->disconnectFromHost();
             delete m_deviceSocket;
@@ -252,5 +254,5 @@ void Decoder::pushFrame()
         // the previous newFrame will consume this frame
         return;
     }    
-    emit newFrame();
+    emit onNewFrame();
 }

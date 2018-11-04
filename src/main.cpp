@@ -1,9 +1,10 @@
-#include "dialog.h"
-
 #include <QApplication>
 #include <QDebug>
 #include <QTcpSocket>
 #include <QTcpServer>
+
+#include "dialog.h"
+#include "decoder.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,14 +12,17 @@ int main(int argc, char *argv[])
     //QApplication::setAttribute(Qt::AA_UseOpenGLES);
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 
+    Decoder::init();
     QApplication a(argc, argv);
 
     qputenv("QTSCRCPY_ADB_PATH", "G:\\mygitcode\\QtScrcpy\\src\\adb.exe");
     qputenv("QTSCRCPY_SERVER_PATH", "G:\\mygitcode\\QtScrcpy\\src\\scrcpy-server.jar");
 
-    Dialog w;
-    //w.move(50, 930);
-    w.show();
+    Dialog* w = new Dialog;
+    w->show();
 
-    return a.exec();
+    int ret = a.exec();
+
+    Decoder::deInit();
+    return ret;
 }

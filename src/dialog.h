@@ -2,10 +2,9 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include <QPointer>
 
-#include "server.h"
-#include "decoder.h"
-#include "frames.h"
+#include "videoform.h"
 
 namespace Ui {
 class Dialog;
@@ -29,10 +28,8 @@ private slots:
 
 private:
     Ui::Dialog *ui;
-    Server* server;
-    Decoder decoder;
-    Frames frames;
-    QYUVOpenGLWidget* w;
+
+    QPointer<VideoForm> m_videoForm;
 };
 
 #endif // DIALOG_H
