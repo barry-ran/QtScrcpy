@@ -90,15 +90,19 @@ void QYUVOpenGLWidget::setFrameSize(const QSize &frameSize)
     if (m_frameSize != frameSize) {
         m_frameSize = frameSize;
         m_needUpdate = true;
+        // inittexture immediately
+        repaint();
     }
 }
 
 void QYUVOpenGLWidget::updateTextures(quint8 *dataY, quint8 *dataU, quint8 *dataV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV)
 {
-    updateTexture(m_texture[0], 0, dataY, linesizeY);
-    updateTexture(m_texture[1], 1, dataU, linesizeU);
-    updateTexture(m_texture[2], 2, dataV, linesizeV);
-    update();
+    if (m_textureInited) {
+        updateTexture(m_texture[0], 0, dataY, linesizeY);
+        updateTexture(m_texture[1], 1, dataU, linesizeU);
+        updateTexture(m_texture[2], 2, dataV, linesizeV);
+        update();
+    }
 }
 
 void QYUVOpenGLWidget::initializeGL()
@@ -114,36 +118,35 @@ void QYUVOpenGLWidget::initializeGL()
     // 设置背景清理色为黑色
     glClearColor(0.0,0.0,0.0,0.0);
     // 清理颜色背景
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);    
 }
 
 void QYUVOpenGLWidget::paintGL()
 {    
     if (m_needUpdate) {
-        //TODO 需要deInitTextures吗
         deInitTextures();
         initTextures();
         m_needUpdate = false;
     }
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture[0]);
+    if (m_textureInited) {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_texture[0]);
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_texture[1]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, m_texture[1]);
 
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, m_texture[2]);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, m_texture[2]);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    // 没有画面则显示黑屏
-    //glClear(GL_COLOR_BUFFER_BIT);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
 }
 
 void QYUVOpenGLWidget::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);
+    repaint();
 }
 
 void QYUVOpenGLWidget::initShader()
@@ -208,12 +211,14 @@ void QYUVOpenGLWidget::initTextures()
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width()/2, m_frameSize.height()/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
+    m_textureInited = true;
 }
 
 void QYUVOpenGLWidget::deInitTextures()
 {
     glDeleteTextures(3, m_texture);
     memset(m_texture, 0, 3);
+    m_textureInited = false;
 }
 
 void QYUVOpenGLWidget::updateTexture(GLuint texture, quint32 textureType, quint8 *pixels, quint32 stride)

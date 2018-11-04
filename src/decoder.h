@@ -32,7 +32,8 @@ public:
     void stopDecode();
 
 signals:
-    void newFrame();
+    void onNewFrame();
+    void onDecodeStop();
 
 protected:
     void run();

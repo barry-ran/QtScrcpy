@@ -34,7 +34,8 @@ SOURCES += \
     convert.cpp \
     frames.cpp \
     fpscounter.cpp \
-    qyuvopenglwidget.cpp
+    qyuvopenglwidget.cpp \
+    videoform.cpp
 
 HEADERS += \
         dialog.h \
@@ -44,10 +45,12 @@ HEADERS += \
     convert.h \
     frames.h \
     fpscounter.h \
-    qyuvopenglwidget.h
+    qyuvopenglwidget.h \
+    videoform.h
 
 FORMS += \
-        dialog.ui
+        dialog.ui \
+    videoform.ui
 
 INCLUDEPATH += \
         $$PWD/ffmpeg/include
