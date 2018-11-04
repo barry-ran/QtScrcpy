@@ -1,12 +1,16 @@
 #include <QDebug>
 #include <QTimer>
 #include <QThread>
+#include <QSize>
+#include <QTimerEvent>
 
 #include "server.h"
 
 #define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
+#define DEVICE_NAME_FIELD_LENGTH 64
 //#define SOCKET_NAME "qtscrcpy" //jar需要同步修改
 #define SOCKET_NAME "scrcpy"
+
 
 Server::Server(QObject *parent) : QObject(parent)
 {
@@ -16,15 +20,27 @@ Server::Server(QObject *parent) : QObject(parent)
     connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
         m_deviceSocket = m_serverSocket.nextPendingConnection();
         m_deviceSocket->setParent(Q_NULLPTR);
-//        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
-//            static quint64 count = 0;
-//            qDebug() << count <<  "ready read";
-//            count++;
-//            QByteArray ar = m_deviceSocket->readAll();
-//            //m_deviceSocket->write(ar);
-//        });
-    });
 
+        QString deviceName;
+        QSize deviceSize;
+
+        if (m_deviceSocket->isValid() && readInfo(deviceName, deviceSize)) {
+            // we don't need the server socket anymore
+            // just m_deviceSocket is ok
+            m_serverSocket.close();
+            // the server is started, we can clean up the jar from the temporary folder
+            removeServer();
+            m_serverCopiedToDevice = false;
+            // we don't need the adb tunnel anymore
+            disableTunnelReverse();
+            m_tunnelEnabled = false;
+            emit connectToResult(true, deviceName, deviceSize);
+        } else {
+            stop();
+            emit connectToResult(false, deviceName, deviceSize);
+        }
+        stopAcceptTimeoutTimer();
+    });
 }
 
 Server:: ~Server()
@@ -159,70 +175,64 @@ bool Server::connectTo()
     if (SSS_RUNNING != m_serverStartStep) {
         qWarning("server not run");
         return false;
-    }
-    if (m_tunnelForward) {
-        m_deviceSocket = new QTcpSocket();
-//        connect(m_deviceSocket, &QTcpSocket::readyRead, this, [this](){
-//            static quint64 count = 0;
-//            qDebug() << count <<  "ready read";
-//            count++;
-//        });
+    }    
 
-        // wait for devices server start
-        QTimer::singleShot(1000, this, [this](){
-            if (m_deviceSocket) {
-                m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
-            }
-        });
+    if (!m_tunnelForward && !m_deviceSocket) {
+        startAcceptTimeoutTimer();
+        return true;
     }
 
-    QTimer::singleShot(1200, this, [this](){
-        if (!m_deviceSocket) {
-            emit connectToResult(false);
-            return;
-        }
+    QString deviceName;
+    QSize deviceSize;
+    bool success = false;
 
-        bool success = false;
-        if (m_tunnelForward) {
-            if (m_deviceSocket->isValid()) {
-                // connect will success even if devices offline, recv data is real connect success
-                // because connect is to pc adb server
-                QByteArray data = m_deviceSocket->read(1);
-                if (!data.isEmpty()) {
-                    success = true;
-                } else {
-                    success = false;
-                }
-            } else {
-                m_deviceSocket->deleteLater();
-                success = false;
-            }
+    m_deviceSocket = new QTcpSocket();
+
+    // wait for devices server start
+    m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+    if (!m_deviceSocket->waitForConnected(1000)) {
+        stop();
+        qWarning("connect to server failed");
+        emit connectToResult(false, "", QSize());
+        return false;
+    }
+    if (QTcpSocket::ConnectedState == m_deviceSocket->state()) {
+        // connect will success even if devices offline, recv data is real connect success
+        // because connect is to pc adb server
+        m_deviceSocket->waitForReadyRead(1000);
+        QByteArray data = m_deviceSocket->read(1);
+        if (!data.isEmpty() && readInfo(deviceName, deviceSize)) {
+            success = true;
         } else {
-            if (m_deviceSocket->isValid()) {
-                // we don't need the server socket anymore
-                // just m_deviceSocket is ok
-                m_serverSocket.close();
-                success = true;
-            } else {
-                m_deviceSocket->deleteLater();
-                success = false;
-            }
+            qWarning("connect to server read device info failed");
+            success = false;
         }
-        if (success) {
-            // the server is started, we can clean up the jar from the temporary folder
-            removeServer();
-            m_serverCopiedToDevice = false;
-            // we don't need the adb tunnel anymore
-            if (m_tunnelForward) {
-                disableTunnelForward();
-            } else {
-                disableTunnelReverse();
-            }
-            m_tunnelEnabled = false;
-        }
-        emit connectToResult(success);
-    });
-    return true;
+    } else {
+        qWarning("connect to server failed");
+        m_deviceSocket->deleteLater();
+        success = false;
+    }
+
+    if (success) {
+        // the server is started, we can clean up the jar from the temporary folder
+        removeServer();
+        m_serverCopiedToDevice = false;
+        // we don't need the adb tunnel anymore
+        disableTunnelForward();
+        m_tunnelEnabled = false;
+    } else {
+        stop();
+    }
+    emit connectToResult(success, deviceName, deviceSize);
+    return success;
+}
+
+void Server::timerEvent(QTimerEvent *event)
+{
+    if (event && m_acceptTimeoutTimer == event->timerId()) {
+        stopAcceptTimeoutTimer();
+        emit connectToResult(false, "", QSize());
+    }
 }
 
 QTcpSocket* Server::getDeviceSocketByThread(QThread* thread)
@@ -315,6 +325,41 @@ bool Server::startServerByStep()
     return stepSuccess;
 }
 
+bool Server::readInfo(QString &deviceName, QSize &size)
+{
+    unsigned char buf[DEVICE_NAME_FIELD_LENGTH + 4];
+    if (m_deviceSocket->bytesAvailable() <= (DEVICE_NAME_FIELD_LENGTH + 4)) {
+        m_deviceSocket->waitForReadyRead(300);
+    }
+
+    qint64 len = m_deviceSocket->read((char*)buf, sizeof(buf));
+    if (len < DEVICE_NAME_FIELD_LENGTH + 4) {
+        qInfo("Could not retrieve device information");
+        return false;
+    }
+    buf[DEVICE_NAME_FIELD_LENGTH - 1] = '\0'; // in case the client sends garbage
+    // strcpy is safe here, since name contains at least DEVICE_NAME_FIELD_LENGTH bytes
+    // and strlen(buf) < DEVICE_NAME_FIELD_LENGTH
+    deviceName = (char*)buf;
+    size.setWidth((buf[DEVICE_NAME_FIELD_LENGTH] << 8) | buf[DEVICE_NAME_FIELD_LENGTH + 1]);
+    size.setHeight((buf[DEVICE_NAME_FIELD_LENGTH + 2] << 8) | buf[DEVICE_NAME_FIELD_LENGTH + 3]);
+    return true;
+}
+
+void Server::startAcceptTimeoutTimer()
+{
+    stopAcceptTimeoutTimer();
+    m_acceptTimeoutTimer = startTimer(1000);
+}
+
+void Server::stopAcceptTimeoutTimer()
+{
+    if (m_acceptTimeoutTimer) {
+        killTimer(m_acceptTimeoutTimer);
+        m_acceptTimeoutTimer = 0;
+    }
+}
+
 void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
 {
     if (sender() == &m_workProcess) {
@@ -374,7 +419,9 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 m_serverStartStep = SSS_NULL;
                 emit serverStartResult(false);
             }
+        } else if (SSS_RUNNING == m_serverStartStep) {
+            m_serverStartStep = SSS_NULL;
+            emit onServerStop();
         }
     }
-
 }
