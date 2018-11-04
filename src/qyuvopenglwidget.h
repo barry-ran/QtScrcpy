@@ -1,5 +1,6 @@
 #ifndef QYUVOPENGLWIDGET_H
 #define QYUVOPENGLWIDGET_H
+
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
@@ -33,7 +34,7 @@ private:
 private:
     // 视频帧尺寸
     QSize m_frameSize = {-1, -1};
-    bool m_needInit = false;
+    bool m_needUpdate = false;
 
     // 顶点缓冲对象(Vertex Buffer Objects, VBO)：默认即为VertexBuffer(GL_ARRAY_BUFFER)类型
     QOpenGLBuffer m_vbo;
@@ -45,9 +46,6 @@ private:
     QOpenGLTexture* m_textureY = Q_NULLPTR;
     QOpenGLTexture* m_textureU = Q_NULLPTR;
     QOpenGLTexture* m_textureV = Q_NULLPTR;
-
-    // YUV纹理，用于生成纹理贴图
-    GLuint m_texture[3] = {0};
 };
 
 #endif // QYUVOPENGLWIDGET_H

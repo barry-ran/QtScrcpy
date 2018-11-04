@@ -33,7 +33,6 @@ SOURCES += \
         server.cpp \
     convert.cpp \
     frames.cpp \
-    yuvglwidget.cpp \
     fpscounter.cpp \
     qyuvopenglwidget.cpp
 
@@ -44,7 +43,6 @@ HEADERS += \
         server.h \
     convert.h \
     frames.h \
-    yuvglwidget.h \
     fpscounter.h \
     qyuvopenglwidget.h
 
