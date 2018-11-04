@@ -1,12 +1,10 @@
 #ifndef QYUVOPENGLWIDGET_H
 #define QYUVOPENGLWIDGET_H
-
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLBuffer>
 
-QT_FORWARD_DECLARE_CLASS(QOpenGLTexture)
 class QYUVOpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -40,12 +38,10 @@ private:
     QOpenGLBuffer m_vbo;
 
     // 着色器程序：编译链接着色器
-    QOpenGLShaderProgram m_shaderProgram;
+    QOpenGLShaderProgram m_shaderProgram;    
 
     // YUV纹理，用于生成纹理贴图
-    QOpenGLTexture* m_textureY = Q_NULLPTR;
-    QOpenGLTexture* m_textureU = Q_NULLPTR;
-    QOpenGLTexture* m_textureV = Q_NULLPTR;
+    GLuint m_texture[3] = {0};
 };
 
 #endif // QYUVOPENGLWIDGET_H
