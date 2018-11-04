@@ -35,10 +35,14 @@ public:
 
 signals:
     void serverStartResult(bool success);
-    void connectToResult(bool success);
+    void connectToResult(bool success, const QString &deviceName, const QSize &size);
+    void onServerStop();
 
 private slots:
     void onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult);
+
+protected:
+    void timerEvent(QTimerEvent *event);
 
 private:
     const QString& getServerPath();
@@ -50,6 +54,9 @@ private:
     bool disableTunnelForward();
     bool execute();
     bool startServerByStep();
+    bool readInfo(QString& deviceName, QSize& size);
+    void startAcceptTimeoutTimer();
+    void stopAcceptTimeoutTimer();
 
 private:
     QString m_serverPath = "";
@@ -65,6 +72,7 @@ private:
     quint16 m_maxSize = 0;
     quint32 m_bitRate = 0;
     QString m_crop = "";
+    quint32 m_acceptTimeoutTimer = 0;
 
     SERVER_START_STEP m_serverStartStep = SSS_NULL;
 };
