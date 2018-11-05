@@ -45,7 +45,7 @@ static qint32 readPacket(void *opaque, quint8 *buf, qint32 bufSize) {
     return 0;
 }
 
-void Decoder::setDeviceSocket(QTcpSocket* deviceSocket)
+void Decoder::setDeviceSocket(DeviceSocket* deviceSocket)
 {
     m_deviceSocket = deviceSocket;
 }
@@ -56,16 +56,7 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
         return 0;
     }
     if (m_deviceSocket) {
-        while (!m_quit && m_deviceSocket->bytesAvailable() <= 0) {
-            if (!m_deviceSocket->waitForReadyRead(300)
-                    && QTcpSocket::SocketTimeoutError != m_deviceSocket->error()) {
-                qDebug() << "waitForReadyRead error " << m_deviceSocket->error();
-                break;                
-            }
-        }
-        qint64 readSize = qMin(m_deviceSocket->bytesAvailable(), (qint64)bufSize);
-        //qDebug() << "ready recv data " << readSize;
-        return m_deviceSocket->read((char*)buf, readSize);
+        return m_deviceSocket->recvData(buf, bufSize);
     }    
     return 0;
 }
@@ -239,12 +230,7 @@ runQuit:
             avcodec_free_context(&codecCtx);
         }
 
-        emit onDecodeStop();
-
-        if (m_deviceSocket) {
-            m_deviceSocket->disconnectFromHost();
-            delete m_deviceSocket;
-        }
+        emit onDecodeStop();        
 }
 
 void Decoder::pushFrame()

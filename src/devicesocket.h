@@ -1,6 +1,7 @@
 #ifndef DEVICESOCKET_H
 #define DEVICESOCKET_H
 
+#include <QEvent>
 #include <QTcpSocket>
 #include <QMutex>
 #include <QWaitCondition>
@@ -14,10 +15,12 @@ public:
 
     qint32 recvData(quint8* buf, qint32 bufSize);
 
-signals:
+protected:
+    bool eventFilter(QObject *watched, QEvent *event);
 
 protected slots:
     void onReadyRead();
+    void quitNotify();
 
 private:
     QMutex m_mutex;

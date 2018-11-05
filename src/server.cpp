@@ -17,9 +17,8 @@ Server::Server(QObject *parent) : QObject(parent)
     connect(&m_workProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
     connect(&m_serverProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
 
-    connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
-        m_deviceSocket = m_serverSocket.nextPendingConnection();
-        m_deviceSocket->setParent(Q_NULLPTR);
+    connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){        
+        m_deviceSocket = dynamic_cast<DeviceSocket*>(m_serverSocket.nextPendingConnection());
 
         QString deviceName;
         QSize deviceSize;
@@ -186,7 +185,7 @@ bool Server::connectTo()
     QSize deviceSize;
     bool success = false;
 
-    m_deviceSocket = new QTcpSocket();
+    m_deviceSocket = new DeviceSocket();
 
     // wait for devices server start
     m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
@@ -235,23 +234,17 @@ void Server::timerEvent(QTimerEvent *event)
     }
 }
 
-QTcpSocket* Server::getDeviceSocketByThread(QThread* thread)
-{
-    if (!m_deviceSocket || QThread::currentThread() != m_deviceSocket->thread()) {
-        return Q_NULLPTR;
-    }
-
-    if (thread) {
-        m_deviceSocket->moveToThread(thread);
-    }
-    QTcpSocket* devicesSocket = m_deviceSocket;
-    m_deviceSocket = Q_NULLPTR;
-
-    return devicesSocket;
+DeviceSocket* Server::getDeviceSocket()
+{    
+    return m_deviceSocket;
 }
 
 void Server::stop()
 {
+    if (m_deviceSocket) {
+        m_deviceSocket->close();
+        m_deviceSocket->deleteLater();
+    }
     // ignore failure
     m_serverProcess.kill();
     if (m_tunnelEnabled) {
@@ -267,11 +260,7 @@ void Server::stop()
         removeServer();
         m_serverCopiedToDevice = false;
     }
-    m_serverSocket.close();
-    if (m_deviceSocket) {
-        m_deviceSocket->close();
-        m_deviceSocket->deleteLater();
-    }
+    m_serverSocket.close();    
 }
 
 bool Server::startServerByStep()
