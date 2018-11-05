@@ -22,18 +22,16 @@ VideoForm::VideoForm(QWidget *parent) :
 
     connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
         if (success) {
+            // update ui
             setWindowTitle(deviceName);
-
             updateShowSize(size);
-            // 双屏有问题，位置有问题
             QDesktopWidget* desktop = QApplication::desktop();
             if (desktop) {
-                QSize screenSize = desktop->size();
-                if (!screenSize.isEmpty()) {
-                    move((screenSize.width() - width())/2, (screenSize.height() - height())/2);
-                }
+                QRect mainScreenRc = desktop->availableGeometry();
+                move((mainScreenRc.width() - width())/2, (mainScreenRc.height() - height())/2);
             }
 
+            // init decode
             m_decoder.setDeviceSocket(m_server->getDeviceSocketByThread(&m_decoder));
             m_decoder.startDecode();
         }
