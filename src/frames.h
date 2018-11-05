@@ -1,5 +1,6 @@
 #ifndef FRAMES_H
 #define FRAMES_H
+
 #include <QMutex>
 #include <QWaitCondition>
 
