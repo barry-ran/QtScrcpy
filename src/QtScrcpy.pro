@@ -35,7 +35,8 @@ SOURCES += \
     frames.cpp \
     fpscounter.cpp \
     qyuvopenglwidget.cpp \
-    videoform.cpp
+    videoform.cpp \
+    devicesocket.cpp
 
 HEADERS += \
         dialog.h \
@@ -46,7 +47,8 @@ HEADERS += \
     frames.h \
     fpscounter.h \
     qyuvopenglwidget.h \
-    videoform.h
+    videoform.h \
+    devicesocket.h
 
 FORMS += \
         dialog.ui \
