@@ -2,10 +2,10 @@
 #define DECODER_H
 #include <functional>
 #include <QThread>
-#include <QTcpSocket>
 #include <QPointer>
 #include <QMutex>
 
+#include "devicesocket.h"
 extern "C"
 {
 #include "libavcodec/avcodec.h"
@@ -26,7 +26,7 @@ public:
     static void deInit();    
 
     void setFrames(Frames* frames);
-    void setDeviceSocket(QTcpSocket* deviceSocket);
+    void setDeviceSocket(DeviceSocket* deviceSocket);
     qint32 recvData(quint8* buf, qint32 bufSize);
     bool startDecode();
     void stopDecode();
@@ -40,7 +40,7 @@ protected:
     void pushFrame();
 
 private:
-    QPointer<QTcpSocket> m_deviceSocket = Q_NULLPTR;    
+    QPointer<DeviceSocket> m_deviceSocket;
     QMutex m_mutex;
     bool m_quit = false;
     Frames* m_frames;

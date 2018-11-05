@@ -2,10 +2,10 @@
 #define SERVER_H
 
 #include <QObject>
-#include <QTcpSocket>
-#include <QTcpServer>
 #include <QPointer>
 
+#include "tcpServer.h"
+#include "devicesocket.h"
 #include "adbprocess.h"
 
 class Server : public QObject
@@ -27,9 +27,7 @@ public:
     bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop);    
     bool connectTo();
 
-    // you can call this if you will use device socket in sub thread
-    // must call this in main thread
-    QTcpSocket* getDeviceSocketByThread(QThread* thread);
+    DeviceSocket* getDeviceSocket();
 
     void stop();
 
@@ -63,8 +61,8 @@ private:
     AdbProcess m_workProcess;
     QString m_serial = "";
     AdbProcess m_serverProcess;
-    QTcpServer m_serverSocket; // only used if !tunnel_forward
-    QPointer<QTcpSocket> m_deviceSocket = Q_NULLPTR;
+    TcpServer m_serverSocket; // only used if !tunnel_forward
+    QPointer<DeviceSocket> m_deviceSocket = Q_NULLPTR;
     quint16 m_localPort = 0;
     bool m_tunnelEnabled = false;
     bool m_tunnelForward = false; // use "adb forward" instead of "adb reverse"

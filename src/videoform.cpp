@@ -32,7 +32,7 @@ VideoForm::VideoForm(QWidget *parent) :
             }
 
             // init decode
-            m_decoder.setDeviceSocket(m_server->getDeviceSocketByThread(&m_decoder));
+            m_decoder.setDeviceSocket(m_server->getDeviceSocket());
             m_decoder.startDecode();
         }
     });
@@ -58,12 +58,13 @@ VideoForm::VideoForm(QWidget *parent) :
     },Qt::QueuedConnection);
 
     m_server->start("P7C0218510000537", 27183, 1080, 8000000, "");
+    //m_server->start("P7C0218510000537", 27183, 0, 8000000, "");
 }
 
 VideoForm::~VideoForm()
 {
-    m_decoder.stopDecode();
     m_server->stop();
+    m_decoder.stopDecode();
     delete m_server;
     m_frames.deInit();
     delete ui;
