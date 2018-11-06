@@ -16,7 +16,7 @@ public:
     qint32 recvData(quint8* buf, qint32 bufSize);
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool event(QEvent *event);
 
 protected slots:
     void onReadyRead();
