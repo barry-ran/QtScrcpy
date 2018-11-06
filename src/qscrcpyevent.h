@@ -18,11 +18,4 @@ class DeviceSocketEvent : public QScrcpyEvent
 public:
     DeviceSocketEvent() : QScrcpyEvent(DeviceSocket){}
 };
-
-// ControlEvent
-class ControlEvent : public QScrcpyEvent
-{
-public:
-    ControlEvent() : QScrcpyEvent(Control){}
-};
 #endif // QSCRCPYEVENT_H

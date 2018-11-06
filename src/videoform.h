@@ -6,6 +6,7 @@
 #include "server.h"
 #include "decoder.h"
 #include "frames.h"
+#include "controller.h"
 
 namespace Ui {
 class videoForm;
@@ -22,11 +23,15 @@ public:
 private:
     void updateShowSize(const QSize &newSize);
 
+protected:
+    void mousePressEvent(QMouseEvent *event);
+
 private:
     Ui::videoForm *ui;
     Server* m_server = Q_NULLPTR;
     Decoder m_decoder;
     Frames m_frames;
+    Controller m_controller;
 };
 
 #endif // VIDEOFORM_H

@@ -3,6 +3,7 @@
 
 #include "decoder.h"
 #include "frames.h"
+#include "devicesocket.h"
 
 #define BUFSIZE 0x10000
 

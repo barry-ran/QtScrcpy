@@ -1,11 +1,10 @@
 #ifndef DECODER_H
 #define DECODER_H
-#include <functional>
+
 #include <QThread>
 #include <QPointer>
 #include <QMutex>
 
-#include "devicesocket.h"
 extern "C"
 {
 #include "libavcodec/avcodec.h"
@@ -13,7 +12,7 @@ extern "C"
 }
 
 class Frames;
-
+class DeviceSocket;
 class Decoder : public QThread
 {
     Q_OBJECT

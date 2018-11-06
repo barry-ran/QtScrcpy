@@ -16,6 +16,7 @@ public:
     QSize sizeHint() const override;
 
     void setFrameSize(const QSize& frameSize);
+    const QSize& frameSize();
     void updateTextures(quint8* dataY, quint8* dataU, quint8* dataV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV);
 
 protected:

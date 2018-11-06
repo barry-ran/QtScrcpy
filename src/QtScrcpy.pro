@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 #DEFINES += SKIP_FRAMES
 
+# 源码
 SOURCES += \
         main.cpp \
         dialog.cpp \
@@ -37,7 +38,9 @@ SOURCES += \
     qyuvopenglwidget.cpp \
     videoform.cpp \
     devicesocket.cpp \
-    tcpserver.cpp
+    tcpserver.cpp \
+    controlevent.cpp \
+    controller.cpp
 
 HEADERS += \
         dialog.h \
@@ -51,15 +54,23 @@ HEADERS += \
     videoform.h \
     devicesocket.h \
     tcpserver.h \
-    qscrcpyevent.h
+    qscrcpyevent.h \
+    controlevent.h \
+    controller.h
 
 FORMS += \
         dialog.ui \
     videoform.ui
 
-INCLUDEPATH += \
-        $$PWD/ffmpeg/include
+#子工程
+include ($$PWD/android/android.pri)
 
+# 附加包含路径
+INCLUDEPATH += \
+        $$PWD/ffmpeg/include \
+        $$PWD/android
+
+# 依赖库
 LIBS += \
         -L$$PWD/ffmpeg/lib -lavcodec \
         -L$$PWD/ffmpeg/lib -lavformat \
