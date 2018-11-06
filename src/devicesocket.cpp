@@ -9,8 +9,6 @@ DeviceSocket::DeviceSocket(QObject *parent) : QTcpSocket(parent)
     connect(this, &DeviceSocket::readyRead, this, &DeviceSocket::onReadyRead);
     connect(this, &DeviceSocket::aboutToClose, this, &DeviceSocket::quitNotify);
     connect(this, &DeviceSocket::disconnected, this, &DeviceSocket::quitNotify);
-
-    installEventFilter(this);
 }
 
 DeviceSocket::~DeviceSocket()
@@ -39,13 +37,13 @@ qint32 DeviceSocket::recvData(quint8 *buf, qint32 bufSize)
     return m_dataSize;
 }
 
-bool DeviceSocket::eventFilter(QObject *watched, QEvent *event)
+bool DeviceSocket::event(QEvent *event)
 {
     if (event->type() == QScrcpyEvent::DeviceSocket) {
         onReadyRead();
         return true;
     }
-    return false;
+    return QTcpSocket::event(event);
 }
 
 void DeviceSocket::onReadyRead()
