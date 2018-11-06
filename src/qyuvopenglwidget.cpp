@@ -95,6 +95,11 @@ void QYUVOpenGLWidget::setFrameSize(const QSize &frameSize)
     }
 }
 
+const QSize& QYUVOpenGLWidget::frameSize()
+{
+    return m_frameSize;
+}
+
 void QYUVOpenGLWidget::updateTextures(quint8 *dataY, quint8 *dataU, quint8 *dataV, quint32 linesizeY, quint32 linesizeU, quint32 linesizeV)
 {
     if (m_textureInited) {

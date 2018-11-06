@@ -1,4 +1,5 @@
 #include <QDesktopWidget>
+#include <QMouseEvent>
 
 #include "videoform.h"
 #include "ui_videoform.h"
@@ -34,6 +35,9 @@ VideoForm::VideoForm(QWidget *parent) :
             // init decode
             m_decoder.setDeviceSocket(m_server->getDeviceSocket());
             m_decoder.startDecode();
+
+            // init controller
+            m_controller.setDeviceSocket(m_server->getDeviceSocket());
         }
     });
 
@@ -83,4 +87,10 @@ void VideoForm::updateShowSize(const QSize &newSize)
     if (showSize != size()) {
         resize(showSize);
     }
+}
+
+void VideoForm::mousePressEvent(QMouseEvent *event)
+{
+    QRect rc(event->pos(), ui->videoWidget->frameSize());
+    m_controller.test(rc);
 }

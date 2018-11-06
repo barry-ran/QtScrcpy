@@ -24,6 +24,7 @@ void Dialog::on_adbProcess_clicked()
 {
     AdbProcess* adb = new AdbProcess();
     connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+        Q_UNUSED(processResult);
         sender()->deleteLater();
     });
     adb->execute("", QStringList() << "devices");
