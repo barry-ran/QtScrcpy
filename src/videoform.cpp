@@ -91,6 +91,14 @@ void VideoForm::updateShowSize(const QSize &newSize)
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-    QRect rc(event->pos(), ui->videoWidget->frameSize());
+    QSize frameSize = ui->videoWidget->frameSize();
+    QSize widgetWize = size();
+
+    QPoint pos = event->pos();
+    // convert pos
+    pos.setX(pos.x() * 1.0f * frameSize.width() / widgetWize.width());
+    pos.setY(pos.y() * 1.0f * frameSize.height() / widgetWize.height());
+
+    QRect rc(pos, frameSize);
     m_controller.test(rc);
 }
