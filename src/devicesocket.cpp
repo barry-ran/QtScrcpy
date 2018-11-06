@@ -1,14 +1,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 
+#include "qscrcpyevent.h"
 #include "devicesocket.h"
-
-static const int GetDataEvent = QEvent::registerEventType(QEvent::User+1);
-class DeviceSocketEvent : public QEvent
-{
-public:
-    DeviceSocketEvent() : QEvent(QEvent::Type(GetDataEvent)){}
-};
 
 DeviceSocket::DeviceSocket(QObject *parent) : QTcpSocket(parent)
 {
@@ -47,7 +41,7 @@ qint32 DeviceSocket::recvData(quint8 *buf, qint32 bufSize)
 
 bool DeviceSocket::eventFilter(QObject *watched, QEvent *event)
 {
-    if (event->type() == GetDataEvent) {
+    if (event->type() == QScrcpyEvent::DeviceSocket) {
         onReadyRead();
         return true;
     }

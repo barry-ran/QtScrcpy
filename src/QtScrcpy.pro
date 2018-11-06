@@ -50,7 +50,8 @@ HEADERS += \
     qyuvopenglwidget.h \
     videoform.h \
     devicesocket.h \
-    tcpserver.h
+    tcpserver.h \
+    qscrcpyevent.h
 
 FORMS += \
         dialog.ui \
