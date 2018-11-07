@@ -3,6 +3,7 @@
 
 #include "videoform.h"
 #include "ui_videoform.h"
+#include "inputconvert.h"
 
 VideoForm::VideoForm(QWidget *parent) :
     QWidget(parent),
@@ -91,14 +92,32 @@ void VideoForm::updateShowSize(const QSize &newSize)
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-    QSize frameSize = ui->videoWidget->frameSize();
-    QSize widgetWize = size();
+    ControlEvent* controlEvent = InputConvert::mouseEvent(event, ui->videoWidget->frameSize(), size());
+    if (controlEvent) {
+        m_controller.postControlEvent(controlEvent);
+    }
+}
 
-    QPoint pos = event->pos();
-    // convert pos
-    pos.setX(pos.x() * 1.0f * frameSize.width() / widgetWize.width());
-    pos.setY(pos.y() * 1.0f * frameSize.height() / widgetWize.height());
+void VideoForm::mouseReleaseEvent(QMouseEvent *event)
+{
+    ControlEvent* controlEvent = InputConvert::mouseEvent(event, ui->videoWidget->frameSize(), size());
+    if (controlEvent) {
+        m_controller.postControlEvent(controlEvent);
+    }
+}
 
-    QRect rc(pos, frameSize);
-    m_controller.test(rc);
+void VideoForm::mouseMoveEvent(QMouseEvent *event)
+{
+    ControlEvent* controlEvent = InputConvert::mouseEvent(event, ui->videoWidget->frameSize(), size());
+    if (controlEvent) {
+        m_controller.postControlEvent(controlEvent);
+    }
+}
+
+void VideoForm::wheelEvent(QWheelEvent *event)
+{
+    ControlEvent* controlEvent = InputConvert::wheelEvent(event, ui->videoWidget->frameSize(), size());
+    if (controlEvent) {
+        m_controller.postControlEvent(controlEvent);
+    }
 }
