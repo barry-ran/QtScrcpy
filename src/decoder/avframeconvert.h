@@ -1,5 +1,5 @@
-#ifndef CONVERT_H
-#define CONVERT_H
+#ifndef AVFRAMECONVERT_H
+#define AVFRAMECONVERT_H
 #include <QtGlobal>
 
 extern "C"
@@ -9,11 +9,11 @@ extern "C"
 #include "libavutil/frame.h"
 }
 
-class Convert
+class AVFrameConvert
 {
 public:
-    Convert();
-    virtual ~Convert();
+    AVFrameConvert();
+    virtual ~AVFrameConvert();
 
 public:
     void setSrcFrameInfo(quint32 srcWidth, quint32 srcHeight, AVPixelFormat srcFormat);
@@ -37,4 +37,4 @@ private:
     struct SwsContext *m_convertCtx = Q_NULLPTR;
 };
 
-#endif // CONVERT_H
+#endif // AVFRAMECONVERT_H

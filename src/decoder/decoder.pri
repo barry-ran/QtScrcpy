@@ -1,12 +1,12 @@
 HEADERS += \
-    $$PWD/convert.h \
     $$PWD/decoder.h \
     $$PWD/frames.h \
-    $$PWD/fpscounter.h
+    $$PWD/fpscounter.h \
+    $$PWD/avframeconvert.h
 
 SOURCES += \
-    $$PWD/convert.cpp \
     $$PWD/decoder.cpp \
     $$PWD/frames.cpp \
-    $$PWD/fpscounter.cpp
+    $$PWD/fpscounter.cpp \
+    $$PWD/avframeconvert.cpp
 

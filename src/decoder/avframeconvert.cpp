@@ -1,18 +1,18 @@
 #include <QDebug>
 
-#include "convert.h"
+#include "avframeconvert.h"
 
-Convert::Convert()
+AVFrameConvert::AVFrameConvert()
 {
 
 }
 
-Convert::~Convert()
+AVFrameConvert::~AVFrameConvert()
 {
 
 }
 
-void Convert::setSrcFrameInfo(quint32 srcWidth, quint32 srcHeight, AVPixelFormat srcFormat)
+void AVFrameConvert::setSrcFrameInfo(quint32 srcWidth, quint32 srcHeight, AVPixelFormat srcFormat)
 {
     m_srcWidth = srcWidth;
     m_srcHeight = srcHeight;
@@ -20,28 +20,28 @@ void Convert::setSrcFrameInfo(quint32 srcWidth, quint32 srcHeight, AVPixelFormat
     qDebug() << "Convert::src frame info " << srcWidth << "x" << srcHeight;
 }
 
-void Convert::getSrcFrameInfo(quint32& srcWidth, quint32& srcHeight, AVPixelFormat& srcFormat)
+void AVFrameConvert::getSrcFrameInfo(quint32& srcWidth, quint32& srcHeight, AVPixelFormat& srcFormat)
 {
     srcWidth = m_srcWidth;
     srcHeight = m_srcHeight;
     srcFormat = m_srcFormat;    
 }
 
-void Convert::setDstFrameInfo(quint32 dstWidth, quint32 dstHeight, AVPixelFormat dstFormat)
+void AVFrameConvert::setDstFrameInfo(quint32 dstWidth, quint32 dstHeight, AVPixelFormat dstFormat)
 {
     m_dstWidth = dstWidth;
     m_dstHeight = dstHeight;
     m_dstFormat = dstFormat;
 }
 
-void Convert::getDstFrameInfo(quint32& dstWidth, quint32& dstHeight, AVPixelFormat& dstFormat)
+void AVFrameConvert::getDstFrameInfo(quint32& dstWidth, quint32& dstHeight, AVPixelFormat& dstFormat)
 {
     dstWidth = m_dstWidth;
     dstHeight = m_dstHeight;
     dstFormat = m_dstFormat;
 }
 
-bool Convert::init()
+bool AVFrameConvert::init()
 {
     if (m_convertCtx) {
         return true;
@@ -54,12 +54,12 @@ bool Convert::init()
     return true;
 }
 
-bool Convert::isInit()
+bool AVFrameConvert::isInit()
 {
     return m_convertCtx ? true : false;
 }
 
-void Convert::deInit()
+void AVFrameConvert::deInit()
 {
     if (m_convertCtx) {
         sws_freeContext(m_convertCtx);
@@ -67,7 +67,7 @@ void Convert::deInit()
     }
 }
 
-bool Convert::convert(AVFrame* srcFrame, AVFrame* dstFrame)
+bool AVFrameConvert::convert(AVFrame* srcFrame, AVFrame* dstFrame)
 {
     if(!m_convertCtx || !srcFrame || !dstFrame) {
         return false;
