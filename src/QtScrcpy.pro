@@ -29,46 +29,35 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         dialog.cpp \
-        adbprocess.cpp \
-        decoder.cpp \
-        server.cpp \
-    convert.cpp \
-    frames.cpp \
-    fpscounter.cpp \
-    qyuvopenglwidget.cpp \
-    videoform.cpp \
-    devicesocket.cpp \
-    tcpserver.cpp \
-    controlevent.cpp \
-    controller.cpp
+    videoform.cpp
 
 HEADERS += \
         dialog.h \
-        adbprocess.h \
-        decoder.h \
-        server.h \
-    convert.h \
-    frames.h \
-    fpscounter.h \
-    qyuvopenglwidget.h \
-    videoform.h \
-    devicesocket.h \
-    tcpserver.h \
-    qscrcpyevent.h \
-    controlevent.h \
-    controller.h
+    videoform.h
 
 FORMS += \
         dialog.ui \
     videoform.ui
 
 #子工程
+include ($$PWD/common/common.pri)
+include ($$PWD/server/server.pri)
+include ($$PWD/adb/adb.pri)
+include ($$PWD/decoder/decoder.pri)
+include ($$PWD/render/render.pri)
 include ($$PWD/android/android.pri)
+include ($$PWD/inputcontrol/inputcontrol.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
         $$PWD/ffmpeg/include \
-        $$PWD/android
+        $$PWD/common \
+        $$PWD/server \
+        $$PWD/adb \
+        $$PWD/decoder \
+        $$PWD/render \
+        $$PWD/android \
+        $$PWD/inputcontrol
 
 # 依赖库
 LIBS += \
