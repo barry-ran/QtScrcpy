@@ -121,3 +121,19 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         m_controller.postControlEvent(controlEvent);
     }
 }
+
+void VideoForm::keyPressEvent(QKeyEvent *event)
+{
+    ControlEvent* controlEvent = InputConvert::keyEvent(event);
+    if (controlEvent) {
+        m_controller.postControlEvent(controlEvent);
+    }
+}
+
+void VideoForm::keyReleaseEvent(QKeyEvent *event)
+{
+    ControlEvent* controlEvent = InputConvert::keyEvent(event);
+    if (controlEvent) {
+        m_controller.postControlEvent(controlEvent);
+    }
+}

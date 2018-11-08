@@ -1,5 +1,6 @@
 #include <QFile>
 #include <QTime>
+#include <QKeyEvent>
 
 #include "dialog.h"
 #include "ui_dialog.h"
@@ -43,4 +44,10 @@ void Dialog::on_stopServerBtn_clicked()
     if (m_videoForm) {
         m_videoForm->close();
     }
+}
+
+void Dialog::keyPressEvent(QKeyEvent *event)
+{
+    qDebug() << event->key();
+    return QDialog::keyPressEvent(event);
 }
