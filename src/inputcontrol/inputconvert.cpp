@@ -5,6 +5,11 @@ InputConvert::InputConvert()
 
 }
 
+InputConvert::~InputConvert()
+{
+
+}
+
 ControlEvent* InputConvert::mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize)
 {
     if (!from) {

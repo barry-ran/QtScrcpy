@@ -3,7 +3,6 @@
 
 #include "videoform.h"
 #include "ui_videoform.h"
-#include "inputconvert.h"
 
 VideoForm::VideoForm(QWidget *parent) :
     QWidget(parent),
@@ -99,7 +98,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-    ControlEvent* controlEvent = InputConvert::mouseEvent(event, ui->videoWidget->frameSize(), size());
+    ControlEvent* controlEvent = m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
     if (controlEvent) {
         m_controller.postControlEvent(controlEvent);
     }
@@ -107,7 +106,7 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
-    ControlEvent* controlEvent = InputConvert::mouseEvent(event, ui->videoWidget->frameSize(), size());
+    ControlEvent* controlEvent = m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
     if (controlEvent) {
         m_controller.postControlEvent(controlEvent);
     }
@@ -115,7 +114,7 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
-    ControlEvent* controlEvent = InputConvert::mouseEvent(event, ui->videoWidget->frameSize(), size());
+    ControlEvent* controlEvent = m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
     if (controlEvent) {
         m_controller.postControlEvent(controlEvent);
     }
@@ -123,7 +122,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
-    ControlEvent* controlEvent = InputConvert::wheelEvent(event, ui->videoWidget->frameSize(), size());
+    ControlEvent* controlEvent = m_inputConvert.wheelEvent(event, ui->videoWidget->frameSize(), size());
     if (controlEvent) {
         m_controller.postControlEvent(controlEvent);
     }
@@ -131,7 +130,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
 
 void VideoForm::keyPressEvent(QKeyEvent *event)
 {
-    ControlEvent* controlEvent = InputConvert::keyEvent(event);
+    ControlEvent* controlEvent = m_inputConvert.keyEvent(event);
     if (controlEvent) {
         m_controller.postControlEvent(controlEvent);
     }
@@ -139,7 +138,7 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
-    ControlEvent* controlEvent = InputConvert::keyEvent(event);
+    ControlEvent* controlEvent = m_inputConvert.keyEvent(event);
     if (controlEvent) {
         m_controller.postControlEvent(controlEvent);
     }
