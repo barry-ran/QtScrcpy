@@ -7,6 +7,7 @@
 #include "decoder.h"
 #include "frames.h"
 #include "controller.h"
+#include "inputconvert.h"
 
 namespace Ui {
 class videoForm;
@@ -38,6 +39,7 @@ private:
     Decoder m_decoder;
     Frames m_frames;
     Controller m_controller;
+    InputConvert m_inputConvert;
 };
 
 #endif // VIDEOFORM_H
