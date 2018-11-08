@@ -33,6 +33,7 @@ protected:
 
 private:
     Ui::videoForm *ui;
+    QSize frameSize;
     Server* m_server = Q_NULLPTR;
     Decoder m_decoder;
     Frames m_frames;

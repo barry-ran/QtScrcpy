@@ -77,16 +77,23 @@ VideoForm::~VideoForm()
 
 void VideoForm::updateShowSize(const QSize &newSize)
 {
-    QSize showSize = newSize;
-    QDesktopWidget* desktop = QApplication::desktop();
-    if (desktop) {
-        QSize screenSize = desktop->size();
-        showSize.setWidth(qMin(newSize.width(), screenSize.width()));
-        showSize.setHeight(qMin(newSize.height(), screenSize.height() - 100));
-    }
+    if (frameSize != newSize) {
+        frameSize = newSize;
 
-    if (showSize != size()) {
-        resize(showSize);
+        QSize showSize = newSize;
+        QDesktopWidget* desktop = QApplication::desktop();
+        if (desktop) {
+            QRect screenRect = desktop->availableGeometry();
+            showSize.setWidth(qMin(newSize.width(), screenRect.width()));
+            showSize.setHeight(qMin(newSize.height(), screenRect.height() - 100));
+
+            // 窗口居中
+            move(screenRect.center() - geometry().center());
+        }
+
+        if (showSize != size()) {
+            resize(showSize);
+        }
     }
 }
 
