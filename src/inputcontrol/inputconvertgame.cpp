@@ -24,14 +24,29 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
         return;
     }
 
+    int action = 0;
+
+    // pointer index
+    int pointerIndex = 0;
+
+    if (from->key() == Qt::Key_W) {
+        pointerIndex = 0x0000;
+    } else if (from->key() == Qt::Key_D) {
+        pointerIndex = 0x0100;
+    } else {
+        return;
+    }
+
+
+    action |= pointerIndex;
+
     // action
-    AndroidMotioneventAction action;
     switch (from->type()) {
     case QEvent::KeyPress:
-        action = AMOTION_EVENT_ACTION_DOWN;
+        action |= AMOTION_EVENT_ACTION_DOWN;
         break;
     case QEvent::KeyRelease:
-        action = AMOTION_EVENT_ACTION_UP;
+        action |= AMOTION_EVENT_ACTION_UP;
         break;
     default:
         return;
@@ -51,7 +66,7 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
     if (!controlEvent) {
         return;
     }
-    controlEvent->setMouseEventData(action, AMOTION_EVENT_BUTTON_PRIMARY, QRect(pos.toPoint(), frameSize));
+    controlEvent->setMouseEventData((AndroidMotioneventAction)action, AMOTION_EVENT_BUTTON_PRIMARY, QRect(pos.toPoint(), frameSize));
     sendControlEvent(controlEvent);
 
     if (QEvent::KeyPress == from->type()) {
@@ -60,7 +75,9 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
             return;
         }
         pos.setY(pos.y() - 50);
-        controlEvent2->setMouseEventData(AMOTION_EVENT_ACTION_MOVE, AMOTION_EVENT_BUTTON_PRIMARY, QRect(pos.toPoint(), frameSize));
+        action &= AMOTION_EVENT_ACTION_POINTER_INDEX_MASK;
+        action |= AMOTION_EVENT_ACTION_MOVE;
+        controlEvent2->setMouseEventData((AndroidMotioneventAction)action, AMOTION_EVENT_BUTTON_PRIMARY, QRect(pos.toPoint(), frameSize));
         sendControlEvent(controlEvent2);
     }
 }
