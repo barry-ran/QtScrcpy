@@ -6,8 +6,8 @@
 #include "server.h"
 #include "decoder.h"
 #include "frames.h"
-#include "controller.h"
-#include "inputconvert.h"
+#include "inputconvertnormal.h"
+#include "inputconvertgame.h"
 
 namespace Ui {
 class videoForm;
@@ -38,8 +38,8 @@ private:
     Server* m_server = Q_NULLPTR;
     Decoder m_decoder;
     Frames m_frames;
-    Controller m_controller;
-    InputConvert m_inputConvert;
+    //InputConvertNormal m_inputConvert;
+    InputConvertGame m_inputConvert;
 };
 
 #endif // VIDEOFORM_H

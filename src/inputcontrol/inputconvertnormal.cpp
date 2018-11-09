@@ -1,19 +1,19 @@
-#include "inputconvert.h"
+#include "inputconvertnormal.h"
 
-InputConvert::InputConvert()
+InputConvertNormal::InputConvertNormal()
 {
 
 }
 
-InputConvert::~InputConvert()
+InputConvertNormal::~InputConvertNormal()
 {
 
 }
 
-ControlEvent* InputConvert::mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize)
+void InputConvertNormal::mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize)
 {
     if (!from) {
-        return Q_NULLPTR;
+        return;
     }
 
     // action
@@ -29,7 +29,7 @@ ControlEvent* InputConvert::mouseEvent(const QMouseEvent* from, const QSize& fra
         action = AMOTION_EVENT_ACTION_MOVE;
         break;
     default:
-        return Q_NULLPTR;
+        return;
     }
 
     // pos
@@ -41,16 +41,16 @@ ControlEvent* InputConvert::mouseEvent(const QMouseEvent* from, const QSize& fra
     // set data
     ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_MOUSE);
     if (!controlEvent) {
-        return Q_NULLPTR;
+        return;
     }
     controlEvent->setMouseEventData(action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize));
-    return controlEvent;
+    sendControlEvent(controlEvent);
 }
 
-ControlEvent *InputConvert::wheelEvent(const QWheelEvent *from, const QSize& frameSize, const QSize& showSize)
+void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameSize, const QSize& showSize)
 {
     if (!from) {
-        return Q_NULLPTR;
+        return;
     }
 
     // delta
@@ -74,16 +74,16 @@ ControlEvent *InputConvert::wheelEvent(const QWheelEvent *from, const QSize& fra
     // set data
     ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_SCROLL);
     if (!controlEvent) {
-        return Q_NULLPTR;
+        return;
     }
     controlEvent->setScrollEventData(QRect(pos.toPoint(), frameSize), hScroll, vScroll);
-    return controlEvent;
+    sendControlEvent(controlEvent);
 }
 
-ControlEvent *InputConvert::keyEvent(const QKeyEvent *from)
+void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize& frameSize, const QSize& showSize)
 {
     if (!from) {
-        return Q_NULLPTR;
+        return;
     }
 
     // action
@@ -96,25 +96,25 @@ ControlEvent *InputConvert::keyEvent(const QKeyEvent *from)
         action = AKEY_EVENT_ACTION_UP;
         break;
     default:
-        return Q_NULLPTR;
+        return;
     }
 
     // key code
     AndroidKeycode keyCode = convertKeyCode(from->key(), from->modifiers());
     if (AKEYCODE_UNKNOWN == keyCode) {
-        return Q_NULLPTR;
+        return;
     }
 
     // set data
     ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_KEYCODE);
     if (!controlEvent) {
-        return Q_NULLPTR;
+        return;
     }
     controlEvent->setKeycodeEventData(action, keyCode, convertMetastate(from->modifiers()));
-    return controlEvent;
+    sendControlEvent(controlEvent);
 }
 
-AndroidMotioneventButtons InputConvert::convertMouseButtons(Qt::MouseButtons buttonState)
+AndroidMotioneventButtons InputConvertNormal::convertMouseButtons(Qt::MouseButtons buttonState)
 {
     quint32 buttons = 0;
     if (buttonState & Qt::LeftButton) {
@@ -135,7 +135,7 @@ AndroidMotioneventButtons InputConvert::convertMouseButtons(Qt::MouseButtons but
     return (AndroidMotioneventButtons)buttons;
 }
 
-AndroidKeycode InputConvert::convertKeyCode(int key, Qt::KeyboardModifiers modifiers)
+AndroidKeycode InputConvertNormal::convertKeyCode(int key, Qt::KeyboardModifiers modifiers)
 {
     AndroidKeycode keyCode = AKEYCODE_UNKNOWN;
     // functional keys
@@ -309,7 +309,7 @@ AndroidKeycode InputConvert::convertKeyCode(int key, Qt::KeyboardModifiers modif
     return keyCode;
 }
 
-AndroidMetastate InputConvert::convertMetastate(Qt::KeyboardModifiers modifiers)
+AndroidMetastate InputConvertNormal::convertMetastate(Qt::KeyboardModifiers modifiers)
 {
     int metastate = AMETA_NONE;
 

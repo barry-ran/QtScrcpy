@@ -1,12 +1,14 @@
 HEADERS += \
     $$PWD/controlevent.h \
     $$PWD/controller.h \
-    $$PWD/inputconvert.h \
-    $$PWD/inputconvertbase.h
+    $$PWD/inputconvertbase.h \
+    $$PWD/inputconvertgame.h \
+    $$PWD/inputconvertnormal.h
 
 SOURCES += \
     $$PWD/controlevent.cpp \
     $$PWD/controller.cpp \
-    $$PWD/inputconvert.cpp \
-    $$PWD/inputconvertbase.cpp
+    $$PWD/inputconvertbase.cpp \
+    $$PWD/inputconvertgame.cpp \
+    $$PWD/inputconvertnormal.cpp
 
