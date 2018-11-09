@@ -37,7 +37,7 @@ VideoForm::VideoForm(QWidget *parent) :
             m_decoder.startDecode();
 
             // init controller
-            m_controller.setDeviceSocket(m_server->getDeviceSocket());
+            m_inputConvert.setDeviceSocket(m_server->getDeviceSocket());
         }
     });
 
@@ -98,48 +98,33 @@ void VideoForm::updateShowSize(const QSize &newSize)
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-    ControlEvent* controlEvent = m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
-    if (controlEvent) {
-        m_controller.postControlEvent(controlEvent);
-    }
+    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
 }
 
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
-    ControlEvent* controlEvent = m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
-    if (controlEvent) {
-        m_controller.postControlEvent(controlEvent);
-    }
+    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
 }
 
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
-    ControlEvent* controlEvent = m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
-    if (controlEvent) {
-        m_controller.postControlEvent(controlEvent);
-    }
+    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
 }
 
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
-    ControlEvent* controlEvent = m_inputConvert.wheelEvent(event, ui->videoWidget->frameSize(), size());
-    if (controlEvent) {
-        m_controller.postControlEvent(controlEvent);
-    }
+    m_inputConvert.wheelEvent(event, ui->videoWidget->frameSize(), size());
+
 }
 
 void VideoForm::keyPressEvent(QKeyEvent *event)
 {
-    ControlEvent* controlEvent = m_inputConvert.keyEvent(event);
-    if (controlEvent) {
-        m_controller.postControlEvent(controlEvent);
-    }
+    qDebug() << "keyPressEvent" << event->isAutoRepeat();
+    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
-    ControlEvent* controlEvent = m_inputConvert.keyEvent(event);
-    if (controlEvent) {
-        m_controller.postControlEvent(controlEvent);
-    }
+    qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
+    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
 }

@@ -21,7 +21,9 @@ void Controller::setDeviceSocket(DeviceSocket *deviceSocket)
 
 void Controller::postControlEvent(ControlEvent *controlEvent)
 {
-    QCoreApplication::postEvent(this, controlEvent);
+    if (controlEvent) {
+        QCoreApplication::postEvent(this, controlEvent);
+    }
 }
 
 void Controller::test(QRect rc)
@@ -33,7 +35,7 @@ void Controller::test(QRect rc)
 
 bool Controller::event(QEvent *event)
 {
-    if (event->type() == ControlEvent::Control) {
+    if (event && event->type() == ControlEvent::Control) {
         ControlEvent* controlEvent = dynamic_cast<ControlEvent*>(event);
         if (controlEvent) {
             sendControl(controlEvent->serializeData());
