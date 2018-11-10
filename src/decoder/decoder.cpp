@@ -197,6 +197,7 @@ void Decoder::run()
             }
             if (len < 0) {
                 qCritical("Could not decode video packet: %d", len);
+                av_packet_unref(&packet);
                 goto runQuit;
             }
             if (gotPicture) {
