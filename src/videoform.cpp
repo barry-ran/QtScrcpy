@@ -88,6 +88,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
 
             // 窗口居中
             move(screenRect.center() - geometry().center());
+            qDebug() << screenRect.center() << geometry().center();
         }
 
         if (showSize != size()) {
