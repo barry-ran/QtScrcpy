@@ -16,9 +16,10 @@ public:
     enum ControlEventType {
         CET_KEYCODE,
         CET_TEXT,
-        CET_MOUSE,
+        CET_MOUSE,        
         CET_SCROLL,
         CET_COMMAND,
+        CET_TOUCH,
     };   
 
     ControlEvent(ControlEventType controlEventType);
@@ -26,6 +27,10 @@ public:
     void setKeycodeEventData(AndroidKeyeventAction action, AndroidKeycode keycode, AndroidMetastate metastate);
     void setTextEventData(QString text);
     void setMouseEventData(AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position);
+    // id 代表一个触摸点，最多支持10个触摸点[0,9]
+    // action 只能是AMOTION_EVENT_ACTION_DOWN，AMOTION_EVENT_ACTION_UP，AMOTION_EVENT_ACTION_MOVE
+    // position action动作对应的位置
+    void setTouchEventData(quint32 id, AndroidMotioneventAction action, QRect position);
     void setScrollEventData(QRect position, qint32 hScroll, qint32 vScroll);
     void setCommandEventData(qint32 action);
 
@@ -53,6 +58,11 @@ private:
                 AndroidMotioneventButtons buttons;
                 QRect position;
             } mouseEvent;
+            struct {
+                quint32 id;
+                AndroidMotioneventAction action;
+                QRect position;
+            } touchEvent;
             struct {
                 QRect position;
                 qint32 hScroll;

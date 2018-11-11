@@ -24,43 +24,31 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
         return;
     }
 
-    int action = 0;
+    AndroidMotioneventAction action;
     // pos
     QPointF pos;
+    // id
+    int id = 0;
 
-    // pointer index
-    int pointerIndex = 0;
-
-    if (from->key() == Qt::Key_W) {
-        pointerIndex = 0x0000;
+    if (from->key() == Qt::Key_A) {
+        id = 0;
         pos.setX(showSize.width() * 0.25f);
-        pos.setY(showSize.height() * 0.5f);
-    } else if (from->key() == Qt::Key_D) {
-        pointerIndex = 0x0100;
-        pos.setX(showSize.width() * 0.5f);
         pos.setY(showSize.height() * 0.25f);
+    } else if (from->key() == Qt::Key_S) {
+        id = 1;
+        pos.setX(showSize.width() * 0.35f);
+        pos.setY(showSize.height() * 0.35f);
     } else {
         return;
     }
 
-
-    action |= pointerIndex;
-
     // action
     switch (from->type()) {
     case QEvent::KeyPress:
-        if (from->key() == Qt::Key_W) {
-            action |= AMOTION_EVENT_ACTION_DOWN;
-        } else {
-            action |= AMOTION_EVENT_ACTION_POINTER_DOWN;
-        }
+        action = AMOTION_EVENT_ACTION_DOWN;
         break;
     case QEvent::KeyRelease:
-        if (from->key() == Qt::Key_W) {
-            action |= AMOTION_EVENT_ACTION_UP;
-        } else {
-            action |= AMOTION_EVENT_ACTION_POINTER_UP;
-        }
+        action = AMOTION_EVENT_ACTION_UP;
         break;
     default:
         return;
@@ -71,14 +59,27 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
     pos.setY(pos.y() * frameSize.height() / showSize.height());
 
     // set data
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_MOUSE);
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_TOUCH);
     if (!controlEvent) {
         return;
-    }
-    controlEvent->setMouseEventData((AndroidMotioneventAction)action, AMOTION_EVENT_BUTTON_PRIMARY, QRect(pos.toPoint(), frameSize));
+    }    
+    controlEvent->setTouchEventData(id, action, QRect(pos.toPoint(), frameSize));
     sendControlEvent(controlEvent);
-    return;
 
+    if (QEvent::KeyPress == from->type() && from->key() == Qt::Key_S) {
+        // set data
+        ControlEvent* controlEvent2 = new ControlEvent(ControlEvent::CET_TOUCH);
+        if (!controlEvent2) {
+            return;
+        }
+        pos.setX(pos.x() + 50);
+        pos.setY(pos.y() + 50);
+        controlEvent2->setTouchEventData(id, AMOTION_EVENT_ACTION_MOVE, QRect(pos.toPoint(), frameSize));
+        sendControlEvent(controlEvent2);
+    }
+
+    return;
+/*
     if (QEvent::KeyPress == from->type()) {
         ControlEvent* controlEvent2 = new ControlEvent(ControlEvent::CET_MOUSE);
         if (!controlEvent2) {
@@ -90,4 +91,5 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
         controlEvent2->setMouseEventData((AndroidMotioneventAction)action, AMOTION_EVENT_BUTTON_PRIMARY, QRect(pos.toPoint(), frameSize));
         sendControlEvent(controlEvent2);
     }
+    */
 }
