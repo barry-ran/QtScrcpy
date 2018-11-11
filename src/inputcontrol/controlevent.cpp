@@ -29,6 +29,13 @@ void ControlEvent::setMouseEventData(AndroidMotioneventAction action, AndroidMot
     m_data.mouseEvent.position = position;
 }
 
+void ControlEvent::setTouchEventData(quint32 id, AndroidMotioneventAction action, QRect position)
+{
+    m_data.touchEvent.action = action;
+    m_data.touchEvent.id = id;
+    m_data.touchEvent.position = position;
+}
+
 void ControlEvent::setScrollEventData(QRect position, qint32 hScroll, qint32 vScroll)
 {
     m_data.scrollEvent.position = position;
@@ -92,6 +99,11 @@ QByteArray ControlEvent::serializeData()
         buffer.putChar(m_data.mouseEvent.action);
         write32(buffer, m_data.mouseEvent.buttons);
         writePosition(buffer, m_data.mouseEvent.position);
+        break;
+    case CET_TOUCH:
+        buffer.putChar(m_data.touchEvent.id);
+        buffer.putChar(m_data.touchEvent.action);
+        writePosition(buffer, m_data.touchEvent.position);
         break;
     case CET_SCROLL:
         writePosition(buffer, m_data.scrollEvent.position);

@@ -119,12 +119,12 @@ void VideoForm::wheelEvent(QWheelEvent *event)
 
 void VideoForm::keyPressEvent(QKeyEvent *event)
 {
-    qDebug() << "keyPressEvent" << event->isAutoRepeat();
+    //qDebug() << "keyPressEvent" << event->isAutoRepeat();
     m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
-    qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
+    //qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
     m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
 }
