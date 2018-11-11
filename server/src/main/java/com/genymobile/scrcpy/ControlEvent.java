@@ -10,6 +10,7 @@ public final class ControlEvent {
     public static final int TYPE_MOUSE = 2;
     public static final int TYPE_SCROLL = 3;
     public static final int TYPE_COMMAND = 4;
+    public static final int TYPE_TOUCH = 5;
 
     public static final int COMMAND_BACK_OR_SCREEN_ON = 0;
 
@@ -19,6 +20,7 @@ public final class ControlEvent {
     private int action; // KeyEvent.ACTION_* or MotionEvent.ACTION_* or COMMAND_*
     private int keycode; // KeyEvent.KEYCODE_*
     private int buttons; // MotionEvent.BUTTON_*
+    private int id;
     private Position position;
     private int hScroll;
     private int vScroll;
@@ -47,6 +49,15 @@ public final class ControlEvent {
         event.type = TYPE_MOUSE;
         event.action = action;
         event.buttons = buttons;
+        event.position = position;
+        return event;
+    }
+
+    public static ControlEvent createMotionTouchEvent(int id, int action, Position position) {
+        ControlEvent event = new ControlEvent();
+        event.type = TYPE_TOUCH;
+        event.action = action;
+        event.id = id;
         event.position = position;
         return event;
     }
@@ -89,6 +100,10 @@ public final class ControlEvent {
 
     public int getButtons() {
         return buttons;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public Position getPosition() {

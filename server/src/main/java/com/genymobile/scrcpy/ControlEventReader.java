@@ -10,6 +10,7 @@ public class ControlEventReader {
 
     private static final int KEYCODE_PAYLOAD_LENGTH = 9;
     private static final int MOUSE_PAYLOAD_LENGTH = 13;
+    private static final int TOUCH_PAYLOAD_LENGTH = 10;
     private static final int SCROLL_PAYLOAD_LENGTH = 16;
     private static final int COMMAND_PAYLOAD_LENGTH = 1;
 
@@ -48,7 +49,6 @@ public class ControlEventReader {
             return null;
         }
         int savedPosition = buffer.position();
-
         int type = buffer.get();
         ControlEvent controlEvent;
         switch (type) {
@@ -60,6 +60,9 @@ public class ControlEventReader {
                 break;
             case ControlEvent.TYPE_MOUSE:
                 controlEvent = parseMouseControlEvent();
+                break;
+            case ControlEvent.TYPE_TOUCH:
+                controlEvent = parseMouseTouchEvent();
                 break;
             case ControlEvent.TYPE_SCROLL:
                 controlEvent = parseScrollControlEvent();
@@ -111,6 +114,16 @@ public class ControlEventReader {
         int buttons = buffer.getInt();
         Position position = readPosition(buffer);
         return ControlEvent.createMotionControlEvent(action, buttons, position);
+    }
+
+    private ControlEvent parseMouseTouchEvent() {
+        if (buffer.remaining() < TOUCH_PAYLOAD_LENGTH) {
+            return null;
+        }
+        int id = toUnsigned(buffer.get());
+        int action = toUnsigned(buffer.get());
+        Position position = readPosition(buffer);
+        return ControlEvent.createMotionTouchEvent(id, action, position);
     }
 
     private ControlEvent parseScrollControlEvent() {
