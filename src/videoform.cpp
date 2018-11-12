@@ -11,6 +11,9 @@ VideoForm::VideoForm(QWidget *parent) :
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
 
+    setMouseTracking(true);
+    ui->videoWidget->setMouseTracking(true);
+
     m_server = new Server();
     m_frames.init();
     m_decoder.setFrames(&m_frames);
