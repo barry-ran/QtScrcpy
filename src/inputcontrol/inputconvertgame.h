@@ -5,10 +5,11 @@
 #include "inputconvertbase.h"
 
 #define MULTI_TOUCH_MAX_NUM 10
-class InputConvertGame : public InputConvertBase
+class InputConvertGame : public QObject, public InputConvertBase
 {
+    Q_OBJECT
 public:
-    InputConvertGame();
+    InputConvertGame(QObject* parent = Q_NULLPTR);
     virtual ~InputConvertGame();
 
     void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
@@ -31,6 +32,22 @@ protected:
     // steer wheel
     bool isSteerWheelKeys(const QKeyEvent* from);
     void processSteerWheel(const QKeyEvent* from);
+    int updateSteerWheelKeysPress(const QKeyEvent* from, int& keyPress1, int& keyPress2);
+    void steerWheelMove(int keysNum, int keyPress1, int keyPress2);
+
+    // click
+    bool processKeyClick(const QKeyEvent* from);
+
+    // mouse
+    bool processMouseClick(const QMouseEvent* from);
+    bool processMouseMove(const QMouseEvent* from);
+    void startMouseMoveTimer();
+    void stopMouseMoveTimer();
+    void mouseMoveStartTouch();
+    void mouseMoveStopTouch();
+
+protected:
+    void timerEvent(QTimerEvent *event);
 
 private:
     enum SteerWheelDirection {
@@ -47,11 +64,17 @@ private:
     int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
 
     QPointF m_steerWheelPos = {0.16f, 0.75f};
-    float m_steerWheelOffset = 0.1f;
+    QPointF m_steerWheelOffset = {0.1f, 0.2f};
     // order by SteerWheelDirection(up right down left)
     int m_steerWheelKeys[4] = {Qt::Key_W, Qt::Key_D, Qt::Key_S, Qt::Key_A};
+    bool m_steerWheelKeysPress[4] = { false };
     int m_steerWheelKeysNum = 0;
     int m_steerWheelFirstTouchKey = 0;
+
+    // mouse move
+    QPointF m_mouseMoveStartPos = {0.57f, 0.26f};
+    bool m_mouseMovePress = false;
+    int m_mouseMoveTimer = 0;
 };
 
 #endif // INPUTCONVERTGAME_H
