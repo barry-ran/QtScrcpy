@@ -317,7 +317,7 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
         return false;
     }
 
-    mouseMoveStartTouch();
+    mouseMoveStartTouch(from);
     startMouseMoveTimer();
 
     // move
@@ -327,21 +327,23 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
     pos.setX(pos.x() / m_showSize.width());
     pos.setY(pos.y() / m_showSize.height());
     sendTouchMoveEvent(getTouchID(Qt::ExtraButton24), pos);
-
+    m_mouseMoveLastPos = pos;
     if (pos.x() < 0.1 || pos.x() > 0.9 || pos.y() < 0.1 || pos.y() > 0.9) {
         mouseMoveStopTouch();
-
-        QPoint localPos = QPoint(m_showSize.width()*m_mouseMoveStartPos.x(), m_showSize.height()*m_mouseMoveStartPos.y());
-        QPoint posOffset = from->localPos().toPoint() - localPos;
-        QPoint globalPos = from->globalPos();
-
-        globalPos += posOffset;
-        QCursor::setPos(globalPos);
-
-        mouseMoveStartTouch();
+        mouseMoveStartTouch(from);
     }
 
     return true;
+}
+
+void InputConvertGame::moveCursorToStart(const QMouseEvent *from)
+{
+    QPoint localPos = QPoint(m_showSize.width()*m_mouseMoveStartPos.x(), m_showSize.height()*m_mouseMoveStartPos.y());
+    QPoint posOffset = from->localPos().toPoint() - localPos;
+    QPoint globalPos = from->globalPos();
+
+    globalPos -= posOffset;
+    QCursor::setPos(globalPos);
 }
 
 void InputConvertGame::startMouseMoveTimer()
@@ -358,9 +360,10 @@ void InputConvertGame::stopMouseMoveTimer()
     }
 }
 
-void InputConvertGame::mouseMoveStartTouch()
+void InputConvertGame::mouseMoveStartTouch(const QMouseEvent* from)
 {
     if (!m_mouseMovePress) {
+        moveCursorToStart(from);
         int id = attachTouchID(Qt::ExtraButton24);
         sendTouchDownEvent(id, m_mouseMoveStartPos);
         m_mouseMovePress = true;
@@ -370,7 +373,7 @@ void InputConvertGame::mouseMoveStartTouch()
 void InputConvertGame::mouseMoveStopTouch()
 {
     if (m_mouseMovePress) {
-        sendTouchUpEvent(getTouchID(Qt::ExtraButton24), m_mouseMoveStartPos);
+        sendTouchUpEvent(getTouchID(Qt::ExtraButton24), m_mouseMoveLastPos);
         detachTouchID(Qt::ExtraButton24);
         m_mouseMovePress = false;
     }
