@@ -260,6 +260,7 @@ void InputConvertGame::steerWheelMove(int keysNum, int keyPress1, int keyPress2)
 bool InputConvertGame::processKeyClick(const QKeyEvent *from)
 {
     QPointF clickPos;
+    bool touchTwice = false;
     switch (from->key()) {
     case Qt::Key_Space: // 跳
         clickPos = QPointF(0.96f, 0.7f);
@@ -291,6 +292,14 @@ bool InputConvertGame::processKeyClick(const QKeyEvent *from)
     case Qt::Key_H: // 捡东西3
         clickPos = QPointF(0.7f, 0.54f);
         break;
+    case Qt::Key_Q: // 左探头
+        touchTwice = true;
+        clickPos = QPointF(0.2f, 0.54f);
+        break;
+    case Qt::Key_E: // 右探头
+        touchTwice = true;
+        clickPos = QPointF(0.3f, 0.54f);
+        break;
     default:
         return false;
         break;
@@ -299,7 +308,15 @@ bool InputConvertGame::processKeyClick(const QKeyEvent *from)
     if (QEvent::KeyPress == from->type()) {
         int id = attachTouchID(from->key());
         sendTouchDownEvent(id, clickPos);
+        if (touchTwice) {
+            sendTouchUpEvent(getTouchID(from->key()), clickPos);
+            detachTouchID(from->key());
+        }
     } else if (QEvent::KeyRelease == from->type()) {
+        if (touchTwice) {
+            int id = attachTouchID(from->key());
+            sendTouchDownEvent(id, clickPos);
+        }
         sendTouchUpEvent(getTouchID(from->key()), clickPos);
         detachTouchID(from->key());
     }
