@@ -234,23 +234,23 @@ void InputConvertGame::steerWheelMove(int keysNum, int keyPress1, int keyPress2)
     switch (keysNum) {
     case 2:
         if (keyPress2 == SWD_UP) {
-            movePos.setY(movePos.y() - m_steerWheelOffset.y());
+            movePos.setY(movePos.y() - m_steerWheelOffset.top());
         } else if (keyPress2 == SWD_RIGHT) {
-            movePos.setX(movePos.x() + m_steerWheelOffset.x());
+            movePos.setX(movePos.x() + m_steerWheelOffset.right());
         } else if (keyPress2 == SWD_DOWN) {
-            movePos.setY(movePos.y() + m_steerWheelOffset.y());
+            movePos.setY(movePos.y() + m_steerWheelOffset.bottom());
         } else if (keyPress2 == SWD_LEFT) {
-            movePos.setX(movePos.x() - m_steerWheelOffset.x());
+            movePos.setX(movePos.x() - m_steerWheelOffset.left());
         }
     case 1:
         if (keyPress1 == SWD_UP) {
-            movePos.setY(movePos.y() - m_steerWheelOffset.y());
+            movePos.setY(movePos.y() - m_steerWheelOffset.top());
         } else if (keyPress1 == SWD_RIGHT) {
-            movePos.setX(movePos.x() + m_steerWheelOffset.x());
+            movePos.setX(movePos.x() + m_steerWheelOffset.right());
         } else if (keyPress1 == SWD_DOWN) {
-            movePos.setY(movePos.y() + m_steerWheelOffset.y());
+            movePos.setY(movePos.y() + m_steerWheelOffset.bottom());
         } else if (keyPress1 == SWD_LEFT) {
-            movePos.setX(movePos.x() - m_steerWheelOffset.x());
+            movePos.setX(movePos.x() - m_steerWheelOffset.left());
         }
         break;
     }
@@ -291,6 +291,24 @@ bool InputConvertGame::processKeyClick(const QKeyEvent *from)
         break;
     case Qt::Key_H: // 捡东西3
         clickPos = QPointF(0.7f, 0.54f);
+        break;
+    case Qt::Key_1: // 换枪1
+        clickPos = QPointF(0.45f, 0.9f);
+        break;
+    case Qt::Key_2: // 换枪2
+        clickPos = QPointF(0.55f, 0.9f);
+        break;
+    case Qt::Key_3: // 手雷
+        clickPos = QPointF(0.67f, 0.92f);
+        break;
+    case Qt::Key_5: // 下车
+        clickPos = QPointF(0.92f, 0.4f);
+        break;
+    case Qt::Key_Shift: // 车加速
+        clickPos = QPointF(0.82f, 0.8f);
+        break;
+    case Qt::Key_4: // 开关门
+        clickPos = QPointF(0.7f, 0.7f);
         break;
     case Qt::Key_Q: // 左探头
         clickTwice = true;
