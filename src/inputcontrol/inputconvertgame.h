@@ -41,9 +41,10 @@ protected:
     // mouse
     bool processMouseClick(const QMouseEvent* from);
     bool processMouseMove(const QMouseEvent* from);
+    void moveCursorToStart(const QMouseEvent* from);
     void startMouseMoveTimer();
     void stopMouseMoveTimer();
-    void mouseMoveStartTouch();
+    void mouseMoveStartTouch(const QMouseEvent* from);
     void mouseMoveStopTouch();
 
 protected:
@@ -73,6 +74,7 @@ private:
 
     // mouse move
     QPointF m_mouseMoveStartPos = {0.57f, 0.26f};
+    QPointF m_mouseMoveLastPos;
     bool m_mouseMovePress = false;
     int m_mouseMoveTimer = 0;
 };
