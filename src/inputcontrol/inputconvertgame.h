@@ -2,19 +2,19 @@
 #define INPUTCONVERTGAME_H
 
 #include <QPointF>
-#include "inputconvertbase.h"
+#include "inputconvertnormal.h"
 
 #define MULTI_TOUCH_MAX_NUM 10
-class InputConvertGame : public QObject, public InputConvertBase
+class InputConvertGame : public QObject, public InputConvertNormal
 {
     Q_OBJECT
 public:
     InputConvertGame(QObject* parent = Q_NULLPTR);
     virtual ~InputConvertGame();
 
-    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
-    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
-    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+    virtual void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
+    virtual void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
+    virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
 
 protected:
     void updateSize(const QSize& frameSize, const QSize& showSize);
@@ -61,6 +61,7 @@ private:
 private:
     QSize m_frameSize;
     QSize m_showSize;
+    bool m_gameMap = false;
 
     int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
 
