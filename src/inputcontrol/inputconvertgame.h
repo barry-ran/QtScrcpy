@@ -65,8 +65,8 @@ private:
 
     int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
 
-    QPointF m_steerWheelPos = {0.16f, 0.75f};
-    QPointF m_steerWheelOffset = {0.1f, 0.2f};
+    QPointF m_steerWheelPos = {0.16f, 0.75f};    
+    QRectF m_steerWheelOffset = {QPointF(0.1f, 0.27f), QPointF(0.1f, 0.2f)};
     // order by SteerWheelDirection(up right down left)
     int m_steerWheelKeys[4] = {Qt::Key_W, Qt::Key_D, Qt::Key_S, Qt::Key_A};
     bool m_steerWheelKeysPress[4] = { false };
