@@ -9,9 +9,9 @@ public:
     InputConvertNormal();
     virtual ~InputConvertNormal();
 
-    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
-    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
-    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+    virtual void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
+    virtual void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
+    virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
 
 private:
     AndroidMotioneventButtons convertMouseButtons(Qt::MouseButtons buttonState);

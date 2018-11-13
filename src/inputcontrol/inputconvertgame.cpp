@@ -15,42 +15,60 @@ InputConvertGame::~InputConvertGame()
 
 void InputConvertGame::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
-    updateSize(frameSize, showSize);
+    if (m_gameMap) {
+        updateSize(frameSize, showSize);
 
-    // mouse move
-    if (processMouseMove(from)) {
-        return;
-    }
+        // mouse move
+        if (processMouseMove(from)) {
+            return;
+        }
 
-    // mouse click
-    if (processMouseClick(from)) {
-        return;
+        // mouse click
+        if (processMouseClick(from)) {
+            return;
+        }
+    } else {
+        InputConvertNormal::mouseEvent(from, frameSize, showSize);
     }
-    return;
 }
 
 void InputConvertGame::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
 {
-    Q_UNUSED(from);
-    updateSize(frameSize, showSize);
+    if (m_gameMap) {
+        updateSize(frameSize, showSize);
+    } else {
+        InputConvertNormal::wheelEvent(from, frameSize, showSize);
+    }
 }
 
 void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, const QSize& showSize)
 {
-    updateSize(frameSize, showSize);
-    if (!from || from->isAutoRepeat()) {
+    switch (from->key()) {
+    case Qt::Key_QuoteLeft:
+        if (QEvent::KeyPress == from->type()) {
+            m_gameMap = !m_gameMap;
+        }
         return;
     }
 
-    // steer wheel
-    if (isSteerWheelKeys(from)) {
-        processSteerWheel(from);
-        return;
-    }
+    if (m_gameMap) {
+        updateSize(frameSize, showSize);
+        if (!from || from->isAutoRepeat()) {
+            return;
+        }
 
-    // key click
-    if (processKeyClick(from)) {
-        return;
+        // steer wheel
+        if (isSteerWheelKeys(from)) {
+            processSteerWheel(from);
+            return;
+        }
+
+        // key click
+        if (processKeyClick(from)) {
+            return;
+        }
+    } else {
+        InputConvertNormal::keyEvent(from, frameSize, showSize);
     }
 }
 
