@@ -3,6 +3,7 @@
 #include <QThread>
 #include <QSize>
 #include <QTimerEvent>
+#include <QCoreApplication>
 
 #include "server.h"
 
@@ -52,7 +53,7 @@ const QString& Server::getServerPath()
     if (m_serverPath.isEmpty()) {
         m_serverPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_SERVER_PATH"));
         if (m_serverPath.isEmpty()) {
-            m_serverPath = "scrcpy-server.jar";
+            m_serverPath = QCoreApplication::applicationDirPath() + "/scrcpy-server.jar";
         }
     }
     return m_serverPath;

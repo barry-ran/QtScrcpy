@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
     Decoder::init();
     QApplication a(argc, argv);
 
-    qputenv("QTSCRCPY_ADB_PATH", "G:\\mygitcode\\QtScrcpy\\src\\adb.exe");
-    qputenv("QTSCRCPY_SERVER_PATH", "G:\\mygitcode\\QtScrcpy\\src\\scrcpy-server.jar");
+    //qputenv("QTSCRCPY_ADB_PATH", "G:\\mygitcode\\QtScrcpy\\src\\adb.exe");
+    //qputenv("QTSCRCPY_SERVER_PATH", "G:\\mygitcode\\QtScrcpy\\src\\scrcpy-server.jar");
 
     Dialog* w = new Dialog;
     w->show();

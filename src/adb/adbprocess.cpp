@@ -1,8 +1,8 @@
-#include "adbprocess.h"
-
 #include <QProcess>
 #include <QCoreApplication>
 #include <QDebug>
+
+#include "adbprocess.h"
 
 QString AdbProcess::s_adbPath = "";
 
@@ -24,7 +24,7 @@ const QString& AdbProcess::getAdbPath()
     if (s_adbPath.isEmpty()) {
         s_adbPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_ADB_PATH"));
         if (s_adbPath.isEmpty()) {
-            s_adbPath = "adb";
+            s_adbPath = QCoreApplication::applicationDirPath() + "/adb";
         }
     }
     return s_adbPath;
@@ -49,7 +49,7 @@ void AdbProcess::initSignals()
     });
 
     connect(this, &QProcess::errorOccurred, this,
-            [this](QProcess::ProcessError error){
+            [this](QProcess::ProcessError error){        
         if (QProcess::FailedToStart == error) {            
             emit adbProcessResult(AER_ERROR_MISSING_BINARY);
         } else {
@@ -86,7 +86,6 @@ void AdbProcess::execute(const QString& serial, const QStringList& args)
     adbArgs << args;
     qDebug() << getAdbPath() << adbArgs.join(" ");
     start(getAdbPath(), adbArgs);
-    //start("C:\\Users\\Barry\\Desktop\\sockettool.exe", Q_NULLPTR);
 }
 
 bool AdbProcess::isRuning()
