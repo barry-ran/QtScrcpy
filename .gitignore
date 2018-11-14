@@ -1,0 +1,5 @@
+/src/QtScrcpy.pro.user
+/output/debug/*.pdb
+/output/debug/*.ilk
+/output/debug/QtScrcpy.exe
+/output/release/QtScrcpy.exe

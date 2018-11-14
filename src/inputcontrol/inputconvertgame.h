@@ -47,6 +47,9 @@ protected:
     void mouseMoveStartTouch(const QMouseEvent* from);
     void mouseMoveStopTouch();
 
+    void switchGameMap();
+    void grabCursor(bool grab);
+
 protected:
     void timerEvent(QTimerEvent *event);
 

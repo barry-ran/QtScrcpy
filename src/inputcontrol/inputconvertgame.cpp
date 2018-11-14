@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QCursor>
+#include <QGuiApplication>
 
 #include "inputconvertgame.h"
 
@@ -46,7 +47,7 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
     switch (from->key()) {
     case Qt::Key_QuoteLeft:
         if (QEvent::KeyPress == from->type()) {
-            m_gameMap = !m_gameMap;
+            switchGameMap();
         }
         return;
     }
@@ -266,10 +267,12 @@ bool InputConvertGame::processKeyClick(const QKeyEvent *from)
         clickPos = QPointF(0.96f, 0.7f);
         break;
     case Qt::Key_M: // 地图
+        switchGameMap();
         clickPos = QPointF(0.98f, 0.03f);
         break;
     case Qt::Key_Tab: // 背包
         clickPos = QPointF(0.06f, 0.9f);
+        switchGameMap();
         break;
     case Qt::Key_Z: // 趴
         clickPos = QPointF(0.95f, 0.9f);
@@ -429,6 +432,22 @@ void InputConvertGame::mouseMoveStopTouch()
         sendTouchUpEvent(getTouchID(Qt::ExtraButton24), m_mouseMoveLastPos);
         detachTouchID(Qt::ExtraButton24);
         m_mouseMovePress = false;
+    }
+}
+
+void InputConvertGame::switchGameMap()
+{
+    m_gameMap = !m_gameMap;
+    grabCursor(m_gameMap);
+}
+
+void InputConvertGame::grabCursor(bool grab)
+{
+    if(grab) {
+        QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+    } else {
+        mouseMoveStopTouch();
+        QGuiApplication::restoreOverrideCursor();
     }
 }
 
