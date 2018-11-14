@@ -4,3 +4,4 @@
 /output/debug/QtScrcpy.exe
 /output/release/QtScrcpy.exe
 /*.user
+/QtScrcpy/*.user
