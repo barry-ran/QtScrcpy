@@ -3,3 +3,4 @@
 /output/debug/*.ilk
 /output/debug/QtScrcpy.exe
 /output/release/QtScrcpy.exe
+/*.user
