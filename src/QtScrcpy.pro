@@ -39,7 +39,14 @@ FORMS += \
         dialog.ui \
     videoform.ui
 
-#子工程
+# 指定可执行程序输出目录
+CONFIG(debug, debug|release) {
+    DESTDIR = $$PWD/../output/debug
+} else {
+    DESTDIR = $$PWD/../output/release
+}
+
+# 子工程
 include ($$PWD/common/common.pri)
 include ($$PWD/server/server.pri)
 include ($$PWD/adb/adb.pri)
