@@ -267,12 +267,16 @@ bool InputConvertGame::processKeyClick(const QKeyEvent *from)
         clickPos = QPointF(0.96f, 0.7f);
         break;
     case Qt::Key_M: // 地图
-        switchGameMap();
+        if (QEvent::KeyRelease == from->type()) {
+            switchGameMap();
+        }
         clickPos = QPointF(0.98f, 0.03f);
         break;
     case Qt::Key_Tab: // 背包
-        clickPos = QPointF(0.06f, 0.9f);
-        switchGameMap();
+        if (QEvent::KeyRelease == from->type()) {
+            switchGameMap();
+        }
+        clickPos = QPointF(0.06f, 0.9f);        
         break;
     case Qt::Key_Z: // 趴
         clickPos = QPointF(0.95f, 0.9f);
@@ -382,13 +386,17 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
     // convert pos
     pos.setX(pos.x() / m_showSize.width());
     pos.setY(pos.y() / m_showSize.height());
-    sendTouchMoveEvent(getTouchID(Qt::ExtraButton24), pos);
-    m_mouseMoveLastPos = pos;
+
     if (pos.x() < 0.1 || pos.x() > 0.9 || pos.y() < 0.1 || pos.y() > 0.9) {
         mouseMoveStopTouch();
         mouseMoveStartTouch(from);
     }
 
+    if (!m_mouseMoveLastPos.isNull()) {
+        pos = (m_mouseMoveLastPos + pos)/4;
+    }
+    sendTouchMoveEvent(getTouchID(Qt::ExtraButton24), pos);
+    m_mouseMoveLastPos = pos;    
     return true;
 }
 
@@ -430,6 +438,7 @@ void InputConvertGame::mouseMoveStopTouch()
 {
     if (m_mouseMovePress) {
         sendTouchUpEvent(getTouchID(Qt::ExtraButton24), m_mouseMoveLastPos);
+        m_mouseMoveLastPos = QPointF(0.0f, 0.0f);
         detachTouchID(Qt::ExtraButton24);
         m_mouseMovePress = false;
     }
