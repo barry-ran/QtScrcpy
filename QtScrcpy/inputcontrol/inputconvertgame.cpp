@@ -4,6 +4,8 @@
 
 #include "inputconvertgame.h"
 
+#define CURSOR_POS_CHECK 50
+
 InputConvertGame::InputConvertGame(QObject* parent) : QObject(parent)
 {
 
@@ -103,18 +105,15 @@ void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAct
     if (!controlEvent) {
         return;
     }
-    controlEvent->setTouchEventData(id, action, QRect(calcAbsolutePos(pos).toPoint(), m_frameSize));
+    controlEvent->setTouchEventData(id, action, QRect(calcFrameAbsolutePos(pos).toPoint(), m_frameSize));
     sendControlEvent(controlEvent);
 }
 
-QPointF InputConvertGame::calcAbsolutePos(QPointF relativePos)
+QPointF InputConvertGame::calcFrameAbsolutePos(QPointF relativePos)
 {
     QPointF absolutePos;
-    absolutePos.setX(m_showSize.width() * relativePos.x());
-    absolutePos.setY(m_showSize.height() * relativePos.y());
-    // convert pos
-    absolutePos.setX(absolutePos.x() * m_frameSize.width() / m_showSize.width());
-    absolutePos.setY(absolutePos.y() * m_frameSize.height() / m_showSize.height());
+    absolutePos.setX(m_frameSize.width() * relativePos.x());
+    absolutePos.setY(m_frameSize.height() * relativePos.y());
     return absolutePos;
 }
 
@@ -375,28 +374,34 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
 {
     if (QEvent::MouseMove != from->type()) {
         return false;
-    }
+    }    
 
-    mouseMoveStartTouch(from);
-    startMouseMoveTimer();
-
-    // move
-    // pos
-    QPointF pos = from->localPos();
-    // convert pos
-    pos.setX(pos.x() / m_showSize.width());
-    pos.setY(pos.y() / m_showSize.height());
-
-    if (pos.x() < 0.1 || pos.x() > 0.9 || pos.y() < 0.1 || pos.y() > 0.9) {
-        mouseMoveStopTouch();
-        mouseMoveStartTouch(from);
+    if (checkCursorPos(from)) {
+        m_mouseMoveLastPos = QPointF(0.0f, 0.0f);
+        return true;
     }
 
     if (!m_mouseMoveLastPos.isNull()) {
-        pos = (m_mouseMoveLastPos + pos)/4;
+        QPointF distance = from->localPos() - m_mouseMoveLastPos;
+        distance /= 8;
+
+        mouseMoveStartTouch(from);
+        startMouseMoveTimer();
+
+        m_mouseMoveLastConverPos.setX(m_mouseMoveLastConverPos.x() + distance.x() / m_showSize.width());
+        m_mouseMoveLastConverPos.setY(m_mouseMoveLastConverPos.y() + distance.y() / m_showSize.height());
+
+        if (m_mouseMoveLastConverPos.x() < 0.1
+                || m_mouseMoveLastConverPos.x() > 0.9
+                || m_mouseMoveLastConverPos.y() < 0.1
+                || m_mouseMoveLastConverPos.y() > 0.9) {
+            mouseMoveStopTouch();
+            mouseMoveStartTouch(from);
+        }
+
+        sendTouchMoveEvent(getTouchID(Qt::ExtraButton24), m_mouseMoveLastConverPos);
     }
-    sendTouchMoveEvent(getTouchID(Qt::ExtraButton24), pos);
-    m_mouseMoveLastPos = pos;    
+    m_mouseMoveLastPos = from->localPos();
     return true;
 }
 
@@ -404,6 +409,15 @@ void InputConvertGame::moveCursorToStart(const QMouseEvent *from)
 {
     QPoint localPos = QPoint(m_showSize.width()*m_mouseMoveStartPos.x(), m_showSize.height()*m_mouseMoveStartPos.y());
     QPoint posOffset = from->localPos().toPoint() - localPos;
+    QPoint globalPos = from->globalPos();
+
+    globalPos -= posOffset;
+    QCursor::setPos(globalPos);
+}
+
+void InputConvertGame::moveCursorTo(const QMouseEvent *from, const QPoint &pos)
+{
+    QPoint posOffset = from->localPos().toPoint() - pos;
     QPoint globalPos = from->globalPos();
 
     globalPos -= posOffset;
@@ -427,9 +441,10 @@ void InputConvertGame::stopMouseMoveTimer()
 void InputConvertGame::mouseMoveStartTouch(const QMouseEvent* from)
 {
     if (!m_mouseMovePress) {
-        moveCursorToStart(from);
+        //moveCursorToStart(from);
         int id = attachTouchID(Qt::ExtraButton24);
         sendTouchDownEvent(id, m_mouseMoveStartPos);
+        m_mouseMoveLastConverPos = m_mouseMoveStartPos;
         m_mouseMovePress = true;
     }
 }
@@ -437,8 +452,7 @@ void InputConvertGame::mouseMoveStartTouch(const QMouseEvent* from)
 void InputConvertGame::mouseMoveStopTouch()
 {
     if (m_mouseMovePress) {
-        sendTouchUpEvent(getTouchID(Qt::ExtraButton24), m_mouseMoveLastPos);
-        m_mouseMoveLastPos = QPointF(0.0f, 0.0f);
+        sendTouchUpEvent(getTouchID(Qt::ExtraButton24), m_mouseMoveLastConverPos);
         detachTouchID(Qt::ExtraButton24);
         m_mouseMovePress = false;
     }
@@ -446,18 +460,39 @@ void InputConvertGame::mouseMoveStopTouch()
 
 void InputConvertGame::switchGameMap()
 {
-    m_gameMap = !m_gameMap;
-    grabCursor(m_gameMap);
-}
-
-void InputConvertGame::grabCursor(bool grab)
-{
-    if(grab) {
+    m_gameMap = !m_gameMap;    
+    emit grabCursor(m_gameMap);
+    if (m_gameMap) {
         QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     } else {
         mouseMoveStopTouch();
         QGuiApplication::restoreOverrideCursor();
     }
+}
+
+bool InputConvertGame::checkCursorPos(const QMouseEvent *from)
+{
+    bool moveCursor = false;
+    QPoint pos = from->pos();
+    if (pos.x() < CURSOR_POS_CHECK) {
+        pos.setX(m_showSize.width() - CURSOR_POS_CHECK);
+        moveCursor = true;
+    } else if (pos.x() > m_showSize.width() - CURSOR_POS_CHECK) {
+        pos.setX(CURSOR_POS_CHECK);
+        moveCursor = true;
+    } else if (pos.y() < CURSOR_POS_CHECK) {
+        pos.setY(m_showSize.height() - CURSOR_POS_CHECK);
+        moveCursor = true;
+    } else if (pos.y() > m_showSize.height() - CURSOR_POS_CHECK) {
+        pos.setY(CURSOR_POS_CHECK);
+        moveCursor = true;
+    }
+
+    if (moveCursor) {
+        moveCursorTo(from, pos);
+    }
+
+    return moveCursor;
 }
 
 void InputConvertGame::timerEvent(QTimerEvent *event)

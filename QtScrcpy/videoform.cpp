@@ -4,6 +4,9 @@
 #include "videoform.h"
 #include "ui_videoform.h"
 
+#include <Windows.h>
+#pragma comment(lib, "User32.lib")
+
 VideoForm::VideoForm(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::videoForm)
@@ -13,6 +16,19 @@ VideoForm::VideoForm(QWidget *parent) :
 
     setMouseTracking(true);
     ui->videoWidget->setMouseTracking(true);
+
+    connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
+        if(grab) {
+            RECT mainRect; //windef.h中被定义
+            mainRect.left = (LONG)this->geometry().left();
+            mainRect.right = (LONG)this->geometry().right();
+            mainRect.top = (LONG)this->geometry().top();
+            mainRect.bottom = (LONG)this->geometry().bottom();
+            ClipCursor(&mainRect);
+        } else {
+            ClipCursor(Q_NULLPTR);
+        }
+    });
 
     m_server = new Server();
     m_frames.init();
