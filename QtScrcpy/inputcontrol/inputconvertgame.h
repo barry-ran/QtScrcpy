@@ -16,13 +16,16 @@ public:
     virtual void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
     virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
 
+signals:
+    void grabCursor(bool grab);
+
 protected:
     void updateSize(const QSize& frameSize, const QSize& showSize);
     void sendTouchDownEvent(int id, QPointF pos);
     void sendTouchMoveEvent(int id, QPointF pos);
     void sendTouchUpEvent(int id, QPointF pos);
     void sendTouchEvent(int id, QPointF pos, AndroidMotioneventAction action);
-    QPointF calcAbsolutePos(QPointF relativePos);
+    QPointF calcFrameAbsolutePos(QPointF relativePos);
 
     // multi touch id
     int attachTouchID(int key);
@@ -42,13 +45,14 @@ protected:
     bool processMouseClick(const QMouseEvent* from);
     bool processMouseMove(const QMouseEvent* from);
     void moveCursorToStart(const QMouseEvent* from);
+    void moveCursorTo(const QMouseEvent* from, const QPoint& pos);
     void startMouseMoveTimer();
     void stopMouseMoveTimer();
     void mouseMoveStartTouch(const QMouseEvent* from);
     void mouseMoveStopTouch();
 
-    void switchGameMap();
-    void grabCursor(bool grab);
+    void switchGameMap();    
+    bool checkCursorPos(const QMouseEvent* from);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -77,7 +81,8 @@ private:
     int m_steerWheelFirstTouchKey = 0;
 
     // mouse move
-    QPointF m_mouseMoveStartPos = {0.57f, 0.26f};
+    QPointF m_mouseMoveStartPos = {0.57f, 0.26f};    
+    QPointF m_mouseMoveLastConverPos = m_mouseMoveStartPos;
     QPointF m_mouseMoveLastPos = {0.0f, 0.0f};
     bool m_mouseMovePress = false;
     int m_mouseMoveTimer = 0;
