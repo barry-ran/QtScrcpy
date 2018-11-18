@@ -72,16 +72,19 @@ VideoForm::VideoForm(QWidget *parent) :
 
     // must be Qt::QueuedConnection, ui update must be main thread
     QObject::connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
-        m_frames.lock();
+        m_frames.lock();        
         const AVFrame *frame = m_frames.consumeRenderedFrame();
+        qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
         updateShowSize(QSize(frame->width, frame->height));
         ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
         ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
         m_frames.unLock();
     },Qt::QueuedConnection);
 
-    m_server->start("P7C0218510000537", 27183, 1080, 8000000, "");
+    // support 480p 720p 1080p
     //m_server->start("P7C0218510000537", 27183, 0, 8000000, "");
+    //m_server->start("P7C0218510000537", 27183, 1080, 8000000, "");
+    m_server->start("P7C0218510000537", 27183, 720, 8000000, "");
 }
 
 VideoForm::~VideoForm()

@@ -69,6 +69,7 @@ public final class Device {
     @SuppressWarnings("checkstyle:MagicNumber")
     private static Size computeVideoSize(int w, int h, int maxSize) {
         // Compute the video size and the padding of the content inside this video.
+        /*
         // Principle:
         // - scale down the great side of the screen to maxSize (if necessary);
         // - scale down the other side so that the aspect ratio is preserved;
@@ -91,7 +92,46 @@ public final class Device {
             w = portrait ? minor : major;
             h = portrait ? major : minor;
         }
-        return new Size(w, h);
+        */
+
+        // Principle:480p/720p/1080p and not larger than device size.
+        w &= ~7; // in case it's not a multiple of 8
+        h &= ~7;
+        boolean vertival = h > w;
+        boolean validSize = false;
+        int newWidth = w;
+        int newHeight = h;
+        // 480p/720p/1080p
+        switch (maxSize) {
+            case 480: // 480p:640x480
+                newWidth = 640;
+                newHeight = 480;
+                validSize = true;
+                break;
+            case 720: // 720p:1280x720
+                newWidth = 1280;
+                newHeight = 720;
+                validSize = true;
+                break;
+            case 1080: // 1080p:1920x1080
+                newWidth = 1920;
+                newHeight = 1080;
+                validSize = true;
+                break;
+        }
+        // vertival convert
+        if (validSize && vertival) {
+            int temp = newWidth;
+            newWidth = newHeight;
+            newHeight = temp;
+        }
+        // not larger than device size.
+        if (newWidth > w || newHeight > h) {
+            newWidth = w;
+            newHeight = h;
+        }
+
+        return new Size(newWidth, newHeight);
     }
 
     public Point getPhysicalPoint(Position position) {
