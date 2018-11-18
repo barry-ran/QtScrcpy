@@ -44,12 +44,7 @@ VideoForm::VideoForm(QWidget *parent) :
         if (success) {
             // update ui
             setWindowTitle(deviceName);
-            updateShowSize(size);
-            QDesktopWidget* desktop = QApplication::desktop();
-            if (desktop) {
-                QRect mainScreenRc = desktop->availableGeometry();
-                move((mainScreenRc.width() - width())/2, (mainScreenRc.height() - height())/2);
-            }
+            updateShowSize(size);            
 
             // init decode
             m_decoder.setDeviceSocket(m_server->getDeviceSocket());
@@ -74,7 +69,7 @@ VideoForm::VideoForm(QWidget *parent) :
     QObject::connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
         m_frames.lock();        
         const AVFrame *frame = m_frames.consumeRenderedFrame();
-        qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
+        //qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
         updateShowSize(QSize(frame->width, frame->height));
         ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
         ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
@@ -101,17 +96,26 @@ void VideoForm::updateShowSize(const QSize &newSize)
     if (frameSize != newSize) {
         frameSize = newSize;
 
+        bool vertical = newSize.height() > newSize.width();
         QSize showSize = newSize;
         QDesktopWidget* desktop = QApplication::desktop();
         if (desktop) {
             QRect screenRect = desktop->availableGeometry();
-            showSize.setWidth(qMin(newSize.width(), screenRect.width()));
-            showSize.setHeight(qMin(newSize.height(), screenRect.height() - 100));
+            if (vertical) {
+                showSize.setHeight(qMin(newSize.height(), screenRect.height()));
+                showSize.setWidth(showSize.height()/2);
+            } else {
+                showSize.setWidth(qMin(newSize.width(), screenRect.width()));
+                showSize.setHeight(showSize.width()/2);
+            }
 
-            // 窗口居中
+            // 窗口居中            
             move(screenRect.center() - QRect(0, 0, showSize.width(), showSize.height()).center());
         }
 
+        int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
+        // 减去标题栏高度
+        showSize.setHeight(showSize.height() - titleBarHeight);
         if (showSize != size()) {
             resize(showSize);
         }
