@@ -56,10 +56,17 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
     if (!buf) {
         return 0;
     }
-    if (m_deviceSocket) {
-        return m_deviceSocket->recvData(buf, bufSize);
-    }    
-    return 0;
+    if (m_deviceSocket) {        
+        qint32 len = m_deviceSocket->recvData(buf, bufSize);
+        if (len == -1) {
+            return AVERROR(errno);
+        }
+        if (len == 0) {
+            return AVERROR_EOF;
+        }
+        return len;
+    }
+    return AVERROR_EOF;
 }
 
 bool Decoder::startDecode()
