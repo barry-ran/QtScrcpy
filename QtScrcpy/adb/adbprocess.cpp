@@ -97,6 +97,14 @@ bool AdbProcess::isRuning()
     }
 }
 
+void AdbProcess::setShowTouchesEnabled(const QString &serial, bool enabled)
+{
+    QStringList adbArgs;
+    adbArgs << "shell" << "settings" << "put" << "system" << "show_touches";
+    adbArgs << (enabled ? "1" : "0");
+    execute(serial, adbArgs);
+}
+
 void AdbProcess::forward(const QString& serial, quint16 localPort, const QString& deviceSocketName)
 {
     QStringList adbArgs;

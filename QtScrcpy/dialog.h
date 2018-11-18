@@ -26,9 +26,6 @@ private slots:
 
     void on_stopServerBtn_clicked();
 
-protected:
-    void keyPressEvent(QKeyEvent *event);
-
 private:
     Ui::Dialog *ui;
 

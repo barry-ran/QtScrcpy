@@ -25,10 +25,12 @@ void Dialog::on_adbProcess_clicked()
 {
     AdbProcess* adb = new AdbProcess();
     connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-        Q_UNUSED(processResult);
-        sender()->deleteLater();
+        if (AdbProcess::AER_SUCCESS_START != processResult) {
+            sender()->deleteLater();
+        }
     });
     adb->execute("", QStringList() << "devices");
+    //adb->setShowTouchesEnabled("P7C0218510000537", true);
 }
 
 void Dialog::on_startServerBtn_clicked()
@@ -44,10 +46,4 @@ void Dialog::on_stopServerBtn_clicked()
     if (m_videoForm) {
         m_videoForm->close();
     }
-}
-
-void Dialog::keyPressEvent(QKeyEvent *event)
-{
-    qDebug() << event->key();
-    return QDialog::keyPressEvent(event);
 }

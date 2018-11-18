@@ -28,6 +28,7 @@ public:
     void install(const QString& serial, const QString& local);
     void removePath(const QString& serial, const QString& path);
     bool isRuning();
+    void setShowTouchesEnabled(const QString& serial, bool enabled);
 
     static const QString& getAdbPath();
 
