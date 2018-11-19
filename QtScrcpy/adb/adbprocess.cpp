@@ -44,7 +44,6 @@ void AdbProcess::initSignals()
             emit adbProcessResult(AER_ERROR_EXEC);
         }
 
-        qDebug() << ">>>>>>>>" << __FUNCTION__;
         qDebug() << "adb return " << exitCode << "exit status " << exitStatus;
     });
 
@@ -61,14 +60,22 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::readyReadStandardError, this,
             [this](){
-        qDebug() << ">>>>>>>>" << __FUNCTION__;
         qDebug() << QString::fromLocal8Bit(readAllStandardError());
     });
 
     connect(this, &QProcess::readyReadStandardOutput, this,
             [this](){
-        qDebug() << ">>>>>>>>" << __FUNCTION__;
-        qDebug() << QString::fromLocal8Bit(readAllStandardOutput());
+        QString stdOut = QString::fromLocal8Bit(readAllStandardOutput());
+
+        // get devices serial by adb devices
+        QStringList serials;
+        QStringList devicesInfoList = stdOut.split(QRegExp("\r\n|\n"), QString::SkipEmptyParts);
+        for(QString deviceInfo : devicesInfoList) {
+            QStringList deviceInfos = deviceInfo.split(QRegExp("\t"), QString::SkipEmptyParts);
+            if (2 == deviceInfos.count() && 0 == deviceInfos[1].compare("device")) {
+                serials << deviceInfos[0];
+            }
+        }
     });
 
     connect(this, &QProcess::started, this,
