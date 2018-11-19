@@ -155,11 +155,7 @@ bool Server::execute()
 }
 
 bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop)
-{
-    if (serial.isEmpty()) {
-        return false;
-    }
-
+{    
     m_serial = serial;
     m_localPort = localPort;
     m_maxSize = maxSize;
