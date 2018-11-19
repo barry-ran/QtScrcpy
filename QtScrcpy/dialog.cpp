@@ -21,10 +21,13 @@ Dialog::~Dialog()
     delete ui;
 }
 
-void Dialog::on_adbProcess_clicked()
+void Dialog::on_updateDevice_clicked()
 {
     AdbProcess* adb = new AdbProcess();
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+    connect(adb, &AdbProcess::adbProcessResult, this, [this, adb](AdbProcess::ADB_EXEC_RESULT processResult){
+        if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+            qDebug() << adb->getDevicesSerialFromStdOut().join("*");
+        }
         if (AdbProcess::AER_SUCCESS_START != processResult) {
             sender()->deleteLater();
         }
