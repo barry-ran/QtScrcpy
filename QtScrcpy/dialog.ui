@@ -10,6 +10,18 @@
     <height>412</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>442</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>442</width>
+    <height>16777215</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>QtScrcpy</string>
   </property>
