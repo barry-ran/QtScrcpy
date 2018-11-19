@@ -30,6 +30,7 @@ public:
     bool isRuning();
     void setShowTouchesEnabled(const QString& serial, bool enabled);
     QStringList getDevicesSerialFromStdOut();
+    QString getStdOut();
 
     static const QString& getAdbPath();
 

@@ -26,6 +26,8 @@ private slots:
 
     void on_stopServerBtn_clicked();
 
+    void on_wirelessConnectBtn_clicked();
+
 private:
     Ui::Dialog *ui;
 
