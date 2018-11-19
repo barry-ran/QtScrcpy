@@ -30,23 +30,23 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="adbProcess">
+       <widget class="QPushButton" name="updateDevice">
         <property name="text">
-         <string>adbProcess</string>
+         <string>update device</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="startServerBtn">
         <property name="text">
-         <string>startServer</string>
+         <string>start server</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="stopServerBtn">
         <property name="text">
-         <string>stopServer</string>
+         <string>stop server</string>
         </property>
        </widget>
       </item>

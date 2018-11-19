@@ -65,17 +65,8 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::readyReadStandardOutput, this,
             [this](){
-        QString stdOut = QString::fromLocal8Bit(readAllStandardOutput());
-
-        // get devices serial by adb devices
-        QStringList serials;
-        QStringList devicesInfoList = stdOut.split(QRegExp("\r\n|\n"), QString::SkipEmptyParts);
-        for(QString deviceInfo : devicesInfoList) {
-            QStringList deviceInfos = deviceInfo.split(QRegExp("\t"), QString::SkipEmptyParts);
-            if (2 == deviceInfos.count() && 0 == deviceInfos[1].compare("device")) {
-                serials << deviceInfos[0];
-            }
-        }
+        m_standardOutput = QString::fromLocal8Bit(readAllStandardOutput());
+        qDebug() << m_standardOutput;
     });
 
     connect(this, &QProcess::started, this,
@@ -86,6 +77,7 @@ void AdbProcess::initSignals()
 
 void AdbProcess::execute(const QString& serial, const QStringList& args)
 {
+    m_standardOutput = "";
     QStringList adbArgs;
     if (!serial.isEmpty()) {
         adbArgs << "-s" << serial;
@@ -110,6 +102,20 @@ void AdbProcess::setShowTouchesEnabled(const QString &serial, bool enabled)
     adbArgs << "shell" << "settings" << "put" << "system" << "show_touches";
     adbArgs << (enabled ? "1" : "0");
     execute(serial, adbArgs);
+}
+
+QStringList AdbProcess::getDevicesSerialFromStdOut()
+{
+    // get devices serial by adb devices
+    QStringList serials;
+    QStringList devicesInfoList = m_standardOutput.split(QRegExp("\r\n|\n"), QString::SkipEmptyParts);
+    for(QString deviceInfo : devicesInfoList) {
+        QStringList deviceInfos = deviceInfo.split(QRegExp("\t"), QString::SkipEmptyParts);
+        if (2 == deviceInfos.count() && 0 == deviceInfos[1].compare("device")) {
+            serials << deviceInfos[0];
+        }
+    }
+    return serials;
 }
 
 void AdbProcess::forward(const QString& serial, quint16 localPort, const QString& deviceSocketName)

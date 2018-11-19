@@ -20,7 +20,7 @@ public:
     ~Dialog();
 
 private slots:
-    void on_adbProcess_clicked();
+    void on_updateDevice_clicked();
 
     void on_startServerBtn_clicked();
 

@@ -29,6 +29,7 @@ public:
     void removePath(const QString& serial, const QString& path);
     bool isRuning();
     void setShowTouchesEnabled(const QString& serial, bool enabled);
+    QStringList getDevicesSerialFromStdOut();
 
     static const QString& getAdbPath();
 
@@ -38,6 +39,8 @@ signals:
 private:
     void initSignals();
 
+private:
+    QString m_standardOutput = "";
     static QString s_adbPath;
 };
 
