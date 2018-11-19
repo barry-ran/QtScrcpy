@@ -118,6 +118,11 @@ QStringList AdbProcess::getDevicesSerialFromStdOut()
     return serials;
 }
 
+QString AdbProcess::getStdOut()
+{
+    return m_standardOutput;
+}
+
 void AdbProcess::forward(const QString& serial, quint16 localPort, const QString& deviceSocketName)
 {
     QStringList adbArgs;

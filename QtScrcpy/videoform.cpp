@@ -7,9 +7,10 @@
 #include <Windows.h>
 #pragma comment(lib, "User32.lib")
 
-VideoForm::VideoForm(QWidget *parent) :
+VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::videoForm)
+    ui(new Ui::videoForm),
+    m_serial(serial)
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
@@ -81,7 +82,7 @@ VideoForm::VideoForm(QWidget *parent) :
     //m_server->start("P7C0218510000537", 27183, 1080, 8000000, "");
 
     // only one devices, serial can be null
-    m_server->start("", 27183, 720, 8000000, "");
+    m_server->start(m_serial, 27183, 720, 8000000, "");
 
     // support wireless connect
     //m_server->start("192.168.0.174:5555", 27183, 720, 8000000, "");

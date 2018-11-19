@@ -18,7 +18,7 @@ class VideoForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit VideoForm(QWidget *parent = 0);
+    explicit VideoForm(const QString& serial, QWidget *parent = 0);
     ~VideoForm();
 
 private:
@@ -40,6 +40,7 @@ private:
     Frames m_frames;
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
+    QString m_serial = "";
 };
 
 #endif // VIDEOFORM_H
