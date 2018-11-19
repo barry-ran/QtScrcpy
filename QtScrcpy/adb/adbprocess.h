@@ -31,6 +31,7 @@ public:
     void setShowTouchesEnabled(const QString& serial, bool enabled);
     QStringList getDevicesSerialFromStdOut();
     QString getStdOut();
+    QString getErrorOut();
 
     static const QString& getAdbPath();
 
@@ -42,6 +43,7 @@ private:
 
 private:
     QString m_standardOutput = "";
+    QString m_errorOutput = "";
     static QString s_adbPath;
 };
 

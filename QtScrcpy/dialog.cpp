@@ -4,7 +4,6 @@
 
 #include "dialog.h"
 #include "ui_dialog.h"
-#include "adbprocess.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -13,6 +12,27 @@ Dialog::Dialog(QWidget *parent) :
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
     //setWindowFlags(windowFlags() | Qt::WindowMaximizeButtonHint | Qt::WindowMinimizeButtonHint);
+
+    connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+        QString log = "";
+        switch (processResult) {
+        case AdbProcess::AER_SUCCESS_START:
+            log = "adb run";
+            break;
+        case AdbProcess::AER_ERROR_EXEC:
+            log = m_adb.getErrorOut();
+            break;
+        case AdbProcess::AER_ERROR_MISSING_BINARY:
+            log = "adb not find";
+            break;
+        case AdbProcess::AER_SUCCESS_EXEC:
+            log = m_adb.getStdOut();
+            break;
+        }
+        if (!log.isEmpty()) {
+            outLog(log);
+        }
+    });
 }
 
 Dialog::~Dialog()
@@ -23,17 +43,11 @@ Dialog::~Dialog()
 
 void Dialog::on_updateDevice_clicked()
 {
-    AdbProcess* adb = new AdbProcess();
-    connect(adb, &AdbProcess::adbProcessResult, this, [this, adb](AdbProcess::ADB_EXEC_RESULT processResult){
-        if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
-            ui->outEdit->append(adb->getDevicesSerialFromStdOut().join("*"));
-        }
-        if (AdbProcess::AER_SUCCESS_START != processResult) {
-            sender()->deleteLater();
-        }
-    });
-    adb->execute("", QStringList() << "devices");
-    //adb->setShowTouchesEnabled("P7C0218510000537", true);
+    if (checkAdbRun()) {
+        return;
+    }
+    outLog("update devices...");
+    m_adb.execute("", QStringList() << "devices");
 }
 
 void Dialog::on_startServerBtn_clicked()
@@ -53,19 +67,38 @@ void Dialog::on_stopServerBtn_clicked()
 
 void Dialog::on_wirelessConnectBtn_clicked()
 {
-    AdbProcess* adb = new AdbProcess();
-    connect(adb, &AdbProcess::adbProcessResult, this, [this, adb](AdbProcess::ADB_EXEC_RESULT processResult){
-        if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
-            ui->outEdit->append(adb->getStdOut());
-        }
-        if (AdbProcess::AER_SUCCESS_START != processResult) {
-            sender()->deleteLater();
-        }
-    });
-
-    //adb connect 172.16.8.197:5555
+    if (checkAdbRun()) {
+        return;
+    }
+    outLog("wireless connect...");
     QStringList adbArgs;
     adbArgs << "connect";
     adbArgs << ui->deviceIpEdt->text().trimmed();
-    adb->execute("", adbArgs);
+    m_adb.execute("", adbArgs);
+}
+
+void Dialog::on_startAdbdBtn_clicked()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+    outLog("start devices adbd...");
+    // adb tcpip 5555
+    QStringList adbArgs;
+    adbArgs << "tcpip";
+    adbArgs << "5555";
+    m_adb.execute("", adbArgs);
+}
+
+void Dialog::outLog(const QString &log)
+{
+    ui->outEdit->append(log);
+}
+
+bool Dialog::checkAdbRun()
+{
+    if (m_adb.isRuning()) {
+        outLog("wait for the end of the current command to run");
+    }
+    return m_adb.isRuning();
 }
