@@ -60,13 +60,14 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::readyReadStandardError, this,
             [this](){
-        qDebug() << QString::fromLocal8Bit(readAllStandardError());
+        m_errorOutput = QString::fromLocal8Bit(readAllStandardError()).trimmed();
+        qDebug() << "AdbProcess::error:" << m_errorOutput;
     });
 
     connect(this, &QProcess::readyReadStandardOutput, this,
             [this](){
-        m_standardOutput = QString::fromLocal8Bit(readAllStandardOutput());
-        qDebug() << m_standardOutput;
+        m_standardOutput = QString::fromLocal8Bit(readAllStandardOutput()).trimmed();
+        qDebug() << "AdbProcess::std out:" << m_standardOutput;
     });
 
     connect(this, &QProcess::started, this,
@@ -78,6 +79,7 @@ void AdbProcess::initSignals()
 void AdbProcess::execute(const QString& serial, const QStringList& args)
 {
     m_standardOutput = "";
+    m_errorOutput = "";
     QStringList adbArgs;
     if (!serial.isEmpty()) {
         adbArgs << "-s" << serial;
@@ -121,6 +123,11 @@ QStringList AdbProcess::getDevicesSerialFromStdOut()
 QString AdbProcess::getStdOut()
 {
     return m_standardOutput;
+}
+
+QString AdbProcess::getErrorOut()
+{
+    return m_errorOutput;
 }
 
 void AdbProcess::forward(const QString& serial, quint16 localPort, const QString& deviceSocketName)

@@ -5,6 +5,7 @@
 #include <QPointer>
 
 #include "videoform.h"
+#include "adbprocess.h"
 
 namespace Ui {
 class Dialog;
@@ -28,9 +29,15 @@ private slots:
 
     void on_wirelessConnectBtn_clicked();
 
+    void on_startAdbdBtn_clicked();
+
+private:
+    void outLog(const QString& log);
+    bool checkAdbRun();
+
 private:
     Ui::Dialog *ui;
-
+    AdbProcess m_adb;
     QPointer<VideoForm> m_videoForm;
 };
 
