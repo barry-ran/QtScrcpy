@@ -73,3 +73,6 @@ LIBS += \
         -L$$PWD/ffmpeg/lib -lavutil \
         -L$$PWD/ffmpeg/lib -lswscale
 
+RESOURCES += \
+    res.qrc
+
