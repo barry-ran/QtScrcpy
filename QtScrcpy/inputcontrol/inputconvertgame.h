@@ -51,7 +51,7 @@ protected:
     void mouseMoveStartTouch(const QMouseEvent* from);
     void mouseMoveStopTouch();
 
-    void switchGameMap();    
+    bool switchGameMap();
     bool checkCursorPos(const QMouseEvent* from);
 
 protected:
@@ -86,6 +86,8 @@ private:
     QPointF m_mouseMoveLastPos = {0.0f, 0.0f};
     bool m_mouseMovePress = false;
     int m_mouseMoveTimer = 0;
+
+    bool m_needSwitchGameAgain = false;
 };
 
 #endif // INPUTCONVERTGAME_H
