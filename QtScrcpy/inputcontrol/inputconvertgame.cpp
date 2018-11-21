@@ -49,9 +49,19 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
     switch (from->key()) {
     case Qt::Key_QuoteLeft:
         if (QEvent::KeyPress == from->type()) {
-            switchGameMap();
+            if (!switchGameMap()) {
+                m_needSwitchGameAgain = false;
+            }
         }
         return;
+    }
+
+    if (m_needSwitchGameAgain) {
+        updateSize(frameSize, showSize);
+        // Qt::Key_Tab Qt::Key_M
+        if (processKeyClick(from)) {
+            return;
+        }
     }
 
     if (m_gameMap) {
@@ -267,12 +277,14 @@ bool InputConvertGame::processKeyClick(const QKeyEvent *from)
         break;
     case Qt::Key_M: // 地图
         if (QEvent::KeyRelease == from->type()) {
+            m_needSwitchGameAgain = !m_needSwitchGameAgain;
             switchGameMap();
         }
         clickPos = QPointF(0.98f, 0.03f);
         break;
     case Qt::Key_Tab: // 背包
         if (QEvent::KeyRelease == from->type()) {
+            m_needSwitchGameAgain = !m_needSwitchGameAgain;
             switchGameMap();
         }
         clickPos = QPointF(0.06f, 0.9f);        
@@ -307,14 +319,23 @@ bool InputConvertGame::processKeyClick(const QKeyEvent *from)
     case Qt::Key_3: // 手雷
         clickPos = QPointF(0.67f, 0.92f);
         break;
+    case Qt::Key_4: // 快速打药
+        clickPos = QPointF(0.33f, 0.95f);
+        break;
     case Qt::Key_5: // 下车
         clickPos = QPointF(0.92f, 0.4f);
+        break;
+    case Qt::Key_6: // 救人
+        clickPos = QPointF(0.49f, 0.63f);
         break;
     case Qt::Key_Shift: // 车加速
         clickPos = QPointF(0.82f, 0.8f);
         break;
-    case Qt::Key_4: // 开关门
+    case Qt::Key_X: // 开关门
         clickPos = QPointF(0.7f, 0.7f);
+        break;
+    case Qt::Key_T: // 舔包
+        clickPos = QPointF(0.72f, 0.26f);
         break;
     case Qt::Key_Q: // 左探头
         clickTwice = true;
@@ -458,16 +479,17 @@ void InputConvertGame::mouseMoveStopTouch()
     }
 }
 
-void InputConvertGame::switchGameMap()
+bool InputConvertGame::switchGameMap()
 {
     m_gameMap = !m_gameMap;    
     emit grabCursor(m_gameMap);
     if (m_gameMap) {
         QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     } else {
-        mouseMoveStopTouch();
+        mouseMoveStopTouch();        
         QGuiApplication::restoreOverrideCursor();
     }
+    return m_gameMap;
 }
 
 bool InputConvertGame::checkCursorPos(const QMouseEvent *from)
