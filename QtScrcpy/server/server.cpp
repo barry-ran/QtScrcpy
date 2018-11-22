@@ -198,6 +198,7 @@ bool Server::connectTo()
             // connect will success even if devices offline, recv data is real connect success
             // because connect is to pc adb server
             m_deviceSocket->waitForReadyRead(1000);
+            // devices will send 1 byte first on tunnel forward mode
             QByteArray data = m_deviceSocket->read(1);
             if (!data.isEmpty() && readInfo(deviceName, deviceSize)) {
                 success = true;
