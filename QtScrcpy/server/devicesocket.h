@@ -18,9 +18,11 @@ public:
 protected:
     bool event(QEvent *event);
 
-protected slots:
-    void onReadyRead();
+public slots:
     void quitNotify();
+
+protected slots:
+    void onReadyRead();    
 
 private:
     QMutex m_mutex;
@@ -29,6 +31,7 @@ private:
     quint8* m_buffer = Q_NULLPTR;
     qint32 m_bufferSize = 0;
     qint32 m_dataSize = 0;
+    bool m_quit = false;
 };
 
 #endif // DEVICESOCKET_H

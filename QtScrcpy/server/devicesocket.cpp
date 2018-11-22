@@ -18,6 +18,9 @@ DeviceSocket::~DeviceSocket()
 
 qint32 DeviceSocket::recvData(quint8 *buf, qint32 bufSize)
 {
+    if (m_quit) {
+        return 0;
+    }
     QMutexLocker locker(&m_mutex);
 
     m_buffer = buf;
@@ -63,6 +66,7 @@ void DeviceSocket::onReadyRead()
 
 void DeviceSocket::quitNotify()
 {
+    m_quit = true;
     QMutexLocker locker(&m_mutex);
     if (m_buffer) {
         m_buffer = Q_NULLPTR;
