@@ -57,7 +57,7 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
         return 0;
     }
     if (m_deviceSocket) {        
-        qint32 len = m_deviceSocket->recvData(buf, bufSize);
+        qint32 len = m_deviceSocket->subThreadRecvData(buf, bufSize);
         if (len == -1) {
             return AVERROR(errno);
         }

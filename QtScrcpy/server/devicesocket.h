@@ -13,16 +13,14 @@ public:
     explicit DeviceSocket(QObject *parent = nullptr);
     virtual ~DeviceSocket();
 
-    qint32 recvData(quint8* buf, qint32 bufSize);
+    qint32 subThreadRecvData(quint8* buf, qint32 bufSize);
 
 protected:
     bool event(QEvent *event);
 
-public slots:
-    void quitNotify();
-
 protected slots:
-    void onReadyRead();    
+    void onReadyRead();
+    void quitNotify();
 
 private:
     QMutex m_mutex;
