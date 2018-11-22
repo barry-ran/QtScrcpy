@@ -1,4 +1,5 @@
 #include <QCoreApplication>
+#include <QThread>
 #include <QDebug>
 
 #include "qscrcpyevent.h"
@@ -16,8 +17,10 @@ DeviceSocket::~DeviceSocket()
     quitNotify();
 }
 
-qint32 DeviceSocket::recvData(quint8 *buf, qint32 bufSize)
+qint32 DeviceSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
 {
+    // this function cant call in main thread
+    Q_ASSERT(QCoreApplication::instance()->thread() != QThread::currentThread());
     if (m_quit) {
         return 0;
     }
