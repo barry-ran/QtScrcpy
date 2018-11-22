@@ -362,8 +362,8 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                     m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
 #else
                     // test tunnelForward
-                    //m_tunnelForward = true;
-                    //m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
+                    m_tunnelForward = true;
+                    m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
 #endif
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult){
