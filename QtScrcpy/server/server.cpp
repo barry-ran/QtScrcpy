@@ -178,49 +178,53 @@ bool Server::connectTo()
         return true;
     }
 
-    QString deviceName;
-    QSize deviceSize;
-    bool success = false;
+    // device server need time to start
+    QTimer::singleShot(600, this, [this](){
+        QString deviceName;
+        QSize deviceSize;
+        bool success = false;
 
-    m_deviceSocket = new DeviceSocket();
+        m_deviceSocket = new DeviceSocket();
 
-    // wait for devices server start
-    m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
-    if (!m_deviceSocket->waitForConnected(1000)) {
-        stop();
-        qWarning("connect to server failed");
-        emit connectToResult(false, "", QSize());
-        return false;
-    }
-    if (QTcpSocket::ConnectedState == m_deviceSocket->state()) {
-        // connect will success even if devices offline, recv data is real connect success
-        // because connect is to pc adb server
-        m_deviceSocket->waitForReadyRead(1000);
-        QByteArray data = m_deviceSocket->read(1);
-        if (!data.isEmpty() && readInfo(deviceName, deviceSize)) {
-            success = true;
+        // wait for devices server start
+        m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+        if (!m_deviceSocket->waitForConnected(1000)) {
+            stop();
+            qWarning("connect to server failed");
+            emit connectToResult(false, "", QSize());
+            return false;
+        }
+        if (QTcpSocket::ConnectedState == m_deviceSocket->state()) {
+            // connect will success even if devices offline, recv data is real connect success
+            // because connect is to pc adb server
+            m_deviceSocket->waitForReadyRead(1000);
+            QByteArray data = m_deviceSocket->read(1);
+            if (!data.isEmpty() && readInfo(deviceName, deviceSize)) {
+                success = true;
+            } else {
+                qWarning("connect to server read device info failed");
+                success = false;
+            }
         } else {
-            qWarning("connect to server read device info failed");
+            qWarning("connect to server failed");
+            m_deviceSocket->deleteLater();
             success = false;
         }
-    } else {
-        qWarning("connect to server failed");
-        m_deviceSocket->deleteLater();
-        success = false;
-    }
 
-    if (success) {
-        // the server is started, we can clean up the jar from the temporary folder
-        removeServer();
-        m_serverCopiedToDevice = false;
-        // we don't need the adb tunnel anymore
-        disableTunnelForward();
-        m_tunnelEnabled = false;
-    } else {
-        stop();
-    }
-    emit connectToResult(success, deviceName, deviceSize);
-    return success;
+        if (success) {
+            // the server is started, we can clean up the jar from the temporary folder
+            removeServer();
+            m_serverCopiedToDevice = false;
+            // we don't need the adb tunnel anymore
+            disableTunnelForward();
+            m_tunnelEnabled = false;
+        } else {
+            stop();
+        }
+        emit connectToResult(success, deviceName, deviceSize);
+    });
+
+    return true;
 }
 
 void Server::timerEvent(QTimerEvent *event)
@@ -354,7 +358,13 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
             case SSS_PUSH:
                 if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
                     m_serverCopiedToDevice = true;
+#if 1
                     m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
+#else
+                    // test tunnelForward
+                    //m_tunnelForward = true;
+                    //m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
+#endif
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult){
                     qCritical("adb push");
