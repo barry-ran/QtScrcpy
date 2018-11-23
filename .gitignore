@@ -130,3 +130,6 @@
 /server/gradlew
 /server/gradlew.bat
 /server/local.properties
+/output/win/debug/QtScrcpy.ilk
+/output/win/debug/QtScrcpy.pdb
+/output/win/debug/QtScrcpy.exe
