@@ -7,8 +7,6 @@
 #include "videoform.h"
 #include "ui_videoform.h"
 
-
-
 VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::videoForm),
