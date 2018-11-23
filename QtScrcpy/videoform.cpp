@@ -1,11 +1,13 @@
 #include <QDesktopWidget>
 #include <QMouseEvent>
+#ifdef Q_OS_WIN32
+#include <Windows.h>
+#endif
 
 #include "videoform.h"
 #include "ui_videoform.h"
 
-#include <Windows.h>
-#pragma comment(lib, "User32.lib")
+
 
 VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     QWidget(parent),
@@ -19,8 +21,9 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     ui->videoWidget->setMouseTracking(true);
 
     connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
+#ifdef Q_OS_WIN32
         if(grab) {
-            RECT mainRect; //windef.h中被定义
+            RECT mainRect;
             mainRect.left = (LONG)this->geometry().left();
             mainRect.right = (LONG)this->geometry().right();
             mainRect.top = (LONG)this->geometry().top();
@@ -29,6 +32,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
         } else {
             ClipCursor(Q_NULLPTR);
         }
+#endif
     });
 
     m_server = new Server();

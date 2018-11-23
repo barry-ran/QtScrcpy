@@ -39,11 +39,25 @@ FORMS += \
         dialog.ui \
     videoform.ui
 
-# 指定可执行程序输出目录
-CONFIG(debug, debug|release) {
-    DESTDIR = $$PWD/../output/debug
-} else {
-    DESTDIR = $$PWD/../output/release
+# ***********************************************************
+# 输出目录
+# ***********************************************************
+# Win平台下输出目录
+win32 {
+    CONFIG(debug, debug|release) {
+        DESTDIR = $$PWD/../output/win/debug
+    } else {
+        DESTDIR = $$PWD/../output/win/release
+    }
+}
+
+# Mac os平台下输出目录
+macos {
+    CONFIG(debug, debug|release) {
+        DESTDIR = $$PWD/../output/mac/debug
+    } else {
+        DESTDIR = $$PWD/../output/mac/release
+    }
 }
 
 # 子工程
@@ -57,7 +71,7 @@ include ($$PWD/inputcontrol/inputcontrol.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
-        $$PWD/ffmpeg/include \
+        $$PWD/../third_party/ffmpeg/include \
         $$PWD/common \
         $$PWD/server \
         $$PWD/adb \
@@ -66,12 +80,19 @@ INCLUDEPATH += \
         $$PWD/android \
         $$PWD/inputcontrol
 
-# 依赖库
+# ***********************************************************
+# 依赖模块
+# ***********************************************************
 LIBS += \
-        -L$$PWD/ffmpeg/lib -lavcodec \
-        -L$$PWD/ffmpeg/lib -lavformat \
-        -L$$PWD/ffmpeg/lib -lavutil \
-        -L$$PWD/ffmpeg/lib -lswscale
+        -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
+        -L$$PWD/../third_party/ffmpeg/lib -lavformat \
+        -L$$PWD/../third_party/ffmpeg/lib -lavutil \
+        -L$$PWD/../third_party/ffmpeg/lib -lswscale
+
+# Win平台下依赖模块
+win32 {
+    LIBS += -lUser32
+}
 
 RESOURCES += \
     res.qrc
