@@ -83,15 +83,23 @@ INCLUDEPATH += \
 # ***********************************************************
 # 依赖模块
 # ***********************************************************
-LIBS += \
-        -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
-        -L$$PWD/../third_party/ffmpeg/lib -lavformat \
-        -L$$PWD/../third_party/ffmpeg/lib -lavutil \
-        -L$$PWD/../third_party/ffmpeg/lib -lswscale
-
 # Win平台下依赖模块
 win32 {
-    LIBS += -lUser32
+    LIBS += \
+            -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
+            -L$$PWD/../third_party/ffmpeg/lib -lavformat \
+            -L$$PWD/../third_party/ffmpeg/lib -lavutil \
+            -L$$PWD/../third_party/ffmpeg/lib -lswscale \
+            -lUser32
+}
+
+# mac平台下依赖模块
+macos {
+    LIBS += \
+            -L$$PWD/../third_party/ffmpeg/lib -lavcodec.58 \
+            -L$$PWD/../third_party/ffmpeg/lib -lavformat.58 \
+            -L$$PWD/../third_party/ffmpeg/lib -lavutil.56 \
+            -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
 }
 
 RESOURCES += \
