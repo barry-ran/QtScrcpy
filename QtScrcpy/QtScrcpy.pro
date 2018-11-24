@@ -39,27 +39,6 @@ FORMS += \
         dialog.ui \
     videoform.ui
 
-# ***********************************************************
-# 输出目录
-# ***********************************************************
-# Win平台下输出目录
-win32 {
-    CONFIG(debug, debug|release) {
-        DESTDIR = $$PWD/../output/win/debug
-    } else {
-        DESTDIR = $$PWD/../output/win/release
-    }
-}
-
-# Mac os平台下输出目录
-macos {
-    CONFIG(debug, debug|release) {
-        DESTDIR = $$PWD/../output/mac/debug
-    } else {
-        DESTDIR = $$PWD/../output/mac/release
-    }
-}
-
 # 子工程
 include ($$PWD/common/common.pri)
 include ($$PWD/server/server.pri)
@@ -80,27 +59,49 @@ INCLUDEPATH += \
         $$PWD/android \
         $$PWD/inputcontrol
 
+
 # ***********************************************************
-# 依赖模块
+# Win平台下配置
 # ***********************************************************
-# Win平台下依赖模块
 win32 {
+    # 输出目录
+    CONFIG(debug, debug|release) {
+        DESTDIR = $$PWD/../output/win/debug
+    } else {
+        DESTDIR = $$PWD/../output/win/release
+    }
+
+    # 依赖模块
     LIBS += \
             -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
             -L$$PWD/../third_party/ffmpeg/lib -lavformat \
             -L$$PWD/../third_party/ffmpeg/lib -lavutil \
             -L$$PWD/../third_party/ffmpeg/lib -lswscale \
             -lUser32
+
+    # windows rc file
+    RC_FILE = $$PWD/res/QtScrcpy.rc
 }
 
-# mac平台下依赖模块
+# ***********************************************************
+# Mac平台下配置
+# ***********************************************************
 macos {
+    # 输出目录
+    CONFIG(debug, debug|release) {
+        DESTDIR = $$PWD/../output/mac/debug
+    } else {
+        DESTDIR = $$PWD/../output/mac/release
+    }
+
+    # 依赖模块
     LIBS += \
             -L$$PWD/../third_party/ffmpeg/lib -lavcodec.58 \
             -L$$PWD/../third_party/ffmpeg/lib -lavformat.58 \
             -L$$PWD/../third_party/ffmpeg/lib -lavutil.56 \
             -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
 
+    # mac bundle file
     APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server.jar)
     APP_SCRCPY_SERVER.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_SCRCPY_SERVER

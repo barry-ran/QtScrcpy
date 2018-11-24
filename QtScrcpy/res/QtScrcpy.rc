@@ -1,0 +1,34 @@
+#include "winver.h"
+//#include "../version/version.h"
+IDI_ICON1   ICON    DISCARDABLE     "QtScrcpy.ico"
+/*
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION CCTALK_VERSION_RES
+ PRODUCTVERSION CCTALK_VERSION_RES
+ FILEFLAGS 0x0L
+ FILEFLAGSMASK 0x3fL
+ FILEOS 0x00040004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "CompanyName", "Personal"
+            VALUE "FileDescription", "QtScrcpy"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "LegalCopyright", "Copyright (C) Barry 2018-2028. All rights reserved."
+            VALUE "InternalName", "QtScrcpy"
+            VALUE "OriginalFilename", "QtScrcpy.exe"
+            VALUE "ProductName", "QtScrcpy"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0, 1200
+    END
+END
+*/
