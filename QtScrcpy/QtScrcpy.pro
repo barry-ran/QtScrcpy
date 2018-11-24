@@ -100,6 +100,14 @@ macos {
             -L$$PWD/../third_party/ffmpeg/lib -lavformat.58 \
             -L$$PWD/../third_party/ffmpeg/lib -lavutil.56 \
             -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
+
+    APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server.jar)
+    APP_SCRCPY_SERVER.path = Contents/MacOS
+    QMAKE_BUNDLE_DATA += APP_SCRCPY_SERVER
+
+    APP_ADB.files = $$files($$PWD/../third_party/adb/adb)
+    APP_ADB.path = Contents/MacOS
+    QMAKE_BUNDLE_DATA += APP_ADB
 }
 
 RESOURCES += \
