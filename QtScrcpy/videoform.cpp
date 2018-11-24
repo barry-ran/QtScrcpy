@@ -92,6 +92,8 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
         // support wireless connect
         //m_server->start("192.168.0.174:5555", 27183, 720, 8000000, "");
     });
+
+    updateShowSize(size());
 }
 
 VideoForm::~VideoForm()
