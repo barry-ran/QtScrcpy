@@ -1,8 +1,5 @@
 /src/QtScrcpy.pro.user
-/output/debug/*.pdb
-/output/debug/*.ilk
-/output/debug/QtScrcpy.exe
-/output/release/QtScrcpy.exe
+/output/mac/*
 /*.user
 /QtScrcpy/*.user
 /server/.gradle/4.6/fileChanges/last-build.bin
