@@ -1,5 +1,6 @@
 #include <QDesktopWidget>
 #include <QMouseEvent>
+#include <QTimer>
 #ifdef Q_OS_WIN32
 #include <Windows.h>
 #endif
@@ -79,15 +80,18 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
         m_frames.unLock();
     },Qt::QueuedConnection);
 
-    // support 480p 720p 1080p
-    //m_server->start("P7C0218510000537", 27183, 0, 8000000, "");
-    //m_server->start("P7C0218510000537", 27183, 1080, 8000000, "");
+    // fix: macos cant recv finished signel, timer is ok
+    QTimer::singleShot(0, this, [this](){
+        // support 480p 720p 1080p
+        //m_server->start("P7C0218510000537", 27183, 0, 8000000, "");
+        //m_server->start("P7C0218510000537", 27183, 1080, 8000000, "");
 
-    // only one devices, serial can be null
-    m_server->start(m_serial, 27183, 720, 8000000, "");
+        // only one devices, serial can be null
+        m_server->start(m_serial, 27183, 720, 8000000, "");
 
-    // support wireless connect
-    //m_server->start("192.168.0.174:5555", 27183, 720, 8000000, "");
+        // support wireless connect
+        //m_server->start("192.168.0.174:5555", 27183, 720, 8000000, "");
+    });
 }
 
 VideoForm::~VideoForm()
