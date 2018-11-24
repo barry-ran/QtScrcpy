@@ -109,6 +109,9 @@ macos {
     APP_ADB.files = $$files($$PWD/../third_party/adb/adb)
     APP_ADB.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_ADB
+
+    # mac application icon
+    ICON = $$PWD/res/QtScrcpy.icns
 }
 
 RESOURCES += \
