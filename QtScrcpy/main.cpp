@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
 #ifdef Q_OS_WIN32
-    qputenv("QTSCRCPY_ADB_PATH", "..\\..\\..\\third_party\\adb\\adb.exe");
-    qputenv("QTSCRCPY_SERVER_PATH", "..\\..\\..\\third_party\\scrcpy-server.jar");
+    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/adb.exe");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server.jar");
 #endif
 
     //加载样式表
