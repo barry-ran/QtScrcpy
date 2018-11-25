@@ -15,14 +15,19 @@ int main(int argc, char *argv[])
 {
     //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     //QApplication::setAttribute(Qt::AA_UseOpenGLES);
-    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);    
+    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Decoder::init();
     QApplication a(argc, argv);
 
 #ifdef Q_OS_WIN32
-    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/adb.exe");
+    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/win/adb.exe");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server.jar");
+#endif
+
+#ifdef Q_OS_LINUX
+    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/linux/adb");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server.jar");
 #endif
 

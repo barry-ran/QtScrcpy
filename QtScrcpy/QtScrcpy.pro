@@ -73,8 +73,8 @@ win32 {
 
     # 依赖模块
     LIBS += \
-            -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
             -L$$PWD/../third_party/ffmpeg/lib -lavformat \
+            -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
             -L$$PWD/../third_party/ffmpeg/lib -lavutil \
             -L$$PWD/../third_party/ffmpeg/lib -lswscale \
             -lUser32
@@ -96,8 +96,8 @@ macos {
 
     # 依赖模块
     LIBS += \
-            -L$$PWD/../third_party/ffmpeg/lib -lavcodec.58 \
             -L$$PWD/../third_party/ffmpeg/lib -lavformat.58 \
+            -L$$PWD/../third_party/ffmpeg/lib -lavcodec.58 \
             -L$$PWD/../third_party/ffmpeg/lib -lavutil.56 \
             -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
 
@@ -106,13 +106,36 @@ macos {
     APP_SCRCPY_SERVER.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_SCRCPY_SERVER
 
-    APP_ADB.files = $$files($$PWD/../third_party/adb/adb)
+    APP_ADB.files = $$files($$PWD/../third_party/adb/mac/adb)
     APP_ADB.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_ADB
 
     # mac application icon
     ICON = $$PWD/res/QtScrcpy.icns
 }
+
+# ***********************************************************
+# Linux平台下配置
+# ***********************************************************
+linux {
+    # 输出目录
+    CONFIG(debug, debug|release) {
+        DESTDIR = $$PWD/../output/linux/debug
+    } else {
+        DESTDIR = $$PWD/../output/linux/release
+    }
+
+    # 依赖模块
+    LIBS += \
+            -L$$PWD/../third_party/ffmpeg/lib -lavformat \
+            -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
+            -L$$PWD/../third_party/ffmpeg/lib -lavutil \
+            -L$$PWD/../third_party/ffmpeg/lib -lswscale
+
+    # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
+}
+
+# message("test")
 
 RESOURCES += \
     res.qrc
