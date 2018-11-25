@@ -120,6 +120,18 @@ QStringList AdbProcess::getDevicesSerialFromStdOut()
     return serials;
 }
 
+QString AdbProcess::getDeviceIPFromStdOut()
+{
+    QString ip = "";
+    QString strIPExp = "inet [\\d.]*";
+    QRegExp ipRegExp(strIPExp,Qt::CaseInsensitive);
+    if (ipRegExp.indexIn(m_standardOutput) != -1) {
+        ip = ipRegExp.cap(0);
+        ip = ip.right(ip.size() - 5);
+    }
+    return ip;
+}
+
 QString AdbProcess::getStdOut()
 {
     return m_standardOutput;
