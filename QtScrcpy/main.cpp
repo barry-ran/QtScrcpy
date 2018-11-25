@@ -6,12 +6,18 @@
 #include "dialog.h"
 #include "decoder.h"
 
+Dialog* g_mainDlg = Q_NULLPTR;
+
+QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+
 int main(int argc, char *argv[])
 {
     //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     //QApplication::setAttribute(Qt::AA_UseOpenGLES);
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);    
 
+    g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Decoder::init();
     QApplication a(argc, argv);
 
@@ -30,11 +36,27 @@ int main(int argc, char *argv[])
         file.close();
     }
 
-    Dialog* w = new Dialog;
-    w->show();
+    g_mainDlg = new Dialog;
+    g_mainDlg->show();
 
     int ret = a.exec();
 
     Decoder::deInit();
     return ret;
+}
+
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    if (g_oldMessageHandler) {
+        g_oldMessageHandler(type, context, msg);
+    }
+
+    if (QtDebugMsg < type) {
+        if (g_mainDlg && !msg.contains("app_proces")) {
+            g_mainDlg->outLog(msg);
+        }
+    }
+    if (QtFatalMsg == type) {
+        abort();
+    }
 }
