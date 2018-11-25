@@ -368,7 +368,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
 #endif
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult){
-                    qCritical("adb push");
+                    qCritical("adb push failed");
                     m_serverStartStep = SSS_NULL;
                     emit serverStartResult(false);
                 }
@@ -378,7 +378,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult){
-                    qCritical("adb reverse");
+                    qCritical("adb reverse failed");
                     m_tunnelForward = true;
                     m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
                     startServerByStep();
@@ -389,7 +389,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult){
-                    qCritical("adb forward");
+                    qCritical("adb forward failed");
                     m_serverStartStep = SSS_NULL;
                     emit serverStartResult(false);
                 }

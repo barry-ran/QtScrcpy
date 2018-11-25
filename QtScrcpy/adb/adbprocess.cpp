@@ -43,7 +43,6 @@ void AdbProcess::initSignals()
             //P7C0218510000537        unauthorized ,手机端此时弹出调试认证，要允许调试
             emit adbProcessResult(AER_ERROR_EXEC);
         }
-
         qDebug() << "adb return " << exitCode << "exit status " << exitStatus;
     });
 
@@ -60,14 +59,14 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::readyReadStandardError, this,
             [this](){
-        m_errorOutput = QString::fromLocal8Bit(readAllStandardError()).trimmed();
-        qDebug() << "AdbProcess::error:" << m_errorOutput;
+        m_errorOutput = QString::fromLocal8Bit(readAllStandardError()).trimmed();        
+        qWarning(QString("AdbProcess::error:%1").arg(m_errorOutput).toUtf8());
     });
 
     connect(this, &QProcess::readyReadStandardOutput, this,
             [this](){
         m_standardOutput = QString::fromLocal8Bit(readAllStandardOutput()).trimmed();
-        qDebug() << "AdbProcess::std out:" << m_standardOutput;
+        qInfo(QString("AdbProcess::out:%1").arg(m_standardOutput).toUtf8());
     });
 
     connect(this, &QProcess::started, this,

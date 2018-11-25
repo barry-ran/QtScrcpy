@@ -20,6 +20,8 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
 
+    void outLog(const QString& log, bool newLine = true);
+
 private slots:
     void on_updateDevice_clicked();
 
@@ -34,7 +36,6 @@ private slots:
     void on_getIPBtn_clicked();
 
 private:
-    void outLog(const QString& log);
     bool checkAdbRun();
 
 private:

@@ -40,7 +40,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
 
     connect(m_server, &Server::serverStartResult, this, [this](bool success){
         if (success) {
-            m_server->connectTo();
+            m_server->connectTo();            
         }
     });
 
