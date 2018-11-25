@@ -31,6 +31,8 @@ private slots:
 
     void on_startAdbdBtn_clicked();
 
+    void on_getIPBtn_clicked();
+
 private:
     void outLog(const QString& log);
     bool checkAdbRun();

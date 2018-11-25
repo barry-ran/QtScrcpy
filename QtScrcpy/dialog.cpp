@@ -27,6 +27,18 @@ Dialog::Dialog(QWidget *parent) :
             break;
         case AdbProcess::AER_SUCCESS_EXEC:
             log = m_adb.getStdOut();
+            QStringList args = m_adb.arguments();
+            if (args.contains("devices")) {
+                QStringList devices = m_adb.getDevicesSerialFromStdOut();
+                if (!devices.isEmpty()) {
+                    ui->serialEdt->setText(devices.at(0));
+                }
+            } else if (args.contains("show") && args.contains("wlan0")) {
+                QString ip = m_adb.getDeviceIPFromStdOut();
+                if (!ip.isEmpty()) {
+                    ui->deviceIpEdt->setText(ip);
+                }
+            }
             break;
         }
         if (!log.isEmpty()) {
@@ -70,10 +82,15 @@ void Dialog::on_wirelessConnectBtn_clicked()
     if (checkAdbRun()) {
         return;
     }
+    QString addr = ui->deviceIpEdt->text().trimmed();
+    if (!ui->devicePortEdt->text().isEmpty()) {
+        addr += ":";
+        addr += ui->devicePortEdt->text().trimmed();
+    }
     outLog("wireless connect...");
     QStringList adbArgs;
     adbArgs << "connect";
-    adbArgs << ui->deviceIpEdt->text().trimmed();
+    adbArgs << addr;
     m_adb.execute("", adbArgs);
 }
 
@@ -87,7 +104,7 @@ void Dialog::on_startAdbdBtn_clicked()
     QStringList adbArgs;
     adbArgs << "tcpip";
     adbArgs << "5555";
-    m_adb.execute("", adbArgs);
+    m_adb.execute(ui->serialEdt->text().trimmed(), adbArgs);
 }
 
 void Dialog::outLog(const QString &log)
@@ -101,4 +118,25 @@ bool Dialog::checkAdbRun()
         outLog("wait for the end of the current command to run");
     }
     return m_adb.isRuning();
+}
+
+void Dialog::on_getIPBtn_clicked()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+
+    outLog("get ip...");
+    // adb -s P7C0218510000537 shell ifconfig wlan0
+    // or
+    // adb -s P7C0218510000537 shell ip -f inet addr show wlan0
+    QStringList adbArgs;
+    adbArgs << "shell";
+    adbArgs << "ip";
+    adbArgs << "-f";
+    adbArgs << "inet";
+    adbArgs << "addr";
+    adbArgs << "show";
+    adbArgs << "wlan0";
+    m_adb.execute(ui->serialEdt->text().trimmed(), adbArgs);
 }
