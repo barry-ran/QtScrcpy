@@ -1,5 +1,6 @@
 /src/QtScrcpy.pro.user
 /output/mac/*
+/output/linux/*
 /*.user
 /QtScrcpy/*.user
 /server/.gradle/4.6/fileChanges/last-build.bin
