@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QPointer>
 
-#include "tcpServer.h"
+#include "tcpserver.h"
 #include "devicesocket.h"
 #include "adbprocess.h"
 
