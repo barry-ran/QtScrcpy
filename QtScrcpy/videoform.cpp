@@ -136,6 +136,17 @@ void VideoForm::updateShowSize(const QSize &newSize)
     }
 }
 
+void VideoForm::switchFullScreen()
+{
+    if (isFullScreen()) {
+        showNormal();
+        ui->rightToolWidget->show();
+    } else {
+        ui->rightToolWidget->hide();
+        showFullScreen();
+    }
+}
+
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
@@ -159,6 +170,11 @@ void VideoForm::wheelEvent(QWheelEvent *event)
 
 void VideoForm::keyPressEvent(QKeyEvent *event)
 {
+    if (Qt::Key_Escape == event->key()
+            && !event->isAutoRepeat()
+            && isFullScreen()) {
+        switchFullScreen();
+    }
     //qDebug() << "keyPressEvent" << event->isAutoRepeat();
     m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
 }
@@ -167,4 +183,9 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
     //qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
     m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
+}
+
+void VideoForm::on_fullScrcenbtn_clicked()
+{
+    switchFullScreen();
 }
