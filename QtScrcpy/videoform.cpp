@@ -7,6 +7,7 @@
 
 #include "videoform.h"
 #include "ui_videoform.h"
+#include "iconhelper.h"
 
 VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     QWidget(parent),
@@ -94,6 +95,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     });
 
     updateShowSize(size());
+    initStyle();
 }
 
 VideoForm::~VideoForm()
@@ -103,6 +105,12 @@ VideoForm::~VideoForm()
     delete m_server;
     m_frames.deInit();
     delete ui;
+}
+
+void VideoForm::initStyle()
+{
+    IconHelper::Instance()->SetIcon(ui->fullScrcenbtn, QChar(0xf0b2), 13);
+    IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf104), 15);
 }
 
 void VideoForm::updateShowSize(const QSize &newSize)
@@ -123,15 +131,18 @@ void VideoForm::updateShowSize(const QSize &newSize)
                 showSize.setHeight(showSize.width()/2);
             }
 
-            // 窗口居中            
+            if (isFullScreen()) {
+                switchFullScreen();
+            }
+            // 窗口居中
             move(screenRect.center() - QRect(0, 0, showSize.width(), showSize.height()).center());
         }
 
         int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
         // 减去标题栏高度
         showSize.setHeight(showSize.height() - titleBarHeight);
-        if (showSize != size()) {
-            resize(showSize);
+        if (showSize != size()) {            
+            resize(showSize);            
         }
     }
 }
@@ -149,22 +160,22 @@ void VideoForm::switchFullScreen()
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
+    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
+    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
-    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), size());
+    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
-    m_inputConvert.wheelEvent(event, ui->videoWidget->frameSize(), size());
+    m_inputConvert.wheelEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 
 }
 
@@ -176,16 +187,21 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         switchFullScreen();
     }
     //qDebug() << "keyPressEvent" << event->isAutoRepeat();
-    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
+    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
     //qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
-    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), size());
+    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
 void VideoForm::on_fullScrcenbtn_clicked()
 {
     switchFullScreen();
+}
+
+void VideoForm::on_returnBtn_clicked()
+{
+
 }

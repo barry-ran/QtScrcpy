@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>res/psblack.css</file>
+        <file>res/fontawesome-webfont.ttf</file>
     </qresource>
 </RCC>

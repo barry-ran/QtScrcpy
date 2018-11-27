@@ -47,6 +47,7 @@ include ($$PWD/decoder/decoder.pri)
 include ($$PWD/render/render.pri)
 include ($$PWD/android/android.pri)
 include ($$PWD/inputcontrol/inputcontrol.pri)
+include ($$PWD/fontawesome/fontawesome.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
@@ -57,7 +58,8 @@ INCLUDEPATH += \
         $$PWD/decoder \
         $$PWD/render \
         $$PWD/android \
-        $$PWD/inputcontrol
+        $$PWD/inputcontrol \
+        $$PWD/fontawesome
 
 
 # ***********************************************************
