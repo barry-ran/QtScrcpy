@@ -24,6 +24,7 @@ public:
 private:
     void updateShowSize(const QSize &newSize);
     void switchFullScreen();
+    void initStyle();
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -35,6 +36,8 @@ protected:
 
 private slots:
     void on_fullScrcenbtn_clicked();
+
+    void on_returnBtn_clicked();
 
 private:
     Ui::videoForm *ui;
