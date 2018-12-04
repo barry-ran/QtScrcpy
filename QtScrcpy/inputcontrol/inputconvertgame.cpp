@@ -404,7 +404,7 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
 
     if (!m_mouseMoveLastPos.isNull()) {
         QPointF distance = from->localPos() - m_mouseMoveLastPos;
-        distance /= 8;
+        distance /= 10;
 
         mouseMoveStartTouch(from);
         startMouseMoveTimer();

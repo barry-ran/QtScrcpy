@@ -23,11 +23,13 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
 #ifdef Q_OS_WIN32
         if(grab) {
+            QRect rc(mapToGlobal(ui->videoWidget->pos())
+                     , ui->videoWidget->size());
             RECT mainRect;
-            mainRect.left = (LONG)this->geometry().left();
-            mainRect.right = (LONG)this->geometry().right();
-            mainRect.top = (LONG)this->geometry().top();
-            mainRect.bottom = (LONG)this->geometry().bottom();
+            mainRect.left = (LONG)rc.left();
+            mainRect.right = (LONG)rc.right();
+            mainRect.top = (LONG)rc.top();
+            mainRect.bottom = (LONG)rc.bottom();
             ClipCursor(&mainRect);
         } else {
             ClipCursor(Q_NULLPTR);
@@ -198,7 +200,8 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
 
 void VideoForm::on_fullScrcenbtn_clicked()
 {
-    switchFullScreen();
+    QKeySequence s =ui->fullScrcenbtn->shortcut();
+    switchFullScreen();    
 }
 
 void VideoForm::on_returnBtn_clicked()
