@@ -1,6 +1,8 @@
 #include <QProcess>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QFileInfo>
+#include <QDir>
 
 #include "adbprocess.h"
 
@@ -23,7 +25,8 @@ const QString& AdbProcess::getAdbPath()
 {
     if (s_adbPath.isEmpty()) {
         s_adbPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_ADB_PATH"));
-        if (s_adbPath.isEmpty()) {
+        QFileInfo fileInfo(s_adbPath);
+        if (s_adbPath.isEmpty() || !fileInfo.isFile()) {
             s_adbPath = QCoreApplication::applicationDirPath() + "/adb";
         }
     }
