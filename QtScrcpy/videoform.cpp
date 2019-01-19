@@ -1,6 +1,9 @@
 #include <QDesktopWidget>
 #include <QMouseEvent>
 #include <QTimer>
+#include <QStyle>
+#include <QStyleOption>
+#include <QPainter>
 #ifdef Q_OS_WIN32
 #include <Windows.h>
 #endif
@@ -16,6 +19,16 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
+
+    QPixmap phone;
+    if (phone.load(":/res/phone.png")) {
+        m_widthHeightRatio = 1.0f * phone.width() / phone.height();
+    }
+
+    // 去掉标题栏
+    setWindowFlags(Qt::FramelessWindowHint);
+    // 根据图片构造异形窗口
+    setAttribute(Qt::WA_TranslucentBackground);
 
     setMouseTracking(true);
     ui->videoWidget->setMouseTracking(true);
@@ -98,6 +111,9 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
 
     updateShowSize(size());
     initStyle();
+
+    bool vertical = size().height() > size().width();
+    updateStyleSheet(vertical);
 }
 
 VideoForm::~VideoForm()
@@ -111,8 +127,29 @@ VideoForm::~VideoForm()
 
 void VideoForm::initStyle()
 {
-    IconHelper::Instance()->SetIcon(ui->fullScrcenbtn, QChar(0xf0b2), 13);
-    IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf104), 15);
+    //IconHelper::Instance()->SetIcon(ui->fullScrcenbtn, QChar(0xf0b2), 13);
+    //IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf104), 15);
+}
+
+void VideoForm::updateStyleSheet(bool vertical)
+{
+    if (vertical) {
+        setStyleSheet(R"(
+                 #videoForm {
+                     border-image: url(:/res/phone-v.png) 150px 142px 85px 142px;
+                     border-width: 150px 142px 85px 142px;
+                 }
+                 )");
+        layout()->setContentsMargins(10, 68, 12, 62);
+    } else {
+        setStyleSheet(R"(
+                 #videoForm {
+                     border-image: url(:/res/phone-h.png) 142px 85px 142px 150px;
+                     border-width: 142px 85px 142px 150px;
+                 }
+                 )");
+        layout()->setContentsMargins(68, 12, 62, 10);
+    }
 }
 
 void VideoForm::updateShowSize(const QSize &newSize)
@@ -126,11 +163,11 @@ void VideoForm::updateShowSize(const QSize &newSize)
         if (desktop) {
             QRect screenRect = desktop->availableGeometry();
             if (vertical) {
-                showSize.setHeight(qMin(newSize.height(), screenRect.height()));
-                showSize.setWidth(showSize.height()/2);
+                showSize.setHeight(qMin(newSize.height(), screenRect.height() - 200));
+                showSize.setWidth(showSize.height() * m_widthHeightRatio);
             } else {
                 showSize.setWidth(qMin(newSize.width(), screenRect.width()));
-                showSize.setHeight(showSize.width()/2);
+                showSize.setHeight(showSize.width() * m_widthHeightRatio);
             }
 
             if (isFullScreen()) {
@@ -140,11 +177,13 @@ void VideoForm::updateShowSize(const QSize &newSize)
             move(screenRect.center() - QRect(0, 0, showSize.width(), showSize.height()).center());
         }
 
-        int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
-        // 减去标题栏高度
-        showSize.setHeight(showSize.height() - titleBarHeight);
+        // 减去标题栏高度 (mark:已经没有标题栏了)
+        //int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
+        //showSize.setHeight(showSize.height() - titleBarHeight);
+
         if (showSize != size()) {            
-            resize(showSize);            
+            resize(showSize);
+            updateStyleSheet(vertical);
         }
     }
 }
@@ -153,32 +192,54 @@ void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
-        ui->rightToolWidget->show();
     } else {
-        ui->rightToolWidget->hide();
         showFullScreen();
     }
 }
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    if (ui->videoWidget->geometry().contains(event->pos())) {
+        event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
+        m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    } else {
+        if (event->button() == Qt::LeftButton) {
+            m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+            event->accept();
+        }
+    }
 }
 
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
-    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    if (ui->videoWidget->geometry().contains(event->pos())) {
+        event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
+        m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    }
 }
 
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
-{
-    m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+{    
+    if (ui->videoWidget->geometry().contains(event->pos())) {
+        event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
+        m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    } else {
+        if (event->buttons() & Qt::LeftButton) {
+            move(event->globalPos() - m_dragPosition);
+            event->accept();
+        }
+    }
 }
 
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
-    m_inputConvert.wheelEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
-
+    if (ui->videoWidget->geometry().contains(event->pos())) {
+        QPoint pos = ui->videoWidget->mapFrom(this, event->pos());
+        QWheelEvent wheelEvent(pos, event->globalPosF(), event->pixelDelta(),
+                               event->angleDelta(), event->buttons(), event->modifiers(),
+                               event->phase(), event->inverted(), event->source());
+        m_inputConvert.wheelEvent(&wheelEvent, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    }
 }
 
 void VideoForm::keyPressEvent(QKeyEvent *event)
@@ -198,9 +259,16 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
     m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
+void VideoForm::paintEvent(QPaintEvent *paint)
+{
+    QStyleOption opt;
+    opt.init(this);
+    QPainter p(this);
+    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+}
+
 void VideoForm::on_fullScrcenbtn_clicked()
 {
-    QKeySequence s =ui->fullScrcenbtn->shortcut();
     switchFullScreen();    
 }
 

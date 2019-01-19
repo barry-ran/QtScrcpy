@@ -25,6 +25,7 @@ private:
     void updateShowSize(const QSize &newSize);
     void switchFullScreen();
     void initStyle();
+    void updateStyleSheet(bool vertical);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -34,9 +35,10 @@ protected:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
+    void paintEvent(QPaintEvent *);
+
 private slots:
     void on_fullScrcenbtn_clicked();
-
     void on_returnBtn_clicked();
 
 private:
@@ -48,6 +50,9 @@ private:
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
     QString m_serial = "";
+
+    QPoint m_dragPosition;
+    float m_widthHeightRatio = 0.5f;
 };
 
 #endif // VIDEOFORM_H
