@@ -8,8 +8,9 @@
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
-{
+{    
     ui->setupUi(this);
+
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
 

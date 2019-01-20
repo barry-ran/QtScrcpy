@@ -29,15 +29,18 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         dialog.cpp \
-    videoform.cpp
+    videoform.cpp \
+    toolform.cpp
 
 HEADERS += \
         dialog.h \
-    videoform.h
+    videoform.h \
+    toolform.h
 
 FORMS += \
         dialog.ui \
-    videoform.ui
+    videoform.ui \
+    toolform.ui
 
 # 子工程
 include ($$PWD/common/common.pri)
@@ -47,7 +50,9 @@ include ($$PWD/decoder/decoder.pri)
 include ($$PWD/render/render.pri)
 include ($$PWD/android/android.pri)
 include ($$PWD/inputcontrol/inputcontrol.pri)
+include ($$PWD/uibase/uibase.pri)
 include ($$PWD/fontawesome/fontawesome.pri)
+
 
 # 附加包含路径
 INCLUDEPATH += \
@@ -59,6 +64,7 @@ INCLUDEPATH += \
         $$PWD/render \
         $$PWD/android \
         $$PWD/inputcontrol \
+        $$PWD/uibase \
         $$PWD/fontawesome
 
 
