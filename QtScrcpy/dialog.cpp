@@ -34,8 +34,9 @@ Dialog::Dialog(QWidget *parent) :
             QStringList args = m_adb.arguments();
             if (args.contains("devices")) {
                 QStringList devices = m_adb.getDevicesSerialFromStdOut();
-                if (!devices.isEmpty()) {
-                    ui->serialEdt->setText(devices.at(0));
+                ui->serialBox->clear();
+                for (auto& item : devices) {
+                    ui->serialBox->addItem(item);
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
@@ -69,7 +70,7 @@ void Dialog::on_updateDevice_clicked()
 void Dialog::on_startServerBtn_clicked()
 {
     if (!m_videoForm) {
-        m_videoForm = new VideoForm(ui->serialEdt->text().trimmed());
+        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed());
     }
     m_videoForm->show();
 }
@@ -108,7 +109,7 @@ void Dialog::on_startAdbdBtn_clicked()
     QStringList adbArgs;
     adbArgs << "tcpip";
     adbArgs << "5555";
-    m_adb.execute(ui->serialEdt->text().trimmed(), adbArgs);
+    m_adb.execute(ui->serialBox->currentText().trimmed(), adbArgs);
 }
 
 void Dialog::outLog(const QString &log, bool newLine)
@@ -145,5 +146,5 @@ void Dialog::on_getIPBtn_clicked()
     adbArgs << "addr";
     adbArgs << "show";
     adbArgs << "wlan0";
-    m_adb.execute(ui->serialEdt->text().trimmed(), adbArgs);
+    m_adb.execute(ui->serialBox->currentText().trimmed(), adbArgs);
 }
