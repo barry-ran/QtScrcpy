@@ -97,31 +97,14 @@
       <string>USB line</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
+      <item row="4" column="0">
+       <widget class="QPushButton" name="startAdbdBtn">
         <property name="text">
-         <string>device serial:</string>
+         <string>start device adbd</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QLineEdit" name="serialEdt"/>
-      </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="updateDevice">
-        <property name="text">
-         <string>update device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QPushButton" name="startServerBtn">
-        <property name="text">
-         <string>start server</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
+      <item row="3" column="2">
        <widget class="QPushButton" name="stopServerBtn">
         <property name="text">
          <string>stop server</string>
@@ -129,18 +112,35 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="QPushButton" name="startAdbdBtn">
+       <widget class="QPushButton" name="updateDevice">
         <property name="text">
-         <string>start device adbd</string>
+         <string>update device</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
+       <widget class="QPushButton" name="startServerBtn">
+        <property name="text">
+         <string>start server</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>device serial:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
        <widget class="QPushButton" name="getIPBtn">
         <property name="text">
          <string>get ip</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="serialBox"/>
       </item>
      </layout>
     </widget>
