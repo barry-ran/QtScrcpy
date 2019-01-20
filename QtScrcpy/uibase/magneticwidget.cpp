@@ -11,9 +11,9 @@ MagneticWidget::MagneticWidget(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     , m_adsorbWidget(adsorbWidget)
 {
     Q_ASSERT(m_adsorbWidget);
-    setAttribute(Qt::WA_DeleteOnClose);
+    setParent(m_adsorbWidget);
+    setWindowFlags(windowFlags() | Qt::Tool);
 
-    connect(m_adsorbWidget, &QWidget::destroyed, this, &QWidget::close);
     m_adsorbWidget->installEventFilter(this);
 
 }
@@ -32,6 +32,10 @@ bool MagneticWidget::eventFilter(QObject *watched, QEvent *event)
     }
     if (m_adsorbed && QEvent::Move == event->type()) {
         move(m_adsorbWidget->pos() - m_relativePos);
+    }
+    if (m_adsorbed && (QEvent::Show == event->type() || QEvent::FocusIn == event->type())) {
+        show();
+        raise();
     }
     if (m_adsorbed && QEvent::Resize == event->type()) {
         QRect parentRect;
