@@ -11,6 +11,7 @@
 #include "videoform.h"
 #include "ui_videoform.h"
 #include "iconhelper.h"
+#include "toolform.h"
 
 VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     QWidget(parent),
@@ -18,7 +19,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     m_serial(serial)
 {
     ui->setupUi(this);
-    setAttribute(Qt::WA_DeleteOnClose);
+    setAttribute(Qt::WA_DeleteOnClose);    
 
     QPixmap phone;
     if (phone.load(":/res/phone.png")) {
@@ -114,6 +115,10 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
 
     bool vertical = size().height() > size().width();
     updateStyleSheet(vertical);
+
+    ToolForm* mw = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
+    mw->move(pos().x() + geometry().width(), pos().y() + 30);
+    mw->show();
 }
 
 VideoForm::~VideoForm()
