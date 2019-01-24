@@ -7,6 +7,7 @@
 #ifdef Q_OS_WIN32
 #include <Windows.h>
 #endif
+#include <QQuickWidget>
 
 #include "videoform.h"
 #include "ui_videoform.h"
@@ -19,7 +20,8 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     m_serial(serial)
 {
     ui->setupUi(this);
-    setAttribute(Qt::WA_DeleteOnClose);    
+
+    setAttribute(Qt::WA_DeleteOnClose);
 
     QPixmap phone;
     if (phone.load(":/res/phone.png")) {
@@ -116,6 +118,18 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     bool vertical = size().height() > size().width();
     updateStyleSheet(vertical);
 
+    /*
+        ui->videoWidget->hide();
+        // qquickwidget
+        QQuickWidget* pinwheel = new QQuickWidget(this);
+        pinwheel->setObjectName(QString::fromUtf8("pinwheel"));
+        pinwheel->setAutoFillBackground(false);
+        pinwheel->setResizeMode(QQuickWidget::SizeRootObjectToView);
+        pinwheel->setSource(QUrl(QString::fromUtf8("qrc:/qml/pinwheel.qml")));
+        pinwheel->setClearColor(QColor(Qt::transparent));
+        pinwheel->setGeometry(ui->videoWidget->geometry());
+        pinwheel->show();
+    */
     ToolForm* mw = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
     mw->move(pos().x() + geometry().width(), pos().y() + 30);
     mw->show();

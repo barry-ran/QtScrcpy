@@ -4,5 +4,7 @@
         <file>res/fontawesome-webfont.ttf</file>
         <file>res/phone-h.png</file>
         <file>res/phone-v.png</file>
+        <file>qml/pinwheel.qml</file>
+        <file>qml/images/pinwheel.png</file>
     </qresource>
 </RCC>
