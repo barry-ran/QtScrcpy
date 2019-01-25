@@ -31,7 +31,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     // 去掉标题栏
     setWindowFlags(Qt::FramelessWindowHint);
     // 根据图片构造异形窗口
-    setAttribute(Qt::WA_TranslucentBackground);
+    setAttribute(Qt::WA_TranslucentBackground);    
 
     setMouseTracking(true);
     ui->videoWidget->setMouseTracking(true);
@@ -118,18 +118,30 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     bool vertical = size().height() > size().width();
     updateStyleSheet(vertical);
 
+    ui->videoWidget->hide();
+    //ui->loadingWidget->setAutoFillBackground(true);
+    //ui->quickWidget->setClearColor(QColor(Qt::transparent));
+
+    //ui->quickWidget->setSource(QUrl(QString::fromUtf8("qrc:/qml/pinwheel.qml")));
+    //ui->quickWidget->show();
     /*
-        ui->videoWidget->hide();
-        // qquickwidget
-        QQuickWidget* pinwheel = new QQuickWidget(this);
-        pinwheel->setObjectName(QString::fromUtf8("pinwheel"));
-        pinwheel->setAutoFillBackground(false);
-        pinwheel->setResizeMode(QQuickWidget::SizeRootObjectToView);
-        pinwheel->setSource(QUrl(QString::fromUtf8("qrc:/qml/pinwheel.qml")));
-        pinwheel->setClearColor(QColor(Qt::transparent));
-        pinwheel->setGeometry(ui->videoWidget->geometry());
-        pinwheel->show();
+    QWidget* test = new QWidget(this);
+    test->setGeometry(QRect(0, 200, 170, 370));
+    test->setAutoFillBackground(false);
+    test->show();
+    // qquickwidget
+    QQuickWidget* pinwheel = new QQuickWidget(this);
+    pinwheel->setObjectName(QString::fromUtf8("pinwheel"));
+    pinwheel->setAutoFillBackground(false);
+    pinwheel->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    pinwheel->setSource(QUrl(QString::fromUtf8("qrc:/qml/pinwheel.qml")));
+    pinwheel->setClearColor(QColor(Qt::transparent));
+    pinwheel->setGeometry(QRect(0, 0, 170, 170));
+    //pinwheel->setGeometry(ui->videoWidget->geometry());
+    pinwheel->setAutoFillBackground(true);
+    pinwheel->show();
     */
+
     ToolForm* mw = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
     mw->move(pos().x() + geometry().width(), pos().y() + 30);
     mw->show();
