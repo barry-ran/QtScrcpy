@@ -253,10 +253,14 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
     if (ui->videoWidget->geometry().contains(event->pos())) {
-        QPoint pos = ui->videoWidget->mapFrom(this, event->pos());
-        QWheelEvent wheelEvent(pos, event->globalPosF(), event->pixelDelta(),
-                               event->angleDelta(), event->buttons(), event->modifiers(),
-                               event->phase(), event->inverted(), event->source());
+        QPointF pos = ui->videoWidget->mapFrom(this, event->pos());
+        /*
+        QWheelEvent(const QPointF &pos, const QPointF& globalPos, int delta,
+                Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers,
+                Qt::Orientation orient = Qt::Vertical);
+        */
+        QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(),
+                               event->buttons(), event->modifiers(), event->orientation());
         m_inputConvert.wheelEvent(&wheelEvent, ui->videoWidget->frameSize(), ui->videoWidget->size());
     }
 }
