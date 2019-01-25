@@ -9,6 +9,7 @@ ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
 {
     ui->setupUi(this);
     //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
 }
 
 ToolForm::~ToolForm()

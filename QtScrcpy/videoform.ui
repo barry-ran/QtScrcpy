@@ -59,20 +59,8 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+      <item>
        <widget class="QQuickWidget" name="quickWidget">
-        <property name="minimumSize">
-         <size>
-          <width>170</width>
-          <height>170</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>170</width>
-          <height>170</height>
-         </size>
-        </property>
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>

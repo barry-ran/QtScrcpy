@@ -19,8 +19,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     ui(new Ui::videoForm),
     m_serial(serial)
 {    
-    ui->setupUi(this);
-    setAttribute(Qt::WA_DeleteOnClose);
+    ui->setupUi(this);    
     initUI();
 
     connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
@@ -78,7 +77,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     // must be Qt::QueuedConnection, ui update must be main thread
     QObject::connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
         if (ui->videoWidget->isHidden()) {
-            ui->loadingWidget->hide();
+            ui->loadingWidget->close();
             ui->videoWidget->show();
         }
         m_frames.lock();        
@@ -107,11 +106,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     initStyle();
 
     bool vertical = size().height() > size().width();
-    updateStyleSheet(vertical);    
-
-    ToolForm* mw = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
-    mw->move(pos().x() + geometry().width(), pos().y() + 30);
-    mw->show();
+    updateStyleSheet(vertical);
 }
 
 VideoForm::~VideoForm()
@@ -130,12 +125,14 @@ void VideoForm::initUI()
         m_widthHeightRatio = 1.0f * phone.width() / phone.height();
     }
 
+    setAttribute(Qt::WA_DeleteOnClose);
     // 去掉标题栏
     setWindowFlags(Qt::FramelessWindowHint);
     // 根据图片构造异形窗口
     setAttribute(Qt::WA_TranslucentBackground);
 
     setMouseTracking(true);
+    ui->loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
     ui->videoWidget->setMouseTracking(true);
     ui->videoWidget->hide();
 
@@ -143,6 +140,15 @@ void VideoForm::initUI()
     ui->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
     // 背景透明
     ui->quickWidget->setClearColor(QColor(Qt::transparent));
+}
+
+void VideoForm::showToolFrom(bool show)
+{
+    if (!m_toolForm) {
+        m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
+        m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
+    }
+    m_toolForm->setVisible(show);
 }
 
 void VideoForm::initStyle()
@@ -212,8 +218,10 @@ void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
+        showToolFrom(true);
     } else {
-        showFullScreen();
+        showToolFrom(false);
+        showFullScreen();        
     }
 }
 
@@ -289,6 +297,11 @@ void VideoForm::paintEvent(QPaintEvent *paint)
     opt.init(this);
     QPainter p(this);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+}
+
+void VideoForm::showEvent(QShowEvent *event)
+{
+    showToolFrom();
 }
 
 void VideoForm::on_fullScrcenbtn_clicked()
