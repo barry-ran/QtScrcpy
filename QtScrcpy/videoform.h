@@ -26,6 +26,7 @@ private:
     void switchFullScreen();
     void initStyle();
     void updateStyleSheet(bool vertical);
+    void initUI();
 
 protected:
     void mousePressEvent(QMouseEvent *event);

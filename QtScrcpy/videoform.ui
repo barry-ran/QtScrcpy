@@ -41,7 +41,7 @@
       <bool>false</bool>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(0, 0, 0);</string>
+      <string notr="true"/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
@@ -77,14 +77,14 @@
          <bool>false</bool>
         </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(0, 0, 0);</string>
+         <string notr="true"/>
         </property>
         <property name="resizeMode">
          <enum>QQuickWidget::SizeRootObjectToView</enum>
         </property>
         <property name="source">
          <url>
-          <string>file:///G:/mygitcode/QtScrcpy/QtScrcpy/qml/pinwheel.qml</string>
+          <string>qrc:/qml/pinwheel.qml</string>
          </url>
         </property>
        </widget>

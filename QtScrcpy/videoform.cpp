@@ -18,23 +18,10 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::videoForm),
     m_serial(serial)
-{
+{    
     ui->setupUi(this);
-
     setAttribute(Qt::WA_DeleteOnClose);
-
-    QPixmap phone;
-    if (phone.load(":/res/phone.png")) {
-        m_widthHeightRatio = 1.0f * phone.width() / phone.height();
-    }
-
-    // 去掉标题栏
-    setWindowFlags(Qt::FramelessWindowHint);
-    // 根据图片构造异形窗口
-    setAttribute(Qt::WA_TranslucentBackground);    
-
-    setMouseTracking(true);
-    ui->videoWidget->setMouseTracking(true);
+    initUI();
 
     connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
 #ifdef Q_OS_WIN32
@@ -90,6 +77,10 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
 
     // must be Qt::QueuedConnection, ui update must be main thread
     QObject::connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
+        if (ui->videoWidget->isHidden()) {
+            ui->loadingWidget->hide();
+            ui->videoWidget->show();
+        }
         m_frames.lock();        
         const AVFrame *frame = m_frames.consumeRenderedFrame();
         //qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
@@ -116,31 +107,7 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
     initStyle();
 
     bool vertical = size().height() > size().width();
-    updateStyleSheet(vertical);
-
-    ui->videoWidget->hide();
-    //ui->loadingWidget->setAutoFillBackground(true);
-    //ui->quickWidget->setClearColor(QColor(Qt::transparent));
-
-    //ui->quickWidget->setSource(QUrl(QString::fromUtf8("qrc:/qml/pinwheel.qml")));
-    //ui->quickWidget->show();
-    /*
-    QWidget* test = new QWidget(this);
-    test->setGeometry(QRect(0, 200, 170, 370));
-    test->setAutoFillBackground(false);
-    test->show();
-    // qquickwidget
-    QQuickWidget* pinwheel = new QQuickWidget(this);
-    pinwheel->setObjectName(QString::fromUtf8("pinwheel"));
-    pinwheel->setAutoFillBackground(false);
-    pinwheel->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    pinwheel->setSource(QUrl(QString::fromUtf8("qrc:/qml/pinwheel.qml")));
-    pinwheel->setClearColor(QColor(Qt::transparent));
-    pinwheel->setGeometry(QRect(0, 0, 170, 170));
-    //pinwheel->setGeometry(ui->videoWidget->geometry());
-    pinwheel->setAutoFillBackground(true);
-    pinwheel->show();
-    */
+    updateStyleSheet(vertical);    
 
     ToolForm* mw = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
     mw->move(pos().x() + geometry().width(), pos().y() + 30);
@@ -154,6 +121,28 @@ VideoForm::~VideoForm()
     delete m_server;
     m_frames.deInit();
     delete ui;
+}
+
+void VideoForm::initUI()
+{
+    QPixmap phone;
+    if (phone.load(":/res/phone.png")) {
+        m_widthHeightRatio = 1.0f * phone.width() / phone.height();
+    }
+
+    // 去掉标题栏
+    setWindowFlags(Qt::FramelessWindowHint);
+    // 根据图片构造异形窗口
+    setAttribute(Qt::WA_TranslucentBackground);
+
+    setMouseTracking(true);
+    ui->videoWidget->setMouseTracking(true);
+    ui->videoWidget->hide();
+
+    // 最后绘制，不设置最后绘制会影响父窗体异形异常（quickWidget的透明通道会形成穿透）
+    ui->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
+    // 背景透明
+    ui->quickWidget->setClearColor(QColor(Qt::transparent));
 }
 
 void VideoForm::initStyle()
