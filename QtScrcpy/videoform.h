@@ -2,6 +2,7 @@
 #define VIDEOFORM_H
 
 #include <QWidget>
+#include <QPointer>
 
 #include "server.h"
 #include "decoder.h"
@@ -13,6 +14,7 @@ namespace Ui {
 class videoForm;
 }
 
+class ToolForm;
 class VideoForm : public QWidget
 {
     Q_OBJECT
@@ -27,6 +29,7 @@ private:
     void initStyle();
     void updateStyleSheet(bool vertical);
     void initUI();
+    void showToolFrom(bool show = true);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -37,6 +40,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event);
 
     void paintEvent(QPaintEvent *);
+    void showEvent(QShowEvent *event);
 
 private slots:
     void on_fullScrcenbtn_clicked();
@@ -51,9 +55,9 @@ private:
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
     QString m_serial = "";
-
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
+    QPointer<ToolForm> m_toolForm;
 };
 
 #endif // VIDEOFORM_H
