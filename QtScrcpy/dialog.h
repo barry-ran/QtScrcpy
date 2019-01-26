@@ -35,8 +35,11 @@ private slots:
 
     void on_getIPBtn_clicked();
 
+    void on_wirelessDisConnectBtn_clicked();
+
 private:
     bool checkAdbRun();
+    void initUI();
 
 private:
     Ui::Dialog *ui;

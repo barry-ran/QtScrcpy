@@ -20,7 +20,7 @@ class VideoForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit VideoForm(const QString& serial, QWidget *parent = 0);
+    explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, QWidget *parent = 0);
     ~VideoForm();
 
 private:
@@ -55,6 +55,8 @@ private:
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
     QString m_serial = "";
+    quint16 m_maxSize = 720;
+    quint32 m_bitRate = 8000000;
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
     QPointer<ToolForm> m_toolForm;

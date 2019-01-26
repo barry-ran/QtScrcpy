@@ -6,21 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>442</width>
+    <width>564</width>
     <height>486</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>442</width>
-    <height>0</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>442</width>
-    <height>16777215</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>QtScrcpy</string>
@@ -41,35 +29,8 @@
      <property name="title">
       <string>Wireless</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4" columnstretch="2,1,1,0">
-      <item row="2" column="2">
-       <widget class="QLineEdit" name="devicePortEdt">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string notr="true">5555</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3">
-       <widget class="QPushButton" name="wirelessConnectBtn">
-        <property name="text">
-         <string>wireless connect</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLineEdit" name="deviceIpEdt">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string notr="true">192.168.0.1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
+     <layout class="QGridLayout" name="gridLayout_4" columnstretch="2,0,0,1,0">
+      <item row="3" column="2">
        <widget class="QLabel" name="label">
         <property name="minimumSize">
          <size>
@@ -88,6 +49,40 @@
         </property>
        </widget>
       </item>
+      <item row="3" column="3">
+       <widget class="QLineEdit" name="devicePortEdt">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string notr="true">5555</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLineEdit" name="deviceIpEdt">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string notr="true">192.168.0.1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QPushButton" name="wirelessConnectBtn">
+        <property name="text">
+         <string>wireless connect</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4">
+       <widget class="QPushButton" name="wirelessDisConnectBtn">
+        <property name="text">
+         <string>wireless disconnect</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -97,50 +92,74 @@
       <string>USB line</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="4" column="0">
-       <widget class="QPushButton" name="startAdbdBtn">
-        <property name="text">
-         <string>start device adbd</string>
-        </property>
-       </widget>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="serialBox"/>
       </item>
-      <item row="3" column="2">
+      <item row="1" column="3">
        <widget class="QPushButton" name="stopServerBtn">
         <property name="text">
          <string>stop server</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QPushButton" name="updateDevice">
-        <property name="text">
-         <string>update device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
+      <item row="1" column="2">
        <widget class="QPushButton" name="startServerBtn">
         <property name="text">
          <string>start server</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>device serial:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QPushButton" name="getIPBtn">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>get ip</string>
+         <string>bit rate:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QComboBox" name="serialBox"/>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="bitRateBox">
+        <property name="currentText">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>video size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QComboBox" name="videoSizeBox"/>
+      </item>
+      <item row="4" column="3">
+       <widget class="QPushButton" name="startAdbdBtn">
+        <property name="text">
+         <string>start adbd</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="getIPBtn">
+        <property name="text">
+         <string>get device ip</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QPushButton" name="updateDevice">
+        <property name="text">
+         <string>update device</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
