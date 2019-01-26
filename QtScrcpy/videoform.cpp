@@ -98,7 +98,8 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
         // support wireless connect, example:
         //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
         // only one devices, serial can be null
-        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "");
+        // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
+        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "-");
     });
 
     updateShowSize(size());
