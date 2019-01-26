@@ -13,10 +13,22 @@ extern "C"
 
 class Frames;
 class DeviceSocket;
+class Recorder;
 class Decoder : public QThread
 {
     Q_OBJECT
 public:
+    typedef struct FrameMeta {
+        quint64 pts;
+        struct FrameMeta* next;
+    } FrameMeta;
+
+    typedef struct ReceiverState {
+        // meta (in order) for frames not consumed yet
+        FrameMeta* frameMetaQueue;
+        qint32 remaining; // remaining bytes to receive for the current frame
+    } ReceiverState;
+
     Decoder();
     virtual ~Decoder();
 
@@ -26,9 +38,11 @@ public:
 
     void setFrames(Frames* frames);
     void setDeviceSocket(DeviceSocket* deviceSocket);
+    void setRecoder(Recorder* recorder);
     qint32 recvData(quint8* buf, qint32 bufSize);
     bool startDecode();
     void stopDecode();
+    ReceiverState* getReceiverState();
 
 signals:
     void onNewFrame();
@@ -43,6 +57,10 @@ private:
     QMutex m_mutex;
     bool m_quit = false;
     Frames* m_frames;
+
+    // for recorder
+    Recorder* m_recorder;
+    ReceiverState m_receiverState;
 };
 
 #endif // DECODER_H

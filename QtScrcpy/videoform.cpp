@@ -17,6 +17,7 @@
 #include "iconhelper.h"
 #include "toolform.h"
 #include "controlevent.h"
+#include "recorder.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWidget *parent) :
     QWidget(parent),
@@ -29,8 +30,10 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
     initUI();
 
     m_server = new Server();
+    m_recorder = new Recorder("./test.mp4", QSize(600, 300));
     m_frames.init();
     m_decoder.setFrames(&m_frames);
+    m_decoder.setRecoder(m_recorder);
 
     initSignals();
 
@@ -41,7 +44,8 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
         //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
         // only one devices, serial can be null
         // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
-        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "-");
+        // sendFrameMeta for recorder mp4
+        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "-", true);
     });
 
     updateShowSize(size());
@@ -52,9 +56,11 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
 
 VideoForm::~VideoForm()
 {
-    m_server->stop();
     m_decoder.stopDecode();
+    m_server->stop();    
+    m_decoder.wait();
     delete m_server;
+    delete m_recorder;
     m_frames.deInit();
     delete ui;
 }

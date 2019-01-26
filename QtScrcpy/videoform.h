@@ -16,6 +16,7 @@ class videoForm;
 }
 
 class ToolForm;
+class Recorder;
 class VideoForm : public QWidget
 {
     Q_OBJECT
@@ -75,6 +76,7 @@ private:
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
     QPointer<ToolForm> m_toolForm;
+    Recorder* m_recorder = Q_NULLPTR;
 };
 
 #endif // VIDEOFORM_H
