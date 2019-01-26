@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QPushButton" name="fullScreenBtn">
+     <property name="toolTip">
+      <string>full screen</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -36,6 +39,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="powerBtn">
+     <property name="toolTip">
+      <string>turn off</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -43,6 +49,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="turnOnBtn">
+     <property name="toolTip">
+      <string>turn on</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -50,6 +59,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="volumeUpBtn">
+     <property name="toolTip">
+      <string>volume up</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -57,6 +69,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="volumeDownBtn">
+     <property name="toolTip">
+      <string>volume down</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -64,6 +79,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="appSwitchBtn">
+     <property name="toolTip">
+      <string>app switch</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -71,6 +89,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="menuBtn">
+     <property name="toolTip">
+      <string>menu</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -78,6 +99,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="homeBtn">
+     <property name="toolTip">
+      <string>home</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -85,6 +109,9 @@
    </item>
    <item>
     <widget class="QPushButton" name="returnBtn">
+     <property name="toolTip">
+      <string>return</string>
+     </property>
      <property name="text">
       <string/>
      </property>

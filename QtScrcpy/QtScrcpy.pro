@@ -148,5 +148,3 @@ linux {
 RESOURCES += \
     res.qrc
 
-DISTFILES +=
-
