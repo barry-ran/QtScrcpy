@@ -2,8 +2,6 @@
 
 #include "controlevent.h"
 
-#define TEXT_MAX_CHARACTER_LENGTH 300
-
 ControlEvent::ControlEvent(ControlEventType controlEventType)
     : QScrcpyEvent(Control)
 {
@@ -19,7 +17,14 @@ void ControlEvent::setKeycodeEventData(AndroidKeyeventAction action, AndroidKeyc
 
 void ControlEvent::setTextEventData(QString text)
 {
-    m_data.textEvent.text = text;
+    // write length (2 byte) + date (non nul-terminated)
+    if (TEXT_MAX_CHARACTER_LENGTH < text.length()) {
+        // injecting a text takes time, so limit the text length
+        text = text.left(TEXT_MAX_CHARACTER_LENGTH);
+    }
+    QByteArray tmp = text.toUtf8();
+    memset(m_data.textEvent.text, 0, sizeof (m_data.textEvent.text));
+    memcpy(m_data.textEvent.text, tmp.data(), tmp.length());
 }
 
 void ControlEvent::setMouseEventData(AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position)
@@ -85,14 +90,8 @@ QByteArray ControlEvent::serializeData()
         break;
     case CET_TEXT:
     {
-        // write length (2 byte) + date (non nul-terminated)
-        if (TEXT_MAX_CHARACTER_LENGTH < m_data.textEvent.text.length()) {
-            // injecting a text takes time, so limit the text length
-            m_data.textEvent.text = m_data.textEvent.text.left(TEXT_MAX_CHARACTER_LENGTH);
-        }
-        QByteArray tmp = m_data.textEvent.text.toUtf8();
-        write16(buffer, tmp.length());
-        buffer.write(tmp.data(), tmp.length());
+        write16(buffer, strlen(m_data.textEvent.text));
+        buffer.write(m_data.textEvent.text, strlen(m_data.textEvent.text));
     }
         break;
     case CET_MOUSE:

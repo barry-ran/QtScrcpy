@@ -41,7 +41,7 @@
      <property name="title">
       <string>Wireless</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_4" columnstretch="2,0,0,1,0">
+     <layout class="QGridLayout" name="gridLayout_4" columnstretch="2,0,0,1,2">
       <item row="3" column="2">
        <widget class="QLabel" name="label">
         <property name="minimumSize">
