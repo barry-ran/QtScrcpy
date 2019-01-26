@@ -66,7 +66,6 @@ private:
     quint16 m_localPort = 0;
     bool m_tunnelEnabled = false;
     bool m_tunnelForward = false; // use "adb forward" instead of "adb reverse"
-    bool m_serverCopiedToDevice = false;
     quint16 m_maxSize = 0;
     quint32 m_bitRate = 0;
     QString m_crop = "";

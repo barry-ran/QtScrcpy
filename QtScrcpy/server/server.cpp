@@ -10,9 +10,7 @@
 
 #define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 #define DEVICE_NAME_FIELD_LENGTH 64
-//#define SOCKET_NAME "qtscrcpy" //jar需要同步修改
-#define SOCKET_NAME "scrcpy"
-
+#define SOCKET_NAME "qtscrcpy"
 
 Server::Server(QObject *parent) : QObject(parent)
 {
@@ -28,10 +26,7 @@ Server::Server(QObject *parent) : QObject(parent)
         if (m_deviceSocket->isValid() && readInfo(deviceName, deviceSize)) {
             // we don't need the server socket anymore
             // just m_deviceSocket is ok
-            m_serverSocket.close();
-            // the server is started, we can clean up the jar from the temporary folder
-            removeServer();
-            m_serverCopiedToDevice = false;
+            m_serverSocket.close();            
             // we don't need the adb tunnel anymore
             disableTunnelReverse();
             m_tunnelEnabled = false;
@@ -67,21 +62,6 @@ bool Server::pushServer()
         m_workProcess.kill();
     }
     m_workProcess.push(m_serial, getServerPath(), DEVICE_SERVER_PATH);
-    return true;
-}
-
-bool Server::removeServer()
-{
-    AdbProcess* adb = new AdbProcess();
-    if (!adb) {
-        return false;
-    }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-        if (AdbProcess::AER_SUCCESS_START != processResult) {
-            sender()->deleteLater();
-        }
-    });
-    adb->removePath(m_serial, DEVICE_SERVER_PATH);
     return true;
 }
 
@@ -217,10 +197,7 @@ bool Server::connectTo()
             success = false;
         }
 
-        if (success) {
-            // the server is started, we can clean up the jar from the temporary folder
-            removeServer();
-            m_serverCopiedToDevice = false;
+        if (success) {            
             // we don't need the adb tunnel anymore
             disableTunnelForward();
             m_tunnelEnabled = false;
@@ -262,11 +239,7 @@ void Server::stop()
         }
         m_tunnelForward = false;
         m_tunnelEnabled = false;
-    }
-    if (m_serverCopiedToDevice) {
-        removeServer();
-        m_serverCopiedToDevice = false;
-    }
+    }    
     m_serverSocket.close();    
 }
 
@@ -363,7 +336,6 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
             switch (m_serverStartStep) {
             case SSS_PUSH:
                 if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
-                    m_serverCopiedToDevice = true;
 #if 1
                     m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
 #else
