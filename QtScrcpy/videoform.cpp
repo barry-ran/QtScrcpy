@@ -8,6 +8,9 @@
 #include <Windows.h>
 #endif
 #include <QQuickWidget>
+#include <QMimeData>
+#include <QFileInfo>
+#include <QMessageBox>
 
 #include "videoform.h"
 #include "ui_videoform.h"
@@ -25,72 +28,11 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
     ui->setupUi(this);    
     initUI();
 
-    connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
-#ifdef Q_OS_WIN32
-        if(grab) {
-            QRect rc(mapToGlobal(ui->videoWidget->pos())
-                     , ui->videoWidget->size());
-            RECT mainRect;
-            mainRect.left = (LONG)rc.left();
-            mainRect.right = (LONG)rc.right();
-            mainRect.top = (LONG)rc.top();
-            mainRect.bottom = (LONG)rc.bottom();
-            ClipCursor(&mainRect);
-        } else {
-            ClipCursor(Q_NULLPTR);
-        }
-#endif
-    });
-
     m_server = new Server();
     m_frames.init();
     m_decoder.setFrames(&m_frames);
 
-    connect(m_server, &Server::serverStartResult, this, [this](bool success){
-        if (success) {
-            m_server->connectTo();            
-        }
-    });
-
-    connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
-        if (success) {
-            // update ui
-            setWindowTitle(deviceName);
-            updateShowSize(size);            
-
-            // init decode
-            m_decoder.setDeviceSocket(m_server->getDeviceSocket());
-            m_decoder.startDecode();
-
-            // init controller
-            m_inputConvert.setDeviceSocket(m_server->getDeviceSocket());
-        }
-    });
-
-    connect(m_server, &Server::onServerStop, this, [this](){
-        close();
-        qDebug() << "server process stop";
-    });
-
-    connect(&m_decoder, &Decoder::onDecodeStop, this, [this](){
-        close();
-        qDebug() << "decoder thread stop";
-    });
-
-    // must be Qt::QueuedConnection, ui update must be main thread
-    QObject::connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
-        if (ui->videoWidget->isHidden()) {
-            ui->loadingWidget->close();
-            ui->videoWidget->show();
-        }
-        m_frames.lock();        
-        const AVFrame *frame = m_frames.consumeRenderedFrame();
-        //qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
-        updateShowSize(QSize(frame->width, frame->height));
-        ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
-        ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
-        m_frames.unLock();
-    },Qt::QueuedConnection);
+    initSignals();
 
     // fix: macos cant recv finished signel, timer is ok
     QTimer::singleShot(0, this, [this](){
@@ -139,6 +81,84 @@ void VideoForm::initUI()
     ui->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
     // 背景透明
     ui->quickWidget->setClearColor(QColor(Qt::transparent));
+}
+
+void VideoForm::initSignals()
+{
+    connect(&m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult){
+        if (FileHandler::FAR_IS_RUNNING == processResult) {
+            QMessageBox::warning(this, "QtScrcpy", tr("wait current file transfer to complete"), QMessageBox::Ok);
+        }
+        if (FileHandler::FAR_SUCCESS_EXEC == processResult) {
+            QMessageBox::information(this, "QtScrcpy", tr("file transfer complete"), QMessageBox::Ok);
+        }
+        if (FileHandler::FAR_ERROR_EXEC == processResult) {
+            QMessageBox::information(this, "QtScrcpy", tr("file transfer failed"), QMessageBox::Ok);
+        }
+    });
+    connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
+#ifdef Q_OS_WIN32
+        if(grab) {
+            QRect rc(mapToGlobal(ui->videoWidget->pos())
+                     , ui->videoWidget->size());
+            RECT mainRect;
+            mainRect.left = (LONG)rc.left();
+            mainRect.right = (LONG)rc.right();
+            mainRect.top = (LONG)rc.top();
+            mainRect.bottom = (LONG)rc.bottom();
+            ClipCursor(&mainRect);
+        } else {
+            ClipCursor(Q_NULLPTR);
+        }
+#endif
+    });
+    connect(m_server, &Server::serverStartResult, this, [this](bool success){
+        if (success) {
+            m_server->connectTo();
+        } else {
+            close();
+        }
+    });
+
+    connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
+        if (success) {
+            // update ui
+            setWindowTitle(deviceName);
+            updateShowSize(size);
+
+            // init decode
+            m_decoder.setDeviceSocket(m_server->getDeviceSocket());
+            m_decoder.startDecode();
+
+            // init controller
+            m_inputConvert.setDeviceSocket(m_server->getDeviceSocket());
+        }
+    });
+
+    connect(m_server, &Server::onServerStop, this, [this](){
+        close();
+        qDebug() << "server process stop";
+    });
+
+    connect(&m_decoder, &Decoder::onDecodeStop, this, [this](){
+        close();
+        qDebug() << "decoder thread stop";
+    });
+
+    // must be Qt::QueuedConnection, ui update must be main thread
+    connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
+        if (ui->videoWidget->isHidden()) {
+            ui->loadingWidget->close();
+            ui->videoWidget->show();
+        }
+        m_frames.lock();
+        const AVFrame *frame = m_frames.consumeRenderedFrame();
+        //qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
+        updateShowSize(QSize(frame->width, frame->height));
+        ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
+        ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+        m_frames.unLock();
+    },Qt::QueuedConnection);
 }
 
 void VideoForm::showToolFrom(bool show)
@@ -371,4 +391,37 @@ void VideoForm::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
     showToolFrom();
+}
+
+void VideoForm::dragEnterEvent(QDragEnterEvent *event)
+{
+    event->acceptProposedAction();
+}
+
+void VideoForm::dragMoveEvent(QDragMoveEvent *event)
+{
+    Q_UNUSED(event);
+}
+
+void VideoForm::dragLeaveEvent(QDragLeaveEvent *event)
+{
+    Q_UNUSED(event);
+}
+
+void VideoForm::dropEvent(QDropEvent *event)
+{
+    const QMimeData* qm = event->mimeData();
+    QString file = qm->urls()[0].toLocalFile();
+    QFileInfo fileInfo(file);
+
+    if (!fileInfo.exists()) {
+        QMessageBox::warning(this, "QtScrcpy", tr("file does not exist"), QMessageBox::Ok);
+        return;
+    }
+
+    if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
+        m_fileHandler.installApkRequest(m_serial, file);
+        return;
+    }
+    m_fileHandler.pushFileRequest(m_serial, file);
 }

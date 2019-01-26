@@ -9,6 +9,7 @@
 #include "frames.h"
 #include "inputconvertnormal.h"
 #include "inputconvertgame.h"
+#include "filehandler.h"
 
 namespace Ui {
 class videoForm;
@@ -39,6 +40,7 @@ private:
     void updateShowSize(const QSize &newSize);
     void updateStyleSheet(bool vertical);
     void initUI();
+    void initSignals();
     void showToolFrom(bool show = true);
     void postKeyCodeClick(AndroidKeycode keycode);
 
@@ -53,6 +55,11 @@ protected:
     void paintEvent(QPaintEvent *);
     void showEvent(QShowEvent *event);
 
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dragLeaveEvent(QDragLeaveEvent *event);
+    void dropEvent(QDropEvent *event);
+
 private:
     Ui::videoForm *ui;
     QSize frameSize;
@@ -61,6 +68,7 @@ private:
     Frames m_frames;
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
+    FileHandler m_fileHandler;
     QString m_serial = "";
     quint16 m_maxSize = 720;
     quint32 m_bitRate = 8000000;
