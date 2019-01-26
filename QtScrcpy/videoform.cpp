@@ -259,6 +259,16 @@ void VideoForm::postTurnOn()
     m_inputConvert.sendControlEvent(controlEvent);
 }
 
+void VideoForm::postTextInput(const QString& text)
+{
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_TEXT);
+    if (!controlEvent) {
+        return;
+    }
+    controlEvent->setTextEventData(text);
+    m_inputConvert.sendControlEvent(controlEvent);
+}
+
 void VideoForm::postGoHome()
 {
     postKeyCodeClick(AKEYCODE_HOME);

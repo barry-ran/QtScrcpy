@@ -33,6 +33,7 @@ public:
     void postVolumeDown();
     // turn the screen on if it was off, press BACK otherwise
     void postTurnOn();
+    void postTextInput(const QString& text);
 
 private:
     void updateShowSize(const QSize &newSize);

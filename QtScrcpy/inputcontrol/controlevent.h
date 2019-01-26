@@ -10,6 +10,8 @@
 #include "keycodes.h"
 
 #define CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON 0
+
+#define TEXT_MAX_CHARACTER_LENGTH 300
 // ControlEvent
 class ControlEvent : public QScrcpyEvent
 {
@@ -52,7 +54,7 @@ private:
                 AndroidMetastate metastate;
             } keycodeEvent;
             struct {
-                QString text;
+                char text[TEXT_MAX_CHARACTER_LENGTH + 1];
             } textEvent;
             struct {
                 AndroidMotioneventAction action;
