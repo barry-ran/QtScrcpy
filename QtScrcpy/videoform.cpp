@@ -14,10 +14,12 @@
 #include "iconhelper.h"
 #include "toolform.h"
 
-VideoForm::VideoForm(const QString& serial, QWidget *parent) :
+VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWidget *parent) :
     QWidget(parent),
     ui(new Ui::videoForm),
-    m_serial(serial)
+    m_serial(serial),
+    m_maxSize(maxSize),
+    m_bitRate(bitRate)
 {    
     ui->setupUi(this);    
     initUI();
@@ -91,15 +93,11 @@ VideoForm::VideoForm(const QString& serial, QWidget *parent) :
 
     // fix: macos cant recv finished signel, timer is ok
     QTimer::singleShot(0, this, [this](){
-        // support 480p 720p 1080p
-        //m_server->start("P7C0218510000537", 27183, 0, 8000000, "");
-        //m_server->start("P7C0218510000537", 27183, 1080, 8000000, "");
-
+        // max size support 480p 720p 1080p 设备原生分辨率
+        // support wireless connect, example:
+        //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
         // only one devices, serial can be null
-        m_server->start(m_serial, 27183, 720, 8000000, "");
-
-        // support wireless connect
-        //m_server->start("192.168.0.174:5555", 27183, 720, 8000000, "");
+        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "");
     });
 
     updateShowSize(size());

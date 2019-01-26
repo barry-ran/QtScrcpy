@@ -10,9 +10,7 @@ Dialog::Dialog(QWidget *parent) :
     ui(new Ui::Dialog)
 {    
     ui->setupUi(this);
-
-    setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+    initUI();
 
     connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
         QString log = "";
@@ -58,6 +56,24 @@ Dialog::~Dialog()
     delete ui;
 }
 
+void Dialog::initUI()
+{
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+
+    ui->bitRateBox->addItem("2000000");
+    ui->bitRateBox->addItem("6000000");
+    ui->bitRateBox->addItem("8000000");
+    ui->bitRateBox->addItem("10000000");
+    ui->bitRateBox->setCurrentIndex(2);
+
+    ui->videoSizeBox->addItem("480");
+    ui->videoSizeBox->addItem("720");
+    ui->videoSizeBox->addItem("1080");
+    ui->videoSizeBox->addItem("native");
+    ui->videoSizeBox->setCurrentIndex(1);
+}
+
 void Dialog::on_updateDevice_clicked()
 {
     if (checkAdbRun()) {
@@ -70,7 +86,10 @@ void Dialog::on_updateDevice_clicked()
 void Dialog::on_startServerBtn_clicked()
 {
     if (!m_videoForm) {
-        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed());
+        quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
+        // this is ok that "native" toUshort is 0
+        quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
+        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate);
     }
     m_videoForm->show();
 }
@@ -147,4 +166,17 @@ void Dialog::on_getIPBtn_clicked()
     adbArgs << "show";
     adbArgs << "wlan0";
     m_adb.execute(ui->serialBox->currentText().trimmed(), adbArgs);
+}
+
+void Dialog::on_wirelessDisConnectBtn_clicked()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+    QString addr = ui->deviceIpEdt->text().trimmed();
+    outLog("wireless disconnect...", false);
+    QStringList adbArgs;
+    adbArgs << "disconnect";
+    adbArgs << addr;
+    m_adb.execute("", adbArgs);
 }
