@@ -221,7 +221,10 @@ void QYUVOpenGLWidget::initTextures()
 
 void QYUVOpenGLWidget::deInitTextures()
 {
-    glDeleteTextures(3, m_texture);
+    if (QOpenGLFunctions::isInitialized(QOpenGLFunctions::d_ptr)) {
+        glDeleteTextures(3, m_texture);
+    }
+
     memset(m_texture, 0, 3);
     m_textureInited = false;
 }
