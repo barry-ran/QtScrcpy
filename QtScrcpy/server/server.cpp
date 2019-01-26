@@ -148,6 +148,8 @@ bool Server::execute()
     args << (m_tunnelForward ? "true" : "false");
     if (m_crop.isEmpty()) {
         args << "-";
+    } else {
+        args << m_crop;
     }
 
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
