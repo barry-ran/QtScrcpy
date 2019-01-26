@@ -14,7 +14,7 @@ public final class DesktopConnection implements Closeable {
 
     private static final int DEVICE_NAME_FIELD_LENGTH = 64;
 
-    private static final String SOCKET_NAME = "scrcpy";
+    private static final String SOCKET_NAME = "qtscrcpy";
 
     private final LocalSocket socket;
     private final InputStream inputStream;
