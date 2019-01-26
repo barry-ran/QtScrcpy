@@ -118,9 +118,32 @@
     </message>
 </context>
 <context>
+    <name>VideoForm</name>
+    <message>
+        <location filename="../videoform.cpp" line="90"/>
+        <source>wait current file transfer to complete</source>
+        <translation>wait current file transfer to complete</translation>
+    </message>
+    <message>
+        <location filename="../videoform.cpp" line="93"/>
+        <source>file transfer complete</source>
+        <translation>file transfer complete</translation>
+    </message>
+    <message>
+        <location filename="../videoform.cpp" line="96"/>
+        <source>file transfer failed</source>
+        <translation>file transfer failed</translation>
+    </message>
+    <message>
+        <location filename="../videoform.cpp" line="418"/>
+        <source>file does not exist</source>
+        <translation>file does not exist</translation>
+    </message>
+</context>
+<context>
     <name>videoForm</name>
     <message>
-        <location filename="../videoform.ui" line="75"/>
+        <location filename="../videoform.ui" line="78"/>
         <source>qrc:/qml/pinwheel.qml</source>
         <translation>qrc:/qml/pinwheel.qml</translation>
     </message>
