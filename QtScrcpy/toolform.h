@@ -2,6 +2,7 @@
 #define TOOLFORM_H
 
 #include <QWidget>
+#include <QPointer>
 
 #include "magneticwidget.h"
 
@@ -9,6 +10,7 @@ namespace Ui {
 class ToolForm;
 }
 
+class VideoForm;
 class ToolForm : public MagneticWidget
 {
     Q_OBJECT
@@ -22,9 +24,32 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
+private slots:
+    void on_fullScreenBtn_clicked();
+
+    void on_returnBtn_clicked();
+
+    void on_homeBtn_clicked();
+
+    void on_menuBtn_clicked();
+
+    void on_appSwitchBtn_clicked();
+
+    void on_powerBtn_clicked();
+
+    void on_volumeUpBtn_clicked();
+
+    void on_volumeDownBtn_clicked();
+
+    void on_turnOnBtn_clicked();
+
+private:
+    void initStyle();
+
 private:
     Ui::ToolForm *ui;
     QPoint m_dragPosition;
+    QPointer<VideoForm> m_videoForm;
 };
 
 #endif // TOOLFORM_H

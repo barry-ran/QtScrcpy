@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>564</width>
+    <width>560</width>
     <height>486</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>560</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>560</width>
+    <height>16777215</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>QtScrcpy</string>
