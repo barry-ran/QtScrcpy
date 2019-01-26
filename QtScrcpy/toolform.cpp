@@ -47,7 +47,7 @@ void ToolForm::mousePressEvent(QMouseEvent *event)
 
 void ToolForm::mouseReleaseEvent(QMouseEvent *event)
 {
-
+    Q_UNUSED(event);
 }
 
 void ToolForm::mouseMoveEvent(QMouseEvent *event)

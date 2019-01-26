@@ -349,6 +349,7 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
 
 void VideoForm::paintEvent(QPaintEvent *paint)
 {
+    Q_UNUSED(paint);
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);
@@ -357,5 +358,6 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 
 void VideoForm::showEvent(QShowEvent *event)
 {
+    Q_UNUSED(event);
     showToolFrom();
 }

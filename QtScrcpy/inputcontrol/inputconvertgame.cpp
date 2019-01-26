@@ -461,6 +461,7 @@ void InputConvertGame::stopMouseMoveTimer()
 
 void InputConvertGame::mouseMoveStartTouch(const QMouseEvent* from)
 {
+    Q_UNUSED(from);
     if (!m_mouseMovePress) {
         //moveCursorToStart(from);
         int id = attachTouchID(Qt::ExtraButton24);

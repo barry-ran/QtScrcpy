@@ -82,6 +82,8 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameS
 
 void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize& frameSize, const QSize& showSize)
 {
+    Q_UNUSED(frameSize);
+    Q_UNUSED(showSize);
     if (!from) {
         return;
     }
