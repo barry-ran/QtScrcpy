@@ -233,10 +233,18 @@ void VideoForm::switchFullScreen()
         showNormal();
         updateStyleSheet(height() > width());
         showToolFrom(true);
+#ifdef Q_OS_WIN32
+        ::SetThreadExecutionState(ES_CONTINUOUS);
+#endif
     } else {
         showToolFrom(false);
         layout()->setContentsMargins(0, 0, 0, 0);
         showFullScreen();
+
+        // 全屏状态禁止电脑休眠、息屏
+#ifdef Q_OS_WIN32
+        ::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+#endif
     }
 }
 
