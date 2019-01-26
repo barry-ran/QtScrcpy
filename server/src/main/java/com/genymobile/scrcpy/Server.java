@@ -45,29 +45,21 @@ public final class Server {
 
     @SuppressWarnings("checkstyle:MagicNumber")
     private static Options createOptions(String... args) {
+        if (args.length != 4)
+            throw new IllegalArgumentException("Expecting 4 parameters");
+
         Options options = new Options();
-        if (args.length < 1) {
-            return options;
-        }
+
         int maxSize = Integer.parseInt(args[0]) & ~7; // multiple of 8
         options.setMaxSize(maxSize);
 
-        if (args.length < 2) {
-            return options;
-        }
         int bitRate = Integer.parseInt(args[1]);
         options.setBitRate(bitRate);
 
-        if (args.length < 3) {
-            return options;
-        }
         // use "adb forward" instead of "adb tunnel"? (so the server must listen)
         boolean tunnelForward = Boolean.parseBoolean(args[2]);
         options.setTunnelForward(tunnelForward);
 
-        if (args.length < 4) {
-            return options;
-        }
         Rect crop = parseCrop(args[3]);
         options.setCrop(crop);
 
@@ -75,7 +67,7 @@ public final class Server {
     }
 
     private static Rect parseCrop(String crop) {
-        if (crop.isEmpty()) {
+        if ("-".equals(crop)) {
             return null;
         }
         // input format: "width:height:x:y"

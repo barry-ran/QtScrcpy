@@ -146,11 +146,12 @@ bool Server::execute()
     args << QString::number(m_maxSize);
     args << QString::number(m_bitRate);
     args << (m_tunnelForward ? "true" : "false");
-    if (!m_crop.isEmpty()) {
-        args << m_crop;
+    if (m_crop.isEmpty()) {
+        args << "-";
     }
 
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
+    // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
     // 这条adb命令是阻塞运行的，m_serverProcess进程不会退出了
     m_serverProcess.execute(m_serial, args);
     return true;
