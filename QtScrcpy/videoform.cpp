@@ -13,6 +13,7 @@
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
+#include "controlevent.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWidget *parent) :
     QWidget(parent),
@@ -101,7 +102,6 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
     });
 
     updateShowSize(size());
-    initStyle();
 
     bool vertical = size().height() > size().width();
     updateStyleSheet(vertical);
@@ -125,7 +125,7 @@ void VideoForm::initUI()
 
     setAttribute(Qt::WA_DeleteOnClose);
     // 去掉标题栏
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::FramelessWindowHint);    
     // 根据图片构造异形窗口
     setAttribute(Qt::WA_TranslucentBackground);
 
@@ -147,12 +147,6 @@ void VideoForm::showToolFrom(bool show)
         m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
     }
     m_toolForm->setVisible(show);
-}
-
-void VideoForm::initStyle()
-{
-    //IconHelper::Instance()->SetIcon(ui->fullScrcenbtn, QChar(0xf0b2), 13);
-    //IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf104), 15);
 }
 
 void VideoForm::updateStyleSheet(bool vertical)
@@ -216,11 +210,75 @@ void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
+        updateStyleSheet(height() > width());
         showToolFrom(true);
     } else {
         showToolFrom(false);
-        showFullScreen();        
+        layout()->setContentsMargins(0, 0, 0, 0);
+        showFullScreen();
     }
+}
+
+void VideoForm::postGoMenu()
+{
+    postKeyCodeClick(AKEYCODE_MENU);
+}
+
+void VideoForm::postGoBack()
+{
+    postKeyCodeClick(AKEYCODE_BACK);
+}
+
+void VideoForm::postAppSwitch()
+{
+    postKeyCodeClick(AKEYCODE_APP_SWITCH);
+}
+
+void VideoForm::postPower()
+{
+    postKeyCodeClick(AKEYCODE_POWER);
+}
+
+void VideoForm::postVolumeUp()
+{
+    postKeyCodeClick(AKEYCODE_VOLUME_UP);
+}
+
+void VideoForm::postVolumeDown()
+{
+    postKeyCodeClick(AKEYCODE_VOLUME_DOWN);
+}
+
+void VideoForm::postTurnOn()
+{
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COMMAND);
+    if (!controlEvent) {
+        return;
+    }
+    controlEvent->setCommandEventData(CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON);
+    m_inputConvert.sendControlEvent(controlEvent);
+}
+
+void VideoForm::postGoHome()
+{
+    postKeyCodeClick(AKEYCODE_HOME);
+}
+
+void VideoForm::postKeyCodeClick(AndroidKeycode keycode)
+{
+    ControlEvent* controlEventDown = new ControlEvent(ControlEvent::CET_KEYCODE);
+    if (!controlEventDown) {
+        return;
+    }
+    controlEventDown->setKeycodeEventData(AKEY_EVENT_ACTION_DOWN, keycode, AMETA_NONE);
+    m_inputConvert.sendControlEvent(controlEventDown);
+
+    ControlEvent* controlEventUp = new ControlEvent(ControlEvent::CET_KEYCODE);
+    if (!controlEventUp) {
+        return;
+    }
+    controlEventUp->setKeycodeEventData(AKEY_EVENT_ACTION_UP, keycode, AMETA_NONE);
+    m_inputConvert.sendControlEvent(controlEventUp);
 }
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
@@ -300,14 +358,4 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 void VideoForm::showEvent(QShowEvent *event)
 {
     showToolFrom();
-}
-
-void VideoForm::on_fullScrcenbtn_clicked()
-{
-    switchFullScreen();    
-}
-
-void VideoForm::on_returnBtn_clicked()
-{
-
 }

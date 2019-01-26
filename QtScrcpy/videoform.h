@@ -23,13 +23,23 @@ public:
     explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, QWidget *parent = 0);
     ~VideoForm();
 
+    void switchFullScreen();
+    void postGoMenu();
+    void postGoHome();
+    void postGoBack();
+    void postAppSwitch();
+    void postPower();
+    void postVolumeUp();
+    void postVolumeDown();
+    // turn the screen on if it was off, press BACK otherwise
+    void postTurnOn();
+
 private:
     void updateShowSize(const QSize &newSize);
-    void switchFullScreen();
-    void initStyle();
     void updateStyleSheet(bool vertical);
     void initUI();
     void showToolFrom(bool show = true);
+    void postKeyCodeClick(AndroidKeycode keycode);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -41,10 +51,6 @@ protected:
 
     void paintEvent(QPaintEvent *);
     void showEvent(QShowEvent *event);
-
-private slots:
-    void on_fullScrcenbtn_clicked();
-    void on_returnBtn_clicked();
 
 private:
     Ui::videoForm *ui;

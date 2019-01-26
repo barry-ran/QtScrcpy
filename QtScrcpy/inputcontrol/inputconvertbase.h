@@ -21,7 +21,6 @@ public:
     virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize) = 0;
 
     void setDeviceSocket(DeviceSocket* deviceSocket);
-protected:
     void sendControlEvent(ControlEvent* event);
 
 private:

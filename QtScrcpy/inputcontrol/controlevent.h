@@ -9,6 +9,7 @@
 #include "input.h"
 #include "keycodes.h"
 
+#define CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON 0
 // ControlEvent
 class ControlEvent : public QScrcpyEvent
 {
