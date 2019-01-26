@@ -6,5 +6,7 @@
         <file>res/phone-v.png</file>
         <file>qml/pinwheel.qml</file>
         <file>qml/images/pinwheel.png</file>
+        <file>i18n/QtScrcpy_en.qm</file>
+        <file>i18n/QtScrcpy_zh.qm</file>
     </qresource>
 </RCC>

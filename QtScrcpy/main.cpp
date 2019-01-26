@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QTcpSocket>
 #include <QTcpServer>
+#include <QTranslator>
 
 #include "dialog.h"
 #include "decoder.h"
@@ -10,6 +11,7 @@ Dialog* g_mainDlg = Q_NULLPTR;
 
 QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+void installTranslator();
 
 int main(int argc, char *argv[])
 {
@@ -20,6 +22,8 @@ int main(int argc, char *argv[])
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Decoder::init();
     QApplication a(argc, argv);
+
+    installTranslator();
 
 #ifdef Q_OS_WIN32
     qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/win/adb.exe");
@@ -48,6 +52,24 @@ int main(int argc, char *argv[])
 
     Decoder::deInit();
     return ret;
+}
+
+void installTranslator() {
+    static QTranslator translator;
+    QLocale locale;
+    QLocale::Language language = locale.language();
+    QString languagePath = ":i18n/";
+    switch (language) {
+    case QLocale::Chinese:
+        languagePath += "QtScrcpy_zh.qm";
+        break;
+    case QLocale::English:
+    default:
+        languagePath += "QtScrcpy_en.qm";
+    }
+
+    translator.load(languagePath);
+    qApp->installTranslator(&translator);
 }
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
