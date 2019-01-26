@@ -18,7 +18,7 @@ public final class Server {
         final Device device = new Device(options);
         boolean tunnelForward = options.isTunnelForward();
         try (DesktopConnection connection = DesktopConnection.open(device, tunnelForward)) {
-            ScreenEncoder screenEncoder = new ScreenEncoder(options.getBitRate());
+            ScreenEncoder screenEncoder = new ScreenEncoder(options.getSendFrameMeta(), options.getBitRate());
 
             // asynchronous
             startEventController(device, connection);
@@ -49,8 +49,8 @@ public final class Server {
 
     @SuppressWarnings("checkstyle:MagicNumber")
     private static Options createOptions(String... args) {
-        if (args.length != 4)
-            throw new IllegalArgumentException("Expecting 4 parameters");
+        if (args.length != 5)
+            throw new IllegalArgumentException("Expecting 5 parameters");
 
         Options options = new Options();
 
@@ -66,6 +66,9 @@ public final class Server {
 
         Rect crop = parseCrop(args[3]);
         options.setCrop(crop);
+
+        boolean sendFrameMeta = Boolean.parseBoolean(args[4]);
+        options.setSendFrameMeta(sendFrameMeta);
 
         return options;
     }

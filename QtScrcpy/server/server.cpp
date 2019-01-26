@@ -131,7 +131,7 @@ bool Server::execute()
     } else {
         args << m_crop;
     }
-
+    args << (m_sendFrameMeta ? "true" : "false");
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
     // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
     // 这条adb命令是阻塞运行的，m_serverProcess进程不会退出了
@@ -139,13 +139,14 @@ bool Server::execute()
     return true;
 }
 
-bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop)
+bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop, bool sendFrameMeta)
 {    
     m_serial = serial;
     m_localPort = localPort;
     m_maxSize = maxSize;
     m_bitRate = bitRate;
     m_crop = crop;
+    m_sendFrameMeta = sendFrameMeta;
 
     m_serverStartStep = SSS_PUSH;
     return startServerByStep();

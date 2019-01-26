@@ -24,7 +24,7 @@ public:
     explicit Server(QObject *parent = nullptr);
     virtual ~Server();
 
-    bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop);    
+    bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop, bool sendFrameMeta = false);
     bool connectTo();
 
     DeviceSocket* getDeviceSocket();
@@ -66,6 +66,7 @@ private:
     quint16 m_localPort = 0;
     bool m_tunnelEnabled = false;
     bool m_tunnelForward = false; // use "adb forward" instead of "adb reverse"
+    bool m_sendFrameMeta = false;
     quint16 m_maxSize = 0;
     quint32 m_bitRate = 0;
     QString m_crop = "";
