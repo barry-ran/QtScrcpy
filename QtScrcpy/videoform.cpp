@@ -225,7 +225,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
                 showSize.setHeight(qMin(newSize.height(), screenRect.height() - 200));
                 showSize.setWidth(showSize.height() * m_widthHeightRatio);
             } else {
-                showSize.setWidth(qMin(newSize.width(), screenRect.width()));
+                showSize.setWidth(qMin(newSize.width(), screenRect.width()/2));
                 showSize.setHeight(showSize.width() * m_widthHeightRatio);
             }
 

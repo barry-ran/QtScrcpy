@@ -31,6 +31,8 @@ public:
     explicit MagneticWidget(QWidget* adsorbWidget, AdsorbPositions adsorbPos = AP_ALL);
     ~MagneticWidget();
 
+    bool isAdsorbed();
+
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void moveEvent(QMoveEvent *event) override;
