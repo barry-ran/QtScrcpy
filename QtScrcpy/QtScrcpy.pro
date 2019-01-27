@@ -121,6 +121,10 @@ macos {
     APP_ADB.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_ADB
 
+    APP_FFMPEG.files = $$files($$PWD/../third_party/ffmpeg/lib/*.dylib)
+    APP_FFMPEG.path = Contents/MacOS
+    QMAKE_BUNDLE_DATA += APP_FFMPEG
+
     # mac application icon
     ICON = $$PWD/res/QtScrcpy.icns
 }
