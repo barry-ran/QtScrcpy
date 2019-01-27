@@ -111,7 +111,7 @@ void Dialog::on_stopServerBtn_clicked()
 {    
     if (m_videoForm) {
         m_videoForm->close();
-        outLog("stop server...");
+        outLog("stop server");
     }
 }
 
