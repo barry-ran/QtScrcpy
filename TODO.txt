@@ -7,3 +7,9 @@
 
 
 最后更新 7764a836f1ee02a4540cfc4118c20729018daaac
+
+
+mark:
+
+ffmpeg编译参数详解
+https://www.cnblogs.com/wainiwann/p/4204230.html
