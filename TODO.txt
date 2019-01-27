@@ -1,3 +1,5 @@
+// TODO mac: Qt::FramelessWindowHit full screen is abnormal
+
 工具栏扩展（模拟点击指定次数等）
 
 模拟点击改用手指(注意：辅助按键就都没了)
