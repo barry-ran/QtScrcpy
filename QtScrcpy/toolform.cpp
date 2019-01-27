@@ -10,8 +10,8 @@ ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     , ui(new Ui::ToolForm)
 {
     ui->setupUi(this);
-    //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-    setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+    //setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
 
     m_videoForm = dynamic_cast<VideoForm*>(adsorbWidget);
 
