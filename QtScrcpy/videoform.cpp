@@ -244,8 +244,11 @@ void VideoForm::updateShowSize(const QSize &newSize)
         //showSize.setHeight(showSize.height() - titleBarHeight);
 
         if (showSize != size()) {
+#ifdef Q_OS_OSX
             setFixedSize(showSize);
-            //resize(showSize);
+#else
+            resize(showSize);
+#endif
             updateStyleSheet(vertical);
         }
     }
