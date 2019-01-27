@@ -25,6 +25,11 @@ MagneticWidget::~MagneticWidget()
     }
 }
 
+bool MagneticWidget::isAdsorbed()
+{
+    return m_adsorbed;
+}
+
 bool MagneticWidget::eventFilter(QObject *watched, QEvent *event)
 {
     if (watched != m_adsorbWidget || !event) {

@@ -297,7 +297,9 @@ void Decoder::run()
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 37, 0)
         int ret;
         if ((ret = avcodec_send_packet(codecCtx, &packet)) < 0) {
-            qCritical("Could not send video packet: %d", ret);
+            char errorbuf[255] = { 0 };
+            av_strerror(ret, errorbuf, 254);
+            qCritical("Could not send video packet: %s", errorbuf);
             goto runQuit;
         }
         if (decodingFrame) {
