@@ -102,7 +102,7 @@ void Dialog::on_startServerBtn_clicked()
         quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
         m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate, absFilePath);
 
-        outLog("start server...");
+        outLog("start server...", false);
     }
     m_videoForm->show();
 }
@@ -111,7 +111,7 @@ void Dialog::on_stopServerBtn_clicked()
 {    
     if (m_videoForm) {
         m_videoForm->close();
-        outLog("stop server...", false);
+        outLog("stop server...");
     }
 }
 
@@ -202,9 +202,7 @@ void Dialog::on_selectRecordPathBtn_clicked()
                                                           tr("select path"),
                                                           "",
                                                           options);
-    if (!directory.isEmpty()) {
-        ui->recordPathEdt->setText(directory);
-    }
+    ui->recordPathEdt->setText(directory);
 }
 
 void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
