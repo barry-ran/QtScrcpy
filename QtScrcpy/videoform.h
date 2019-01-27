@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QTime>
 
 #include "server.h"
 #include "decoder.h"
@@ -77,6 +78,7 @@ private:
     float m_widthHeightRatio = 0.5f;
     QPointer<ToolForm> m_toolForm;
     Recorder* m_recorder = Q_NULLPTR;
+    QTime m_startTimeCount;
 };
 
 #endif // VIDEOFORM_H

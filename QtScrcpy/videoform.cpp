@@ -41,6 +41,7 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
 
     // fix: macos cant recv finished signel, timer is ok
     QTimer::singleShot(0, this, [this](){
+        m_startTimeCount.start();
         // max size support 480p 720p 1080p 设备原生分辨率
         // support wireless connect, example:
         //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
@@ -132,6 +133,10 @@ void VideoForm::initSignals()
 
     connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
         if (success) {
+            float diff = m_startTimeCount.elapsed() / 1000.0f;
+            qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
+
+
             // update ui
             setWindowTitle(deviceName);
             updateShowSize(size);
