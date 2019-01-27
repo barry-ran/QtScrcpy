@@ -243,8 +243,9 @@ void VideoForm::updateShowSize(const QSize &newSize)
         //int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
         //showSize.setHeight(showSize.height() - titleBarHeight);
 
-        if (showSize != size()) {            
-            resize(showSize);
+        if (showSize != size()) {
+            setFixedSize(showSize);
+            //resize(showSize);
             updateStyleSheet(vertical);
         }
     }
