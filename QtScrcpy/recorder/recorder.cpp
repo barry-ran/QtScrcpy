@@ -72,7 +72,9 @@ bool Recorder::open(AVCodec *inputCodec)
     int ret = avio_open(&m_formatCtx->pb, m_fileName.toUtf8().toStdString().c_str(),
                         AVIO_FLAG_WRITE);
     if (ret < 0) {
-        qCritical(QString("Failed to open output file: %1").arg(m_fileName).toUtf8().toStdString().c_str());
+        char errorbuf[255] = { 0 };
+        av_strerror(ret, errorbuf, 254);
+        qCritical(QString("Failed to open output file: %1 %2").arg(errorbuf).arg(m_fileName).toUtf8().toStdString().c_str());
         // ostream will be cleaned up during context cleaning
         avformat_free_context(m_formatCtx);
         m_formatCtx = Q_NULLPTR;
@@ -121,7 +123,7 @@ const AVOutputFormat *Recorder::findMp4Muxer()
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 9, 100)
         outFormat = av_muxer_iterate(&opaque);
 #else
-        outFormat = av_oformat_next(oformat);
+        outFormat = av_oformat_next(outFormat);
 #endif
         // until null or with name "mp4"
     } while (outFormat && strcmp(outFormat->name, "mp4"));
