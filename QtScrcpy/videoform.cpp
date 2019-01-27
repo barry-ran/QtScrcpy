@@ -79,11 +79,13 @@ void VideoForm::initUI()
     }
 
     setAttribute(Qt::WA_DeleteOnClose);
+    // TODO mac: Qt::FramelessWindowHit full screen is abnormal
+#ifndef Q_OS_OSX
     // 去掉标题栏
-    setWindowFlags(Qt::FramelessWindowHint);    
+    setWindowFlags(Qt::FramelessWindowHint);
     // 根据图片构造异形窗口
     setAttribute(Qt::WA_TranslucentBackground);
-
+#endif
     setMouseTracking(true);
     ui->loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
     ui->videoWidget->setMouseTracking(true);
