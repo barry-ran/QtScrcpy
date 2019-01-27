@@ -111,7 +111,6 @@ static qint32 readPacketWithMeta(void *opaque, uint8_t *buf, int bufSize) {
     // It is followed by <packet_size> bytes containing the packet/frame.
 
     if (!state->remaining) {
-#define HEADER_SIZE 12
         quint8 header[HEADER_SIZE];
         qint32 r = decoder->recvData(header, HEADER_SIZE);
         if (r == -1) {
@@ -121,7 +120,9 @@ static qint32 readPacketWithMeta(void *opaque, uint8_t *buf, int bufSize) {
             return AVERROR_EOF;
         }
         // no partial read (net_recv_all())
-        Q_ASSERT(r == HEADER_SIZE);
+        if (r != HEADER_SIZE) {
+            return AVERROR(ENOMEM);
+        }
 
         uint64_t pts = bufferRead64be(header);
         state->remaining = bufferRead32be(&header[8]);
@@ -155,9 +156,16 @@ static qint32 readPacketWithMeta(void *opaque, uint8_t *buf, int bufSize) {
 static qint32 readRawPacket(void *opaque, quint8 *buf, qint32 bufSize) {
     Decoder *decoder = (Decoder*)opaque;
     if (decoder) {
-        return decoder->recvData(buf, bufSize);
+        qint32 len = decoder->recvData(buf, bufSize);
+        if (len == -1) {
+            return AVERROR(errno);
+        }
+        if (len == 0) {
+            return AVERROR_EOF;
+        }
+        return len;
     }
-    return 0;
+    return AVERROR_EOF;
 }
 
 void Decoder::setDeviceSocket(DeviceSocket* deviceSocket)
@@ -177,15 +185,9 @@ qint32 Decoder::recvData(quint8* buf, qint32 bufSize)
     }
     if (m_deviceSocket) {        
         qint32 len = m_deviceSocket->subThreadRecvData(buf, bufSize);
-        if (len == -1) {
-            return AVERROR(errno);
-        }
-        if (len == 0) {
-            return AVERROR_EOF;
-        }
         return len;
     }
-    return AVERROR_EOF;
+    return 0;
 }
 
 bool Decoder::startDecode()
@@ -204,7 +206,7 @@ void Decoder::stopDecode()
     if (m_frames) {
         m_frames->stop();
     }
-    //wait();
+    wait();
 }
 
 Decoder::ReceiverState *Decoder::getReceiverState()

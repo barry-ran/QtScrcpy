@@ -84,6 +84,6 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
         }
     }
     if (QtFatalMsg == type) {
-        abort();
+        //abort();
     }
 }

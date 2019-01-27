@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QTime>
 #include <QKeyEvent>
+#include <QFileDialog>
 
 #include "dialog.h"
 #include "ui_dialog.h"
@@ -86,10 +87,22 @@ void Dialog::on_updateDevice_clicked()
 void Dialog::on_startServerBtn_clicked()
 {
     if (!m_videoForm) {
+        QString absFilePath;
+        QString fileDir(ui->recordPathEdt->text().trimmed());
+        if (!fileDir.isEmpty()) {
+            QDateTime dateTime = QDateTime::currentDateTime();
+            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss.zzz");
+            fileName = windowTitle() + fileName + ".mp4";
+            QDir dir(fileDir);
+            absFilePath = dir.absoluteFilePath(fileName);
+        }
+
         quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
         // this is ok that "native" toUshort is 0
         quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
-        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate);
+        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate, absFilePath);
+
+        outLog("start server...");
     }
     m_videoForm->show();
 }
@@ -98,6 +111,7 @@ void Dialog::on_stopServerBtn_clicked()
 {    
     if (m_videoForm) {
         m_videoForm->close();
+        outLog("stop server...", false);
     }
 }
 
@@ -179,4 +193,21 @@ void Dialog::on_wirelessDisConnectBtn_clicked()
     adbArgs << "disconnect";
     adbArgs << addr;
     m_adb.execute("", adbArgs);
+}
+
+void Dialog::on_selectRecordPathBtn_clicked()
+{
+    QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
+    QString directory = QFileDialog::getExistingDirectory(this,
+                                                          tr("select path"),
+                                                          "",
+                                                          options);
+    if (!directory.isEmpty()) {
+        ui->recordPathEdt->setText(directory);
+    }
+}
+
+void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
+{
+    ui->recordPathEdt->setToolTip(arg1);
 }

@@ -19,7 +19,7 @@
 #include "controlevent.h"
 #include "recorder.h"
 
-VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWidget *parent) :
+VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::videoForm),
     m_serial(serial),
@@ -30,10 +30,12 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
     initUI();
 
     m_server = new Server();
-    m_recorder = new Recorder("./test.mp4", QSize(600, 300));
     m_frames.init();
     m_decoder.setFrames(&m_frames);
-    m_decoder.setRecoder(m_recorder);
+    if (!fileName.trimmed().isEmpty()) {
+        m_recorder = new Recorder(fileName.trimmed());
+        m_decoder.setRecoder(m_recorder);
+    }
 
     initSignals();
 
@@ -56,11 +58,13 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate,QWi
 
 VideoForm::~VideoForm()
 {
+    m_server->stop();
+    // server must stop before decoder, because decoder block main thread
     m_decoder.stopDecode();
-    m_server->stop();    
-    m_decoder.wait();
     delete m_server;
-    delete m_recorder;
+    if (m_recorder) {
+        delete m_recorder;
+    }
     m_frames.deInit();
     delete ui;
 }
@@ -132,7 +136,12 @@ void VideoForm::initSignals()
             setWindowTitle(deviceName);
             updateShowSize(size);
 
-            // init decode
+            // init recorder
+            if (m_recorder) {
+                m_recorder->setFrameSize(size);
+            }
+
+            // init decoder
             m_decoder.setDeviceSocket(m_server->getDeviceSocket());
             m_decoder.startDecode();
 

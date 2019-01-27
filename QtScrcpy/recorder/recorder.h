@@ -11,9 +11,10 @@ extern "C"
 class Recorder
 {
 public:
-    Recorder(const QString& fileName, const QSize& declaredFrameSize);
+    Recorder(const QString& fileName);
     virtual ~Recorder();
 
+    void setFrameSize(const QSize& declaredFrameSize);
     bool open(AVCodec* inputCodec);
     void close();
     bool write(AVPacket* packet);

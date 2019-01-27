@@ -22,7 +22,7 @@ class VideoForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, QWidget *parent = 0);
+    explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, const QString& fileName = "", QWidget *parent = 0);
     ~VideoForm();
 
     void switchFullScreen();

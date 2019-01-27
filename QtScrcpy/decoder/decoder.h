@@ -59,7 +59,7 @@ private:
     Frames* m_frames;
 
     // for recorder
-    Recorder* m_recorder;
+    Recorder* m_recorder = Q_NULLPTR;
     ReceiverState m_receiverState;
 };
 
