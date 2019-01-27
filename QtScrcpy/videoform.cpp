@@ -79,13 +79,12 @@ void VideoForm::initUI()
     }
 
     setAttribute(Qt::WA_DeleteOnClose);
-    // TODO mac: Qt::FramelessWindowHit full screen is abnormal
-#ifndef Q_OS_OSX
+
     // 去掉标题栏
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     // 根据图片构造异形窗口
     setAttribute(Qt::WA_TranslucentBackground);
-#endif
+
     setMouseTracking(true);
     ui->loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
     ui->videoWidget->setMouseTracking(true);
@@ -258,12 +257,20 @@ void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
+#ifdef Q_OS_OSX
+        setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+        show();
+#endif
         updateStyleSheet(height() > width());
         showToolFrom(true);
 #ifdef Q_OS_WIN32
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
+        // mac fullscreen must show title bar
+#ifdef Q_OS_OSX
+        setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
+#endif
         showToolFrom(false);
         layout()->setContentsMargins(0, 0, 0, 0);
         showFullScreen();
