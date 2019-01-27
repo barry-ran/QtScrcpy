@@ -221,6 +221,7 @@ void Decoder::run()
     AVFormatContext *formatCtx = Q_NULLPTR;
     AVCodec *codec = Q_NULLPTR;
     AVCodecContext *codecCtx = Q_NULLPTR;
+    ReadPacketFunc readPacket = Q_NULLPTR;
     bool isFormatCtxOpen = false;
     bool isCodecCtxOpen = false;    
 
@@ -236,7 +237,7 @@ void Decoder::run()
     m_receiverState.remaining = 0;
 
     // if recording is enabled, a "header" is sent between raw packets
-    ReadPacketFunc readPacket = m_recorder ? readPacketWithMeta: readRawPacket;
+    readPacket = m_recorder ? readPacketWithMeta: readRawPacket;
 
     // io context
     avioCtx = avio_alloc_context(decoderBuffer, BUFSIZE, 0, this, readPacket, NULL, NULL);
