@@ -41,6 +41,7 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
 
     // fix: macos cant recv finished signel, timer is ok
     QTimer::singleShot(0, this, [this](){
+        bool sendFrameMeta = m_recorder ? true : false;
         m_startTimeCount.start();
         // max size support 480p 720p 1080p 设备原生分辨率
         // support wireless connect, example:
@@ -48,7 +49,7 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
         // only one devices, serial can be null
         // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
         // sendFrameMeta for recorder mp4
-        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "-", true);
+        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "-", sendFrameMeta);
     });
 
     updateShowSize(size());
