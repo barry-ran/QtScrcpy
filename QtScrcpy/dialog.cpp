@@ -2,6 +2,7 @@
 #include <QTime>
 #include <QKeyEvent>
 #include <QFileDialog>
+#include <QTimer>
 
 #include "dialog.h"
 #include "ui_dialog.h"
@@ -147,10 +148,14 @@ void Dialog::on_startAdbdBtn_clicked()
 
 void Dialog::outLog(const QString &log, bool newLine)
 {
-    ui->outEdit->append(log);
-    if (newLine) {
-        ui->outEdit->append("<br/>");
-    }
+    // avoid sub thread update ui
+    QString backLog = log;
+    QTimer::singleShot(0, this, [this, backLog, newLine](){
+        ui->outEdit->append(backLog);
+        if (newLine) {
+            ui->outEdit->append("<br/>");
+        }
+    });
 }
 
 bool Dialog::checkAdbRun()
