@@ -37,6 +37,10 @@ private slots:
 
     void on_wirelessDisConnectBtn_clicked();
 
+    void on_selectRecordPathBtn_clicked();
+
+    void on_recordPathEdt_textChanged(const QString &arg1);
+
 private:
     bool checkAdbRun();
     void initUI();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>560</width>
-    <height>486</height>
+    <height>577</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,18 +26,62 @@
    <string notr="true">QtScrcpy</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="2" column="0">
-    <widget class="QTextEdit" name="outEdit">
-     <property name="documentTitle">
-      <string/>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="usbGroupBox">
+     <property name="title">
+      <string>USB line</string>
      </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="2">
+       <widget class="QPushButton" name="getIPBtn">
+        <property name="text">
+         <string>get device ip</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="stopServerBtn">
+        <property name="text">
+         <string>stop server</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPushButton" name="updateDevice">
+        <property name="text">
+         <string>update device</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QPushButton" name="startAdbdBtn">
+        <property name="text">
+         <string>start adbd</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>device serial:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="serialBox"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="startServerBtn">
+        <property name="text">
+         <string>start server</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox">
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="wirelessGroupBox">
      <property name="title">
       <string>Wireless</string>
      </property>
@@ -98,40 +142,26 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="topGroupBox">
-     <property name="title">
-      <string>USB line</string>
+   <item row="3" column="0">
+    <widget class="QTextEdit" name="outEdit">
+     <property name="documentTitle">
+      <string/>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="1" column="1">
-       <widget class="QComboBox" name="serialBox"/>
-      </item>
-      <item row="1" column="3">
-       <widget class="QPushButton" name="stopServerBtn">
-        <property name="text">
-         <string>stop server</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="startServerBtn">
-        <property name="text">
-         <string>start server</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>device serial:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>bit rate:</string>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="configGroupBox">
+     <property name="title">
+      <string>Config</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="3">
+       <widget class="QComboBox" name="videoSizeBox">
+        <property name="toolTip">
+         <string/>
         </property>
        </widget>
       </item>
@@ -152,31 +182,31 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QComboBox" name="videoSizeBox">
-        <property name="toolTip">
-         <string/>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>bit rate:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="3">
-       <widget class="QPushButton" name="startAdbdBtn">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>start adbd</string>
+         <string>record save path:</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="2">
-       <widget class="QPushButton" name="getIPBtn">
-        <property name="text">
-         <string>get device ip</string>
+      <item row="1" column="1" colspan="2">
+       <widget class="QLineEdit" name="recordPathEdt">
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
-       <widget class="QPushButton" name="updateDevice">
+      <item row="1" column="3">
+       <widget class="QPushButton" name="selectRecordPathBtn">
         <property name="text">
-         <string>update device</string>
+         <string>select path</string>
         </property>
        </widget>
       </item>

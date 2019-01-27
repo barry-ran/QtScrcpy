@@ -2,9 +2,8 @@
 
 #include "recorder.h"
 
-Recorder::Recorder(const QString& fileName, const QSize& declaredFrameSize)
+Recorder::Recorder(const QString& fileName)
     : m_fileName(fileName)
-    , m_declaredFrameSize(declaredFrameSize)
 {
 
 }
@@ -12,6 +11,11 @@ Recorder::Recorder(const QString& fileName, const QSize& declaredFrameSize)
 Recorder::~Recorder()
 {
 
+}
+
+void Recorder::setFrameSize(const QSize &declaredFrameSize)
+{
+    m_declaredFrameSize = declaredFrameSize;
 }
 
 bool Recorder::open(AVCodec *inputCodec)
@@ -38,6 +42,7 @@ bool Recorder::open(AVCodec *inputCodec)
     AVStream* outStream = avformat_new_stream(m_formatCtx, inputCodec);
     if (!outStream) {
         avformat_free_context(m_formatCtx);
+        m_formatCtx = Q_NULLPTR;
         return false;
     }
 
@@ -70,6 +75,7 @@ bool Recorder::open(AVCodec *inputCodec)
         qCritical(QString("Failed to open output file: %1").arg(m_fileName).toUtf8().toStdString().c_str());
         // ostream will be cleaned up during context cleaning
         avformat_free_context(m_formatCtx);
+        m_formatCtx = Q_NULLPTR;
         return false;
     }
 
@@ -78,6 +84,7 @@ bool Recorder::open(AVCodec *inputCodec)
         qCritical(QString("Failed to write header to %1").arg(m_fileName).toUtf8().toStdString().c_str());
         avio_closep(&m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
+        m_formatCtx = Q_NULLPTR;
         return false;
     }
 
@@ -86,12 +93,17 @@ bool Recorder::open(AVCodec *inputCodec)
 
 void Recorder::close()
 {
-    int ret = av_write_trailer(m_formatCtx);
-    if (ret < 0) {
-        qCritical(QString("Failed to write trailer to %1").arg(m_fileName).toUtf8().toStdString().c_str());
+    if (Q_NULLPTR != m_formatCtx) {
+        int ret = av_write_trailer(m_formatCtx);
+        if (ret < 0) {
+            qCritical(QString("Failed to write trailer to %1").arg(m_fileName).toUtf8().toStdString().c_str());
+        } else {
+            qInfo(QString("success record %1").arg(m_fileName).toStdString().c_str());
+        }
+        avio_close(m_formatCtx->pb);
+        avformat_free_context(m_formatCtx);
+        m_formatCtx = Q_NULLPTR;
     }
-    avio_close(m_formatCtx->pb);
-    avformat_free_context(m_formatCtx);
 }
 
 bool Recorder::write(AVPacket *packet)
