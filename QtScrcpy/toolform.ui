@@ -13,7 +13,13 @@
   <property name="windowTitle">
    <string>Tool</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="topMargin">
+    <number>30</number>
+   </property>
    <item>
     <widget class="QPushButton" name="fullScreenBtn">
      <property name="toolTip">
