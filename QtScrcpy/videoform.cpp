@@ -432,7 +432,9 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 void VideoForm::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
-    showToolFrom();
+    if (!isFullScreen()) {
+        showToolFrom();
+    }
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)
