@@ -80,10 +80,13 @@ void VideoForm::initUI()
 
     setAttribute(Qt::WA_DeleteOnClose);
 
+    // mac下去掉标题栏影响showfullscreen
+#ifndef Q_OS_OSX
     // 去掉标题栏
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     // 根据图片构造异形窗口
     setAttribute(Qt::WA_TranslucentBackground);
+#endif
 
     setMouseTracking(true);
     ui->loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
@@ -137,7 +140,6 @@ void VideoForm::initSignals()
         if (success) {
             float diff = m_startTimeCount.elapsed() / 1000.0f;
             qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
-
 
             // update ui
             setWindowTitle(deviceName);
@@ -257,9 +259,10 @@ void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
+
 #ifdef Q_OS_OSX
-        setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-        show();
+        //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+        //show();
 #endif
         updateStyleSheet(height() > width());
         showToolFrom(true);
@@ -267,10 +270,10 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
-        setFocus(Qt::ActiveWindowFocusReason);
+        // 这种临时增加标题栏再全屏的方案会导致收不到mousemove事件，导致setmousetrack失效
         // mac fullscreen must show title bar
 #ifdef Q_OS_OSX
-        setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
+        //setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
 #endif
         showToolFrom(false);
         layout()->setContentsMargins(0, 0, 0, 0);
@@ -411,6 +414,7 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
             && isFullScreen()) {
         switchFullScreen();
     }
+
     //qDebug() << "keyPressEvent" << event->isAutoRepeat();
     m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
