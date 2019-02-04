@@ -267,6 +267,7 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
+        setFocus(Qt::ActiveWindowFocusReason);
         // mac fullscreen must show title bar
 #ifdef Q_OS_OSX
         setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
