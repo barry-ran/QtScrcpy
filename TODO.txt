@@ -1,5 +1,6 @@
 // TODO mac: Qt::FramelessWindowHit full screen is abnormal
-
+限制鼠标移动抽象跨平台接口
+Mac游戏时向右移动不流畅问题。
 工具栏扩展（模拟点击指定次数等）
 
 模拟点击改用手指(注意：辅助按键就都没了)

@@ -54,6 +54,7 @@ include ($$PWD/uibase/uibase.pri)
 include ($$PWD/fontawesome/fontawesome.pri)
 include ($$PWD/filehandler/filehandler.pri)
 include ($$PWD/recorder/recorder.pri)
+include ($$PWD/util/util.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
@@ -68,6 +69,7 @@ INCLUDEPATH += \
         $$PWD/uibase \
         $$PWD/filehandler \
         $$PWD/recorder \
+        $$PWD/util \
         $$PWD/fontawesome
 
 
