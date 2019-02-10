@@ -18,6 +18,9 @@
 #include "toolform.h"
 #include "controlevent.h"
 #include "recorder.h"
+#ifdef Q_OS_OSX
+#include "cocoamousetap.h"
+#endif
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, QWidget *parent) :
     QWidget(parent),
@@ -126,6 +129,9 @@ void VideoForm::initSignals()
         } else {
             ClipCursor(Q_NULLPTR);
         }
+#endif
+#ifdef Q_OS_OSX
+        CocoaMouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
 #endif
     });
     connect(m_server, &Server::serverStartResult, this, [this](bool success){
