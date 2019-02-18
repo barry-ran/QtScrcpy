@@ -7,7 +7,10 @@
 #ifdef Q_OS_WIN32
 #include <Windows.h>
 #endif
+#ifdef USE_QTQUICK
 #include <QQuickWidget>
+#endif
+#include <QtWidgets/QHBoxLayout>
 #include <QMimeData>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -76,12 +79,40 @@ VideoForm::~VideoForm()
 
 void VideoForm::initUI()
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     QPixmap phone;
     if (phone.load(":/res/phone.png")) {
         m_widthHeightRatio = 1.0f * phone.width() / phone.height();
     }
 
-    setAttribute(Qt::WA_DeleteOnClose);
+#ifdef USE_QTQUICK
+    // qml animation
+    QWidget *loadingWidget;
+    QHBoxLayout *horizontalLayout;
+    QQuickWidget *quickWidget;
+    loadingWidget = new QWidget(this);
+    loadingWidget->setObjectName(QStringLiteral("loadingWidget"));
+    loadingWidget->setAutoFillBackground(false);
+    loadingWidget->setStyleSheet(QStringLiteral(""));
+    loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
+    m_loadingWidget = loadingWidget;
+    horizontalLayout = new QHBoxLayout(loadingWidget);
+    horizontalLayout->setSpacing(0);
+    horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+    horizontalLayout->setContentsMargins(0, 0, 0, 0);
+    quickWidget = new QQuickWidget(loadingWidget);
+    quickWidget->setObjectName(QStringLiteral("quickWidget"));
+    quickWidget->setAutoFillBackground(false);
+    quickWidget->setStyleSheet(QStringLiteral(""));
+    quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    quickWidget->setSource(QUrl(QStringLiteral("qrc:/qml/pinwheel.qml")));
+    // 最后绘制，不设置最后绘制会影响父窗体异形异常（quickWidget的透明通道会形成穿透）
+    quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
+    // 背景透明
+    quickWidget->setClearColor(QColor(Qt::transparent));
+    horizontalLayout->addWidget(quickWidget);
+    ui->verticalLayout->addWidget(loadingWidget);
+#endif
 
     // mac下去掉标题栏影响showfullscreen
 #ifndef Q_OS_OSX
@@ -91,15 +122,9 @@ void VideoForm::initUI()
     setAttribute(Qt::WA_TranslucentBackground);
 #endif
 
-    setMouseTracking(true);
-    ui->loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
+    setMouseTracking(true);    
     ui->videoWidget->setMouseTracking(true);
-    ui->videoWidget->hide();
-
-    // 最后绘制，不设置最后绘制会影响父窗体异形异常（quickWidget的透明通道会形成穿透）
-    ui->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
-    // 背景透明
-    ui->quickWidget->setClearColor(QColor(Qt::transparent));
+    ui->videoWidget->hide();    
 }
 
 void VideoForm::initSignals()
@@ -178,7 +203,9 @@ void VideoForm::initSignals()
     // must be Qt::QueuedConnection, ui update must be main thread
     connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
         if (ui->videoWidget->isHidden()) {
-            ui->loadingWidget->close();
+            if (m_loadingWidget) {
+                m_loadingWidget->close();
+            }
             ui->videoWidget->show();
         }
         m_frames.lock();
