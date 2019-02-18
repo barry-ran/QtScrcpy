@@ -1,13 +1,12 @@
 // TODO mac: Qt::FramelessWindowHit full screen is abnormal
-限制鼠标移动抽象跨平台接口
+linux下限制鼠标移动
 Mac游戏时向右移动不流畅问题。
 工具栏扩展（模拟点击指定次数等）
 
 模拟点击改用手指(注意：辅助按键就都没了)
-中文输入
+中文输入（server需要改为apk，作为一个输入法，暂不实现）
 
-
-最后更新 7764a836f1ee02a4540cfc4118c20729018daaac
+最后更新scrcpy 7764a836f1ee02a4540cfc4118c20729018daaac
 
 
 mark:

@@ -94,8 +94,7 @@ win32 {
             -L$$PWD/../third_party/ffmpeg/lib -lavformat \
             -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
             -L$$PWD/../third_party/ffmpeg/lib -lavutil \
-            -L$$PWD/../third_party/ffmpeg/lib -lswscale \
-            -lUser32
+            -L$$PWD/../third_party/ffmpeg/lib -lswscale
 
     # windows rc file
     RC_FILE = $$PWD/res/QtScrcpy.rc
