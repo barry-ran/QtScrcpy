@@ -4,9 +4,6 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QPainter>
-#ifdef Q_OS_WIN32
-#include <Windows.h>
-#endif
 #ifdef USE_QTQUICK
 #include <QQuickWidget>
 #endif
@@ -21,9 +18,7 @@
 #include "toolform.h"
 #include "controlevent.h"
 #include "recorder.h"
-#ifdef Q_OS_OSX
-#include "cocoamousetap.h"
-#endif
+#include "mousetap/mousetap.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, QWidget *parent) :
     QWidget(parent),
@@ -141,22 +136,12 @@ void VideoForm::initSignals()
         }
     });
     connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
+
 #ifdef Q_OS_WIN32
-        if(grab) {
-            QRect rc(mapToGlobal(ui->videoWidget->pos())
-                     , ui->videoWidget->size());
-            RECT mainRect;
-            mainRect.left = (LONG)rc.left();
-            mainRect.right = (LONG)rc.right();
-            mainRect.top = (LONG)rc.top();
-            mainRect.bottom = (LONG)rc.bottom();
-            ClipCursor(&mainRect);
-        } else {
-            ClipCursor(Q_NULLPTR);
-        }
+        MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
 #endif
 #ifdef Q_OS_OSX
-        CocoaMouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
+        MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
 #endif
     });
     connect(m_server, &Server::serverStartResult, this, [this](bool success){

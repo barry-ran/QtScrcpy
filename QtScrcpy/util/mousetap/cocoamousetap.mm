@@ -111,8 +111,6 @@ static void SemaphorePostCallback(CFRunLoopTimerRef timer, void *info)
     }
 }
 
-CocoaMouseTap * CocoaMouseTap::s_instance = Q_NULLPTR;
-
 CocoaMouseTap::CocoaMouseTap(QObject *parent)
     : QThread(parent)
 {
@@ -125,14 +123,6 @@ CocoaMouseTap::~CocoaMouseTap()
         delete m_tapData;
         m_tapData = Q_NULLPTR;
     }
-}
-
-CocoaMouseTap *CocoaMouseTap::getInstance()
-{
-    if (s_instance == Q_NULLPTR) {
-        s_instance = new CocoaMouseTap();
-    }
-    return s_instance;
 }
 
 void CocoaMouseTap::initMouseEventTap()

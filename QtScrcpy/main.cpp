@@ -6,9 +6,7 @@
 
 #include "dialog.h"
 #include "decoder.h"
-#ifdef Q_OS_OSX
-#include "cocoamousetap.h"
-#endif
+#include "mousetap/mousetap.h"
 
 Dialog* g_mainDlg = Q_NULLPTR;
 
@@ -28,9 +26,7 @@ int main(int argc, char *argv[])
 
     installTranslator();
 
-#ifdef Q_OS_OSX
-    CocoaMouseTap::getInstance()->initMouseEventTap();
-#endif
+    MouseTap::getInstance()->initMouseEventTap();
 
 #ifdef Q_OS_WIN32
     qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/win/adb.exe");
@@ -57,9 +53,7 @@ int main(int argc, char *argv[])
 
     int ret = a.exec();
 
-#ifdef Q_OS_OSX
-    CocoaMouseTap::getInstance()->quitMouseEventTap();
-#endif
+    MouseTap::getInstance()->quitMouseEventTap();
     Decoder::deInit();
     return ret;
 }
