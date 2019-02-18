@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT += core gui
-QT += network quickwidgets
+QT += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,6 +24,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 #DEFINES += SKIP_FRAMES
+#DEFINES += USE_QTQUICK
+
+contains(DEFINES, USE_QTQUICK) {
+    QT += quickwidgets
+}
 
 # 源码
 SOURCES += \
