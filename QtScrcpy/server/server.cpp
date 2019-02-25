@@ -165,7 +165,9 @@ bool Server::connectTo()
     }
 
     // device server need time to start
-    QTimer::singleShot(600, this, [this](){
+    // TODO:电脑配置太低的话，这里有可能时间不够导致连接太早，安卓监听socket还没有建立
+    // 后续研究其他办法
+    QTimer::singleShot(1000, this, [this](){
         QString deviceName;
         QSize deviceSize;
         bool success = false;
