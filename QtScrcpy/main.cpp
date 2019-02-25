@@ -6,6 +6,7 @@
 
 #include "dialog.h"
 #include "decoder.h"
+#include "mousetap/mousetap.h"
 
 Dialog* g_mainDlg = Q_NULLPTR;
 
@@ -24,6 +25,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     installTranslator();
+
+    MouseTap::getInstance()->initMouseEventTap();
 
 #ifdef Q_OS_WIN32
     qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/win/adb.exe");
@@ -50,6 +53,7 @@ int main(int argc, char *argv[])
 
     int ret = a.exec();
 
+    MouseTap::getInstance()->quitMouseEventTap();
     Decoder::deInit();
     return ret;
 }

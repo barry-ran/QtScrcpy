@@ -24,6 +24,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
 
+    void showEvent(QShowEvent *event);
+    void hideEvent(QHideEvent *event);
+
 private slots:
     void on_fullScreenBtn_clicked();
 

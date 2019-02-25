@@ -413,9 +413,9 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
         m_mouseMoveLastConverPos.setY(m_mouseMoveLastConverPos.y() + distance.y() / m_showSize.height());
 
         if (m_mouseMoveLastConverPos.x() < 0.1
-                || m_mouseMoveLastConverPos.x() > 0.9
+                || m_mouseMoveLastConverPos.x() > 0.8
                 || m_mouseMoveLastConverPos.y() < 0.1
-                || m_mouseMoveLastConverPos.y() > 0.9) {
+                || m_mouseMoveLastConverPos.y() > 0.8) {
             mouseMoveStopTouch();
             mouseMoveStartTouch(from);
         }

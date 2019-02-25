@@ -4,10 +4,10 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QPainter>
-#ifdef Q_OS_WIN32
-#include <Windows.h>
-#endif
+#ifdef USE_QTQUICK
 #include <QQuickWidget>
+#endif
+#include <QtWidgets/QHBoxLayout>
 #include <QMimeData>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -18,6 +18,7 @@
 #include "toolform.h"
 #include "controlevent.h"
 #include "recorder.h"
+#include "mousetap/mousetap.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, QWidget *parent) :
     QWidget(parent),
@@ -73,27 +74,52 @@ VideoForm::~VideoForm()
 
 void VideoForm::initUI()
 {
+    setAttribute(Qt::WA_DeleteOnClose);
     QPixmap phone;
     if (phone.load(":/res/phone.png")) {
         m_widthHeightRatio = 1.0f * phone.width() / phone.height();
     }
 
-    setAttribute(Qt::WA_DeleteOnClose);
+#ifdef USE_QTQUICK
+    // qml animation
+    QWidget *loadingWidget;
+    QHBoxLayout *horizontalLayout;
+    QQuickWidget *quickWidget;
+    loadingWidget = new QWidget(this);
+    loadingWidget->setObjectName(QStringLiteral("loadingWidget"));
+    loadingWidget->setAutoFillBackground(false);
+    loadingWidget->setStyleSheet(QStringLiteral(""));
+    loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
+    m_loadingWidget = loadingWidget;
+    horizontalLayout = new QHBoxLayout(loadingWidget);
+    horizontalLayout->setSpacing(0);
+    horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+    horizontalLayout->setContentsMargins(0, 0, 0, 0);
+    quickWidget = new QQuickWidget(loadingWidget);
+    quickWidget->setObjectName(QStringLiteral("quickWidget"));
+    quickWidget->setAutoFillBackground(false);
+    quickWidget->setStyleSheet(QStringLiteral(""));
+    quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+    quickWidget->setSource(QUrl(QStringLiteral("qrc:/qml/pinwheel.qml")));
+    // 最后绘制，不设置最后绘制会影响父窗体异形异常（quickWidget的透明通道会形成穿透）
+    quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
+    // 背景透明
+    quickWidget->setClearColor(QColor(Qt::transparent));
+    horizontalLayout->addWidget(quickWidget);
+    ui->verticalLayout->addWidget(loadingWidget);
+#endif
 
+    // mac下去掉标题栏影响showfullscreen
+#ifndef Q_OS_OSX
     // 去掉标题栏
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     // 根据图片构造异形窗口
     setAttribute(Qt::WA_TranslucentBackground);
+#endif
 
-    setMouseTracking(true);
-    ui->loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
+    setMouseTracking(true);    
     ui->videoWidget->setMouseTracking(true);
-    ui->videoWidget->hide();
-
-    // 最后绘制，不设置最后绘制会影响父窗体异形异常（quickWidget的透明通道会形成穿透）
-    ui->quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
-    // 背景透明
-    ui->quickWidget->setClearColor(QColor(Qt::transparent));
+    ui->videoWidget->hide();    
 }
 
 void VideoForm::initSignals()
@@ -110,19 +136,12 @@ void VideoForm::initSignals()
         }
     });
     connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
+
 #ifdef Q_OS_WIN32
-        if(grab) {
-            QRect rc(mapToGlobal(ui->videoWidget->pos())
-                     , ui->videoWidget->size());
-            RECT mainRect;
-            mainRect.left = (LONG)rc.left();
-            mainRect.right = (LONG)rc.right();
-            mainRect.top = (LONG)rc.top();
-            mainRect.bottom = (LONG)rc.bottom();
-            ClipCursor(&mainRect);
-        } else {
-            ClipCursor(Q_NULLPTR);
-        }
+        MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
+#endif
+#ifdef Q_OS_OSX
+        MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
 #endif
     });
     connect(m_server, &Server::serverStartResult, this, [this](bool success){
@@ -137,7 +156,6 @@ void VideoForm::initSignals()
         if (success) {
             float diff = m_startTimeCount.elapsed() / 1000.0f;
             qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
-
 
             // update ui
             setWindowTitle(deviceName);
@@ -170,7 +188,9 @@ void VideoForm::initSignals()
     // must be Qt::QueuedConnection, ui update must be main thread
     connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
         if (ui->videoWidget->isHidden()) {
-            ui->loadingWidget->close();
+            if (m_loadingWidget) {
+                m_loadingWidget->close();
+            }
             ui->videoWidget->show();
         }
         m_frames.lock();
@@ -257,9 +277,10 @@ void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
+
 #ifdef Q_OS_OSX
-        setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-        show();
+        //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+        //show();
 #endif
         updateStyleSheet(height() > width());
         showToolFrom(true);
@@ -267,9 +288,10 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
+        // 这种临时增加标题栏再全屏的方案会导致收不到mousemove事件，导致setmousetrack失效
         // mac fullscreen must show title bar
 #ifdef Q_OS_OSX
-        setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
+        //setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
 #endif
         showToolFrom(false);
         layout()->setContentsMargins(0, 0, 0, 0);
@@ -410,6 +432,7 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
             && isFullScreen()) {
         switchFullScreen();
     }
+
     //qDebug() << "keyPressEvent" << event->isAutoRepeat();
     m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
@@ -432,7 +455,9 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 void VideoForm::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
-    showToolFrom();
+    if (!isFullScreen()) {
+        showToolFrom();
+    }
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)

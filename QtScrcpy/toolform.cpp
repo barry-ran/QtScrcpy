@@ -1,4 +1,7 @@
 #include <QMouseEvent>
+#include <QDebug>
+#include <QShowEvent>
+#include <QHideEvent>
 
 #include "toolform.h"
 #include "ui_toolform.h"
@@ -56,6 +59,16 @@ void ToolForm::mouseMoveEvent(QMouseEvent *event)
         move(event->globalPos() - m_dragPosition);
         event->accept();
     }
+}
+
+void ToolForm::showEvent(QShowEvent *event)
+{
+    qDebug() << "show event";
+}
+
+void ToolForm::hideEvent(QHideEvent *event)
+{
+    qDebug() << "hide event";
 }
 
 void ToolForm::on_fullScreenBtn_clicked()
