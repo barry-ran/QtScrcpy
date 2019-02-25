@@ -9,9 +9,10 @@ Image {
         RotationAnimation {
             id:rotationAnimation
             target: wheel
-            to:360000
+            to:360
             direction: RotationAnimation.Clockwise
-            duration: 800000
+            duration: 800
+            loops:Animation.Infinite
         }
 
         onStatusChanged: if (wheel.status == Image.Ready) rotationAnimation.start()

@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT += core gui
-QT += network quickwidgets
+QT += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,6 +24,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 #DEFINES += SKIP_FRAMES
+#DEFINES += USE_QTQUICK
+
+contains(DEFINES, USE_QTQUICK) {
+    QT += quickwidgets
+}
 
 # 源码
 SOURCES += \
@@ -54,6 +59,7 @@ include ($$PWD/uibase/uibase.pri)
 include ($$PWD/fontawesome/fontawesome.pri)
 include ($$PWD/filehandler/filehandler.pri)
 include ($$PWD/recorder/recorder.pri)
+include ($$PWD/util/util.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
@@ -68,6 +74,7 @@ INCLUDEPATH += \
         $$PWD/uibase \
         $$PWD/filehandler \
         $$PWD/recorder \
+        $$PWD/util \
         $$PWD/fontawesome
 
 
@@ -87,8 +94,7 @@ win32 {
             -L$$PWD/../third_party/ffmpeg/lib -lavformat \
             -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
             -L$$PWD/../third_party/ffmpeg/lib -lavutil \
-            -L$$PWD/../third_party/ffmpeg/lib -lswscale \
-            -lUser32
+            -L$$PWD/../third_party/ffmpeg/lib -lswscale
 
     # windows rc file
     RC_FILE = $$PWD/res/QtScrcpy.rc
