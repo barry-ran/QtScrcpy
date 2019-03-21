@@ -9,11 +9,10 @@ struct MouseEventTapData;
 class QWidget;
 class CocoaMouseTap : public MouseTap, public QThread
 {
-private:
+public:
     CocoaMouseTap(QObject *parent = Q_NULLPTR);
     virtual ~CocoaMouseTap();
 
-public:
     void initMouseEventTap() override;
     void quitMouseEventTap() override;
     void enableMouseEventTap(QWidget* widget, bool enabled) override;
