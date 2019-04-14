@@ -122,6 +122,10 @@ void Dialog::on_wirelessConnectBtn_clicked()
         return;
     }
     QString addr = ui->deviceIpEdt->text().trimmed();
+    if (!ui->devicePortEdt->placeholderText().isEmpty()) {
+        addr += ":";
+        addr += ui->devicePortEdt->placeholderText().trimmed();
+    }
     if (!ui->devicePortEdt->text().isEmpty()) {
         addr += ":";
         addr += ui->devicePortEdt->text().trimmed();
