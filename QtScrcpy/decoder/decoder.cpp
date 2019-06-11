@@ -382,9 +382,12 @@ runQuit:
     if (m_recorder) {
         m_recorder->close();
     }
+    if (decoderBuffer) {
+        av_free(decoderBuffer);
+    }
     if (avioCtx) {
         av_freep(&avioCtx);
-    }
+    }    
     if (formatCtx && isFormatCtxOpen) {
         avformat_close_input(&formatCtx);
     }
