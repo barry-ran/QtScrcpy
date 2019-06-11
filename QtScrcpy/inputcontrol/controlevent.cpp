@@ -17,7 +17,7 @@ void ControlEvent::setKeycodeEventData(AndroidKeyeventAction action, AndroidKeyc
 
 void ControlEvent::setTextEventData(QString text)
 {
-    // write length (2 byte) + date (non nul-terminated)
+    // write length (2 byte) + string (non nul-terminated)
     if (TEXT_MAX_CHARACTER_LENGTH < text.length()) {
         // injecting a text takes time, so limit the text length
         text = text.left(TEXT_MAX_CHARACTER_LENGTH);
