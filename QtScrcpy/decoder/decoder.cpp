@@ -22,14 +22,44 @@ Decoder::~Decoder()
 
 }
 
+static void avLogCallback(void *avcl, int level, const char *fmt, va_list vl) {
+    Q_UNUSED(avcl);
+    Q_UNUSED(vl);
+
+    QString localFmt = QString::fromUtf8(fmt);
+    localFmt.prepend("[FFmpeg] ");
+    switch (level) {
+    case AV_LOG_PANIC:
+    case AV_LOG_FATAL:
+        qFatal(localFmt.toUtf8());
+        break;
+    case AV_LOG_ERROR:
+        qCritical(localFmt.toUtf8());
+        break;
+    case AV_LOG_WARNING:
+        qWarning(localFmt.toUtf8());
+        break;
+    case AV_LOG_INFO:
+        qInfo(localFmt.toUtf8());
+        break;
+    case AV_LOG_DEBUG:
+        //qDebug(localFmt.toUtf8());
+        break;
+    }
+
+    // do not forward others, which are too verbose
+    return;
+}
+
 bool Decoder::init()
 {
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)
     av_register_all();
-#endif
+#endif    
     if (avformat_network_init()) {
         return false;
     }
+    av_log_set_callback(avLogCallback);
     return true;
 }
 
