@@ -2,6 +2,16 @@
 
 #include "recorder.h"
 
+// In ffmpeg/doc/APIchanges:
+// 2016-04-11 - 6f69f7a / 9200514 - lavf 57.33.100 / 57.5.0 - avformat.h
+//   Add AVStream.codecpar, deprecate AVStream.codec.
+#if    (LIBAVFORMAT_VERSION_MICRO >= 100 /* FFmpeg */ && \
+        LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)) \
+    || (LIBAVFORMAT_VERSION_MICRO < 100 && /* Libav */ \
+        LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 5, 0))
+# define LAVF_NEW_CODEC_API
+#endif
+
 Recorder::Recorder(const QString& fileName)
     : m_fileName(fileName)
 {
@@ -46,13 +56,7 @@ bool Recorder::open(AVCodec *inputCodec)
         return false;
     }
 
-    // In ffmpeg/doc/APIchanges:
-    // 2016-04-11 - 6f69f7a / 9200514 - lavf 57.33.100 / 57.5.0 - avformat.h
-    // Add AVStream.codecpar, deprecate AVStream.codec.
-#if (LIBAVFORMAT_VERSION_MICRO >= 100 /* FFmpeg */ && \
-    LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)) \
-    || (LIBAVFORMAT_VERSION_MICRO < 100 && /* Libav */ \
-    LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 5, 0))
+#ifdef LAVF_NEW_CODEC_API
     outStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     outStream->codecpar->codec_id = inputCodec->id;
     outStream->codecpar->format = AV_PIX_FMT_YUV420P;
@@ -79,16 +83,7 @@ bool Recorder::open(AVCodec *inputCodec)
         avformat_free_context(m_formatCtx);
         m_formatCtx = Q_NULLPTR;
         return false;
-    }
-
-    ret = avformat_write_header(m_formatCtx, Q_NULLPTR);
-    if (ret < 0) {
-        qCritical(QString("Failed to write header to %1").arg(m_fileName).toUtf8().toStdString().c_str());
-        avio_closep(&m_formatCtx->pb);
-        avformat_free_context(m_formatCtx);
-        m_formatCtx = Q_NULLPTR;
-        return false;
-    }
+    }    
 
     return true;
 }
@@ -110,6 +105,13 @@ void Recorder::close()
 
 bool Recorder::write(AVPacket *packet)
 {
+    if (!m_headerWritten) {
+        bool ok = recorderWriteHeader(packet);
+        if (!ok) {
+            return false;
+        }
+        m_headerWritten = true;
+    }
     return av_write_frame(m_formatCtx, packet) >= 0;
 }
 
@@ -128,4 +130,34 @@ const AVOutputFormat *Recorder::findMp4Muxer()
         // until null or with name "mp4"
     } while (outFormat && strcmp(outFormat->name, "mp4"));
     return outFormat;
+}
+
+bool Recorder::recorderWriteHeader(AVPacket *packet)
+{
+    AVStream *ostream = m_formatCtx->streams[0];
+    quint8* extradata = (quint8*)av_malloc(packet->size * sizeof(quint8));
+    if (!extradata) {
+        qCritical("Cannot allocate extradata");
+        return false;
+    }
+    // copy the first packet to the extra data
+    memcpy(extradata, packet->data, packet->size);
+
+#ifdef LAVF_NEW_CODEC_API
+    ostream->codecpar->extradata = extradata;
+    ostream->codecpar->extradata_size = packet->size;
+#else
+    ostream->codec->extradata = extradata;
+    ostream->codec->extradata_size = packet->size;
+#endif
+
+    int ret = avformat_write_header(m_formatCtx, NULL);
+    if (ret < 0) {
+        qCritical("Failed to write header recorder file");
+        free(extradata);
+        avio_close(m_formatCtx->pb);
+        avformat_free_context(m_formatCtx);
+        return false;
+    }
+    return true;
 }
