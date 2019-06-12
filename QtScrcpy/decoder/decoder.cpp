@@ -411,11 +411,9 @@ void Decoder::run()
 runQuit:
     if (m_recorder) {
         m_recorder->close();
-    }
-    if (decoderBuffer) {
-        av_free(decoderBuffer);
-    }
+    }    
     if (avioCtx) {
+        av_free(avioCtx->buffer);
         av_freep(&avioCtx);
     }    
     if (formatCtx && isFormatCtxOpen) {
