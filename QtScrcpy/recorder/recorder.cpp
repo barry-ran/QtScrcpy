@@ -12,6 +12,8 @@
 # define LAVF_NEW_CODEC_API
 #endif
 
+static const AVRational SCRCPY_TIME_BASE = {1, 1000000}; // timestamps in us
+
 Recorder::Recorder(const QString& fileName)
     : m_fileName(fileName)
 {
@@ -68,10 +70,7 @@ bool Recorder::open(AVCodec *inputCodec)
     outStream->codec->pix_fmt = AV_PIX_FMT_YUV420P;
     outStream->codec->width = m_declaredFrameSize.width();
     outStream->codec->height = m_declaredFrameSize.height();
-#endif
-    // timestamps in us
-    outStream->time_base.num = 1;
-    outStream->time_base.den = 1000000;
+#endif    
 
     int ret = avio_open(&m_formatCtx->pb, m_fileName.toUtf8().toStdString().c_str(),
                         AVIO_FLAG_WRITE);
@@ -112,6 +111,7 @@ bool Recorder::write(AVPacket *packet)
         }
         m_headerWritten = true;
     }
+    recorderRescalePacket(packet);
     return av_write_frame(m_formatCtx, packet) >= 0;
 }
 
@@ -160,4 +160,10 @@ bool Recorder::recorderWriteHeader(AVPacket *packet)
         return false;
     }
     return true;
+}
+
+void Recorder::recorderRescalePacket(AVPacket *packet)
+{
+    AVStream *ostream = m_formatCtx->streams[0];
+    av_packet_rescale_ts(packet, SCRCPY_TIME_BASE, ostream->time_base);
 }

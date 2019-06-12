@@ -22,6 +22,7 @@ public:
 private:
     const AVOutputFormat* findMp4Muxer();
     bool recorderWriteHeader(AVPacket* packet);
+    void recorderRescalePacket(AVPacket *packet);
 
 private:
     QString m_fileName = "";
