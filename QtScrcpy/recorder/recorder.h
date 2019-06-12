@@ -21,11 +21,13 @@ public:
 
 private:
     const AVOutputFormat* findMp4Muxer();
+    bool recorderWriteHeader(AVPacket* packet);
 
 private:
     QString m_fileName = "";
     AVFormatContext* m_formatCtx = Q_NULLPTR;
     QSize m_declaredFrameSize;
+    bool m_headerWritten = false;
 };
 
 #endif // RECORDER_H
