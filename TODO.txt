@@ -8,7 +8,9 @@ Mac游戏时向右移动不流畅问题。
 
 最后更新scrcpy 7764a836f1ee02a4540cfc4118c20729018daaac
 
+TODO b35733edb6df2a00b6af9b1c98627d344c377963 鼠标事件相关系列
 
+video window always_on_top options
 mark:
 
 ffmpeg编译参数详解
