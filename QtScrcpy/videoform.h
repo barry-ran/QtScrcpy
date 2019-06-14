@@ -44,7 +44,7 @@ private:
     void initUI();
     void initSignals();
     void showToolFrom(bool show = true);
-    void postKeyCodeClick(AndroidKeycode keycode);
+    void postKeyCodeClick(AndroidKeycode keycode);    
 
 protected:
     void mousePressEvent(QMouseEvent *event);
