@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QTime>
 
+#include "compat.h"
 #include "decoder.h"
 #include "frames.h"
 #include "devicesocket.h"
@@ -53,7 +54,7 @@ static void avLogCallback(void *avcl, int level, const char *fmt, va_list vl) {
 
 bool Decoder::init()
 {
-#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT(58, 9, 100)
+#ifdef QTSCRCPY_LAVF_REQUIRES_REGISTER_ALL
     av_register_all();
 #endif    
     if (avformat_network_init()) {
@@ -325,7 +326,7 @@ void Decoder::run()
         AVFrame* decodingFrame = m_frames->decodingFrame();
         // the new decoding/encoding API has been introduced by:
         // <http://git.videolan.org/?p=ffmpeg.git;a=commitdiff;h=7fc329e2dd6226dfecaa4a1d7adf353bf2773726>
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT(57, 37, 0)
+#ifdef QTSCRCPY_LAVF_HAS_NEW_ENCODING_DECODING_API
         int ret;
         if ((ret = avcodec_send_packet(codecCtx, &packet)) < 0) {
             char errorbuf[255] = { 0 };
@@ -371,7 +372,7 @@ void Decoder::run()
             int gotPicture = 0;
             int len = -1;
             if (decodingFrame) {
-                len = avcodec_decode_video2(codecCtx, decodingFrame, &gotpicture, &packet);
+                len = avcodec_decode_video2(codecCtx, decodingFrame, &gotPicture, &packet);
             }
             if (len < 0) {
                 qCritical("Could not decode video packet: %d", len);

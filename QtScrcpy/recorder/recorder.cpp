@@ -1,17 +1,8 @@
 #include <QDebug>
 #include <QFileInfo>
 
+#include "compat.h"
 #include "recorder.h"
-
-// In ffmpeg/doc/APIchanges:
-// 2016-04-11 - 6f69f7a / 9200514 - lavf 57.33.100 / 57.5.0 - avformat.h
-//   Add AVStream.codecpar, deprecate AVStream.codec.
-#if    (LIBAVFORMAT_VERSION_MICRO >= 100 /* FFmpeg */ && \
-        LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 33, 100)) \
-    || (LIBAVFORMAT_VERSION_MICRO < 100 && /* Libav */ \
-        LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(57, 5, 0))
-# define LAVF_NEW_CODEC_API
-#endif
 
 static const AVRational SCRCPY_TIME_BASE = {1, 1000000}; // timestamps in us
 
@@ -67,7 +58,7 @@ bool Recorder::open(AVCodec *inputCodec)
         return false;
     }
 
-#ifdef LAVF_NEW_CODEC_API
+#ifdef QTSCRCPY_LAVF_HAS_NEW_CODEC_PARAMS_API
     outStream->codecpar->codec_type = AVMEDIA_TYPE_VIDEO;
     outStream->codecpar->codec_id = inputCodec->id;
     outStream->codecpar->format = AV_PIX_FMT_YUV420P;
@@ -126,12 +117,12 @@ bool Recorder::write(AVPacket *packet)
 
 const AVOutputFormat *Recorder::findMuxer(const char* name)
 {
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 9, 100)
+#ifdef QTSCRCPY_LAVF_HAS_NEW_MUXER_ITERATOR_API
     void* opaque = Q_NULLPTR;
 #endif
     const AVOutputFormat* outFormat = Q_NULLPTR;
     do {
-#if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 9, 100)
+#ifdef QTSCRCPY_LAVF_HAS_NEW_MUXER_ITERATOR_API
         outFormat = av_muxer_iterate(&opaque);
 #else
         outFormat = av_oformat_next(outFormat);
@@ -152,7 +143,7 @@ bool Recorder::recorderWriteHeader(AVPacket *packet)
     // copy the first packet to the extra data
     memcpy(extradata, packet->data, packet->size);
 
-#ifdef LAVF_NEW_CODEC_API
+#ifdef QTSCRCPY_LAVF_HAS_NEW_CODEC_PARAMS_API
     ostream->codecpar->extradata = extradata;
     ostream->codecpar->extradata_size = packet->size;
 #else
