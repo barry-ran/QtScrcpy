@@ -27,8 +27,10 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     m_maxSize(maxSize),
     m_bitRate(bitRate)
 {    
-    ui->setupUi(this);    
+    ui->setupUi(this);
     initUI();
+
+    setWindowFlag(Qt::WindowStaysOnTopHint);
 
     m_server = new Server();
     m_frames.init();

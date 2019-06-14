@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>639</width>
+    <width>685</width>
     <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>520</width>
+    <width>685</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>639</width>
+    <width>685</width>
     <height>16777215</height>
    </size>
   </property>
@@ -168,7 +168,7 @@
       <item row="0" column="4">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>format：</string>
+         <string>record format：</string>
         </property>
        </widget>
       </item>
