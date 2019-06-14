@@ -13,11 +13,11 @@
 #include <QMessageBox>
 
 #include "videoform.h"
+#include "recorder.h"
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
 #include "controlevent.h"
-#include "recorder.h"
 #include "mousetap/mousetap.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, QWidget *parent) :

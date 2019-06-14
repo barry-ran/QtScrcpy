@@ -74,6 +74,10 @@ void Dialog::initUI()
     ui->videoSizeBox->addItem("1080");
     ui->videoSizeBox->addItem("native");
     ui->videoSizeBox->setCurrentIndex(1);
+
+    ui->formatBox->addItem("mp4");
+    ui->formatBox->addItem("mkv");
+    ui->videoSizeBox->setCurrentIndex(0);
 }
 
 void Dialog::on_updateDevice_clicked()
@@ -92,8 +96,9 @@ void Dialog::on_startServerBtn_clicked()
         QString fileDir(ui->recordPathEdt->text().trimmed());
         if (!fileDir.isEmpty()) {
             QDateTime dateTime = QDateTime::currentDateTime();
-            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss.zzz");
-            fileName = windowTitle() + fileName + ".mp4";
+            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
+            QString ext = ui->formatBox->currentText().trimmed();
+            fileName = windowTitle() + fileName + "." + ext;
             QDir dir(fileDir);
             absFilePath = dir.absoluteFilePath(fileName);
         }

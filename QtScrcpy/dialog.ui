@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>502</width>
+    <width>639</width>
     <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>502</width>
+    <width>520</width>
     <height>0</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>502</width>
+    <width>639</width>
     <height>16777215</height>
    </size>
   </property>
@@ -158,10 +158,31 @@
       <string>Config</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>record save path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>format：</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="3">
        <widget class="QComboBox" name="videoSizeBox">
         <property name="toolTip">
          <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>bit rate:</string>
         </property>
        </widget>
       </item>
@@ -182,28 +203,17 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>bit rate:</string>
-        </property>
-       </widget>
+      <item row="0" column="5">
+       <widget class="QComboBox" name="formatBox"/>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>record save path:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" colspan="2">
+      <item row="1" column="1" colspan="3">
        <widget class="QLineEdit" name="recordPathEdt">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
+      <item row="1" column="4" colspan="2">
        <widget class="QPushButton" name="selectRecordPathBtn">
         <property name="text">
          <string>select path</string>

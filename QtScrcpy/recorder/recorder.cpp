@@ -1,4 +1,5 @@
 #include <QDebug>
+#include <QFileInfo>
 
 #include "recorder.h"
 
@@ -16,6 +17,7 @@ static const AVRational SCRCPY_TIME_BASE = {1, 1000000}; // timestamps in us
 
 Recorder::Recorder(const QString& fileName)
     : m_fileName(fileName)
+    , m_format(guessRecordFormat(fileName))
 {
 
 }
@@ -30,11 +32,18 @@ void Recorder::setFrameSize(const QSize &declaredFrameSize)
     m_declaredFrameSize = declaredFrameSize;
 }
 
+void Recorder::setFormat(Recorder::RecorderFormat format)
+{
+    m_format = format;
+}
+
 bool Recorder::open(AVCodec *inputCodec)
 {
-    const AVOutputFormat* mp4 = findMp4Muxer();
-    if (!mp4) {
-        qCritical("Could not find mp4 muxer");
+    QString formatName = recorderGetFormatName(m_format);
+    Q_ASSERT(!formatName.isEmpty());
+    const AVOutputFormat* format = findMuxer(formatName.toUtf8());
+    if (!format) {
+        qCritical("Could not find muxer");
         return false;
     }
 
@@ -49,7 +58,7 @@ bool Recorder::open(AVCodec *inputCodec)
     // still expects a pointer-to-non-const (it has not be updated accordingly)
     // <https://github.com/FFmpeg/FFmpeg/commit/0694d8702421e7aff1340038559c438b61bb30dd>
 
-    m_formatCtx->oformat = (AVOutputFormat*)mp4;
+    m_formatCtx->oformat = (AVOutputFormat*)format;
 
     AVStream* outStream = avformat_new_stream(m_formatCtx, inputCodec);
     if (!outStream) {
@@ -115,7 +124,7 @@ bool Recorder::write(AVPacket *packet)
     return av_write_frame(m_formatCtx, packet) >= 0;
 }
 
-const AVOutputFormat *Recorder::findMp4Muxer()
+const AVOutputFormat *Recorder::findMuxer(const char* name)
 {
 #if LIBAVFORMAT_VERSION_INT >= AV_VERSION_INT(58, 9, 100)
     void* opaque = Q_NULLPTR;
@@ -127,8 +136,8 @@ const AVOutputFormat *Recorder::findMp4Muxer()
 #else
         outFormat = av_oformat_next(outFormat);
 #endif
-        // until null or with name "mp4"
-    } while (outFormat && strcmp(outFormat->name, "mp4"));
+        // until null or with name "name"
+    } while (outFormat && strcmp(outFormat->name, name));
     return outFormat;
 }
 
@@ -166,4 +175,30 @@ void Recorder::recorderRescalePacket(AVPacket *packet)
 {
     AVStream *ostream = m_formatCtx->streams[0];
     av_packet_rescale_ts(packet, SCRCPY_TIME_BASE, ostream->time_base);
+}
+
+QString Recorder::recorderGetFormatName(Recorder::RecorderFormat format)
+{
+    switch (format) {
+    case RECORDER_FORMAT_MP4: return "mp4";
+    case RECORDER_FORMAT_MKV: return "matroska";
+    default: return "";
+    }
+}
+
+Recorder::RecorderFormat Recorder::guessRecordFormat(const QString &fileName)
+{
+    if (4 > fileName.length()) {
+        return Recorder::RECORDER_FORMAT_NULL;
+    }
+    QFileInfo fileInfo = QFileInfo(fileName);
+    QString ext = fileInfo.suffix();
+    if (0 == ext.compare("mp4")) {
+        return Recorder::RECORDER_FORMAT_MP4;
+    }
+    if (0 == ext.compare("mkv")) {
+        return Recorder::RECORDER_FORMAT_MKV;
+    }
+
+    return Recorder::RECORDER_FORMAT_NULL;
 }
