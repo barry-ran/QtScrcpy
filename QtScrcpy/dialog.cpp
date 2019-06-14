@@ -77,7 +77,6 @@ void Dialog::initUI()
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
-    ui->videoSizeBox->setCurrentIndex(0);
 }
 
 void Dialog::on_updateDevice_clicked()
