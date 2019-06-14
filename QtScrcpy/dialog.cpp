@@ -106,6 +106,9 @@ void Dialog::on_startServerBtn_clicked()
         // this is ok that "native" toUshort is 0
         quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
         m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate, absFilePath);
+        if (ui->alwaysTopCheck->isChecked()) {
+            m_videoForm->staysOnTop();
+        }
 
         outLog("start server...", false);
     }
@@ -221,4 +224,17 @@ void Dialog::on_selectRecordPathBtn_clicked()
 void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
 {
     ui->recordPathEdt->setToolTip(arg1);
+}
+
+void Dialog::on_alwaysTopCheck_stateChanged(int arg1)
+{
+    if (!m_videoForm) {
+        return;
+    }
+
+    if (Qt::Checked == arg1) {
+        m_videoForm->staysOnTop(true);
+    } else {
+        m_videoForm->staysOnTop(false);
+    }
 }

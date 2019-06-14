@@ -38,6 +38,8 @@ public:
     void postTurnOn();
     void postTextInput(const QString& text);
 
+    void staysOnTop(bool top = true);
+
 private:
     void updateShowSize(const QSize &newSize);
     void updateStyleSheet(bool vertical);
