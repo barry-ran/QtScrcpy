@@ -28,9 +28,7 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     m_bitRate(bitRate)
 {    
     ui->setupUi(this);
-    initUI();
-
-    setWindowFlag(Qt::WindowStaysOnTopHint);
+    initUI();    
 
     m_server = new Server();
     m_frames.init();
@@ -354,6 +352,22 @@ void VideoForm::postTextInput(const QString& text)
     }
     controlEvent->setTextEventData(text);
     m_inputConvert.sendControlEvent(controlEvent);
+}
+
+void VideoForm::staysOnTop(bool top)
+{
+    bool needShow = false;
+    if (isVisible()) {
+        needShow = true;
+    }
+    if (top) {
+        setWindowFlag(Qt::WindowStaysOnTopHint);
+    } else {
+        setWindowFlag(Qt::WindowStaysOnTopHint, false);
+    }
+    if (needShow) {
+        show();
+    }
 }
 
 void VideoForm::postGoHome()

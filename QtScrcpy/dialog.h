@@ -41,6 +41,8 @@ private slots:
 
     void on_recordPathEdt_textChanged(const QString &arg1);
 
+    void on_alwaysTopCheck_stateChanged(int arg1);
+
 private:
     bool checkAdbRun();
     void initUI();
