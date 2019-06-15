@@ -235,7 +235,7 @@ void Decoder::stopDecode()
 {
     m_quit = true;
     if (m_vb) {
-        m_vb->stop();
+        m_vb->interrupt();
     }
     wait();
 }
