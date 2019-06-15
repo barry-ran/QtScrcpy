@@ -33,7 +33,7 @@ public:
     const AVFrame* consumeRenderedFrame();
 
     // wake up and avoid any blocking call
-    void stop();
+    void interrupt();
 
 private:
     void swap();
@@ -47,7 +47,7 @@ private:
 
 #ifndef SKIP_FRAMES
     QWaitCondition m_renderingFrameConsumedCond;
-    bool m_stopped = true;    
+    bool m_interrupted = true;
 #endif
 };
 

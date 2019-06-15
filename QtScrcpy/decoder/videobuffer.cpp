@@ -74,7 +74,7 @@ bool VideoBuffer::offerDecodedFrame()
 #ifndef SKIP_FRAMES
     // if SKIP_FRAMES is disabled, then the decoder must wait for the current
     // frame to be consumed
-    while (!m_renderingFrameConsumed && !m_stopped) {
+    while (!m_renderingFrameConsumed && !m_interrupted) {
         m_renderingFrameConsumedCond.wait(&m_mutex);
     }    
 #else
@@ -105,11 +105,11 @@ const AVFrame *VideoBuffer::consumeRenderedFrame()
     return m_renderingframe;
 }
 
-void VideoBuffer::stop()
+void VideoBuffer::interrupt()
 {
 #ifndef SKIP_FRAMES
     m_mutex.lock();
-    m_stopped = true;
+    m_interrupted = true;
     m_mutex.unlock();
     // wake up blocking wait
     m_renderingFrameConsumedCond.wakeOne();
