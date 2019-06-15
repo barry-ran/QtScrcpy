@@ -340,7 +340,27 @@ void VideoForm::postTurnOn()
     if (!controlEvent) {
         return;
     }
-    controlEvent->setCommandEventData(CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON);
+    controlEvent->setCommandEventData(ControlEvent::CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON);
+    m_inputConvert.sendControlEvent(controlEvent);
+}
+
+void VideoForm::expandNotificationPanel()
+{
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COMMAND);
+    if (!controlEvent) {
+        return;
+    }
+    controlEvent->setCommandEventData(ControlEvent::CONTROL_EVENT_COMMAND_EXPAND_NOTIFICATION_PANEL);
+    m_inputConvert.sendControlEvent(controlEvent);
+}
+
+void VideoForm::collapseNotificationPanel()
+{
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COMMAND);
+    if (!controlEvent) {
+        return;
+    }
+    controlEvent->setCommandEventData(ControlEvent::CONTROL_EVENT_COMMAND_COLLAPSE_NOTIFICATION_PANEL);
     m_inputConvert.sendControlEvent(controlEvent);
 }
 
@@ -360,10 +380,9 @@ void VideoForm::staysOnTop(bool top)
     if (isVisible()) {
         needShow = true;
     }
-    if (top) {
-        setWindowFlag(Qt::WindowStaysOnTopHint);
-    } else {
-        setWindowFlag(Qt::WindowStaysOnTopHint, false);
+    setWindowFlag(Qt::WindowStaysOnTopHint, top);
+    if (m_toolForm) {
+        m_toolForm->setWindowFlag(Qt::WindowStaysOnTopHint, top);
     }
     if (needShow) {
         show();

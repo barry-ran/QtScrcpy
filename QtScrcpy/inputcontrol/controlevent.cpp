@@ -48,7 +48,7 @@ void ControlEvent::setScrollEventData(QRect position, qint32 hScroll, qint32 vSc
     m_data.scrollEvent.vScroll = vScroll;
 }
 
-void ControlEvent::setCommandEventData(qint32 action)
+void ControlEvent::setCommandEventData(ControlEventCommand action)
 {
     m_data.commandEvent.action = action;
 }
