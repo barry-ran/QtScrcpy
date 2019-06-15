@@ -367,23 +367,19 @@ void Decoder::run()
             av_packet_unref(&packet);
             goto runQuit;
         }
-#else
-        while (packet.size > 0) {
-            int gotPicture = 0;
-            int len = -1;
-            if (decodingFrame) {
-                len = avcodec_decode_video2(codecCtx, decodingFrame, &gotPicture, &packet);
-            }
-            if (len < 0) {
-                qCritical("Could not decode video packet: %d", len);
-                av_packet_unref(&packet);
-                goto runQuit;
-            }
-            if (gotPicture) {
-                pushFrame();
-            }
-            packet.size -= len;
-            packet.data += len;
+#else        
+        int gotPicture = 0;
+        int len = -1;
+        if (decodingFrame) {
+            len = avcodec_decode_video2(codecCtx, decodingFrame, &gotPicture, &packet);
+        }
+        if (len < 0) {
+            qCritical("Could not decode video packet: %d", len);
+            av_packet_unref(&packet);
+            goto runQuit;
+        }
+        if (gotPicture) {
+            pushFrame();
         }
 #endif
         if (m_recorder) {
