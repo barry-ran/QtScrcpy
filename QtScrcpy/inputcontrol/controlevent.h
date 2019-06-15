@@ -9,13 +9,11 @@
 #include "input.h"
 #include "keycodes.h"
 
-#define CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON 0
-
 #define TEXT_MAX_CHARACTER_LENGTH 300
 // ControlEvent
 class ControlEvent : public QScrcpyEvent
 {
-public:
+public:    
     enum ControlEventType {
         CET_KEYCODE,
         CET_TEXT,
@@ -23,7 +21,13 @@ public:
         CET_SCROLL,
         CET_COMMAND,
         CET_TOUCH,
-    };   
+    };
+
+    enum ControlEventCommand {
+        CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON = 0,
+        CONTROL_EVENT_COMMAND_EXPAND_NOTIFICATION_PANEL,
+        CONTROL_EVENT_COMMAND_COLLAPSE_NOTIFICATION_PANEL,
+    };
 
     ControlEvent(ControlEventType controlEventType);
 
@@ -35,7 +39,7 @@ public:
     // position action动作对应的位置
     void setTouchEventData(quint32 id, AndroidMotioneventAction action, QRect position);
     void setScrollEventData(QRect position, qint32 hScroll, qint32 vScroll);
-    void setCommandEventData(qint32 action);
+    void setCommandEventData(ControlEvent::ControlEventCommand action);
 
     QByteArray serializeData();
 
@@ -72,7 +76,7 @@ private:
                 qint32 vScroll;
             } scrollEvent;
             struct {
-                qint32 action;
+                ControlEventCommand action;
             } commandEvent;
         };
 

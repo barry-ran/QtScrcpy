@@ -38,6 +38,7 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->volumeUpBtn, QChar(0xf028), 15);
     IconHelper::Instance()->SetIcon(ui->volumeDownBtn, QChar(0xf027), 15);
     IconHelper::Instance()->SetIcon(ui->turnOnBtn, QChar(0xf09c), 15);
+    IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), 15);
 }
 
 void ToolForm::mousePressEvent(QMouseEvent *event)
@@ -131,5 +132,12 @@ void ToolForm::on_turnOnBtn_clicked()
 {
     if (m_videoForm) {
         m_videoForm->postTurnOn();
+    }
+}
+
+void ToolForm::on_expandNotifyBtn_clicked()
+{
+    if (m_videoForm) {
+        m_videoForm->expandNotificationPanel();
     }
 }

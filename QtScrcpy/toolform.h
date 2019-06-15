@@ -46,6 +46,8 @@ private slots:
 
     void on_turnOnBtn_clicked();
 
+    void on_expandNotifyBtn_clicked();
+
 private:
     void initStyle();
 

@@ -36,6 +36,8 @@ public:
     void postVolumeDown();
     // turn the screen on if it was off, press BACK otherwise
     void postTurnOn();
+    void expandNotificationPanel();
+    void collapseNotificationPanel();
     void postTextInput(const QString& text);
 
     void staysOnTop(bool top = true);

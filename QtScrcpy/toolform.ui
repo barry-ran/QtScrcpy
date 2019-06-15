@@ -44,6 +44,16 @@
     </spacer>
    </item>
    <item>
+    <widget class="QPushButton" name="expandNotifyBtn">
+     <property name="toolTip">
+      <string>expand notify</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="powerBtn">
      <property name="toolTip">
       <string>turn off</string>
