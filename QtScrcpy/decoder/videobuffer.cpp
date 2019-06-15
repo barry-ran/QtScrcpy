@@ -1,21 +1,21 @@
-#include "frames.h"
+#include "videobuffer.h"
 extern "C"
 {
 #include "libavutil/avutil.h"
 #include "libavformat/avformat.h"
 }
 
-Frames::Frames()
+VideoBuffer::VideoBuffer()
 {
 
 }
 
-Frames::~Frames()
+VideoBuffer::~VideoBuffer()
 {
 
 }
 
-bool Frames::init()
+bool VideoBuffer::init()
 {
     m_decodingFrame = av_frame_alloc();
     if (!m_decodingFrame) {
@@ -39,7 +39,7 @@ error:
     return false;
 }
 
-void Frames::deInit()
+void VideoBuffer::deInit()
 {
     if (m_decodingFrame) {
         av_frame_free(&m_decodingFrame);
@@ -52,22 +52,22 @@ void Frames::deInit()
     m_fpsCounter.stop();
 }
 
-void Frames::lock()
+void VideoBuffer::lock()
 {
     m_mutex.lock();
 }
 
-void Frames::unLock()
+void VideoBuffer::unLock()
 {
     m_mutex.unlock();
 }
 
-AVFrame *Frames::decodingFrame()
+AVFrame *VideoBuffer::decodingFrame()
 {
     return m_decodingFrame;
 }
 
-bool Frames::offerDecodedFrame()
+bool VideoBuffer::offerDecodedFrame()
 {
     m_mutex.lock();
 
@@ -90,7 +90,7 @@ bool Frames::offerDecodedFrame()
     return previousFrameConsumed;
 }
 
-const AVFrame *Frames::consumeRenderedFrame()
+const AVFrame *VideoBuffer::consumeRenderedFrame()
 {
     Q_ASSERT(!m_renderingFrameConsumed);
     m_renderingFrameConsumed = true;
@@ -105,7 +105,7 @@ const AVFrame *Frames::consumeRenderedFrame()
     return m_renderingframe;
 }
 
-void Frames::stop()
+void VideoBuffer::stop()
 {
 #ifndef SKIP_FRAMES
     m_mutex.lock();
@@ -116,7 +116,7 @@ void Frames::stop()
 #endif
 }
 
-void Frames::swap()
+void VideoBuffer::swap()
 {
     AVFrame *tmp = m_decodingFrame;
     m_decodingFrame = m_renderingframe;

@@ -1,5 +1,5 @@
-#ifndef FRAMES_H
-#define FRAMES_H
+#ifndef VIDEO_BUFFER_H
+#define VIDEO_BUFFER_H
 
 #include <QMutex>
 #include <QWaitCondition>
@@ -9,11 +9,11 @@
 // forward declarations
 typedef struct AVFrame AVFrame;
 
-class Frames
+class VideoBuffer
 {
 public:
-    Frames();
-    virtual ~Frames();
+    VideoBuffer();
+    virtual ~VideoBuffer();
 
     bool init();
     void deInit();
@@ -51,4 +51,4 @@ private:
 #endif
 };
 
-#endif // FRAMES_H
+#endif // VIDEO_BUFFER_H

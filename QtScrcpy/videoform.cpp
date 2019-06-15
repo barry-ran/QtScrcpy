@@ -31,8 +31,8 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     initUI();    
 
     m_server = new Server();
-    m_frames.init();
-    m_decoder.setFrames(&m_frames);
+    m_vb.init();
+    m_decoder.setVideoBuffer(&m_vb);
     if (!fileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(fileName.trimmed());
         m_decoder.setRecoder(m_recorder);
@@ -68,7 +68,7 @@ VideoForm::~VideoForm()
     if (m_recorder) {
         delete m_recorder;
     }
-    m_frames.deInit();
+    m_vb.deInit();
     delete ui;
 }
 
@@ -193,13 +193,13 @@ void VideoForm::initSignals()
             }
             ui->videoWidget->show();
         }
-        m_frames.lock();
-        const AVFrame *frame = m_frames.consumeRenderedFrame();
+        m_vb.lock();
+        const AVFrame *frame = m_vb.consumeRenderedFrame();
         //qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
         updateShowSize(QSize(frame->width, frame->height));
         ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
         ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
-        m_frames.unLock();
+        m_vb.unLock();
     },Qt::QueuedConnection);
 }
 
