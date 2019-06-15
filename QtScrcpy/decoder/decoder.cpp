@@ -3,7 +3,7 @@
 
 #include "compat.h"
 #include "decoder.h"
-#include "frames.h"
+#include "videobuffer.h"
 #include "devicesocket.h"
 #include "recorder.h"
 
@@ -69,9 +69,9 @@ void Decoder::deInit()
     avformat_network_deinit(); // ignore failure
 }
 
-void Decoder::setFrames(Frames *frames)
+void Decoder::setVideoBuffer(VideoBuffer* vb)
 {
-    m_frames = frames;
+    m_vb = vb;
 }
 
 static quint32 bufferRead32be(quint8* buf) {
@@ -234,8 +234,8 @@ bool Decoder::startDecode()
 void Decoder::stopDecode()
 {
     m_quit = true;
-    if (m_frames) {
-        m_frames->stop();
+    if (m_vb) {
+        m_vb->stop();
     }
     wait();
 }
@@ -323,7 +323,7 @@ void Decoder::run()
     packet.size = 0;    
 
     while (!m_quit && !av_read_frame(formatCtx, &packet)) {
-        AVFrame* decodingFrame = m_frames->decodingFrame();
+        AVFrame* decodingFrame = m_vb->decodingFrame();
         // the new decoding/encoding API has been introduced by:
         // <http://git.videolan.org/?p=ffmpeg.git;a=commitdiff;h=7fc329e2dd6226dfecaa4a1d7adf353bf2773726>
 #ifdef QTSCRCPY_LAVF_HAS_NEW_ENCODING_DECODING_API
@@ -435,7 +435,7 @@ runQuit:
 
 void Decoder::pushFrame()
 {
-    bool previousFrameConsumed = m_frames->offerDecodedFrame();
+    bool previousFrameConsumed = m_vb->offerDecodedFrame();
     if (!previousFrameConsumed) {
         // the previous newFrame will consume this frame
         return;

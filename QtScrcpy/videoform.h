@@ -7,7 +7,7 @@
 
 #include "server.h"
 #include "decoder.h"
-#include "frames.h"
+#include "videobuffer.h"
 #include "inputconvertnormal.h"
 #include "inputconvertgame.h"
 #include "filehandler.h"
@@ -71,7 +71,7 @@ private:
     QSize frameSize;
     Server* m_server = Q_NULLPTR;
     Decoder m_decoder;
-    Frames m_frames;
+    VideoBuffer m_vb;
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
     FileHandler m_fileHandler;

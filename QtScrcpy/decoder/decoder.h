@@ -11,7 +11,7 @@ extern "C"
 #include "libavformat/avformat.h"
 }
 
-class Frames;
+class VideoBuffer;
 class DeviceSocket;
 class Recorder;
 class Decoder : public QThread
@@ -36,7 +36,7 @@ public:
     static bool init();
     static void deInit();    
 
-    void setFrames(Frames* frames);
+    void setVideoBuffer(VideoBuffer* vb);
     void setDeviceSocket(DeviceSocket* deviceSocket);
     void setRecoder(Recorder* recorder);
     qint32 recvData(quint8* buf, qint32 bufSize);
@@ -55,7 +55,7 @@ protected:
 private:
     QPointer<DeviceSocket> m_deviceSocket;
     bool m_quit = false;
-    Frames* m_frames;
+    VideoBuffer* m_vb;
 
     // for recorder
     Recorder* m_recorder = Q_NULLPTR;
