@@ -54,7 +54,6 @@ protected:
 
 private:
     QPointer<DeviceSocket> m_deviceSocket;
-    QMutex m_mutex;
     bool m_quit = false;
     Frames* m_frames;
 
