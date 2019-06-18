@@ -12,6 +12,9 @@ public:
 
 protected:
     virtual void incomingConnection(qintptr handle);
+
+private:
+    bool m_isVideoSocket = true;
 };
 
 #endif // TCPSERVER_H

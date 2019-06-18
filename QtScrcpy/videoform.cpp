@@ -171,11 +171,11 @@ void VideoForm::initSignals()
             }
 
             // init decoder
-            m_stream.setDeviceSocket(m_server->getDeviceSocket());
+            m_stream.setVideoSocket(m_server->getVideoSocket());
             m_stream.startDecode();
 
             // init controller
-            m_inputConvert.setDeviceSocket(m_server->getDeviceSocket());
+            m_inputConvert.setControlSocket(m_server->getControlSocket());
         }
     });
 

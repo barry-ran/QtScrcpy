@@ -10,9 +10,9 @@ InputConvertBase::~InputConvertBase()
 
 }
 
-void InputConvertBase::setDeviceSocket(DeviceSocket *deviceSocket)
+void InputConvertBase::setControlSocket(QTcpSocket *controlSocket)
 {
-    m_controller.setDeviceSocket(deviceSocket);
+    m_controller.setControlSocket(controlSocket);
 }
 
 void InputConvertBase::sendControlEvent(ControlEvent *event)

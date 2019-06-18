@@ -12,7 +12,7 @@ extern "C"
 #include "libavformat/avformat.h"
 }
 
-class DeviceSocket;
+class VideoSocket;
 class Recorder;
 class Decoder;
 class Stream : public QThread
@@ -38,7 +38,7 @@ public:
     static void deInit();
 
     void setDecoder(Decoder* vb);
-    void setDeviceSocket(DeviceSocket* deviceSocket);
+    void setVideoSocket(VideoSocket* deviceSocket);
     void setRecoder(Recorder* recorder);
     qint32 recvData(quint8* buf, qint32 bufSize);
     bool startDecode();
@@ -52,7 +52,7 @@ protected:
     void run();
 
 private:
-    QPointer<DeviceSocket> m_deviceSocket;
+    QPointer<VideoSocket> m_videoSocket;
     QAtomicInteger<qint8> m_quit;
 
     // for recorder

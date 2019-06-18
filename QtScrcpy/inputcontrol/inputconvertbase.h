@@ -20,7 +20,7 @@ public:
     virtual void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize) = 0;
     virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize) = 0;
 
-    void setDeviceSocket(DeviceSocket* deviceSocket);
+    void setControlSocket(QTcpSocket* controlSocket);
     void sendControlEvent(ControlEvent* event);
 
 private:

@@ -1,17 +1,17 @@
-#ifndef DEVICESOCKET_H
-#define DEVICESOCKET_H
+#ifndef VIDEOSOCKET_H
+#define VIDEOSOCKET_H
 
 #include <QEvent>
 #include <QTcpSocket>
 #include <QMutex>
 #include <QWaitCondition>
 
-class DeviceSocket : public QTcpSocket
+class VideoSocket : public QTcpSocket
 {
     Q_OBJECT
 public:
-    explicit DeviceSocket(QObject *parent = nullptr);
-    virtual ~DeviceSocket();
+    explicit VideoSocket(QObject *parent = nullptr);
+    virtual ~VideoSocket();
 
     qint32 subThreadRecvData(quint8* buf, qint32 bufSize);
 
@@ -32,4 +32,4 @@ private:
     bool m_quit = false;
 };
 
-#endif // DEVICESOCKET_H
+#endif // VIDEOSOCKET_H

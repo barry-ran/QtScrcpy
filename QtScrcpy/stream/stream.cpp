@@ -4,7 +4,7 @@
 #include "compat.h"
 #include "stream.h"
 #include "decoder.h"
-#include "devicesocket.h"
+#include "videosocket.h"
 #include "recorder.h"
 
 #define BUFSIZE 0x10000
@@ -199,9 +199,9 @@ static qint32 readRawPacket(void *opaque, quint8 *buf, qint32 bufSize) {
     return AVERROR_EOF;
 }
 
-void Stream::setDeviceSocket(DeviceSocket* deviceSocket)
+void Stream::setVideoSocket(VideoSocket* videoSocket)
 {
-    m_deviceSocket = deviceSocket;
+    m_videoSocket = videoSocket;
 }
 
 void Stream::setRecoder(Recorder *recorder)
@@ -214,8 +214,8 @@ qint32 Stream::recvData(quint8* buf, qint32 bufSize)
     if (!buf) {
         return 0;
     }
-    if (m_deviceSocket) {
-        qint32 len = m_deviceSocket->subThreadRecvData(buf, bufSize);
+    if (m_videoSocket) {
+        qint32 len = m_videoSocket->subThreadRecvData(buf, bufSize);
         return len;
     }
     return 0;
@@ -223,7 +223,7 @@ qint32 Stream::recvData(quint8* buf, qint32 bufSize)
 
 bool Stream::startDecode()
 {
-    if (!m_deviceSocket) {
+    if (!m_videoSocket) {
         return false;
     }
     m_quit.store(0);

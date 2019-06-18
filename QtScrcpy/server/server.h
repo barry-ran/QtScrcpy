@@ -3,9 +3,10 @@
 
 #include <QObject>
 #include <QPointer>
+#include <QSize>
 
 #include "tcpserver.h"
-#include "devicesocket.h"
+#include "videosocket.h"
 #include "adbprocess.h"
 
 class Server : public QObject
@@ -27,13 +28,14 @@ public:
     bool start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop, bool sendFrameMeta = false);
     bool connectTo();
 
-    DeviceSocket* getDeviceSocket();
+    VideoSocket* getVideoSocket();
+    QTcpSocket* getControlSocket();
 
     void stop();
 
 signals:
     void serverStartResult(bool success);
-    void connectToResult(bool success, const QString &deviceName, const QSize &size);
+    void connectToResult(bool success, const QString &deviceName = "", const QSize &size = QSize());
     void onServerStop();
 
 private slots:
@@ -62,7 +64,8 @@ private:
     QString m_serial = "";
     AdbProcess m_serverProcess;
     TcpServer m_serverSocket; // only used if !tunnel_forward
-    QPointer<DeviceSocket> m_deviceSocket = Q_NULLPTR;
+    QPointer<VideoSocket> m_videoSocket = Q_NULLPTR;
+    QPointer<QTcpSocket> m_controlSocket = Q_NULLPTR;
     quint16 m_localPort = 0;
     bool m_tunnelEnabled = false;
     bool m_tunnelForward = false; // use "adb forward" instead of "adb reverse"
@@ -71,6 +74,8 @@ private:
     quint32 m_bitRate = 0;
     QString m_crop = "";
     quint32 m_acceptTimeoutTimer = 0;
+    QString m_deviceName = "";
+    QSize m_deviceSize = QSize();
 
     SERVER_START_STEP m_serverStartStep = SSS_NULL;
 };
