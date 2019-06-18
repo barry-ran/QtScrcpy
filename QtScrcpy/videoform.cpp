@@ -15,6 +15,7 @@
 #include "videoform.h"
 #include "recorder.h"
 #include "videobuffer.h"
+#include "decoder.h"
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
@@ -34,8 +35,8 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     m_server = new Server();
     m_vb = new VideoBuffer();
     m_vb->init();
-    m_decoder.setVideoBuffer(m_vb);
-    m_stream.setDecoder(&m_decoder);
+    m_decoder = new Decoder(m_vb);
+    m_stream.setDecoder(m_decoder);
     if (!fileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(fileName.trimmed());
         m_stream.setRecoder(m_recorder);
@@ -189,7 +190,7 @@ void VideoForm::initSignals()
     });
 
     // must be Qt::QueuedConnection, ui update must be main thread
-    connect(&m_decoder, &Decoder::onNewFrame, this, [this](){
+    connect(m_decoder, &Decoder::onNewFrame, this, [this](){
         if (ui->videoWidget->isHidden()) {
             if (m_loadingWidget) {
                 m_loadingWidget->close();

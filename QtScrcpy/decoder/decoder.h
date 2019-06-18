@@ -12,10 +12,9 @@ class Decoder : public QObject
 {
     Q_OBJECT
 public:
-    Decoder();
+    Decoder(VideoBuffer* vb);
     virtual ~Decoder();
 
-    void setVideoBuffer(VideoBuffer* vb);
     bool open(const AVCodec *codec);
     void close();
     bool push(const AVPacket *packet);
