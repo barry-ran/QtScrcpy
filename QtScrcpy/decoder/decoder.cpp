@@ -4,8 +4,9 @@
 #include "videobuffer.h"
 #include "decoder.h"
 
-Decoder::Decoder()
+Decoder::Decoder(VideoBuffer* vb)
     : QObject(Q_NULLPTR)
+    , m_vb(vb)
 {
 
 }
@@ -13,11 +14,6 @@ Decoder::Decoder()
 Decoder::~Decoder()
 {
 
-}
-
-void Decoder::setVideoBuffer(VideoBuffer* vb)
-{
-    m_vb = vb;
 }
 
 bool Decoder::open(const AVCodec *codec)
