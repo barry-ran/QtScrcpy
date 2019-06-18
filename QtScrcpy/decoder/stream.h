@@ -46,7 +46,7 @@ public:
     ReceiverState* getReceiverState();
 
 signals:
-    void onDecodeStop();
+    void onStreamStop();
 
 protected:
     void run();
