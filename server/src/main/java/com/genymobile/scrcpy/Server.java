@@ -49,8 +49,9 @@ public final class Server {
 
     @SuppressWarnings("checkstyle:MagicNumber")
     private static Options createOptions(String... args) {
-        if (args.length != 5)
+        if (args.length != 5) {
             throw new IllegalArgumentException("Expecting 5 parameters");
+        }
 
         Options options = new Options();
 
@@ -73,6 +74,7 @@ public final class Server {
         return options;
     }
 
+    @SuppressWarnings("checkstyle:MagicNumber")
     private static Rect parseCrop(String crop) {
         if ("-".equals(crop)) {
             return null;
