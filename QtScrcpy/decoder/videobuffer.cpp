@@ -67,7 +67,7 @@ AVFrame *VideoBuffer::decodingFrame()
     return m_decodingFrame;
 }
 
-bool VideoBuffer::offerDecodedFrame()
+void VideoBuffer::offerDecodedFrame(bool& previousFrameSkipped)
 {
     m_mutex.lock();
 
@@ -84,10 +84,9 @@ bool VideoBuffer::offerDecodedFrame()
 #endif
 
     swap();
-    bool previousFrameConsumed = m_renderingFrameConsumed;
+    previousFrameSkipped = !m_renderingFrameConsumed;
     m_renderingFrameConsumed = false;
-    m_mutex.unlock();
-    return previousFrameConsumed;
+    m_mutex.unlock();    
 }
 
 const AVFrame *VideoBuffer::consumeRenderedFrame()

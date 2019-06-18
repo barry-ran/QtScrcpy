@@ -24,7 +24,7 @@ public:
     // set the decoder frame as ready for rendering
     // this function locks m_mutex during its execution
     // returns true if the previous frame had been consumed
-    bool offerDecodedFrame();
+    void offerDecodedFrame(bool& previousFrameSkipped);
 
     // mark the rendering frame as consumed and return it
     // MUST be called with m_mutex locked!!!

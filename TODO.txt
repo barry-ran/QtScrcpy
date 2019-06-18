@@ -3,14 +3,15 @@ linux下限制鼠标移动
 Mac游戏时向右移动不流畅问题。
 工具栏扩展（模拟点击指定次数等）
 
-模拟点击改用手指(注意：辅助按键就都没了)
 中文输入（server需要改为apk，作为一个输入法，暂不实现）
 
 最后更新scrcpy 7764a836f1ee02a4540cfc4118c20729018daaac
 
-TODO b35733edb6df2a00b6af9b1c98627d344c377963 鼠标事件相关系列
+b35733edb6df2a00b6af9b1c98627d344c377963 鼠标事件相关系列
 
-video window always_on_top options
+只录制不启动窗口（先重构，目前启动流程在videoform里）
+
+
 mark:
 
 ffmpeg编译参数详解
