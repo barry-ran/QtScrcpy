@@ -5,7 +5,7 @@
 #include <QTranslator>
 
 #include "dialog.h"
-#include "decoder.h"
+#include "stream.h"
 #include "mousetap/mousetap.h"
 
 Dialog* g_mainDlg = Q_NULLPTR;
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
-    Decoder::init();
+    Stream::init();
     QApplication a(argc, argv);
 
     installTranslator();
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
     int ret = a.exec();
 
     MouseTap::getInstance()->quitMouseEventTap();
-    Decoder::deInit();
+    Stream::deInit();
     return ret;
 }
 

@@ -6,8 +6,9 @@
 #include <QTime>
 
 #include "server.h"
-#include "decoder.h"
+#include "stream.h"
 #include "videobuffer.h"
+#include "decoder.h"
 #include "inputconvertnormal.h"
 #include "inputconvertgame.h"
 #include "filehandler.h"
@@ -70,7 +71,7 @@ private:
     Ui::videoForm *ui;
     QSize frameSize;
     Server* m_server = Q_NULLPTR;
-    Decoder m_decoder;
+    Stream m_stream;
     VideoBuffer m_vb;
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
@@ -82,6 +83,7 @@ private:
     float m_widthHeightRatio = 0.5f;
     QPointer<ToolForm> m_toolForm;
     Recorder* m_recorder = Q_NULLPTR;
+    Decoder m_decoder;
     QTime m_startTimeCount;
     QPointer<QWidget> m_loadingWidget;
 };
