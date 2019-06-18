@@ -363,5 +363,5 @@ runQuit:
         avcodec_free_context(&codecCtx);
     }
 
-    emit onDecodeStop();
+    emit onStreamStop();
 }

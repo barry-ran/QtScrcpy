@@ -7,7 +7,6 @@
 
 #include "server.h"
 #include "stream.h"
-#include "videobuffer.h"
 #include "decoder.h"
 #include "inputconvertnormal.h"
 #include "inputconvertgame.h"
@@ -19,6 +18,7 @@ class videoForm;
 
 class ToolForm;
 class Recorder;
+class VideoBuffer;
 class VideoForm : public QWidget
 {
     Q_OBJECT
@@ -72,7 +72,7 @@ private:
     QSize frameSize;
     Server* m_server = Q_NULLPTR;
     Stream m_stream;
-    VideoBuffer m_vb;
+    VideoBuffer* m_vb;
     //InputConvertNormal m_inputConvert;
     InputConvertGame m_inputConvert;
     FileHandler m_fileHandler;
