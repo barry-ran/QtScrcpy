@@ -118,8 +118,9 @@ void Decoder::pushFrame()
     if (!m_vb) {
         return;
     }
-    bool previousFrameConsumed = m_vb->offerDecodedFrame();
-    if (!previousFrameConsumed) {
+    bool previousFrameSkipped = true;
+    m_vb->offerDecodedFrame(previousFrameSkipped);
+    if (previousFrameSkipped) {
         // the previous newFrame will consume this frame
         return;
     }    
