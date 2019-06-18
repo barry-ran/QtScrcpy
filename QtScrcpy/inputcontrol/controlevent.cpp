@@ -48,11 +48,6 @@ void ControlEvent::setScrollEventData(QRect position, qint32 hScroll, qint32 vSc
     m_data.scrollEvent.vScroll = vScroll;
 }
 
-void ControlEvent::setCommandEventData(ControlEventCommand action)
-{
-    m_data.commandEvent.action = action;
-}
-
 void ControlEvent::write32(QBuffer &buffer, quint32 value)
 {
     buffer.putChar(value >> 24);
@@ -109,8 +104,9 @@ QByteArray ControlEvent::serializeData()
         write32(buffer, m_data.scrollEvent.hScroll);
         write32(buffer, m_data.scrollEvent.vScroll);
         break;
-    case CET_COMMAND:
-        buffer.putChar(m_data.commandEvent.action);
+    case CET_BACK_OR_SCREEN_ON:
+    case CET_EXPAND_NOTIFICATION_PANEL:
+    case CET_COLLAPSE_NOTIFICATION_PANEL:
         break;
     default:
         qDebug() << "Unknown event type:" << m_data.type;

@@ -340,31 +340,28 @@ void VideoForm::postVolumeDown()
 
 void VideoForm::postTurnOn()
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COMMAND);
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_BACK_OR_SCREEN_ON);
     if (!controlEvent) {
         return;
-    }
-    controlEvent->setCommandEventData(ControlEvent::CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON);
+    }    
     m_inputConvert.sendControlEvent(controlEvent);
 }
 
 void VideoForm::expandNotificationPanel()
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COMMAND);
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_EXPAND_NOTIFICATION_PANEL);
     if (!controlEvent) {
         return;
     }
-    controlEvent->setCommandEventData(ControlEvent::CONTROL_EVENT_COMMAND_EXPAND_NOTIFICATION_PANEL);
     m_inputConvert.sendControlEvent(controlEvent);
 }
 
 void VideoForm::collapseNotificationPanel()
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COMMAND);
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COLLAPSE_NOTIFICATION_PANEL);
     if (!controlEvent) {
         return;
-    }
-    controlEvent->setCommandEventData(ControlEvent::CONTROL_EVENT_COMMAND_COLLAPSE_NOTIFICATION_PANEL);
+    }    
     m_inputConvert.sendControlEvent(controlEvent);
 }
 

@@ -15,19 +15,15 @@ class ControlEvent : public QScrcpyEvent
 {
 public:    
     enum ControlEventType {
-        CET_KEYCODE,
+        CET_KEYCODE = 0,
         CET_TEXT,
         CET_MOUSE,        
         CET_SCROLL,
-        CET_COMMAND,
         CET_TOUCH,
-    };
-
-    enum ControlEventCommand {
-        CONTROL_EVENT_COMMAND_BACK_OR_SCREEN_ON = 0,
-        CONTROL_EVENT_COMMAND_EXPAND_NOTIFICATION_PANEL,
-        CONTROL_EVENT_COMMAND_COLLAPSE_NOTIFICATION_PANEL,
-    };
+        CET_BACK_OR_SCREEN_ON,
+        CET_EXPAND_NOTIFICATION_PANEL,
+        CET_COLLAPSE_NOTIFICATION_PANEL,
+    };    
 
     ControlEvent(ControlEventType controlEventType);
 
@@ -39,7 +35,6 @@ public:
     // position action动作对应的位置
     void setTouchEventData(quint32 id, AndroidMotioneventAction action, QRect position);
     void setScrollEventData(QRect position, qint32 hScroll, qint32 vScroll);
-    void setCommandEventData(ControlEvent::ControlEventCommand action);
 
     QByteArray serializeData();
 
@@ -74,10 +69,7 @@ private:
                 QRect position;
                 qint32 hScroll;
                 qint32 vScroll;
-            } scrollEvent;
-            struct {
-                ControlEventCommand action;
-            } commandEvent;
+            } scrollEvent;            
         };
 
         ControlEventData(){}
