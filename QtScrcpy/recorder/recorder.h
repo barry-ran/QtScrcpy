@@ -22,13 +22,13 @@ public:
 
     void setFrameSize(const QSize& declaredFrameSize);
     void setFormat(Recorder::RecorderFormat format);
-    bool open(AVCodec* inputCodec);
+    bool open(const AVCodec* inputCodec);
     void close();
     bool write(AVPacket* packet);
 
 private:
     const AVOutputFormat* findMuxer(const char* name);
-    bool recorderWriteHeader(AVPacket* packet);
+    bool recorderWriteHeader(const AVPacket* packet);
     void recorderRescalePacket(AVPacket *packet);
     QString recorderGetFormatName(Recorder::RecorderFormat format);
     RecorderFormat guessRecordFormat(const QString& fileName);
