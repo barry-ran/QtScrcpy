@@ -33,9 +33,10 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     m_server = new Server();
     m_vb.init();
     m_decoder.setVideoBuffer(&m_vb);
+    m_stream.setDecoder(&m_decoder);
     if (!fileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(fileName.trimmed());
-        m_decoder.setRecoder(m_recorder);
+        m_stream.setRecoder(m_recorder);
     }
 
     initSignals();
@@ -63,7 +64,7 @@ VideoForm::~VideoForm()
 {
     m_server->stop();
     // server must stop before decoder, because decoder block main thread
-    m_decoder.stopDecode();
+    m_stream.stopDecode();
     delete m_server;
     if (m_recorder) {
         delete m_recorder;
@@ -167,8 +168,8 @@ void VideoForm::initSignals()
             }
 
             // init decoder
-            m_decoder.setDeviceSocket(m_server->getDeviceSocket());
-            m_decoder.startDecode();
+            m_stream.setDeviceSocket(m_server->getDeviceSocket());
+            m_stream.startDecode();
 
             // init controller
             m_inputConvert.setDeviceSocket(m_server->getDeviceSocket());
@@ -180,9 +181,9 @@ void VideoForm::initSignals()
         qDebug() << "server process stop";
     });
 
-    connect(&m_decoder, &Decoder::onDecodeStop, this, [this](){
+    connect(&m_stream, &Stream::onStreamStop, this, [this](){
         close();
-        qDebug() << "decoder thread stop";
+        qDebug() << "stream thread stop";
     });
 
     // must be Qt::QueuedConnection, ui update must be main thread
