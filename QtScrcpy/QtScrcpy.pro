@@ -53,6 +53,7 @@ include ($$PWD/server/server.pri)
 include ($$PWD/adb/adb.pri)
 include ($$PWD/decoder/decoder.pri)
 include ($$PWD/render/render.pri)
+include ($$PWD/stream/stream.pri)
 include ($$PWD/android/android.pri)
 include ($$PWD/inputcontrol/inputcontrol.pri)
 include ($$PWD/uibase/uibase.pri)
@@ -69,6 +70,7 @@ INCLUDEPATH += \
         $$PWD/adb \
         $$PWD/decoder \
         $$PWD/render \
+        $$PWD/stream \
         $$PWD/android \
         $$PWD/inputcontrol \
         $$PWD/uibase \
