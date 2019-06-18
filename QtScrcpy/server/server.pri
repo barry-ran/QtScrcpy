@@ -1,9 +1,9 @@
 HEADERS += \
-    $$PWD/devicesocket.h \
     $$PWD/server.h \
-    $$PWD/tcpserver.h
+    $$PWD/tcpserver.h \
+    $$PWD/videosocket.h
 
 SOURCES += \
-    $$PWD/devicesocket.cpp \
     $$PWD/server.cpp \
-    $$PWD/tcpserver.cpp
+    $$PWD/tcpserver.cpp \
+    $$PWD/videosocket.cpp

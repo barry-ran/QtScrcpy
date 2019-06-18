@@ -1,7 +1,6 @@
 #include <QDebug>
 #include <QTimer>
 #include <QThread>
-#include <QSize>
 #include <QTimerEvent>
 #include <QCoreApplication>
 #include <QFileInfo>
@@ -17,25 +16,30 @@ Server::Server(QObject *parent) : QObject(parent)
     connect(&m_workProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
     connect(&m_serverProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
 
-    connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){        
-        m_deviceSocket = dynamic_cast<DeviceSocket*>(m_serverSocket.nextPendingConnection());
-
-        QString deviceName;
-        QSize deviceSize;
-
-        if (m_deviceSocket->isValid() && readInfo(deviceName, deviceSize)) {
-            // we don't need the server socket anymore
-            // just m_deviceSocket is ok
-            m_serverSocket.close();            
-            // we don't need the adb tunnel anymore
-            disableTunnelReverse();
-            m_tunnelEnabled = false;
-            emit connectToResult(true, deviceName, deviceSize);
+    connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
+        QTcpSocket* tmp = m_serverSocket.nextPendingConnection();
+        if (dynamic_cast<VideoSocket*>(tmp)) {
+            m_videoSocket = dynamic_cast<VideoSocket*>(tmp);
+            if (!m_videoSocket->isValid() || !readInfo(m_deviceName, m_deviceSize)) {
+                stop();
+                emit connectToResult(false);
+            }
         } else {
-            stop();
-            emit connectToResult(false, deviceName, deviceSize);
+            m_controlSocket = tmp;
+            if (m_controlSocket && m_controlSocket->isValid()) {
+                // we don't need the server socket anymore
+                // just m_videoSocket is ok
+                m_serverSocket.close();
+                // we don't need the adb tunnel anymore
+                disableTunnelReverse();
+                m_tunnelEnabled = false;
+                emit connectToResult(true, m_deviceName, m_deviceSize);
+            } else {
+                stop();
+                emit connectToResult(false);
+            }
+            stopAcceptTimeoutTimer();
         }
-        stopAcceptTimeoutTimer();
     });
 }
 
@@ -159,7 +163,7 @@ bool Server::connectTo()
         return false;
     }    
 
-    if (!m_tunnelForward && !m_deviceSocket) {
+    if (!m_tunnelForward && !m_videoSocket) {
         startAcceptTimeoutTimer();
         return true;
     }
@@ -167,37 +171,47 @@ bool Server::connectTo()
     // device server need time to start
     // TODO:电脑配置太低的话，这里有可能时间不够导致连接太早，安卓监听socket还没有建立
     // 后续研究其他办法
+    // wait for devices server start
     QTimer::singleShot(1000, this, [this](){
         QString deviceName;
         QSize deviceSize;
         bool success = false;
 
-        m_deviceSocket = new DeviceSocket();
-
-        // wait for devices server start
-        m_deviceSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
-        if (!m_deviceSocket->waitForConnected(1000)) {
+        // video socket
+        m_videoSocket = new VideoSocket();
+        m_videoSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+        if (!m_videoSocket->waitForConnected(1000)) {
             stop();
-            qWarning("connect to server failed");
+            qWarning("video socket connect to server failed");
             emit connectToResult(false, "", QSize());
             return false;
         }
-        if (QTcpSocket::ConnectedState == m_deviceSocket->state()) {
+        if (QTcpSocket::ConnectedState == m_videoSocket->state()) {
             // connect will success even if devices offline, recv data is real connect success
             // because connect is to pc adb server
-            m_deviceSocket->waitForReadyRead(1000);
+            m_videoSocket->waitForReadyRead(1000);
             // devices will send 1 byte first on tunnel forward mode
-            QByteArray data = m_deviceSocket->read(1);
+            QByteArray data = m_videoSocket->read(1);
             if (!data.isEmpty() && readInfo(deviceName, deviceSize)) {
                 success = true;
             } else {
-                qWarning("connect to server read device info failed");
+                qWarning("video socket connect to server read device info failed");
                 success = false;
             }
         } else {
             qWarning("connect to server failed");
-            m_deviceSocket->deleteLater();
+            m_videoSocket->deleteLater();
             success = false;
+        }
+
+        // control socket
+        m_controlSocket = new QTcpSocket();
+        m_controlSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+        if (!m_controlSocket->waitForConnected(1000)) {
+            stop();
+            qWarning("control socket connect to server failed");
+            emit connectToResult(false, "", QSize());
+            return false;
         }
 
         if (success) {            
@@ -221,16 +235,25 @@ void Server::timerEvent(QTimerEvent *event)
     }
 }
 
-DeviceSocket* Server::getDeviceSocket()
+VideoSocket* Server::getVideoSocket()
 {    
-    return m_deviceSocket;
+    return m_videoSocket;
+}
+
+QTcpSocket *Server::getControlSocket()
+{
+    return m_controlSocket;
 }
 
 void Server::stop()
 {
-    if (m_deviceSocket) {
-        m_deviceSocket->close();
-        m_deviceSocket->deleteLater();
+    if (m_videoSocket) {
+        m_videoSocket->close();
+        m_videoSocket->deleteLater();
+    }
+    if (m_controlSocket) {
+        m_controlSocket->close();
+        m_controlSocket->deleteLater();
     }
     // ignore failure
     m_serverProcess.kill();
@@ -270,7 +293,7 @@ bool Server::startServerByStep()
                 // client listens and the server connects to the client. That way, the
                 // client can listen before starting the server app, so there is no need to
                 // try to connect until the server socket is listening on the device.
-                m_serverSocket.setMaxPendingConnections(1);                
+                m_serverSocket.setMaxPendingConnections(2);
                 if (!m_serverSocket.listen(QHostAddress::LocalHost, m_localPort)) {
                     qCritical(QString("Could not listen on port %1").arg(m_localPort).toStdString().c_str());
                     m_serverStartStep = SSS_NULL;
@@ -300,11 +323,11 @@ bool Server::startServerByStep()
 bool Server::readInfo(QString &deviceName, QSize &size)
 {
     unsigned char buf[DEVICE_NAME_FIELD_LENGTH + 4];
-    if (m_deviceSocket->bytesAvailable() <= (DEVICE_NAME_FIELD_LENGTH + 4)) {
-        m_deviceSocket->waitForReadyRead(300);
+    if (m_videoSocket->bytesAvailable() <= (DEVICE_NAME_FIELD_LENGTH + 4)) {
+        m_videoSocket->waitForReadyRead(300);
     }
 
-    qint64 len = m_deviceSocket->read((char*)buf, sizeof(buf));
+    qint64 len = m_videoSocket->read((char*)buf, sizeof(buf));
     if (len < DEVICE_NAME_FIELD_LENGTH + 4) {
         qInfo("Could not retrieve device information");
         return false;

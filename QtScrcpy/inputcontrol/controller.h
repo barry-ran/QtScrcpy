@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QPointer>
 
-class DeviceSocket;
+class QTcpSocket;
 class ControlEvent;
 class Controller : public QObject
 {
@@ -13,7 +13,7 @@ public:
     Controller(QObject* parent = Q_NULLPTR);
     virtual ~Controller();
 
-    void setDeviceSocket(DeviceSocket* deviceSocket);
+    void setControlSocket(QTcpSocket* controlSocket);
     void postControlEvent(ControlEvent* controlEvent);
     void test(QRect rc);
 
@@ -24,7 +24,7 @@ private:
     bool sendControl(const QByteArray& buffer);
 
 private:
-    QPointer<DeviceSocket> m_deviceSocket;
+    QPointer<QTcpSocket> m_controlSocket;
 };
 
 #endif // CONTROLLER_H

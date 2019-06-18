@@ -3,21 +3,21 @@
 #include <QDebug>
 
 #include "qscrcpyevent.h"
-#include "devicesocket.h"
+#include "videosocket.h"
 
-DeviceSocket::DeviceSocket(QObject *parent) : QTcpSocket(parent)
+VideoSocket::VideoSocket(QObject *parent) : QTcpSocket(parent)
 {
-    connect(this, &DeviceSocket::readyRead, this, &DeviceSocket::onReadyRead);
-    connect(this, &DeviceSocket::aboutToClose, this, &DeviceSocket::quitNotify);
-    connect(this, &DeviceSocket::disconnected, this, &DeviceSocket::quitNotify);
+    connect(this, &VideoSocket::readyRead, this, &VideoSocket::onReadyRead);
+    connect(this, &VideoSocket::aboutToClose, this, &VideoSocket::quitNotify);
+    connect(this, &VideoSocket::disconnected, this, &VideoSocket::quitNotify);
 }
 
-DeviceSocket::~DeviceSocket()
+VideoSocket::~VideoSocket()
 {
     quitNotify();
 }
 
-qint32 DeviceSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
+qint32 VideoSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
 {
     // this function cant call in main thread
     Q_ASSERT(QCoreApplication::instance()->thread() != QThread::currentThread());
@@ -31,7 +31,7 @@ qint32 DeviceSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
     m_dataSize = 0;
 
     // post event
-    DeviceSocketEvent* getDataEvent = new DeviceSocketEvent();
+    VideoSocketEvent* getDataEvent = new VideoSocketEvent();
     QCoreApplication::postEvent(this, getDataEvent);
 
     // wait
@@ -43,16 +43,16 @@ qint32 DeviceSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
     return m_dataSize;
 }
 
-bool DeviceSocket::event(QEvent *event)
+bool VideoSocket::event(QEvent *event)
 {
-    if (event->type() == QScrcpyEvent::DeviceSocket) {
+    if (event->type() == QScrcpyEvent::VideoSocket) {
         onReadyRead();
         return true;
     }
     return QTcpSocket::event(event);
 }
 
-void DeviceSocket::onReadyRead()
+void VideoSocket::onReadyRead()
 {
     QMutexLocker locker(&m_mutex);
     if (m_buffer && 0 < bytesAvailable()) {
@@ -67,7 +67,7 @@ void DeviceSocket::onReadyRead()
     }
 }
 
-void DeviceSocket::quitNotify()
+void VideoSocket::quitNotify()
 {
     m_quit = true;
     QMutexLocker locker(&m_mutex);

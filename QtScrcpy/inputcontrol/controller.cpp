@@ -1,7 +1,7 @@
 #include <QCoreApplication>
 
 #include "controller.h"
-#include "devicesocket.h"
+#include "videosocket.h"
 #include "controlevent.h"
 
 Controller::Controller(QObject* parent) : QObject(parent)
@@ -14,9 +14,9 @@ Controller::~Controller()
 
 }
 
-void Controller::setDeviceSocket(DeviceSocket *deviceSocket)
+void Controller::setControlSocket(QTcpSocket* controlSocket)
 {
-    m_deviceSocket = deviceSocket;
+    m_controlSocket = controlSocket;
 }
 
 void Controller::postControlEvent(ControlEvent *controlEvent)
@@ -51,8 +51,8 @@ bool Controller::sendControl(const QByteArray &buffer)
         return false;
     }
     qint32 len = 0;
-    if (m_deviceSocket) {
-        len = m_deviceSocket->write(buffer.data(), buffer.length());
+    if (m_controlSocket) {
+        len = m_controlSocket->write(buffer.data(), buffer.length());
     }
     return len == buffer.length() ? true : false;
 }
