@@ -28,7 +28,7 @@ void Recorder::setFormat(Recorder::RecorderFormat format)
     m_format = format;
 }
 
-bool Recorder::open(AVCodec *inputCodec)
+bool Recorder::open(const AVCodec* inputCodec)
 {
     QString formatName = recorderGetFormatName(m_format);
     Q_ASSERT(!formatName.isEmpty());
@@ -132,7 +132,7 @@ const AVOutputFormat *Recorder::findMuxer(const char* name)
     return outFormat;
 }
 
-bool Recorder::recorderWriteHeader(AVPacket *packet)
+bool Recorder::recorderWriteHeader(const AVPacket* packet)
 {
     AVStream *ostream = m_formatCtx->streams[0];
     quint8* extradata = (quint8*)av_malloc(packet->size * sizeof(quint8));
@@ -162,7 +162,7 @@ bool Recorder::recorderWriteHeader(AVPacket *packet)
     return true;
 }
 
-void Recorder::recorderRescalePacket(AVPacket *packet)
+void Recorder::recorderRescalePacket(AVPacket* packet)
 {
     AVStream *ostream = m_formatCtx->streams[0];
     av_packet_rescale_ts(packet, SCRCPY_TIME_BASE, ostream->time_base);
