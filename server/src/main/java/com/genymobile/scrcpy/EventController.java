@@ -13,11 +13,11 @@ import android.view.MotionEvent;
 import java.io.IOException;
 import java.util.Vector;
 
-
 public class EventController {
 
     private final Device device;
     private final DesktopConnection connection;
+    private final EventSender sender;
 
     private final KeyCharacterMap charMap = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
 
@@ -28,6 +28,7 @@ public class EventController {
     public EventController(Device device, DesktopConnection connection) {
         this.device = device;
         this.connection = connection;
+        sender = new EventSender(connection);
     }
 
     private int getPointer(int id) {
@@ -97,6 +98,10 @@ public class EventController {
         }
     }
 
+    public EventSender getSender() {
+        return sender;
+    }
+
     public void control() throws IOException {
         // on start, turn screen on
         turnScreenOn();
@@ -133,6 +138,13 @@ public class EventController {
             case ControlEvent.TYPE_COLLAPSE_NOTIFICATION_PANEL:
                 device.collapsePanels();
                 break;
+            case ControlEvent.TYPE_GET_CLIPBOARD:
+                String clipboardText = device.getClipboardText();
+                sender.pushClipboardText(clipboardText);
+                break;
+            case ControlEvent.TYPE_SET_CLIPBOARD:
+                device.setClipboardText(controlEvent.getText());
+                break;
             default:
                 // do nothing
         }
@@ -144,7 +156,7 @@ public class EventController {
 
     private boolean injectChar(char c) {
         String decomposed = KeyComposition.decompose(c);
-        char[] chars = decomposed != null ? decomposed.toCharArray() : new char[] {c};
+        char[] chars = decomposed != null ? decomposed.toCharArray() : new char[]{c};
         KeyEvent[] events = charMap.getEvents(chars);
         if (events == null) {
             return false;

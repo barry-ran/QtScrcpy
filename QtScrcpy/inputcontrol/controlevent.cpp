@@ -1,11 +1,25 @@
 #include <QDebug>
 
 #include "controlevent.h"
+#include "bufferutil.h"
 
 ControlEvent::ControlEvent(ControlEventType controlEventType)
     : QScrcpyEvent(Control)
 {
     m_data.type = controlEventType;
+}
+
+ControlEvent::~ControlEvent()
+{
+    if (CET_SET_CLIPBOARD == m_data.type
+            && Q_NULLPTR != m_data.setClipboardEvent.text) {
+        delete m_data.setClipboardEvent.text;
+        m_data.setClipboardEvent.text = Q_NULLPTR;
+    } else if (CET_TEXT == m_data.type
+               && Q_NULLPTR != m_data.textEvent.text){
+        delete m_data.textEvent.text;
+        m_data.textEvent.text = Q_NULLPTR;
+    }
 }
 
 void ControlEvent::setKeycodeEventData(AndroidKeyeventAction action, AndroidKeycode keycode, AndroidMetastate metastate)
@@ -15,16 +29,17 @@ void ControlEvent::setKeycodeEventData(AndroidKeyeventAction action, AndroidKeyc
     m_data.keycodeEvent.metastate = metastate;
 }
 
-void ControlEvent::setTextEventData(QString text)
+void ControlEvent::setTextEventData(QString& text)
 {
     // write length (2 byte) + string (non nul-terminated)
-    if (TEXT_MAX_CHARACTER_LENGTH < text.length()) {
+    if (CONTROL_EVENT_TEXT_MAX_LENGTH < text.length()) {
         // injecting a text takes time, so limit the text length
-        text = text.left(TEXT_MAX_CHARACTER_LENGTH);
+        text = text.left(CONTROL_EVENT_TEXT_MAX_LENGTH);
     }
     QByteArray tmp = text.toUtf8();
-    memset(m_data.textEvent.text, 0, sizeof (m_data.textEvent.text));
+    m_data.textEvent.text = new char[tmp.length() + 1];
     memcpy(m_data.textEvent.text, tmp.data(), tmp.length());
+    m_data.textEvent.text[tmp.length()] = '\0';
 }
 
 void ControlEvent::setMouseEventData(AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position)
@@ -48,26 +63,27 @@ void ControlEvent::setScrollEventData(QRect position, qint32 hScroll, qint32 vSc
     m_data.scrollEvent.vScroll = vScroll;
 }
 
-void ControlEvent::write32(QBuffer &buffer, quint32 value)
+void ControlEvent::setSetClipboardEventData(QString &text)
 {
-    buffer.putChar(value >> 24);
-    buffer.putChar(value >> 16);
-    buffer.putChar(value >> 8);
-    buffer.putChar(value);
-}
+    if (text.isEmpty()) {
+        return;
+    }
+    if (CONTROL_EVENT_CLIPBOARD_TEXT_MAX_LENGTH < text.length()) {
+        text = text.left(CONTROL_EVENT_CLIPBOARD_TEXT_MAX_LENGTH);
+    }
 
-void ControlEvent::write16(QBuffer &buffer, quint32 value)
-{
-    buffer.putChar(value >> 8);
-    buffer.putChar(value);
+    QByteArray tmp = text.toUtf8();
+    m_data.setClipboardEvent.text = new char[tmp.length() + 1];
+    memcpy(m_data.setClipboardEvent.text, tmp.data(), tmp.length());
+    m_data.setClipboardEvent.text[tmp.length()] = '\0';
 }
 
 void ControlEvent::writePosition(QBuffer &buffer, const QRect& value)
 {
-    write16(buffer, value.left());
-    write16(buffer, value.top());
-    write16(buffer, value.width());
-    write16(buffer, value.height());
+    BufferUtil::write16(buffer, value.left());
+    BufferUtil::write16(buffer, value.top());
+    BufferUtil::write16(buffer, value.width());
+    BufferUtil::write16(buffer, value.height());
 }
 
 QByteArray ControlEvent::serializeData()
@@ -80,18 +96,16 @@ QByteArray ControlEvent::serializeData()
     switch (m_data.type) {
     case CET_KEYCODE:
         buffer.putChar(m_data.keycodeEvent.action);
-        write32(buffer, m_data.keycodeEvent.keycode);
-        write32(buffer, m_data.keycodeEvent.metastate);
+        BufferUtil::write32(buffer, m_data.keycodeEvent.keycode);
+        BufferUtil::write32(buffer, m_data.keycodeEvent.metastate);
         break;
     case CET_TEXT:
-    {
-        write16(buffer, strlen(m_data.textEvent.text));
+        BufferUtil::write16(buffer, strlen(m_data.textEvent.text));
         buffer.write(m_data.textEvent.text, strlen(m_data.textEvent.text));
-    }
         break;
     case CET_MOUSE:
         buffer.putChar(m_data.mouseEvent.action);
-        write32(buffer, m_data.mouseEvent.buttons);
+        BufferUtil::write32(buffer, m_data.mouseEvent.buttons);
         writePosition(buffer, m_data.mouseEvent.position);
         break;
     case CET_TOUCH:
@@ -101,12 +115,17 @@ QByteArray ControlEvent::serializeData()
         break;
     case CET_SCROLL:
         writePosition(buffer, m_data.scrollEvent.position);
-        write32(buffer, m_data.scrollEvent.hScroll);
-        write32(buffer, m_data.scrollEvent.vScroll);
+        BufferUtil::write32(buffer, m_data.scrollEvent.hScroll);
+        BufferUtil::write32(buffer, m_data.scrollEvent.vScroll);
+        break;
+    case CET_SET_CLIPBOARD:
+        BufferUtil::write16(buffer, strlen(m_data.setClipboardEvent.text));
+        buffer.write(m_data.setClipboardEvent.text, strlen(m_data.setClipboardEvent.text));
         break;
     case CET_BACK_OR_SCREEN_ON:
     case CET_EXPAND_NOTIFICATION_PANEL:
-    case CET_COLLAPSE_NOTIFICATION_PANEL:
+    case CET_COLLAPSE_NOTIFICATION_PANEL:    
+    case CET_GET_CLIPBOARD:
         break;
     default:
         qDebug() << "Unknown event type:" << m_data.type;

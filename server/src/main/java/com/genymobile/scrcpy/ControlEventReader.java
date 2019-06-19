@@ -14,11 +14,12 @@ public class ControlEventReader {
     private static final int SCROLL_PAYLOAD_LENGTH = 16;
 
     public static final int TEXT_MAX_LENGTH = 300;
+    public static final int CLIPBOARD_TEXT_MAX_LENGTH = 4093;
     private static final int RAW_BUFFER_SIZE = 1024;
 
     private final byte[] rawBuffer = new byte[RAW_BUFFER_SIZE];
     private final ByteBuffer buffer = ByteBuffer.wrap(rawBuffer);
-    private final byte[] textBuffer = new byte[TEXT_MAX_LENGTH];
+    private final byte[] textBuffer = new byte[CLIPBOARD_TEXT_MAX_LENGTH];
 
     public ControlEventReader() {
         // invariant: the buffer is always in "get" mode
@@ -66,9 +67,13 @@ public class ControlEventReader {
             case ControlEvent.TYPE_SCROLL:
                 controlEvent = parseScrollControlEvent();
                 break;
+            case ControlEvent.TYPE_SET_CLIPBOARD:
+                controlEvent = parseSetClipboardEvent();
+                break;
             case ControlEvent.TYPE_BACK_OR_SCREEN_ON:
             case ControlEvent.TYPE_EXPAND_NOTIFICATION_PANEL:
             case ControlEvent.TYPE_COLLAPSE_NOTIFICATION_PANEL:
+            case ControlEvent.TYPE_GET_CLIPBOARD:
                 controlEvent = ControlEvent.createSimpleControlEvent(type);
                 break;
             default:
@@ -94,8 +99,8 @@ public class ControlEventReader {
         return ControlEvent.createKeycodeControlEvent(action, keycode, metaState);
     }
 
-    private ControlEvent parseTextControlEvent() {
-        if (buffer.remaining() < 1) {
+    private String parseString() {
+        if (buffer.remaining() < 2) {
             return null;
         }
         int len = toUnsigned(buffer.getShort());
@@ -103,7 +108,14 @@ public class ControlEventReader {
             return null;
         }
         buffer.get(textBuffer, 0, len);
-        String text = new String(textBuffer, 0, len, StandardCharsets.UTF_8);
+        return new String(textBuffer, 0, len, StandardCharsets.UTF_8);
+    }
+
+    private ControlEvent parseTextControlEvent() {
+        String text = parseString();
+        if (text == null) {
+            return null;
+        }
         return ControlEvent.createTextControlEvent(text);
     }
 
@@ -135,6 +147,14 @@ public class ControlEventReader {
         int hScroll = buffer.getInt();
         int vScroll = buffer.getInt();
         return ControlEvent.createScrollControlEvent(position, hScroll, vScroll);
+    }
+
+    private ControlEvent parseSetClipboardEvent() {
+        String text = parseString();
+        if (text == null) {
+            return null;
+        }
+        return ControlEvent.createSetClipboardControlEvent(text);
     }
 
     private static Position readPosition(ByteBuffer buffer) {
