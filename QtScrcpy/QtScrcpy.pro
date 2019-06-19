@@ -161,5 +161,5 @@ linux {
 # message("test")
 
 RESOURCES += \
-    res.qrc
+    res/res.qrc
 

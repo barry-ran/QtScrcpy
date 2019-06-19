@@ -235,7 +235,7 @@ void VideoForm::updateStyleSheet(bool vertical)
     if (vertical) {
         setStyleSheet(R"(
                  #videoForm {
-                     border-image: url(:/res/phone-v.png) 150px 142px 85px 142px;
+                     border-image: url(:/image/videoform/phone-v.png) 150px 142px 85px 142px;
                      border-width: 150px 142px 85px 142px;
                  }
                  )");
@@ -243,7 +243,7 @@ void VideoForm::updateStyleSheet(bool vertical)
     } else {
         setStyleSheet(R"(
                  #videoForm {
-                     border-image: url(:/res/phone-h.png) 142px 85px 142px 150px;
+                     border-image: url(:/image/videoform/phone-h.png) 142px 85px 142px 150px;
                      border-width: 142px 85px 142px 150px;
                  }
                  )");
