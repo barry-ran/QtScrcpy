@@ -1,18 +1,18 @@
 HEADERS += \
-    $$PWD/controlevent.h \
     $$PWD/controller.h \
     $$PWD/inputconvertbase.h \
     $$PWD/inputconvertgame.h \
     $$PWD/inputconvertnormal.h \
-    $$PWD/deviceevent.h \
-    $$PWD/receiver.h
+    $$PWD/receiver.h \
+    $$PWD/controlmsg.h \
+    $$PWD/devicemsg.h
 
 SOURCES += \
-    $$PWD/controlevent.cpp \
     $$PWD/controller.cpp \
     $$PWD/inputconvertbase.cpp \
     $$PWD/inputconvertgame.cpp \
     $$PWD/inputconvertnormal.cpp \
-    $$PWD/deviceevent.cpp \
-    $$PWD/receiver.cpp
+    $$PWD/receiver.cpp \
+    $$PWD/controlmsg.cpp \
+    $$PWD/devicemsg.cpp
 

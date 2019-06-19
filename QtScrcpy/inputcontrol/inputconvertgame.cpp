@@ -111,12 +111,12 @@ void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAct
     if (0 > id || MULTI_TOUCH_MAX_NUM-1 < id) {
         return;
     }
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_TOUCH);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
+    if (!controlMsg) {
         return;
     }
-    controlEvent->setTouchEventData(id, action, QRect(calcFrameAbsolutePos(pos).toPoint(), m_frameSize));
-    sendControlEvent(controlEvent);
+    controlMsg->setInjectTouchMsgData(id, action, QRect(calcFrameAbsolutePos(pos).toPoint(), m_frameSize));
+    sendControlMsg(controlMsg);
 }
 
 QPointF InputConvertGame::calcFrameAbsolutePos(QPointF relativePos)

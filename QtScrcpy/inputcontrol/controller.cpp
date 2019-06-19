@@ -2,7 +2,7 @@
 
 #include "controller.h"
 #include "videosocket.h"
-#include "controlevent.h"
+#include "controlmsg.h"
 #include "receiver.h"
 
 Controller::Controller(QObject* parent) : QObject(parent)
@@ -29,26 +29,26 @@ QTcpSocket *Controller::getControlSocket()
     return m_controlSocket;
 }
 
-void Controller::postControlEvent(ControlEvent *controlEvent)
+void Controller::postControlMsg(ControlMsg *controlMsg)
 {
-    if (controlEvent) {
-        QCoreApplication::postEvent(this, controlEvent);
+    if (controlMsg) {
+        QCoreApplication::postEvent(this, controlMsg);
     }
 }
 
 void Controller::test(QRect rc)
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_MOUSE);
-    controlEvent->setMouseEventData(AMOTION_EVENT_ACTION_DOWN, AMOTION_EVENT_BUTTON_PRIMARY, rc);
-    postControlEvent(controlEvent);
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_MOUSE);
+    controlMsg->setInjectMouseMsgData(AMOTION_EVENT_ACTION_DOWN, AMOTION_EVENT_BUTTON_PRIMARY, rc);
+    postControlMsg(controlMsg);
 }
 
 bool Controller::event(QEvent *event)
 {
-    if (event && event->type() == ControlEvent::Control) {
-        ControlEvent* controlEvent = dynamic_cast<ControlEvent*>(event);
-        if (controlEvent) {
-            sendControl(controlEvent->serializeData());
+    if (event && event->type() == ControlMsg::Control) {
+        ControlMsg* controlMsg = dynamic_cast<ControlMsg*>(event);
+        if (controlMsg) {
+            sendControl(controlMsg->serializeData());
         }
         return true;
     }

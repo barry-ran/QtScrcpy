@@ -5,7 +5,7 @@
 #include <QPointer>
 
 class QTcpSocket;
-class ControlEvent;
+class ControlMsg;
 class Receiver;
 class Controller : public QObject
 {
@@ -16,7 +16,7 @@ public:
 
     void setControlSocket(QTcpSocket* controlSocket);
     QTcpSocket* getControlSocket();
-    void postControlEvent(ControlEvent* controlEvent);
+    void postControlMsg(ControlMsg* controlMsg);
     void test(QRect rc);
 
 protected:

@@ -20,7 +20,7 @@
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
-#include "controlevent.h"
+#include "controlmsg.h"
 #include "mousetap/mousetap.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, QWidget *parent) :
@@ -341,50 +341,50 @@ void VideoForm::postVolumeDown()
 
 void VideoForm::postTurnOn()
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_BACK_OR_SCREEN_ON);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
+    if (!controlMsg) {
         return;
     }    
-    m_inputConvert.sendControlEvent(controlEvent);
+    m_inputConvert.sendControlMsg(controlMsg);
 }
 
 void VideoForm::expandNotificationPanel()
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_EXPAND_NOTIFICATION_PANEL);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_EXPAND_NOTIFICATION_PANEL);
+    if (!controlMsg) {
         return;
     }
-    m_inputConvert.sendControlEvent(controlEvent);
+    m_inputConvert.sendControlMsg(controlMsg);
 }
 
 void VideoForm::collapseNotificationPanel()
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_COLLAPSE_NOTIFICATION_PANEL);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_COLLAPSE_NOTIFICATION_PANEL);
+    if (!controlMsg) {
         return;
     }    
-    m_inputConvert.sendControlEvent(controlEvent);
+    m_inputConvert.sendControlMsg(controlMsg);
 }
 
 void VideoForm::requestDeviceClipboard()
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_GET_CLIPBOARD);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_GET_CLIPBOARD);
+    if (!controlMsg) {
         return;
     }
-    m_inputConvert.sendControlEvent(controlEvent);
+    m_inputConvert.sendControlMsg(controlMsg);
 }
 
 void VideoForm::setDeviceClipboard()
 {
     QClipboard *board = QApplication::clipboard();
     QString text = board->text();
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_SET_CLIPBOARD);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_SET_CLIPBOARD);
+    if (!controlMsg) {
         return;
     }
-    controlEvent->setSetClipboardEventData(text);
-    m_inputConvert.sendControlEvent(controlEvent);
+    controlMsg->setSetClipboardMsgData(text);
+    m_inputConvert.sendControlMsg(controlMsg);
 }
 
 void VideoForm::clipboardPaste()
@@ -396,12 +396,12 @@ void VideoForm::clipboardPaste()
 
 void VideoForm::postTextInput(QString& text)
 {
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_TEXT);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TEXT);
+    if (!controlMsg) {
         return;
     }
-    controlEvent->setTextEventData(text);
-    m_inputConvert.sendControlEvent(controlEvent);
+    controlMsg->setInjectTextMsgData(text);
+    m_inputConvert.sendControlMsg(controlMsg);
 }
 
 void VideoForm::staysOnTop(bool top)
@@ -426,19 +426,19 @@ void VideoForm::postGoHome()
 
 void VideoForm::postKeyCodeClick(AndroidKeycode keycode)
 {
-    ControlEvent* controlEventDown = new ControlEvent(ControlEvent::CET_KEYCODE);
+    ControlMsg* controlEventDown = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
     if (!controlEventDown) {
         return;
     }
-    controlEventDown->setKeycodeEventData(AKEY_EVENT_ACTION_DOWN, keycode, AMETA_NONE);
-    m_inputConvert.sendControlEvent(controlEventDown);
+    controlEventDown->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_DOWN, keycode, AMETA_NONE);
+    m_inputConvert.sendControlMsg(controlEventDown);
 
-    ControlEvent* controlEventUp = new ControlEvent(ControlEvent::CET_KEYCODE);
+    ControlMsg* controlEventUp = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
     if (!controlEventUp) {
         return;
     }
-    controlEventUp->setKeycodeEventData(AKEY_EVENT_ACTION_UP, keycode, AMETA_NONE);
-    m_inputConvert.sendControlEvent(controlEventUp);
+    controlEventUp->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_UP, keycode, AMETA_NONE);
+    m_inputConvert.sendControlMsg(controlEventUp);
 }
 
 void VideoForm::mousePressEvent(QMouseEvent *event)

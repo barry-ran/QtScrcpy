@@ -4,7 +4,7 @@
 
 #include "receiver.h"
 #include "controller.h"
-#include "deviceevent.h"
+#include "devicemsg.h"
 
 Receiver::Receiver(Controller* controller) : QObject(controller)
 {
@@ -26,24 +26,24 @@ void Receiver::onReadyRead()
 
     while (controlSocket->bytesAvailable()) {
         QByteArray byteArray = controlSocket->peek(controlSocket->bytesAvailable());
-        DeviceEvent deviceEvent;
-        qint32 consume = deviceEvent.deserialize(byteArray);
+        DeviceMsg deviceMsg;
+        qint32 consume = deviceMsg.deserialize(byteArray);
         if (0 >= consume) {
             break;
         }
         controlSocket->read(consume);
-        processEvent(&deviceEvent);
+        processMsg(&deviceMsg);
     }
 }
 
-void Receiver::processEvent(DeviceEvent *deviceEvent)
+void Receiver::processMsg(DeviceMsg *deviceMsg)
 {
-    switch (deviceEvent->type()) {
-    case DeviceEvent::DET_GET_CLIPBOARD:
+    switch (deviceMsg->type()) {
+    case DeviceMsg::DMT_GET_CLIPBOARD:
     {
         QClipboard *board = QApplication::clipboard();
         QString text;
-        deviceEvent->getClipboardEventData(text);
+        deviceMsg->getClipboardMsgData(text);
         board->setText(text);
         break;
     }

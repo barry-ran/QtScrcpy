@@ -39,12 +39,12 @@ void InputConvertNormal::mouseEvent(const QMouseEvent* from, const QSize& frameS
     pos.setY(pos.y() * frameSize.height() / showSize.height());    
 
     // set data
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_MOUSE);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_MOUSE);
+    if (!controlMsg) {
         return;
     }
-    controlEvent->setMouseEventData(action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize));
-    sendControlEvent(controlEvent);
+    controlMsg->setInjectMouseMsgData(action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize));
+    sendControlMsg(controlMsg);
 }
 
 void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameSize, const QSize& showSize)
@@ -72,12 +72,12 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameS
     pos.setY(pos.y() * frameSize.height() / showSize.height());
 
     // set data
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_SCROLL);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_SCROLL);
+    if (!controlMsg) {
         return;
     }
-    controlEvent->setScrollEventData(QRect(pos.toPoint(), frameSize), hScroll, vScroll);
-    sendControlEvent(controlEvent);
+    controlMsg->setInjectScrollMsgData(QRect(pos.toPoint(), frameSize), hScroll, vScroll);
+    sendControlMsg(controlMsg);
 }
 
 void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize& frameSize, const QSize& showSize)
@@ -108,12 +108,12 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize& frameSize,
     }
 
     // set data
-    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_KEYCODE);
-    if (!controlEvent) {
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
+    if (!controlMsg) {
         return;
     }
-    controlEvent->setKeycodeEventData(action, keyCode, convertMetastate(from->modifiers()));
-    sendControlEvent(controlEvent);
+    controlMsg->setInjectKeycodeMsgData(action, keyCode, convertMetastate(from->modifiers()));
+    sendControlMsg(controlMsg);
 }
 
 AndroidMotioneventButtons InputConvertNormal::convertMouseButtons(Qt::MouseButtons buttonState)

@@ -5,7 +5,7 @@
 #include <QWheelEvent>
 #include <QKeyEvent>
 
-#include "controlevent.h"
+#include "controlmsg.h"
 #include "controller.h"
 
 class InputConvertBase
@@ -21,7 +21,7 @@ public:
     virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize) = 0;
 
     void setControlSocket(QTcpSocket* controlSocket);
-    void sendControlEvent(ControlEvent* event);
+    void sendControlMsg(ControlMsg* msg);
 
 private:
     Controller m_controller;
