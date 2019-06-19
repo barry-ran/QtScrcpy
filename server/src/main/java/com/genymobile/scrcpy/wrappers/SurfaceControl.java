@@ -2,6 +2,7 @@ package com.genymobile.scrcpy.wrappers;
 
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
+import android.os.Build;
 import android.os.IBinder;
 import android.view.Surface;
 
@@ -9,6 +10,10 @@ import android.view.Surface;
 public final class SurfaceControl {
 
     private static final Class<?> CLASS;
+
+    // see <https://android.googlesource.com/platform/frameworks/base.git/+/pie-release-2/core/java/android/view/SurfaceControl.java#305>
+    public static final int POWER_MODE_OFF = 0;
+    public static final int POWER_MODE_NORMAL = 2;
 
     static {
         try {
@@ -66,6 +71,27 @@ public final class SurfaceControl {
     public static IBinder createDisplay(String name, boolean secure) {
         try {
             return (IBinder) CLASS.getMethod("createDisplay", String.class, boolean.class).invoke(null, name, secure);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    public static IBinder getBuiltInDisplay(int builtInDisplayId) {
+        try {
+            // the method signature has changed in Android Q
+            // <https://github.com/Genymobile/scrcpy/issues/586>
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                return (IBinder) CLASS.getMethod("getBuiltInDisplay", int.class).invoke(null, builtInDisplayId);
+            }
+            return (IBinder) CLASS.getMethod("getPhysicalDisplayToken", long.class).invoke(null, builtInDisplayId);
+        } catch (Exception e) {
+            throw new AssertionError(e);
+        }
+    }
+
+    public static void setDisplayPowerMode(IBinder displayToken, int mode) {
+        try {
+            CLASS.getMethod("setDisplayPowerMode", IBinder.class, int.class).invoke(null, displayToken, mode);
         } catch (Exception e) {
             throw new AssertionError(e);
         }

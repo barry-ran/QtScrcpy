@@ -14,14 +14,15 @@ public final class ControlMessage {
     public static final int TYPE_COLLAPSE_NOTIFICATION_PANEL = 6;
     public static final int TYPE_GET_CLIPBOARD = 7;
     public static final int TYPE_SET_CLIPBOARD = 8;
+    public static final int TYPE_SET_SCREEN_POWER_MODE = 9;
 
-    public static final int TYPE_INJECT_TOUCH = 9;
+    public static final int TYPE_INJECT_TOUCH = 10;
 
 
     private int type;
     private String text;
     private int metaState; // KeyEvent.META_*
-    private int action; // KeyEvent.ACTION_* or MotionEvent.ACTION_*
+    private int action; // KeyEvent.ACTION_* or MotionEvent.ACTION_* or POWER_MODE_*
     private int keycode; // KeyEvent.KEYCODE_*
     private int buttons; // MotionEvent.BUTTON_*
     private int id;
@@ -79,6 +80,16 @@ public final class ControlMessage {
         ControlMessage event = new ControlMessage();
         event.type = TYPE_SET_CLIPBOARD;
         event.text = text;
+        return event;
+    }
+
+    /**
+     * @param mode one of the {@code Device.SCREEN_POWER_MODE_*} constants
+     */
+    public static ControlMessage createSetScreenPowerMode(int mode) {
+        ControlMessage event = new ControlMessage();
+        event.type = TYPE_SET_SCREEN_POWER_MODE;
+        event.action = mode;
         return event;
     }
 

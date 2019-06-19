@@ -5,11 +5,17 @@ Mac游戏时向右移动不流畅问题。
 
 中文输入（server需要改为apk，作为一个输入法，暂不实现）
 
-最后更新scrcpy 7764a836f1ee02a4540cfc4118c20729018daaac
+最后同步scrcpy b91ecf52256da73f5c8dca04fb82c13ec826cbd7
 
 b35733edb6df2a00b6af9b1c98627d344c377963 鼠标事件相关系列
 
 只录制不启动窗口（先重构，目前启动流程在videoform里）
+跳过帧改为动态配置，而不是静态编译 https://github.com/Genymobile/scrcpy/commit/ebccb9f6cc111e8acfbe10d656cac5c1f1b744a0
+复制粘贴问题对比
+复制粘贴中文测试
+国际化
+单独线程打印帧率 https://github.com/Genymobile/scrcpy/commit/e2a272bf99ecf48fcb050177113f903b3fb323c4
+
 
 
 mark:

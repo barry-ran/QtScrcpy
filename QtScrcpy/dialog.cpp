@@ -105,7 +105,8 @@ void Dialog::on_startServerBtn_clicked()
         quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
         // this is ok that "native" toUshort is 0
         quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
-        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate, absFilePath);
+        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate,
+                                    absFilePath, ui->closeScreenCheck->isChecked());
         if (ui->alwaysTopCheck->isChecked()) {
             m_videoForm->staysOnTop();
         }
@@ -236,5 +237,17 @@ void Dialog::on_alwaysTopCheck_stateChanged(int arg1)
         m_videoForm->staysOnTop(true);
     } else {
         m_videoForm->staysOnTop(false);
+    }
+}
+
+void Dialog::on_closeScreenCheck_stateChanged(int arg1)
+{
+    if (!m_videoForm) {
+        return;
+    }
+    if (ui->closeScreenCheck->isChecked()) {
+        m_videoForm->setScreenPowerMode(ControlMsg::SPM_OFF);
+    } else {
+        m_videoForm->setScreenPowerMode(ControlMsg::SPM_NORMAL);
     }
 }

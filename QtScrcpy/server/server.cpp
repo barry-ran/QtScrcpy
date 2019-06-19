@@ -65,7 +65,7 @@ bool Server::pushServer()
     if (m_workProcess.isRuning()) {
         m_workProcess.kill();
     }
-    m_workProcess.push(m_serial, getServerPath(), DEVICE_SERVER_PATH);
+    m_workProcess.push(m_params.serial, getServerPath(), DEVICE_SERVER_PATH);
     return true;
 }
 
@@ -74,7 +74,7 @@ bool Server::enableTunnelReverse()
     if (m_workProcess.isRuning()) {
         m_workProcess.kill();
     }
-    m_workProcess.reverse(m_serial, SOCKET_NAME, m_localPort);
+    m_workProcess.reverse(m_params.serial, SOCKET_NAME, m_params.localPort);
     return true;
 }
 
@@ -89,7 +89,7 @@ bool Server::disableTunnelReverse()
             sender()->deleteLater();
         }
     });
-    adb->reverseRemove(m_serial, SOCKET_NAME);
+    adb->reverseRemove(m_params.serial, SOCKET_NAME);
     return true;
 }
 
@@ -98,7 +98,7 @@ bool Server::enableTunnelForward()
     if (m_workProcess.isRuning()) {
         m_workProcess.kill();
     }
-    m_workProcess.forward(m_serial, m_localPort, SOCKET_NAME);
+    m_workProcess.forward(m_params.serial, m_params.localPort, SOCKET_NAME);
     return true;
 }
 bool Server::disableTunnelForward()
@@ -112,7 +112,7 @@ bool Server::disableTunnelForward()
             sender()->deleteLater();
         }
     });
-    adb->forwardRemove(m_serial, m_localPort);
+    adb->forwardRemove(m_params.serial, m_params.localPort);
     return true;
 }
 
@@ -127,31 +127,27 @@ bool Server::execute()
     args << "app_process";
     args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
-    args << QString::number(m_maxSize);
-    args << QString::number(m_bitRate);
+    args << QString::number(m_params.maxSize);
+    args << QString::number(m_params.bitRate);
     args << (m_tunnelForward ? "true" : "false");
-    if (m_crop.isEmpty()) {
+    if (m_params.crop.isEmpty()) {
         args << "-";
     } else {
-        args << m_crop;
+        args << m_params.crop;
     }
-    args << (m_sendFrameMeta ? "true" : "false");
+    args << (m_params.sendFrameMeta ? "true" : "false");
+    args << (m_params.control ? "true" : "false");
+
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
     // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
     // 这条adb命令是阻塞运行的，m_serverProcess进程不会退出了
-    m_serverProcess.execute(m_serial, args);
+    m_serverProcess.execute(m_params.serial, args);
     return true;
 }
 
-bool Server::start(const QString& serial, quint16 localPort, quint16 maxSize, quint32 bitRate, const QString& crop, bool sendFrameMeta)
+bool Server::start(Server::ServerParams params)
 {    
-    m_serial = serial;
-    m_localPort = localPort;
-    m_maxSize = maxSize;
-    m_bitRate = bitRate;
-    m_crop = crop;
-    m_sendFrameMeta = sendFrameMeta;
-
+    m_params = params;
     m_serverStartStep = SSS_PUSH;
     return startServerByStep();
 }
@@ -179,7 +175,7 @@ bool Server::connectTo()
 
         // video socket
         m_videoSocket = new VideoSocket();
-        m_videoSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+        m_videoSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
         if (!m_videoSocket->waitForConnected(1000)) {
             stop();
             qWarning("video socket connect to server failed");
@@ -206,7 +202,7 @@ bool Server::connectTo()
 
         // control socket
         m_controlSocket = new QTcpSocket();
-        m_controlSocket->connectToHost(QHostAddress::LocalHost, m_localPort);
+        m_controlSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
         if (!m_controlSocket->waitForConnected(1000)) {
             stop();
             qWarning("control socket connect to server failed");
@@ -294,8 +290,8 @@ bool Server::startServerByStep()
                 // client can listen before starting the server app, so there is no need to
                 // try to connect until the server socket is listening on the device.
                 m_serverSocket.setMaxPendingConnections(2);
-                if (!m_serverSocket.listen(QHostAddress::LocalHost, m_localPort)) {
-                    qCritical(QString("Could not listen on port %1").arg(m_localPort).toStdString().c_str());
+                if (!m_serverSocket.listen(QHostAddress::LocalHost, m_params.localPort)) {
+                    qCritical(QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str());
                     m_serverStartStep = SSS_NULL;
                     if (m_tunnelForward) {
                         disableTunnelForward();

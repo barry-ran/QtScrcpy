@@ -26,9 +26,16 @@ public:
         CMT_COLLAPSE_NOTIFICATION_PANEL,
         CMT_GET_CLIPBOARD,
         CMT_SET_CLIPBOARD,
+        CMT_SET_SCREEN_POWER_MODE,
 
         CMT_INJECT_TOUCH,
-    };    
+    };
+
+    enum ScreenPowerMode {
+        // see <https://android.googlesource.com/platform/frameworks/base.git/+/pie-release-2/core/java/android/view/SurfaceControl.java#305>
+        SPM_OFF = 0,
+        SPM_NORMAL = 2,
+    };
 
     ControlMsg(ControlMsgType controlMsgType);
     virtual ~ControlMsg();
@@ -42,6 +49,7 @@ public:
     void setInjectTouchMsgData(quint32 id, AndroidMotioneventAction action, QRect position);
     void setInjectScrollMsgData(QRect position, qint32 hScroll, qint32 vScroll);
     void setSetClipboardMsgData(QString& text);
+    void setSetScreenPowerModeData(ControlMsg::ScreenPowerMode mode);
 
     QByteArray serializeData();
 
@@ -56,28 +64,31 @@ private:
                 AndroidKeyeventAction action;
                 AndroidKeycode keycode;
                 AndroidMetastate metastate;
-            } injectKeycodeMsg;
+            } injectKeycode;
             struct {
                 char* text = Q_NULLPTR;
-            } injectTextMsg;
+            } injectText;
             struct {
                 AndroidMotioneventAction action;
                 AndroidMotioneventButtons buttons;
                 QRect position;
-            } injectMouseMsg;
+            } injectMouse;
             struct {
                 quint32 id;
                 AndroidMotioneventAction action;
                 QRect position;
-            } injectTouchMsg;
+            } injectTouch;
             struct {
                 QRect position;
                 qint32 hScroll;
                 qint32 vScroll;
-            } injectScrollMsg;
+            } injectScroll;
             struct {
                 char *text = Q_NULLPTR;
-            } setClipboardMsg;
+            } setClipboard;
+            struct {
+                ScreenPowerMode mode;
+            } setScreenPowerMode;
         };
 
         ControlMsgData(){}

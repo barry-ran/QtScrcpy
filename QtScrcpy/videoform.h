@@ -24,7 +24,7 @@ class VideoForm : public QWidget
     Q_OBJECT
 
 public:
-    explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, const QString& fileName = "", QWidget *parent = 0);
+    explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, const QString& fileName = "", bool closeScreen = false, QWidget *parent = 0);
     ~VideoForm();
 
     void switchFullScreen();
@@ -43,6 +43,7 @@ public:
     void setDeviceClipboard();
     void clipboardPaste();
     void postTextInput(QString& text);
+    void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
 
     void staysOnTop(bool top = true);
 
@@ -89,6 +90,7 @@ private:
     Recorder* m_recorder = Q_NULLPTR;    
     QTime m_startTimeCount;
     QPointer<QWidget> m_loadingWidget;
+    bool m_closeScreen = false;
 };
 
 #endif // VIDEOFORM_H

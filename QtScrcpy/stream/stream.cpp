@@ -145,7 +145,7 @@ static qint32 readPacketWithMeta(void *opaque, uint8_t *buf, int bufSize) {
         quint8 header[HEADER_SIZE];
         qint32 r = stream->recvData(header, HEADER_SIZE);
         if (r == -1) {
-            return AVERROR(errno);
+            return errno ? AVERROR(errno) : AVERROR_EOF;
         }
         if (r == 0) {
             return AVERROR_EOF;
@@ -173,7 +173,7 @@ static qint32 readPacketWithMeta(void *opaque, uint8_t *buf, int bufSize) {
 
     qint32 r = stream->recvData(buf, bufSize);
     if (r == -1) {
-        return AVERROR(errno);
+        return errno ? AVERROR(errno) : AVERROR_EOF;
     }
     if (r == 0) {
         return AVERROR_EOF;
