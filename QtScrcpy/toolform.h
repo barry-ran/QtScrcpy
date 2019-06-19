@@ -44,7 +44,7 @@ private slots:
 
     void on_volumeDownBtn_clicked();
 
-    void on_turnOnBtn_clicked();
+    void on_closeScreenBtn_clicked();
 
     void on_expandNotifyBtn_clicked();
 

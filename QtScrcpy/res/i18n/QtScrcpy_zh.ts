@@ -113,14 +113,22 @@
         <translation>下拉通知</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="59"/>
         <source>turn off</source>
-        <translation>锁屏</translation>
+        <translation type="vanished">锁屏</translation>
+    </message>
+    <message>
+        <source>turn on</source>
+        <translation type="vanished">解锁</translation>
+    </message>
+    <message>
+        <location filename="../../toolform.ui" line="59"/>
+        <source>close screen</source>
+        <translation>关闭屏幕</translation>
     </message>
     <message>
         <location filename="../../toolform.ui" line="69"/>
-        <source>turn on</source>
-        <translation>解锁</translation>
+        <source>power</source>
+        <translation>电源</translation>
     </message>
     <message>
         <location filename="../../toolform.ui" line="79"/>
