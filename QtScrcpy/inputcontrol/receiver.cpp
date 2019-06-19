@@ -41,6 +41,7 @@ void Receiver::processMsg(DeviceMsg *deviceMsg)
     switch (deviceMsg->type()) {
     case DeviceMsg::DMT_GET_CLIPBOARD:
     {
+        qInfo("Device clipboard copied");
         QClipboard *board = QApplication::clipboard();
         QString text;
         deviceMsg->getClipboardMsgData(text);

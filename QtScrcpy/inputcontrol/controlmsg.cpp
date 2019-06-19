@@ -12,21 +12,21 @@ ControlMsg::ControlMsg(ControlMsgType controlMsgType)
 ControlMsg::~ControlMsg()
 {
     if (CMT_SET_CLIPBOARD == m_data.type
-            && Q_NULLPTR != m_data.setClipboardMsg.text) {
-        delete m_data.setClipboardMsg.text;
-        m_data.setClipboardMsg.text = Q_NULLPTR;
+            && Q_NULLPTR != m_data.setClipboard.text) {
+        delete m_data.setClipboard.text;
+        m_data.setClipboard.text = Q_NULLPTR;
     } else if (CMT_INJECT_TEXT == m_data.type
-               && Q_NULLPTR != m_data.injectTextMsg.text){
-        delete m_data.injectTextMsg.text;
-        m_data.injectTextMsg.text = Q_NULLPTR;
+               && Q_NULLPTR != m_data.injectText.text){
+        delete m_data.injectText.text;
+        m_data.injectText.text = Q_NULLPTR;
     }
 }
 
 void ControlMsg::setInjectKeycodeMsgData(AndroidKeyeventAction action, AndroidKeycode keycode, AndroidMetastate metastate)
 {
-    m_data.injectKeycodeMsg.action = action;
-    m_data.injectKeycodeMsg.keycode = keycode;
-    m_data.injectKeycodeMsg.metastate = metastate;
+    m_data.injectKeycode.action = action;
+    m_data.injectKeycode.keycode = keycode;
+    m_data.injectKeycode.metastate = metastate;
 }
 
 void ControlMsg::setInjectTextMsgData(QString& text)
@@ -37,30 +37,30 @@ void ControlMsg::setInjectTextMsgData(QString& text)
         text = text.left(CONTROL_MSG_TEXT_MAX_LENGTH);
     }
     QByteArray tmp = text.toUtf8();
-    m_data.injectTextMsg.text = new char[tmp.length() + 1];
-    memcpy(m_data.injectTextMsg.text, tmp.data(), tmp.length());
-    m_data.injectTextMsg.text[tmp.length()] = '\0';
+    m_data.injectText.text = new char[tmp.length() + 1];
+    memcpy(m_data.injectText.text, tmp.data(), tmp.length());
+    m_data.injectText.text[tmp.length()] = '\0';
 }
 
 void ControlMsg::setInjectMouseMsgData(AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position)
 {
-    m_data.injectMouseMsg.action = action;
-    m_data.injectMouseMsg.buttons = buttons;
-    m_data.injectMouseMsg.position = position;
+    m_data.injectMouse.action = action;
+    m_data.injectMouse.buttons = buttons;
+    m_data.injectMouse.position = position;
 }
 
 void ControlMsg::setInjectTouchMsgData(quint32 id, AndroidMotioneventAction action, QRect position)
 {
-    m_data.injectTouchMsg.action = action;
-    m_data.injectTouchMsg.id = id;
-    m_data.injectTouchMsg.position = position;
+    m_data.injectTouch.action = action;
+    m_data.injectTouch.id = id;
+    m_data.injectTouch.position = position;
 }
 
 void ControlMsg::setInjectScrollMsgData(QRect position, qint32 hScroll, qint32 vScroll)
 {
-    m_data.injectScrollMsg.position = position;
-    m_data.injectScrollMsg.hScroll = hScroll;
-    m_data.injectScrollMsg.vScroll = vScroll;
+    m_data.injectScroll.position = position;
+    m_data.injectScroll.hScroll = hScroll;
+    m_data.injectScroll.vScroll = vScroll;
 }
 
 void ControlMsg::setSetClipboardMsgData(QString &text)
@@ -73,9 +73,14 @@ void ControlMsg::setSetClipboardMsgData(QString &text)
     }
 
     QByteArray tmp = text.toUtf8();
-    m_data.setClipboardMsg.text = new char[tmp.length() + 1];
-    memcpy(m_data.setClipboardMsg.text, tmp.data(), tmp.length());
-    m_data.setClipboardMsg.text[tmp.length()] = '\0';
+    m_data.setClipboard.text = new char[tmp.length() + 1];
+    memcpy(m_data.setClipboard.text, tmp.data(), tmp.length());
+    m_data.setClipboard.text[tmp.length()] = '\0';
+}
+
+void ControlMsg::setSetScreenPowerModeData(ControlMsg::ScreenPowerMode mode)
+{
+    m_data.setScreenPowerMode.mode = mode;
 }
 
 void ControlMsg::writePosition(QBuffer &buffer, const QRect& value)
@@ -95,32 +100,35 @@ QByteArray ControlMsg::serializeData()
 
     switch (m_data.type) {
     case CMT_INJECT_KEYCODE:
-        buffer.putChar(m_data.injectKeycodeMsg.action);
-        BufferUtil::write32(buffer, m_data.injectKeycodeMsg.keycode);
-        BufferUtil::write32(buffer, m_data.injectKeycodeMsg.metastate);
+        buffer.putChar(m_data.injectKeycode.action);
+        BufferUtil::write32(buffer, m_data.injectKeycode.keycode);
+        BufferUtil::write32(buffer, m_data.injectKeycode.metastate);
         break;
     case CMT_INJECT_TEXT:
-        BufferUtil::write16(buffer, strlen(m_data.injectTextMsg.text));
-        buffer.write(m_data.injectTextMsg.text, strlen(m_data.injectTextMsg.text));
+        BufferUtil::write16(buffer, strlen(m_data.injectText.text));
+        buffer.write(m_data.injectText.text, strlen(m_data.injectText.text));
         break;
     case CMT_INJECT_MOUSE:
-        buffer.putChar(m_data.injectMouseMsg.action);
-        BufferUtil::write32(buffer, m_data.injectMouseMsg.buttons);
-        writePosition(buffer, m_data.injectMouseMsg.position);
+        buffer.putChar(m_data.injectMouse.action);
+        BufferUtil::write32(buffer, m_data.injectMouse.buttons);
+        writePosition(buffer, m_data.injectMouse.position);
         break;
     case CMT_INJECT_TOUCH:
-        buffer.putChar(m_data.injectTouchMsg.id);
-        buffer.putChar(m_data.injectTouchMsg.action);
-        writePosition(buffer, m_data.injectTouchMsg.position);
+        buffer.putChar(m_data.injectTouch.id);
+        buffer.putChar(m_data.injectTouch.action);
+        writePosition(buffer, m_data.injectTouch.position);
         break;
     case CMT_INJECT_SCROLL:
-        writePosition(buffer, m_data.injectScrollMsg.position);
-        BufferUtil::write32(buffer, m_data.injectScrollMsg.hScroll);
-        BufferUtil::write32(buffer, m_data.injectScrollMsg.vScroll);
+        writePosition(buffer, m_data.injectScroll.position);
+        BufferUtil::write32(buffer, m_data.injectScroll.hScroll);
+        BufferUtil::write32(buffer, m_data.injectScroll.vScroll);
         break;
     case CMT_SET_CLIPBOARD:
-        BufferUtil::write16(buffer, strlen(m_data.setClipboardMsg.text));
-        buffer.write(m_data.setClipboardMsg.text, strlen(m_data.setClipboardMsg.text));
+        BufferUtil::write16(buffer, strlen(m_data.setClipboard.text));
+        buffer.write(m_data.setClipboard.text, strlen(m_data.setClipboard.text));
+        break;
+    case CMT_SET_SCREEN_POWER_MODE:
+        buffer.putChar(m_data.setScreenPowerMode.mode);
         break;
     case CMT_BACK_OR_SCREEN_ON:
     case CMT_EXPAND_NOTIFICATION_PANEL:

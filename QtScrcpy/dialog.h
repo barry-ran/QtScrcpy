@@ -43,6 +43,8 @@ private slots:
 
     void on_alwaysTopCheck_stateChanged(int arg1);
 
+    void on_closeScreenCheck_stateChanged(int arg1);
+
 private:
     bool checkAdbRun();
     void initUI();

@@ -23,7 +23,7 @@
 #include "controlmsg.h"
 #include "mousetap/mousetap.h"
 
-VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, QWidget *parent) :
+VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, bool closeScreen, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::videoForm),
     m_serial(serial),
@@ -33,6 +33,7 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     ui->setupUi(this);
     initUI();    
 
+    m_closeScreen = closeScreen;
     m_server = new Server();
     m_vb = new VideoBuffer();
     m_vb->init();
@@ -55,7 +56,15 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
         // only one devices, serial can be null
         // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
         // sendFrameMeta for recorder mp4
-        m_server->start(m_serial, 27183, m_maxSize, m_bitRate, "-", sendFrameMeta);
+        Server::ServerParams params;
+        params.serial = m_serial;
+        params.localPort = 27183;
+        params.maxSize = m_maxSize;
+        params.bitRate = m_bitRate;
+        params.crop = "-";
+        params.sendFrameMeta = sendFrameMeta;
+        params.control = true;
+        m_server->start(params);
     });
 
     updateShowSize(size());
@@ -177,6 +186,10 @@ void VideoForm::initSignals()
 
             // init controller
             m_inputConvert.setControlSocket(m_server->getControlSocket());
+
+            if (m_closeScreen) {
+                setScreenPowerMode(ControlMsg::SPM_OFF);
+            }
         }
     });
 
@@ -401,6 +414,16 @@ void VideoForm::postTextInput(QString& text)
         return;
     }
     controlMsg->setInjectTextMsgData(text);
+    m_inputConvert.sendControlMsg(controlMsg);
+}
+
+void VideoForm::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
+{
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_SET_SCREEN_POWER_MODE);
+    if (!controlMsg) {
+        return;
+    }
+    controlMsg->setSetScreenPowerModeData(mode);
     m_inputConvert.sendControlMsg(controlMsg);
 }
 

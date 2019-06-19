@@ -12,6 +12,7 @@ public class ControlMessageReader {
     private static final int INJECT_MOUSE_PAYLOAD_LENGTH = 13;
     private static final int INJECT_SCROLL_PAYLOAD_LENGTH = 16;
     private static final int INJECT_TOUCH_PAYLOAD_LENGTH = 10;
+    private static final int SET_SCREEN_POWER_MODE_PAYLOAD_LENGTH = 1;
 
     public static final int TEXT_MAX_LENGTH = 300;
     public static final int CLIPBOARD_TEXT_MAX_LENGTH = 4093;
@@ -50,43 +51,46 @@ public class ControlMessageReader {
         }
         int savedPosition = buffer.position();
         int type = buffer.get();
-        ControlMessage controlEvent;
+        ControlMessage msg;
         switch (type) {
             case ControlMessage.TYPE_INJECT_KEYCODE:
-                controlEvent = parseInjectKeycode();
+                msg = parseInjectKeycode();
                 break;
             case ControlMessage.TYPE_INJECT_TEXT:
-                controlEvent = parseInjectText();
+                msg = parseInjectText();
                 break;
             case ControlMessage.TYPE_INJECT_MOUSE:
-                controlEvent = parseInjectMouse();
+                msg = parseInjectMouse();
                 break;
             case ControlMessage.TYPE_INJECT_TOUCH:
-                controlEvent = parseInjectMouseTouch();
+                msg = parseInjectMouseTouch();
                 break;
             case ControlMessage.TYPE_INJECT_SCROLL:
-                controlEvent = parseInjectScroll();
+                msg = parseInjectScroll();
                 break;
             case ControlMessage.TYPE_SET_CLIPBOARD:
-                controlEvent = parseSetClipboard();
+                msg = parseSetClipboard();
+                break;
+            case ControlMessage.TYPE_SET_SCREEN_POWER_MODE:
+                msg = parseSetScreenPowerMode();
                 break;
             case ControlMessage.TYPE_BACK_OR_SCREEN_ON:
             case ControlMessage.TYPE_EXPAND_NOTIFICATION_PANEL:
             case ControlMessage.TYPE_COLLAPSE_NOTIFICATION_PANEL:
             case ControlMessage.TYPE_GET_CLIPBOARD:
-                controlEvent = ControlMessage.createEmpty(type);
+                msg = ControlMessage.createEmpty(type);
                 break;
             default:
                 Ln.w("Unknown event type: " + type);
-                controlEvent = null;
+                msg = null;
                 break;
         }
 
-        if (controlEvent == null) {
+        if (msg == null) {
             // failure, reset savedPosition
             buffer.position(savedPosition);
         }
-        return controlEvent;
+        return msg;
     }
 
     private ControlMessage parseInjectKeycode() {
@@ -155,6 +159,14 @@ public class ControlMessageReader {
             return null;
         }
         return ControlMessage.createSetClipboard(text);
+    }
+
+    private ControlMessage parseSetScreenPowerMode() {
+        if (buffer.remaining() < SET_SCREEN_POWER_MODE_PAYLOAD_LENGTH) {
+            return null;
+        }
+        int mode = buffer.get();
+        return ControlMessage.createSetScreenPowerMode(mode);
     }
 
     private static Position readPosition(ByteBuffer buffer) {
