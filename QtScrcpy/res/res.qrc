@@ -1,0 +1,30 @@
+<RCC>
+    <qresource prefix="/">
+        <file>font/fontawesome-webfont.ttf</file>
+        <file>image/videoform/phone-h.png</file>
+        <file>image/videoform/phone-v.png</file>
+        <file>qml/pinwheel.qml</file>
+        <file>qml/images/pinwheel.png</file>
+        <file>qss/psblack.css</file>
+        <file>qss/psblack/add_bottom.png</file>
+        <file>qss/psblack/add_left.png</file>
+        <file>qss/psblack/add_right.png</file>
+        <file>qss/psblack/add_top.png</file>
+        <file>qss/psblack/branch_close.png</file>
+        <file>qss/psblack/branch_open.png</file>
+        <file>qss/psblack/calendar_nextmonth.png</file>
+        <file>qss/psblack/calendar_prevmonth.png</file>
+        <file>qss/psblack/checkbox_checked.png</file>
+        <file>qss/psblack/checkbox_checked_disable.png</file>
+        <file>qss/psblack/checkbox_parcial.png</file>
+        <file>qss/psblack/checkbox_parcial_disable.png</file>
+        <file>qss/psblack/checkbox_unchecked.png</file>
+        <file>qss/psblack/checkbox_unchecked_disable.png</file>
+        <file>qss/psblack/radiobutton_checked.png</file>
+        <file>qss/psblack/radiobutton_checked_disable.png</file>
+        <file>qss/psblack/radiobutton_unchecked.png</file>
+        <file>qss/psblack/radiobutton_unchecked_disable.png</file>
+        <file>i18n/QtScrcpy_en.qm</file>
+        <file>i18n/QtScrcpy_zh.qm</file>
+    </qresource>
+</RCC>

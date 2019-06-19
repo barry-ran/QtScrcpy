@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 #endif
 
     //加载样式表
-    QFile file(":/res/psblack.css");
+    QFile file(":/qss/psblack.css");
     if (file.open(QFile::ReadOnly)) {
         QString qss = QLatin1String(file.readAll());
         QString paletteColor = qss.mid(20, 7);
@@ -62,7 +62,7 @@ void installTranslator() {
     static QTranslator translator;
     QLocale locale;
     QLocale::Language language = locale.language();
-    QString languagePath = ":i18n/";
+    QString languagePath = ":/i18n/";
     switch (language) {
     case QLocale::Chinese:
         languagePath += "QtScrcpy_zh.qm";
