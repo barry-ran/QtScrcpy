@@ -39,7 +39,10 @@ public:
     void postTurnOn();
     void expandNotificationPanel();
     void collapseNotificationPanel();
-    void postTextInput(const QString& text);
+    void requestDeviceClipboard();
+    void setDeviceClipboard();
+    void clipboardPaste();
+    void postTextInput(QString& text);
 
     void staysOnTop(bool top = true);
 

@@ -9,10 +9,13 @@ public final class ControlEvent {
     public static final int TYPE_TEXT = 1;
     public static final int TYPE_MOUSE = 2;
     public static final int TYPE_SCROLL = 3;
-    public static final int TYPE_TOUCH = 4;
-    public static final int TYPE_BACK_OR_SCREEN_ON = 5;
-    public static final int TYPE_EXPAND_NOTIFICATION_PANEL = 6;
-    public static final int TYPE_COLLAPSE_NOTIFICATION_PANEL = 7;
+    public static final int TYPE_BACK_OR_SCREEN_ON = 4;
+    public static final int TYPE_EXPAND_NOTIFICATION_PANEL = 5;
+    public static final int TYPE_COLLAPSE_NOTIFICATION_PANEL = 6;
+    public static final int TYPE_GET_CLIPBOARD = 7;
+    public static final int TYPE_SET_CLIPBOARD = 8;
+
+    public static final int TYPE_TOUCH = 9;
 
 
     private int type;
@@ -69,6 +72,13 @@ public final class ControlEvent {
         event.position = position;
         event.hScroll = hScroll;
         event.vScroll = vScroll;
+        return event;
+    }
+
+    public static ControlEvent createSetClipboardControlEvent(String text) {
+        ControlEvent event = new ControlEvent();
+        event.type = TYPE_SET_CLIPBOARD;
+        event.text = text;
         return event;
     }
 

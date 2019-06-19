@@ -11,6 +11,7 @@
 #include <QMimeData>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QClipboard>
 
 #include "videoform.h"
 #include "recorder.h"
@@ -365,7 +366,35 @@ void VideoForm::collapseNotificationPanel()
     m_inputConvert.sendControlEvent(controlEvent);
 }
 
-void VideoForm::postTextInput(const QString& text)
+void VideoForm::requestDeviceClipboard()
+{
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_GET_CLIPBOARD);
+    if (!controlEvent) {
+        return;
+    }
+    m_inputConvert.sendControlEvent(controlEvent);
+}
+
+void VideoForm::setDeviceClipboard()
+{
+    QClipboard *board = QApplication::clipboard();
+    QString text = board->text();
+    ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_SET_CLIPBOARD);
+    if (!controlEvent) {
+        return;
+    }
+    controlEvent->setSetClipboardEventData(text);
+    m_inputConvert.sendControlEvent(controlEvent);
+}
+
+void VideoForm::clipboardPaste()
+{
+    QClipboard *board = QApplication::clipboard();
+    QString text = board->text();
+    postTextInput(text);
+}
+
+void VideoForm::postTextInput(QString& text)
 {
     ControlEvent* controlEvent = new ControlEvent(ControlEvent::CET_TEXT);
     if (!controlEvent) {
@@ -467,6 +496,16 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
             && !event->isAutoRepeat()
             && isFullScreen()) {
         switchFullScreen();
+    }
+    if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier)) {
+        requestDeviceClipboard();
+    }
+    if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier)) {
+        if (event->modifiers() & Qt::ShiftModifier) {
+            setDeviceClipboard();
+        } else {
+            clipboardPaste();
+        }
     }
 
     //qDebug() << "keyPressEvent" << event->isAutoRepeat();

@@ -3,10 +3,11 @@
 #include "controller.h"
 #include "videosocket.h"
 #include "controlevent.h"
+#include "receiver.h"
 
 Controller::Controller(QObject* parent) : QObject(parent)
 {
-
+    m_receiver = new Receiver(this);
 }
 
 Controller::~Controller()
@@ -16,7 +17,16 @@ Controller::~Controller()
 
 void Controller::setControlSocket(QTcpSocket* controlSocket)
 {
+    if (m_controlSocket || !controlSocket) {
+        return;
+    }
     m_controlSocket = controlSocket;
+    connect(controlSocket, &QTcpSocket::readyRead, m_receiver, &Receiver::onReadyRead);
+}
+
+QTcpSocket *Controller::getControlSocket()
+{
+    return m_controlSocket;
 }
 
 void Controller::postControlEvent(ControlEvent *controlEvent)
