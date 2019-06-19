@@ -204,7 +204,7 @@ public final class Device {
     public void setScreenPowerMode(int mode) {
         IBinder d = SurfaceControl.getBuiltInDisplay(0);
         SurfaceControl.setDisplayPowerMode(d, mode);
-        Ln.i("Device screen turned " + (mode == Device.POWER_MODE_OFF ? "off" : "on"));
+        Ln.i("Device screen turned " + (mode == Device.POWER_MODE_OFF ? "off " : "on ") + mode);
     }
 
     static Rect flipRect(Rect crop) {

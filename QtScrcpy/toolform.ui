@@ -54,9 +54,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="powerBtn">
+    <widget class="QPushButton" name="closeScreenBtn">
      <property name="toolTip">
-      <string>turn off</string>
+      <string>close screen</string>
      </property>
      <property name="text">
       <string/>
@@ -64,9 +64,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="turnOnBtn">
+    <widget class="QPushButton" name="powerBtn">
      <property name="toolTip">
-      <string>turn on</string>
+      <string>power</string>
      </property>
      <property name="text">
       <string/>

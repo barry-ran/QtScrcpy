@@ -113,14 +113,22 @@
         <translation>expand notify</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="59"/>
         <source>turn off</source>
-        <translation>turn off</translation>
+        <translation type="vanished">turn off</translation>
+    </message>
+    <message>
+        <source>turn on</source>
+        <translation type="vanished">turn on</translation>
+    </message>
+    <message>
+        <location filename="../../toolform.ui" line="59"/>
+        <source>close screen</source>
+        <translation>close screen</translation>
     </message>
     <message>
         <location filename="../../toolform.ui" line="69"/>
-        <source>turn on</source>
-        <translation>turn on</translation>
+        <source>power</source>
+        <translation>power</translation>
     </message>
     <message>
         <location filename="../../toolform.ui" line="79"/>

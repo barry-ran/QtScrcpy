@@ -33,11 +33,11 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->homeBtn, QChar(0xf1db), 15);
     //IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf104), 15);
     IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf053), 15);
-    IconHelper::Instance()->SetIcon(ui->appSwitchBtn, QChar(0xf24d), 15);
-    IconHelper::Instance()->SetIcon(ui->powerBtn, QChar(0xf023), 15);
+    IconHelper::Instance()->SetIcon(ui->appSwitchBtn, QChar(0xf24d), 15);    
     IconHelper::Instance()->SetIcon(ui->volumeUpBtn, QChar(0xf028), 15);
     IconHelper::Instance()->SetIcon(ui->volumeDownBtn, QChar(0xf027), 15);
-    IconHelper::Instance()->SetIcon(ui->turnOnBtn, QChar(0xf09c), 15);
+    IconHelper::Instance()->SetIcon(ui->closeScreenBtn, QChar(0xf070), 15);
+    IconHelper::Instance()->SetIcon(ui->powerBtn, QChar(0xf011), 15);
     IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), 15);
 }
 
@@ -128,10 +128,10 @@ void ToolForm::on_volumeDownBtn_clicked()
     }
 }
 
-void ToolForm::on_turnOnBtn_clicked()
+void ToolForm::on_closeScreenBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postTurnOn();
+        m_videoForm->setScreenPowerMode(ControlMsg::SPM_OFF);
     }
 }
 
