@@ -15,6 +15,10 @@ b35733edb6df2a00b6af9b1c98627d344c377963 鼠标事件相关系列
 复制粘贴中文测试
 国际化
 单独线程打印帧率 https://github.com/Genymobile/scrcpy/commit/e2a272bf99ecf48fcb050177113f903b3fb323c4
+重构input
+重构videoform
+重构整个目录
+checkbox
 
 
 
