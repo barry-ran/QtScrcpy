@@ -15,10 +15,10 @@ void InputConvertBase::setControlSocket(QTcpSocket *controlSocket)
     m_controller.setControlSocket(controlSocket);
 }
 
-void InputConvertBase::sendControlEvent(ControlEvent *event)
+void InputConvertBase::sendControlMsg(ControlMsg *msg)
 {
-    if (event) {
-        m_controller.postControlEvent(event);
+    if (msg) {
+        m_controller.postControlMsg(msg);
     }
 }
 

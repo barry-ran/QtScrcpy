@@ -4,7 +4,7 @@
 #include <QPointer>
 
 class Controller;
-class DeviceEvent;
+class DeviceMsg;
 class Receiver : public QObject
 {
     Q_OBJECT
@@ -16,7 +16,7 @@ public slots:
     void onReadyRead();
 
 protected:
-    void processEvent(DeviceEvent *deviceEvent);
+    void processMsg(DeviceMsg *deviceMsg);
 
 private:
     QPointer<Controller> m_controller;

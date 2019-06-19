@@ -6,12 +6,12 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-public class ControlEventReader {
+public class ControlMessageReader {
 
-    private static final int KEYCODE_PAYLOAD_LENGTH = 9;
-    private static final int MOUSE_PAYLOAD_LENGTH = 13;
-    private static final int TOUCH_PAYLOAD_LENGTH = 10;
-    private static final int SCROLL_PAYLOAD_LENGTH = 16;
+    private static final int INJECT_KEYCODE_PAYLOAD_LENGTH = 9;
+    private static final int INJECT_MOUSE_PAYLOAD_LENGTH = 13;
+    private static final int INJECT_SCROLL_PAYLOAD_LENGTH = 16;
+    private static final int INJECT_TOUCH_PAYLOAD_LENGTH = 10;
 
     public static final int TEXT_MAX_LENGTH = 300;
     public static final int CLIPBOARD_TEXT_MAX_LENGTH = 4093;
@@ -21,7 +21,7 @@ public class ControlEventReader {
     private final ByteBuffer buffer = ByteBuffer.wrap(rawBuffer);
     private final byte[] textBuffer = new byte[CLIPBOARD_TEXT_MAX_LENGTH];
 
-    public ControlEventReader() {
+    public ControlMessageReader() {
         // invariant: the buffer is always in "get" mode
         buffer.limit(0);
     }
@@ -38,43 +38,43 @@ public class ControlEventReader {
         int head = buffer.position();
         int r = input.read(rawBuffer, head, rawBuffer.length - head);
         if (r == -1) {
-            throw new EOFException("Event controller socket closed");
+            throw new EOFException("Controller socket closed");
         }
         buffer.position(head + r);
         buffer.flip();
     }
 
-    public ControlEvent next() {
+    public ControlMessage next() {
         if (!buffer.hasRemaining()) {
             return null;
         }
         int savedPosition = buffer.position();
         int type = buffer.get();
-        ControlEvent controlEvent;
+        ControlMessage controlEvent;
         switch (type) {
-            case ControlEvent.TYPE_KEYCODE:
-                controlEvent = parseKeycodeControlEvent();
+            case ControlMessage.TYPE_INJECT_KEYCODE:
+                controlEvent = parseInjectKeycode();
                 break;
-            case ControlEvent.TYPE_TEXT:
-                controlEvent = parseTextControlEvent();
+            case ControlMessage.TYPE_INJECT_TEXT:
+                controlEvent = parseInjectText();
                 break;
-            case ControlEvent.TYPE_MOUSE:
-                controlEvent = parseMouseControlEvent();
+            case ControlMessage.TYPE_INJECT_MOUSE:
+                controlEvent = parseInjectMouse();
                 break;
-            case ControlEvent.TYPE_TOUCH:
-                controlEvent = parseMouseTouchEvent();
+            case ControlMessage.TYPE_INJECT_TOUCH:
+                controlEvent = parseInjectMouseTouch();
                 break;
-            case ControlEvent.TYPE_SCROLL:
-                controlEvent = parseScrollControlEvent();
+            case ControlMessage.TYPE_INJECT_SCROLL:
+                controlEvent = parseInjectScroll();
                 break;
-            case ControlEvent.TYPE_SET_CLIPBOARD:
-                controlEvent = parseSetClipboardEvent();
+            case ControlMessage.TYPE_SET_CLIPBOARD:
+                controlEvent = parseSetClipboard();
                 break;
-            case ControlEvent.TYPE_BACK_OR_SCREEN_ON:
-            case ControlEvent.TYPE_EXPAND_NOTIFICATION_PANEL:
-            case ControlEvent.TYPE_COLLAPSE_NOTIFICATION_PANEL:
-            case ControlEvent.TYPE_GET_CLIPBOARD:
-                controlEvent = ControlEvent.createSimpleControlEvent(type);
+            case ControlMessage.TYPE_BACK_OR_SCREEN_ON:
+            case ControlMessage.TYPE_EXPAND_NOTIFICATION_PANEL:
+            case ControlMessage.TYPE_COLLAPSE_NOTIFICATION_PANEL:
+            case ControlMessage.TYPE_GET_CLIPBOARD:
+                controlEvent = ControlMessage.createEmpty(type);
                 break;
             default:
                 Ln.w("Unknown event type: " + type);
@@ -89,14 +89,14 @@ public class ControlEventReader {
         return controlEvent;
     }
 
-    private ControlEvent parseKeycodeControlEvent() {
-        if (buffer.remaining() < KEYCODE_PAYLOAD_LENGTH) {
+    private ControlMessage parseInjectKeycode() {
+        if (buffer.remaining() < INJECT_KEYCODE_PAYLOAD_LENGTH) {
             return null;
         }
         int action = toUnsigned(buffer.get());
         int keycode = buffer.getInt();
         int metaState = buffer.getInt();
-        return ControlEvent.createKeycodeControlEvent(action, keycode, metaState);
+        return ControlMessage.createInjectKeycode(action, keycode, metaState);
     }
 
     private String parseString() {
@@ -111,50 +111,50 @@ public class ControlEventReader {
         return new String(textBuffer, 0, len, StandardCharsets.UTF_8);
     }
 
-    private ControlEvent parseTextControlEvent() {
+    private ControlMessage parseInjectText() {
         String text = parseString();
         if (text == null) {
             return null;
         }
-        return ControlEvent.createTextControlEvent(text);
+        return ControlMessage.createInjectText(text);
     }
 
-    private ControlEvent parseMouseControlEvent() {
-        if (buffer.remaining() < MOUSE_PAYLOAD_LENGTH) {
+    private ControlMessage parseInjectMouse() {
+        if (buffer.remaining() < INJECT_MOUSE_PAYLOAD_LENGTH) {
             return null;
         }
         int action = toUnsigned(buffer.get());
         int buttons = buffer.getInt();
         Position position = readPosition(buffer);
-        return ControlEvent.createMotionControlEvent(action, buttons, position);
+        return ControlMessage.createInjectMotion(action, buttons, position);
     }
 
-    private ControlEvent parseMouseTouchEvent() {
-        if (buffer.remaining() < TOUCH_PAYLOAD_LENGTH) {
+    private ControlMessage parseInjectMouseTouch() {
+        if (buffer.remaining() < INJECT_TOUCH_PAYLOAD_LENGTH) {
             return null;
         }
         int id = toUnsigned(buffer.get());
         int action = toUnsigned(buffer.get());
         Position position = readPosition(buffer);
-        return ControlEvent.createMotionTouchEvent(id, action, position);
+        return ControlMessage.createInjectMotionTouch(id, action, position);
     }
 
-    private ControlEvent parseScrollControlEvent() {
-        if (buffer.remaining() < SCROLL_PAYLOAD_LENGTH) {
+    private ControlMessage parseInjectScroll() {
+        if (buffer.remaining() < INJECT_SCROLL_PAYLOAD_LENGTH) {
             return null;
         }
         Position position = readPosition(buffer);
         int hScroll = buffer.getInt();
         int vScroll = buffer.getInt();
-        return ControlEvent.createScrollControlEvent(position, hScroll, vScroll);
+        return ControlMessage.createInjectScroll(position, hScroll, vScroll);
     }
 
-    private ControlEvent parseSetClipboardEvent() {
+    private ControlMessage parseSetClipboard() {
         String text = parseString();
         if (text == null) {
             return null;
         }
-        return ControlEvent.createSetClipboardControlEvent(text);
+        return ControlMessage.createSetClipboard(text);
     }
 
     private static Position readPosition(ByteBuffer buffer) {

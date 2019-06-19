@@ -25,8 +25,8 @@ public final class DesktopConnection implements Closeable {
     private final OutputStream controlOutputStream;
 
 
-    private final ControlEventReader reader = new ControlEventReader();
-    private final DeviceEventWriter writer = new DeviceEventWriter();
+    private final ControlMessageReader reader = new ControlMessageReader();
+    private final DeviceMessageWriter writer = new DeviceMessageWriter();
 
     private DesktopConnection(LocalSocket videoSocket, LocalSocket controlSocket) throws IOException {
         this.videoSocket = videoSocket;
@@ -105,16 +105,16 @@ public final class DesktopConnection implements Closeable {
         return videoFd;
     }
 
-    public ControlEvent receiveControlEvent() throws IOException {
-        ControlEvent event = reader.next();
-        while (event == null) {
+    public ControlMessage receiveControlMessage() throws IOException {
+        ControlMessage msg = reader.next();
+        while (msg == null) {
             reader.readFrom(controlInputStream);
-            event = reader.next();
+            msg = reader.next();
         }
-        return event;
+        return msg;
     }
 
-    public void sendDeviceEvent(DeviceEvent event) throws IOException {
-        writer.writeTo(event, controlOutputStream);
+    public void sendDeviceMessage(DeviceMessage msg) throws IOException {
+        writer.writeTo(msg, controlOutputStream);
     }
 }

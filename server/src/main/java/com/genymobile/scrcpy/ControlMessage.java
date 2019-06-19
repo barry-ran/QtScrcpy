@@ -1,21 +1,21 @@
 package com.genymobile.scrcpy;
 
 /**
- * Union of all supported event types, identified by their {@code type}.
+ * Union of all supported msg types, identified by their {@code type}.
  */
-public final class ControlEvent {
+public final class ControlMessage {
 
-    public static final int TYPE_KEYCODE = 0;
-    public static final int TYPE_TEXT = 1;
-    public static final int TYPE_MOUSE = 2;
-    public static final int TYPE_SCROLL = 3;
+    public static final int TYPE_INJECT_KEYCODE = 0;
+    public static final int TYPE_INJECT_TEXT = 1;
+    public static final int TYPE_INJECT_MOUSE = 2;
+    public static final int TYPE_INJECT_SCROLL = 3;
     public static final int TYPE_BACK_OR_SCREEN_ON = 4;
     public static final int TYPE_EXPAND_NOTIFICATION_PANEL = 5;
     public static final int TYPE_COLLAPSE_NOTIFICATION_PANEL = 6;
     public static final int TYPE_GET_CLIPBOARD = 7;
     public static final int TYPE_SET_CLIPBOARD = 8;
 
-    public static final int TYPE_TOUCH = 9;
+    public static final int TYPE_INJECT_TOUCH = 9;
 
 
     private int type;
@@ -29,61 +29,61 @@ public final class ControlEvent {
     private int hScroll;
     private int vScroll;
 
-    private ControlEvent() {
+    private ControlMessage() {
     }
 
-    public static ControlEvent createKeycodeControlEvent(int action, int keycode, int metaState) {
-        ControlEvent event = new ControlEvent();
-        event.type = TYPE_KEYCODE;
+    public static ControlMessage createInjectKeycode(int action, int keycode, int metaState) {
+        ControlMessage event = new ControlMessage();
+        event.type = TYPE_INJECT_KEYCODE;
         event.action = action;
         event.keycode = keycode;
         event.metaState = metaState;
         return event;
     }
 
-    public static ControlEvent createTextControlEvent(String text) {
-        ControlEvent event = new ControlEvent();
-        event.type = TYPE_TEXT;
+    public static ControlMessage createInjectText(String text) {
+        ControlMessage event = new ControlMessage();
+        event.type = TYPE_INJECT_TEXT;
         event.text = text;
         return event;
     }
 
-    public static ControlEvent createMotionControlEvent(int action, int buttons, Position position) {
-        ControlEvent event = new ControlEvent();
-        event.type = TYPE_MOUSE;
+    public static ControlMessage createInjectMotion(int action, int buttons, Position position) {
+        ControlMessage event = new ControlMessage();
+        event.type = TYPE_INJECT_MOUSE;
         event.action = action;
         event.buttons = buttons;
         event.position = position;
         return event;
     }
 
-    public static ControlEvent createMotionTouchEvent(int id, int action, Position position) {
-        ControlEvent event = new ControlEvent();
-        event.type = TYPE_TOUCH;
+    public static ControlMessage createInjectMotionTouch(int id, int action, Position position) {
+        ControlMessage event = new ControlMessage();
+        event.type = TYPE_INJECT_TOUCH;
         event.action = action;
         event.id = id;
         event.position = position;
         return event;
     }
 
-    public static ControlEvent createScrollControlEvent(Position position, int hScroll, int vScroll) {
-        ControlEvent event = new ControlEvent();
-        event.type = TYPE_SCROLL;
+    public static ControlMessage createInjectScroll(Position position, int hScroll, int vScroll) {
+        ControlMessage event = new ControlMessage();
+        event.type = TYPE_INJECT_SCROLL;
         event.position = position;
         event.hScroll = hScroll;
         event.vScroll = vScroll;
         return event;
     }
 
-    public static ControlEvent createSetClipboardControlEvent(String text) {
-        ControlEvent event = new ControlEvent();
+    public static ControlMessage createSetClipboard(String text) {
+        ControlMessage event = new ControlMessage();
         event.type = TYPE_SET_CLIPBOARD;
         event.text = text;
         return event;
     }
 
-    public static ControlEvent createSimpleControlEvent(int type) {
-        ControlEvent event = new ControlEvent();
+    public static ControlMessage createEmpty(int type) {
+        ControlMessage event = new ControlMessage();
         event.type = type;
         return event;
     }

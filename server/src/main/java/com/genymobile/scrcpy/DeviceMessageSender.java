@@ -2,13 +2,13 @@ package com.genymobile.scrcpy;
 
 import java.io.IOException;
 
-public final class EventSender {
+public final class DeviceMessageSender {
 
     private final DesktopConnection connection;
 
     private String clipboardText;
 
-    public EventSender(DesktopConnection connection) {
+    public DeviceMessageSender(DesktopConnection connection) {
         this.connection = connection;
     }
 
@@ -27,8 +27,8 @@ public final class EventSender {
                 text = clipboardText;
                 clipboardText = null;
             }
-            DeviceEvent event = DeviceEvent.createGetClipboardEvent(text);
-            connection.sendDeviceEvent(event);
+            DeviceMessage msg = DeviceMessage.createClipboard(text);
+            connection.sendDeviceMessage(msg);
         }
     }
 }
