@@ -529,6 +529,7 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         } else {
             clipboardPaste();
         }
+        return;
     }
 
     //qDebug() << "keyPressEvent" << event->isAutoRepeat();
