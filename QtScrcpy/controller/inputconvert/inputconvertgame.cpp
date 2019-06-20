@@ -6,7 +6,8 @@
 
 #define CURSOR_POS_CHECK 50
 
-InputConvertGame::InputConvertGame(QObject* parent) : QObject(parent)
+InputConvertGame::InputConvertGame(Controller* controller)
+    : InputConvertNormal(controller)
 {
 
 }

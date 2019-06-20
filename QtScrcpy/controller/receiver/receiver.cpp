@@ -1,37 +1,42 @@
 #include <QTcpSocket>
 #include <QApplication>
 #include <QClipboard>
+#include <QTcpSocket>
 
 #include "receiver.h"
-#include "controller.h"
 #include "devicemsg.h"
 
-Receiver::Receiver(Controller* controller) : QObject(controller)
-{
-    m_controller = controller;
-    Q_ASSERT(controller);
+Receiver::Receiver(QObject *parent) : QObject(parent)
+{    
 }
 
 Receiver::~Receiver()
 {
+}
 
+void Receiver::setControlSocket(QTcpSocket *controlSocket)
+{
+    if (m_controlSocket || !controlSocket) {
+        return;
+    }
+    m_controlSocket = controlSocket;
+    connect(controlSocket, &QTcpSocket::readyRead, this, &Receiver::onReadyRead);
 }
 
 void Receiver::onReadyRead()
-{
-    QTcpSocket* controlSocket = m_controller->getControlSocket();
-    if (!controlSocket) {
+{    
+    if (!m_controlSocket) {
         return;
     }
 
-    while (controlSocket->bytesAvailable()) {
-        QByteArray byteArray = controlSocket->peek(controlSocket->bytesAvailable());
+    while (m_controlSocket->bytesAvailable()) {
+        QByteArray byteArray = m_controlSocket->peek(m_controlSocket->bytesAvailable());
         DeviceMsg deviceMsg;
         qint32 consume = deviceMsg.deserialize(byteArray);
         if (0 >= consume) {
             break;
         }
-        controlSocket->read(consume);
+        m_controlSocket->read(consume);
         processMsg(&deviceMsg);
     }
 }

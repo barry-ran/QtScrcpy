@@ -5,8 +5,9 @@
 
 class InputConvertNormal : public InputConvertBase
 {
+    Q_OBJECT
 public:
-    InputConvertNormal();
+    InputConvertNormal(Controller* controller);
     virtual ~InputConvertNormal();
 
     virtual void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);

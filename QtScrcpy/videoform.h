@@ -7,9 +7,8 @@
 
 #include "server.h"
 #include "stream.h"
-#include "inputconvertnormal.h"
-#include "inputconvertgame.h"
 #include "filehandler.h"
+#include "controller.h"
 
 namespace Ui {
 class videoForm;
@@ -22,7 +21,6 @@ class Decoder;
 class VideoForm : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, const QString& fileName = "", bool closeScreen = false, QWidget *parent = 0);
     ~VideoForm();
@@ -72,25 +70,31 @@ protected:
     void dropEvent(QDropEvent *event);
 
 private:
-    Ui::videoForm *ui;
-    QSize frameSize;
-    Server* m_server = Q_NULLPTR;
-    Stream m_stream;
+    // ui
+    Ui::videoForm *ui;    
+    QPointer<ToolForm> m_toolForm;
+    QPointer<QWidget> m_loadingWidget;
+
+    // server relevant
+    Server* m_server = Q_NULLPTR;    
     VideoBuffer* m_vb = Q_NULLPTR;
     Decoder* m_decoder = Q_NULLPTR;
-    //InputConvertNormal m_inputConvert;
-    InputConvertGame m_inputConvert;
+    Recorder* m_recorder = Q_NULLPTR;
+    QPointer<Controller> m_controller;
+    Stream m_stream;
     FileHandler m_fileHandler;
+
+    // server params
     QString m_serial = "";
     quint16 m_maxSize = 720;
     quint32 m_bitRate = 8000000;
+
+    // assist member
+    QSize frameSize;
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
-    QPointer<ToolForm> m_toolForm;
-    Recorder* m_recorder = Q_NULLPTR;    
-    QTime m_startTimeCount;
-    QPointer<QWidget> m_loadingWidget;
     bool m_closeScreen = false;
+    QTime m_startTimeCount;
 };
 
 #endif // VIDEOFORM_H
