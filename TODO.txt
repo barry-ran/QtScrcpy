@@ -20,5 +20,5 @@ ffmpeg编译参数详解
 https://www.cnblogs.com/wainiwann/p/4204230.html
 
 bug：
-1. reverse失败自动切换forward失败（adb执行结果返回了AER_ERROR_EXEC，应该自动切换forward才对，需要现场排查）
-2. forward情况下，connectto里面延时1000有的手机卡，需要2000，想办法彻底解决
+1. everse失败自动切换forward失败（adb执行结果返回了AER_ERROR_EXEC，
+应该自动切换forward才对，需要现场排查），目前先用手动配置forward解决
