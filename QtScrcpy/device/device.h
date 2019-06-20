@@ -29,6 +29,7 @@ public:
     virtual ~Device();
 
     VideoForm *getVideoForm();
+    Controller* getController();
 
 private:
     void initSignals();

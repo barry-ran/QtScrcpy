@@ -23,13 +23,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-#DEFINES += SKIP_FRAMES
-#DEFINES += USE_QTQUICK
-
-contains(DEFINES, USE_QTQUICK) {
-    QT += quickwidgets
-}
-
 # 源码
 SOURCES += \
         main.cpp \
@@ -43,38 +36,19 @@ FORMS += \
 
 # 子工程
 include ($$PWD/common/common.pri)
-include ($$PWD/server/server.pri)
 include ($$PWD/adb/adb.pri)
-include ($$PWD/decoder/decoder.pri)
-include ($$PWD/render/render.pri)
-include ($$PWD/stream/stream.pri)
-include ($$PWD/android/android.pri)
-include ($$PWD/controller/controller.pri)
 include ($$PWD/uibase/uibase.pri)
 include ($$PWD/fontawesome/fontawesome.pri)
-include ($$PWD/filehandler/filehandler.pri)
-include ($$PWD/recorder/recorder.pri)
 include ($$PWD/util/util.pri)
 include ($$PWD/device/device.pri)
-include ($$PWD/ui/ui.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
-        $$PWD/../third_party/ffmpeg/include \
-        $$PWD/common \
-        $$PWD/server \
-        $$PWD/adb \
-        $$PWD/decoder \
-        $$PWD/render \
-        $$PWD/stream \
-        $$PWD/android \
-        $$PWD/controller \
-        $$PWD/uibase \
-        $$PWD/filehandler \
-        $$PWD/recorder \
+        $$PWD/common \        
+        $$PWD/adb \        
+        $$PWD/uibase \        
         $$PWD/util \
-        $$PWD/device \
-        $$PWD/ui \
+        $$PWD/device \        
         $$PWD/fontawesome
 
 

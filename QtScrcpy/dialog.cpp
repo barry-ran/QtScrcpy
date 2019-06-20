@@ -253,8 +253,8 @@ void Dialog::on_closeScreenCheck_stateChanged(int arg1)
         return;
     }
     if (ui->closeScreenCheck->isChecked()) {
-        m_device->getVideoForm()->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
+        m_device->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
     } else {
-        m_device->getVideoForm()->getController()->setScreenPowerMode(ControlMsg::SPM_NORMAL);
+        m_device->getController()->setScreenPowerMode(ControlMsg::SPM_NORMAL);
     }
 }
