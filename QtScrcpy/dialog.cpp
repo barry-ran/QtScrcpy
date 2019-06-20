@@ -6,6 +6,8 @@
 
 #include "dialog.h"
 #include "ui_dialog.h"
+#include "device.h"
+#include "videoform.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -90,7 +92,7 @@ void Dialog::on_updateDevice_clicked()
 
 void Dialog::on_startServerBtn_clicked()
 {
-    if (!m_videoForm) {
+    if (!m_device) {
         QString absFilePath;
         QString fileDir(ui->recordPathEdt->text().trimmed());
         if (!fileDir.isEmpty()) {
@@ -105,21 +107,25 @@ void Dialog::on_startServerBtn_clicked()
         quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
         // this is ok that "native" toUshort is 0
         quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
-        m_videoForm = new VideoForm(ui->serialBox->currentText().trimmed(), videoSize, bitRate,
-                                    absFilePath, ui->closeScreenCheck->isChecked());
-        if (ui->alwaysTopCheck->isChecked()) {
-            m_videoForm->staysOnTop();
+        Device::DeviceParams params;
+        params.serial = ui->serialBox->currentText().trimmed();
+        params.maxSize = videoSize;
+        params.bitRate = bitRate;
+        params.recordFileName = absFilePath;
+        params.closeScreen = ui->closeScreenCheck->isChecked();
+        m_device = new Device(params, this);
+        if (ui->alwaysTopCheck->isChecked() && m_device->getVideoForm()) {
+            m_device->getVideoForm()->staysOnTop();
         }
 
         outLog("start server...", false);
-    }
-    m_videoForm->show();
+    }    
 }
 
 void Dialog::on_stopServerBtn_clicked()
 {    
-    if (m_videoForm) {
-        m_videoForm->close();
+    if (m_device) {
+        m_device->deleteLater();
         outLog("stop server");
     }
 }
@@ -229,26 +235,26 @@ void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
 
 void Dialog::on_alwaysTopCheck_stateChanged(int arg1)
 {
-    if (!m_videoForm) {
+    if (!m_device || m_device->getVideoForm()) {
         return;
     }
 
     if (Qt::Checked == arg1) {
-        m_videoForm->staysOnTop(true);
+        m_device->getVideoForm()->staysOnTop(true);
     } else {
-        m_videoForm->staysOnTop(false);
+        m_device->getVideoForm()->staysOnTop(false);
     }
 }
 
 void Dialog::on_closeScreenCheck_stateChanged(int arg1)
 {
     Q_UNUSED(arg1);
-    if (!m_videoForm) {
+    if (!m_device || m_device->getVideoForm()) {
         return;
     }
     if (ui->closeScreenCheck->isChecked()) {
-        m_videoForm->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
+        m_device->getVideoForm()->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
     } else {
-        m_videoForm->getController()->setScreenPowerMode(ControlMsg::SPM_NORMAL);
+        m_device->getVideoForm()->getController()->setScreenPowerMode(ControlMsg::SPM_NORMAL);
     }
 }

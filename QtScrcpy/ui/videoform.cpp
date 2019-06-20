@@ -13,85 +13,30 @@
 #include <QMessageBox>
 
 #include "videoform.h"
-#include "recorder.h"
-#include "videobuffer.h"
-#include "decoder.h"
+#include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
+#include "controller.h"
 #include "filehandler.h"
-#include "stream.h"
-#include "server.h"
-#include "mousetap/mousetap.h"
+extern "C"
+{
+#include "libavutil/frame.h"
+}
 
-VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, bool closeScreen, QWidget *parent) :
+VideoForm::VideoForm(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::videoForm),
-    m_serial(serial),
-    m_maxSize(maxSize),
-    m_bitRate(bitRate)
+    ui(new Ui::videoForm)
 {    
     ui->setupUi(this);
-    initUI();    
-
-    m_closeScreen = closeScreen;
-
-    m_vb = new VideoBuffer();
-    m_vb->init();
-
-    m_server = new Server(this);
-    m_decoder = new Decoder(m_vb, this);
-    m_stream = new Stream(this);
-    m_stream->setDecoder(m_decoder);
-    m_controller = new Controller(this);
-    m_fileHandler = new FileHandler(this);
-
-    if (!fileName.trimmed().isEmpty()) {
-        m_recorder = new Recorder(fileName.trimmed());
-        m_stream->setRecoder(m_recorder);
-    }
-
-    initSignals();
-
-    // fix: macos cant recv finished signel, timer is ok
-    QTimer::singleShot(0, this, [this](){
-        bool sendFrameMeta = m_recorder ? true : false;
-        m_startTimeCount.start();
-        // max size support 480p 720p 1080p 设备原生分辨率
-        // support wireless connect, example:
-        //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
-        // only one devices, serial can be null
-        // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
-        // sendFrameMeta for recorder mp4
-        Server::ServerParams params;
-        params.serial = m_serial;
-        params.localPort = 27183;
-        params.maxSize = m_maxSize;
-        params.bitRate = m_bitRate;
-        params.crop = "-";
-        params.sendFrameMeta = sendFrameMeta;
-        params.control = true;
-        m_server->start(params);
-    });
-
+    initUI();
     updateShowSize(size());
-
     bool vertical = size().height() > size().width();
     updateStyleSheet(vertical);
 }
 
 VideoForm::~VideoForm()
-{
-    m_server->stop();
-    // server must stop before decoder, because decoder block main thread
-    m_stream->stopDecode();
-
-    if (m_recorder) {
-        delete m_recorder;
-    }    
-    m_vb->deInit();    
-    delete m_vb;
-
+{   
     delete ui;
 }
 
@@ -145,90 +90,28 @@ void VideoForm::initUI()
     ui->videoWidget->hide();    
 }
 
-void VideoForm::initSignals()
+void VideoForm::onGrabCursor(bool grab)
 {
-    connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult){
-        if (FileHandler::FAR_IS_RUNNING == processResult) {
-            QMessageBox::warning(this, "QtScrcpy", tr("wait current file transfer to complete"), QMessageBox::Ok);
-        }
-        if (FileHandler::FAR_SUCCESS_EXEC == processResult) {
-            QMessageBox::information(this, "QtScrcpy", tr("file transfer complete"), QMessageBox::Ok);
-        }
-        if (FileHandler::FAR_ERROR_EXEC == processResult) {
-            QMessageBox::information(this, "QtScrcpy", tr("file transfer failed"), QMessageBox::Ok);
-        }
-    });
-
-    connect(m_controller, &Controller::grabCursor, this, [this](bool grab){
-
-#ifdef Q_OS_WIN32
-        MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
+#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
+    MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
+#else
+    Q_UNUSED(grab);
 #endif
-#ifdef Q_OS_OSX
-        MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
-#endif
-    });
-    connect(m_server, &Server::serverStartResult, this, [this](bool success){
-        if (success) {
-            m_server->connectTo();
-        } else {
-            close();
+}
+
+void VideoForm::updateRender(const AVFrame *frame)
+{
+    if (ui->videoWidget->isHidden()) {
+        if (m_loadingWidget) {
+            m_loadingWidget->close();
         }
-    });
+        ui->videoWidget->show();
+    }
 
-    connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
-        if (success) {
-            float diff = m_startTimeCount.elapsed() / 1000.0f;
-            qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
-
-            // update ui
-            setWindowTitle(deviceName);
-            updateShowSize(size);
-
-            // init recorder
-            if (m_recorder) {
-                m_recorder->setFrameSize(size);
-            }
-
-            // init decoder
-            m_stream->setVideoSocket(m_server->getVideoSocket());
-            m_stream->startDecode();
-
-            // init controller
-            m_controller->setControlSocket(m_server->getControlSocket());
-
-            if (m_closeScreen) {
-                m_controller->setScreenPowerMode(ControlMsg::SPM_OFF);
-            }
-        }
-    });
-
-    connect(m_server, &Server::onServerStop, this, [this](){
-        close();
-        qDebug() << "server process stop";
-    });
-
-    connect(m_stream, &Stream::onStreamStop, this, [this](){
-        close();
-        qDebug() << "stream thread stop";
-    });
-
-    // must be Qt::QueuedConnection, ui update must be main thread
-    connect(m_decoder, &Decoder::onNewFrame, this, [this](){
-        if (ui->videoWidget->isHidden()) {
-            if (m_loadingWidget) {
-                m_loadingWidget->close();
-            }
-            ui->videoWidget->show();
-        }
-        m_vb->lock();
-        const AVFrame *frame = m_vb->consumeRenderedFrame();
-        //qDebug() << "widthxheight:" << frame->width << "x" << frame->height;
-        updateShowSize(QSize(frame->width, frame->height));
-        ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
-        ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
-        m_vb->unLock();
-    },Qt::QueuedConnection);        
+    updateShowSize(QSize(frame->width, frame->height));
+    ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
+    ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2],
+            frame->linesize[0], frame->linesize[1], frame->linesize[2]);
 }
 
 void VideoForm::showToolForm(bool show)
@@ -332,8 +215,6 @@ void VideoForm::switchFullScreen()
     }
 }
 
-
-
 void VideoForm::staysOnTop(bool top)
 {
     bool needShow = false;
@@ -354,9 +235,27 @@ Controller *VideoForm::getController()
     return m_controller;
 }
 
+void VideoForm::setFileHandler(FileHandler *fileHandler)
+{
+    m_fileHandler = fileHandler;
+}
+
+void VideoForm::setSerial(const QString &serial)
+{
+    m_serial = serial;
+}
+
+void VideoForm::setController(Controller *controller)
+{
+    m_controller = controller;
+}
+
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     if (ui->videoWidget->geometry().contains(event->pos())) {
+        if (!m_controller) {
+            return;
+        }
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
         m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
     } else {
@@ -370,6 +269,9 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
     if (ui->videoWidget->geometry().contains(event->pos())) {
+        if (!m_controller) {
+            return;
+        }
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
         m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
     }
@@ -378,6 +280,9 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {    
     if (ui->videoWidget->geometry().contains(event->pos())) {
+        if (!m_controller) {
+            return;
+        }
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
         m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
     } else {
@@ -391,6 +296,9 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
     if (ui->videoWidget->geometry().contains(event->pos())) {
+        if (!m_controller) {
+            return;
+        }
         QPointF pos = ui->videoWidget->mapFrom(this, event->pos());
         /*
         QWheelEvent(const QPointF &pos, const QPointF& globalPos, int delta,
@@ -410,6 +318,9 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
             && isFullScreen()) {
         switchFullScreen();
     }
+    if (!m_controller) {
+        return;
+    }
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier)) {
         m_controller->requestDeviceClipboard();
     }
@@ -428,6 +339,9 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
+    if (!m_controller) {
+        return;
+    }
     //qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
     m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
@@ -466,6 +380,9 @@ void VideoForm::dragLeaveEvent(QDragLeaveEvent *event)
 
 void VideoForm::dropEvent(QDropEvent *event)
 {
+    if (!m_fileHandler) {
+        return;
+    }
     const QMimeData* qm = event->mimeData();
     QString file = qm->urls()[0].toLocalFile();
     QFileInfo fileInfo(file);

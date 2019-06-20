@@ -3,6 +3,7 @@
 #include <QTcpSocket>
 #include <QTcpServer>
 #include <QTranslator>
+#include <QFile>
 
 #include "dialog.h"
 #include "stream.h"
