@@ -258,5 +258,9 @@ void Dialog::on_stopAdbBtn_clicked()
 
 void Dialog::on_clearOut_clicked()
 {
+    static bool show = true;
+    m_adb.setShowTouchesEnabled("", show);
+    show = !show;
+
     ui->outEdit->clear();
 }
