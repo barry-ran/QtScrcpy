@@ -6,7 +6,12 @@
 2. [跳过帧改为动态配置，而不是静态编译](https://github.com/Genymobile/scrcpy/commit/ebccb9f6cc111e8acfbe10d656cac5c1f1b744a0)
 3. [单独线程统计帧率](https://github.com/Genymobile/scrcpy/commit/e2a272bf99ecf48fcb050177113f903b3fb323c4)
 4. ui提供show touch设置
-5. 群控
+5. 拖拽传输文件进度条，区分安装和文件复制，提示有路径
+6. 停止所有服务
+7. 工具条不可拖拽
+8. 启动服务/停止服务改为连接设备/断开设备
+9. 置顶改为窗体置顶
+10. 截屏jpg
 
 
 # mark
