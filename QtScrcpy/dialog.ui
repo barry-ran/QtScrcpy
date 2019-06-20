@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>685</width>
-    <height>600</height>
+    <height>762</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -26,60 +26,6 @@
    <string notr="true">QtScrcpy</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="usbGroupBox">
-     <property name="title">
-      <string>USB line</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="3" column="2">
-       <widget class="QPushButton" name="getIPBtn">
-        <property name="text">
-         <string>get device ip</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QPushButton" name="stopServerBtn">
-        <property name="text">
-         <string>stop server</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QPushButton" name="updateDevice">
-        <property name="text">
-         <string>update device</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QPushButton" name="startAdbdBtn">
-        <property name="text">
-         <string>start adbd</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>device serial:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="serialBox"/>
-      </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="startServerBtn">
-        <property name="text">
-         <string>start server</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="2" column="0">
     <widget class="QGroupBox" name="wirelessGroupBox">
      <property name="title">
@@ -130,6 +76,9 @@
         <property name="text">
          <string>wireless connect</string>
         </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item row="4" column="4">
@@ -137,13 +86,25 @@
         <property name="text">
          <string>wireless disconnect</string>
         </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <widget class="QTextEdit" name="outEdit">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>320</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="documentTitle">
       <string/>
      </property>
@@ -197,6 +158,9 @@
         <property name="text">
          <string>record save path:</string>
         </property>
+        <property name="buddy">
+         <cstring>recordPathEdt</cstring>
+        </property>
        </widget>
       </item>
       <item row="1" column="1" colspan="3">
@@ -210,6 +174,9 @@
        <widget class="QPushButton" name="selectRecordPathBtn">
         <property name="text">
          <string>select path</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
@@ -240,9 +207,147 @@
      </layout>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="usbGroupBox">
+     <property name="title">
+      <string>USB line</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="3" column="2">
+       <widget class="QPushButton" name="getIPBtn">
+        <property name="text">
+         <string>get device ip</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="stopServerBtn">
+        <property name="text">
+         <string>stop server</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QPushButton" name="updateDevice">
+        <property name="text">
+         <string>update device</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QPushButton" name="startAdbdBtn">
+        <property name="text">
+         <string>start adbd</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>device serial:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="serialBox"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="startServerBtn">
+        <property name="text">
+         <string>start server</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QGroupBox" name="adbGroupBox">
+     <property name="title">
+      <string notr="true">adb</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>adb command:</string>
+        </property>
+        <property name="buddy">
+         <cstring>adbCommandEdt</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QPushButton" name="stopAdbBtn">
+        <property name="text">
+         <string>terminate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="adbCommandBtn">
+        <property name="text">
+         <string>execute</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="adbCommandEdt">
+        <property name="text">
+         <string notr="true">devices</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="clearOut">
+        <property name="text">
+         <string>clear</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>updateDevice</tabstop>
+  <tabstop>getIPBtn</tabstop>
+  <tabstop>startAdbdBtn</tabstop>
+  <tabstop>deviceIpEdt</tabstop>
+  <tabstop>devicePortEdt</tabstop>
+  <tabstop>wirelessConnectBtn</tabstop>
+  <tabstop>wirelessDisConnectBtn</tabstop>
+  <tabstop>adbCommandEdt</tabstop>
+  <tabstop>adbCommandBtn</tabstop>
+  <tabstop>bitRateBox</tabstop>
+  <tabstop>videoSizeBox</tabstop>
+  <tabstop>formatBox</tabstop>
+  <tabstop>recordPathEdt</tabstop>
+  <tabstop>selectRecordPathBtn</tabstop>
+  <tabstop>alwaysTopCheck</tabstop>
+  <tabstop>closeScreenCheck</tabstop>
+  <tabstop>serialBox</tabstop>
+  <tabstop>startServerBtn</tabstop>
+  <tabstop>stopServerBtn</tabstop>
+  <tabstop>outEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
