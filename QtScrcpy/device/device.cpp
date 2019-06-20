@@ -64,6 +64,11 @@ VideoForm *Device::getVideoForm()
     return m_videoForm;
 }
 
+Controller *Device::getController()
+{
+    return m_controller;
+}
+
 void Device::initSignals()
 {
     if (m_videoForm) {
