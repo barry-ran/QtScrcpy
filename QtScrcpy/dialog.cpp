@@ -242,12 +242,13 @@ void Dialog::on_alwaysTopCheck_stateChanged(int arg1)
 
 void Dialog::on_closeScreenCheck_stateChanged(int arg1)
 {
+    Q_UNUSED(arg1);
     if (!m_videoForm) {
         return;
     }
     if (ui->closeScreenCheck->isChecked()) {
-        m_videoForm->setScreenPowerMode(ControlMsg::SPM_OFF);
+        m_videoForm->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
     } else {
-        m_videoForm->setScreenPowerMode(ControlMsg::SPM_NORMAL);
+        m_videoForm->getController()->setScreenPowerMode(ControlMsg::SPM_NORMAL);
     }
 }

@@ -15,9 +15,26 @@ public:
     Controller(QObject* parent = Q_NULLPTR);
     virtual ~Controller();
 
-    void setControlSocket(QTcpSocket* controlSocket);
+    void setControlSocket(QTcpSocket* controlSocket);    
     void postControlMsg(ControlMsg* controlMsg);
     void test(QRect rc);
+
+    // turn the screen on if it was off, press BACK otherwise
+    void postTurnOn();
+    void postGoHome();
+    void postGoMenu();
+    void postGoBack();
+    void postAppSwitch();
+    void postPower();
+    void postVolumeUp();
+    void postVolumeDown();
+    void expandNotificationPanel();
+    void collapseNotificationPanel();
+    void requestDeviceClipboard();
+    void setDeviceClipboard();
+    void clipboardPaste();
+    void postTextInput(QString& text);
+    void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
 
     // for input convert
     void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
@@ -32,6 +49,7 @@ protected:
 
 private:
     bool sendControl(const QByteArray& buffer);
+    void postKeyCodeClick(AndroidKeycode keycode);    
 
 private:
     QPointer<QTcpSocket> m_controlSocket;
