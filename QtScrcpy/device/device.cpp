@@ -14,25 +14,37 @@ Device::Device(DeviceParams params, QObject *parent)
     : QObject(parent)
     , m_params(params)
 {
-    m_vb = new VideoBuffer();
-    m_vb->init();
-    m_decoder = new Decoder(m_vb, this);
+    if (!params.display && m_params.recordFileName.trimmed().isEmpty()) {
+        qCritical("not display must be recorded");
+        deleteLater();
+        return;
+    }
+
+    if (params.display) {
+        m_vb = new VideoBuffer();
+        m_vb->init();
+        m_decoder = new Decoder(m_vb, this);
+        m_fileHandler = new FileHandler(this);
+        m_controller = new Controller(this);
+        m_videoForm = new VideoForm();
+        if (m_controller) {
+            m_videoForm->setController(m_controller);
+        }
+        if (m_fileHandler) {
+            m_videoForm->setFileHandler(m_fileHandler);
+        }
+        m_videoForm->show();
+    }
+
     m_stream = new Stream(this);
-    m_stream->setDecoder(m_decoder);
-
+    if (m_decoder) {
+        m_stream->setDecoder(m_decoder);
+    }
     m_server = new Server(this);
-    m_controller = new Controller(this);
-    m_fileHandler = new FileHandler(this);
-
     if (!m_params.recordFileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(m_params.recordFileName);
         m_stream->setRecoder(m_recorder);
     }
-
-    m_videoForm = new VideoForm();
-    m_videoForm->setController(m_controller);
-    m_videoForm->show();
-
     initSignals();
     startServer();
 }
@@ -71,7 +83,7 @@ Controller *Device::getController()
 
 void Device::initSignals()
 {
-    if (m_videoForm) {
+    if (m_controller && m_videoForm) {
         connect(m_controller, &Controller::grabCursor, m_videoForm, &VideoForm::onGrabCursor);
     }
     if (m_fileHandler) {
@@ -117,9 +129,12 @@ void Device::initSignals()
                 m_stream->startDecode();
 
                 // init controller
-                m_controller->setControlSocket(m_server->getControlSocket());
+                if (m_controller) {
+                    m_controller->setControlSocket(m_server->getControlSocket());
+                }
 
-                if (m_params.closeScreen && m_controller) {
+                // 显示界面时才自动息屏（m_params.display）
+                if (m_params.closeScreen && m_params.display && m_controller) {
                     m_controller->setScreenPowerMode(ControlMsg::SPM_OFF);
                 }
             }
@@ -137,7 +152,7 @@ void Device::initSignals()
         });
     }
 
-    if (m_decoder) {
+    if (m_decoder && m_vb) {
         // must be Qt::QueuedConnection, ui update must be main thread
         connect(m_decoder, &Decoder::onNewFrame, this, [this](){
             m_vb->lock();
