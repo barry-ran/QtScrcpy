@@ -5,12 +5,12 @@
 #include <QPointer>
 
 #include "adbprocess.h"
+#include "devicemanage.h"
 
 namespace Ui {
 class Dialog;
 }
 
-class Device;
 class QYUVOpenGLWidget;
 class Dialog : public QDialog
 {
@@ -55,7 +55,7 @@ private:
 private:
     Ui::Dialog *ui;
     AdbProcess m_adb;
-    QPointer<Device> m_device;
+    DeviceManage m_deviceManage;
 };
 
 #endif // DIALOG_H

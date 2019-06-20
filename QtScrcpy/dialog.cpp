@@ -102,42 +102,42 @@ void Dialog::on_updateDevice_clicked()
 
 void Dialog::on_startServerBtn_clicked()
 {
-    if (!m_device) {
-        outLog("start server...", false);
+    outLog("start server...", false);
 
-        QString absFilePath;
-        QString fileDir(ui->recordPathEdt->text().trimmed());
-        if (!fileDir.isEmpty()) {
-            QDateTime dateTime = QDateTime::currentDateTime();
-            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
-            QString ext = ui->formatBox->currentText().trimmed();
-            fileName = windowTitle() + fileName + "." + ext;
-            QDir dir(fileDir);
-            absFilePath = dir.absoluteFilePath(fileName);
-        }
+    QString absFilePath;
+    QString fileDir(ui->recordPathEdt->text().trimmed());
+    if (!fileDir.isEmpty()) {
+        QDateTime dateTime = QDateTime::currentDateTime();
+        QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
+        QString ext = ui->formatBox->currentText().trimmed();
+        fileName = windowTitle() + fileName + "." + ext;
+        QDir dir(fileDir);
+        absFilePath = dir.absoluteFilePath(fileName);
+    }
 
-        quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
-        // this is ok that "native" toUshort is 0
-        quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
-        Device::DeviceParams params;
-        params.serial = ui->serialBox->currentText().trimmed();
-        params.maxSize = videoSize;
-        params.bitRate = bitRate;
-        params.recordFileName = absFilePath;
-        params.closeScreen = ui->closeScreenCheck->isChecked();
-        params.useReverse = ui->useReverseCheck->isChecked();
-        params.display = !ui->notDisplayCheck->isChecked();
-        m_device = new Device(params, this);
+    quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
+    // this is ok that "native" toUshort is 0
+    quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
+    Device::DeviceParams params;
+    params.serial = ui->serialBox->currentText().trimmed();
+    params.maxSize = videoSize;
+    params.bitRate = bitRate;
+    params.recordFileName = absFilePath;
+    params.closeScreen = ui->closeScreenCheck->isChecked();
+    params.useReverse = ui->useReverseCheck->isChecked();
+    params.display = !ui->notDisplayCheck->isChecked();
+    m_deviceManage.connectDevice(params);
+
+/*
         if (ui->alwaysTopCheck->isChecked() && m_device->getVideoForm()) {
             m_device->getVideoForm()->staysOnTop();
-        }        
-    }    
+        }         
+    */
 }
 
 void Dialog::on_stopServerBtn_clicked()
 {    
-    if (m_device) {
-        m_device->deleteLater();
+    if (m_deviceManage.disconnectDevice(ui->serialBox->currentText().trimmed())) {
         outLog("stop server");
     }
 }
@@ -257,10 +257,6 @@ void Dialog::on_stopAdbBtn_clicked()
 }
 
 void Dialog::on_clearOut_clicked()
-{
-    static bool show = true;
-    m_adb.setShowTouchesEnabled("", show);
-    show = !show;
-
+{    
     ui->outEdit->clear();
 }

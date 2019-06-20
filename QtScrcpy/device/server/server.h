@@ -38,6 +38,8 @@ public:
 
     bool start(Server::ServerParams params);
     bool connectTo();
+    bool isReverse();
+    Server::ServerParams getParams();
 
     VideoSocket* getVideoSocket();
     QTcpSocket* getControlSocket();
