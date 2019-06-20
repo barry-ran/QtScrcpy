@@ -168,6 +168,16 @@ bool Server::connectTo()
     return true;
 }
 
+bool Server::isReverse()
+{
+    return !m_tunnelForward;
+}
+
+Server::ServerParams Server::getParams()
+{
+    return m_params;
+}
+
 void Server::timerEvent(QTimerEvent *event)
 {
     if (event && m_acceptTimeoutTimer == event->timerId()) {

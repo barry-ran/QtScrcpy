@@ -9,6 +9,7 @@
 #include "filehandler.h"
 #include "stream.h"
 #include "videoform.h"
+#include "controller.h"
 
 Device::Device(DeviceParams params, QObject *parent)
     : QObject(parent)
@@ -69,6 +70,7 @@ Device::~Device()
     if (m_videoForm) {
         delete m_videoForm;
     }
+    emit deviceDisconnect(m_params.serial);
 }
 
 VideoForm *Device::getVideoForm()
@@ -79,6 +81,11 @@ VideoForm *Device::getVideoForm()
 Controller *Device::getController()
 {
     return m_controller;
+}
+
+Server *Device::getServer()
+{
+    return m_server;
 }
 
 void Device::initSignals()

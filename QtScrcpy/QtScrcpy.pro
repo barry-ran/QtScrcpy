@@ -41,6 +41,7 @@ include ($$PWD/uibase/uibase.pri)
 include ($$PWD/fontawesome/fontawesome.pri)
 include ($$PWD/util/util.pri)
 include ($$PWD/device/device.pri)
+include ($$PWD/devicemanage/devicemanage.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
@@ -48,7 +49,8 @@ INCLUDEPATH += \
         $$PWD/adb \        
         $$PWD/uibase \        
         $$PWD/util \
-        $$PWD/device \        
+        $$PWD/device \
+        $$PWD/devicemanage \
         $$PWD/fontawesome
 
 

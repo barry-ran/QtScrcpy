@@ -4,8 +4,6 @@
 #include <QPointer>
 #include <QTime>
 
-#include "controller.h"
-
 class Recorder;
 class Server;
 class VideoBuffer;
@@ -13,6 +11,7 @@ class Decoder;
 class FileHandler;
 class Stream;
 class VideoForm;
+class Controller;
 class Device : public QObject
 {
     Q_OBJECT
@@ -32,6 +31,10 @@ public:
 
     VideoForm *getVideoForm();
     Controller *getController();
+    Server *getServer();
+
+signals:
+    void deviceDisconnect(QString serial);
 
 private:
     void initSignals();
