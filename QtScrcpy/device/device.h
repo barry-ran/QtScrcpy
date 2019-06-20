@@ -18,19 +18,20 @@ class Device : public QObject
     Q_OBJECT
 public:
     struct DeviceParams {
-        QString recordFileName = "";
-        QString serial = "";
-        quint16 localPort = 27183;
-        quint16 maxSize = 0;
-        quint32 bitRate = 8000000;
-        bool closeScreen = false;
-        bool useReverse = true;
+        QString recordFileName = "";    // 视频录制文件名
+        QString serial = "";            // 设备序列号
+        quint16 localPort = 27183;      // reverse时本地监听端口
+        quint16 maxSize = 720;          // 视频分辨率
+        quint32 bitRate = 8000000;      // 视频比特率
+        bool closeScreen = false;       // 启动时自动息屏
+        bool useReverse = true;         // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
+        bool display = true;            // 是否显示画面（或者仅仅后台录制）
     };
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
 
     VideoForm *getVideoForm();
-    Controller* getController();
+    Controller *getController();
 
 private:
     void initSignals();

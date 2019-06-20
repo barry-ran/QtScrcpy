@@ -103,6 +103,8 @@ void Dialog::on_updateDevice_clicked()
 void Dialog::on_startServerBtn_clicked()
 {
     if (!m_device) {
+        outLog("start server...", false);
+
         QString absFilePath;
         QString fileDir(ui->recordPathEdt->text().trimmed());
         if (!fileDir.isEmpty()) {
@@ -124,12 +126,11 @@ void Dialog::on_startServerBtn_clicked()
         params.recordFileName = absFilePath;
         params.closeScreen = ui->closeScreenCheck->isChecked();
         params.useReverse = ui->useReverseCheck->isChecked();
+        params.display = !ui->notDisplayCheck->isChecked();
         m_device = new Device(params, this);
         if (ui->alwaysTopCheck->isChecked() && m_device->getVideoForm()) {
             m_device->getVideoForm()->staysOnTop();
-        }
-
-        outLog("start server...", false);
+        }        
     }    
 }
 
@@ -241,7 +242,8 @@ void Dialog::on_selectRecordPathBtn_clicked()
 
 void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
 {
-    ui->recordPathEdt->setToolTip(arg1);
+    ui->recordPathEdt->setToolTip(arg1.trimmed());
+    ui->notDisplayCheck->setCheckable(!arg1.trimmed().isEmpty());
 }
 
 void Dialog::on_adbCommandBtn_clicked()
