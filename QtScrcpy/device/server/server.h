@@ -65,9 +65,12 @@ private:
     bool disableTunnelForward();
     bool execute();
     bool startServerByStep();
-    bool readInfo(QString& deviceName, QSize& size);
+    bool readInfo(VideoSocket* videoSocket, QString& deviceName, QSize& size);
     void startAcceptTimeoutTimer();
     void stopAcceptTimeoutTimer();
+    void startConnectTimeoutTimer();
+    void stopConnectTimeoutTimer();
+    void onConnectTimer();
 
 private:
     QString m_serverPath = "";
@@ -79,6 +82,8 @@ private:
     bool m_tunnelEnabled = false;
     bool m_tunnelForward = false; // use "adb forward" instead of "adb reverse"
     quint32 m_acceptTimeoutTimer = 0;
+    quint32 m_connectTimeoutTimer = 0;
+    quint32 m_connectCount = 0;
     QString m_deviceName = "";
     QSize m_deviceSize = QSize();
     ServerParams m_params;

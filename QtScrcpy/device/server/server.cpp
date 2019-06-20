@@ -20,7 +20,7 @@ Server::Server(QObject *parent) : QObject(parent)
         QTcpSocket* tmp = m_serverSocket.nextPendingConnection();
         if (dynamic_cast<VideoSocket*>(tmp)) {
             m_videoSocket = dynamic_cast<VideoSocket*>(tmp);
-            if (!m_videoSocket->isValid() || !readInfo(m_deviceName, m_deviceSize)) {
+            if (!m_videoSocket->isValid() || !readInfo(m_videoSocket, m_deviceName, m_deviceSize)) {
                 stop();
                 emit connectToResult(false);
             }
@@ -164,63 +164,7 @@ bool Server::connectTo()
         return true;
     }
 
-    // device server need time to start
-    // TODO:电脑配置太低的话，这里有可能时间不够导致连接太早，安卓监听socket还没有建立
-    // 后续研究其他办法
-    // wait for devices server start
-    QTimer::singleShot(1000, this, [this](){
-        QString deviceName;
-        QSize deviceSize;
-        bool success = false;
-
-        // video socket
-        m_videoSocket = new VideoSocket();
-        m_videoSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
-        if (!m_videoSocket->waitForConnected(1000)) {
-            stop();
-            qWarning("video socket connect to server failed");
-            emit connectToResult(false, "", QSize());
-            return false;
-        }        
-
-        // control socket
-        m_controlSocket = new QTcpSocket();
-        m_controlSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
-        if (!m_controlSocket->waitForConnected(1000)) {
-            stop();
-            qWarning("control socket connect to server failed");
-            emit connectToResult(false, "", QSize());
-            return false;
-        }
-
-        if (QTcpSocket::ConnectedState == m_videoSocket->state()) {
-            // connect will success even if devices offline, recv data is real connect success
-            // because connect is to pc adb server
-            m_videoSocket->waitForReadyRead(1000);
-            // devices will send 1 byte first on tunnel forward mode
-            QByteArray data = m_videoSocket->read(1);
-            if (!data.isEmpty() && readInfo(deviceName, deviceSize)) {
-                success = true;
-            } else {
-                qWarning("video socket connect to server read device info failed");
-                success = false;
-            }
-        } else {
-            qWarning("connect to server failed");
-            m_videoSocket->deleteLater();
-            success = false;
-        }
-
-        if (success) {
-            // we don't need the adb tunnel anymore
-            disableTunnelForward();
-            m_tunnelEnabled = false;
-        } else {
-            stop();
-        }
-        emit connectToResult(success, deviceName, deviceSize);
-    });
-
+    startConnectTimeoutTimer();
     return true;
 }
 
@@ -229,6 +173,8 @@ void Server::timerEvent(QTimerEvent *event)
     if (event && m_acceptTimeoutTimer == event->timerId()) {
         stopAcceptTimeoutTimer();
         emit connectToResult(false, "", QSize());
+    } else if (event && m_connectTimeoutTimer == event->timerId()) {
+        onConnectTimer();
     }
 }
 
@@ -317,14 +263,14 @@ bool Server::startServerByStep()
     return stepSuccess;
 }
 
-bool Server::readInfo(QString &deviceName, QSize &size)
+bool Server::readInfo(VideoSocket* videoSocket, QString &deviceName, QSize &size)
 {
     unsigned char buf[DEVICE_NAME_FIELD_LENGTH + 4];
-    if (m_videoSocket->bytesAvailable() <= (DEVICE_NAME_FIELD_LENGTH + 4)) {
-        m_videoSocket->waitForReadyRead(300);
+    if (videoSocket->bytesAvailable() <= (DEVICE_NAME_FIELD_LENGTH + 4)) {
+        videoSocket->waitForReadyRead(300);
     }
 
-    qint64 len = m_videoSocket->read((char*)buf, sizeof(buf));
+    qint64 len = videoSocket->read((char*)buf, sizeof(buf));
     if (len < DEVICE_NAME_FIELD_LENGTH + 4) {
         qInfo("Could not retrieve device information");
         return false;
@@ -349,6 +295,93 @@ void Server::stopAcceptTimeoutTimer()
     if (m_acceptTimeoutTimer) {
         killTimer(m_acceptTimeoutTimer);
         m_acceptTimeoutTimer = 0;
+    }
+}
+
+void Server::startConnectTimeoutTimer()
+{
+    stopConnectTimeoutTimer();
+    m_connectTimeoutTimer = startTimer(100);
+}
+
+void Server::stopConnectTimeoutTimer()
+{
+    if (m_connectTimeoutTimer) {
+        killTimer(m_connectTimeoutTimer);
+        m_connectTimeoutTimer = 0;
+    }
+    m_connectCount = 0;
+}
+
+void Server::onConnectTimer()
+{
+    // device server need time to start
+    // 这里连接太早时间不够导致安卓监听socket还没有建立，readInfo会失败，所以采取定时重试策略
+    // 每隔100ms尝试一次，最多尝试100次
+    QString deviceName;
+    QSize deviceSize;
+    bool success = false;
+
+    VideoSocket* videoSocket = new VideoSocket();
+    videoSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
+    if (!videoSocket->waitForConnected(1000)) {
+        // 连接到adb很快的，这里失败不重试
+        m_connectCount = 10;
+        qWarning("video socket connect to server failed");
+        goto result;
+    }
+
+    QTcpSocket *controlSocket = new QTcpSocket();
+    controlSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
+    if (!controlSocket->waitForConnected(1000)) {
+        // 连接到adb很快的，这里失败不重试
+        m_connectCount = 10;
+        qWarning("control socket connect to server failed");
+        goto result;
+    }
+
+    if (QTcpSocket::ConnectedState == videoSocket->state()) {
+        // connect will success even if devices offline, recv data is real connect success
+        // because connect is to pc adb server
+        videoSocket->waitForReadyRead(1000);
+        // devices will send 1 byte first on tunnel forward mode
+        QByteArray data = videoSocket->read(1);
+        if (!data.isEmpty() && readInfo(videoSocket, deviceName, deviceSize)) {
+            success = true;
+            goto result;
+        } else {
+            qWarning("video socket connect to server read device info failed, try again");
+            goto result;
+        }
+    } else {
+        qWarning("connect to server failed");
+        m_connectCount = 10;
+        goto result;
+    }
+
+result:
+    if (success) {
+        stopConnectTimeoutTimer();
+        m_videoSocket = videoSocket;
+        m_controlSocket = controlSocket;
+        // we don't need the adb tunnel anymore
+        disableTunnelForward();
+        m_tunnelEnabled = false;
+        emit connectToResult(success, deviceName, deviceSize);
+        return;
+    }
+
+    if (videoSocket) {
+        videoSocket->deleteLater();
+    }
+    if (controlSocket) {
+        controlSocket->deleteLater();
+    }
+
+    if (10 <= m_connectCount++) {
+        stopConnectTimeoutTimer();
+        stop();
+        emit connectToResult(false);
     }
 }
 
