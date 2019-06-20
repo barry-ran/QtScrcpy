@@ -81,6 +81,16 @@ void Dialog::initUI()
     ui->formatBox->addItem("mkv");
 }
 
+void Dialog::execAdbCmd()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+    QString cmd = ui->adbCommandEdt->text().trimmed();
+    outLog("adb " + cmd, false);
+    m_adb.execute("", cmd.split(" ", QString::SkipEmptyParts));
+}
+
 void Dialog::on_updateDevice_clicked()
 {
     if (checkAdbRun()) {
@@ -257,4 +267,19 @@ void Dialog::on_closeScreenCheck_stateChanged(int arg1)
     } else {
         m_device->getController()->setScreenPowerMode(ControlMsg::SPM_NORMAL);
     }
+}
+
+void Dialog::on_adbCommandBtn_clicked()
+{
+    execAdbCmd();
+}
+
+void Dialog::on_stopAdbBtn_clicked()
+{
+    m_adb.kill();
+}
+
+void Dialog::on_clearOut_clicked()
+{
+    ui->outEdit->clear();
 }

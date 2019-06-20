@@ -45,9 +45,16 @@ private slots:
 
     void on_closeScreenCheck_stateChanged(int arg1);
 
+    void on_adbCommandBtn_clicked();
+
+    void on_stopAdbBtn_clicked();
+
+    void on_clearOut_clicked();
+
 private:
     bool checkAdbRun();
     void initUI();
+    void execAdbCmd();
 
 private:
     Ui::Dialog *ui;
