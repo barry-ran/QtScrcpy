@@ -116,33 +116,13 @@
    <item row="0" column="0">
     <widget class="QGroupBox" name="configGroupBox">
      <property name="title">
-      <string>Config</string>
+      <string>Start Config</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="5">
-       <widget class="QComboBox" name="formatBox"/>
-      </item>
-      <item row="0" column="2">
+      <item row="0" column="4">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>video size:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QComboBox" name="videoSizeBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="bitRateBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="currentText">
-         <string/>
         </property>
        </widget>
       </item>
@@ -150,6 +130,19 @@
        <widget class="QLabel" name="label_3">
         <property name="text">
          <string>bit rate:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7">
+       <widget class="QComboBox" name="formatBox"/>
+      </item>
+      <item row="0" column="3">
+       <widget class="QComboBox" name="bitRateBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="currentText">
+         <string/>
         </property>
        </widget>
       </item>
@@ -163,27 +156,13 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="3">
-       <widget class="QLineEdit" name="recordPathEdt">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4" colspan="2">
+      <item row="1" column="6" colspan="2">
        <widget class="QPushButton" name="selectRecordPathBtn">
         <property name="text">
          <string>select path</string>
         </property>
         <property name="autoDefault">
          <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>record format：</string>
         </property>
        </widget>
       </item>
@@ -197,7 +176,38 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2">
+      <item row="0" column="6">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>record format：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" colspan="3">
+       <widget class="QLineEdit" name="recordPathEdt">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QComboBox" name="videoSizeBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="QCheckBox" name="useReverseCheck">
+        <property name="text">
+         <string>use reverse</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" colspan="2">
        <widget class="QCheckBox" name="closeScreenCheck">
         <property name="text">
          <string>close screen</string>
@@ -342,7 +352,6 @@
   <tabstop>recordPathEdt</tabstop>
   <tabstop>selectRecordPathBtn</tabstop>
   <tabstop>alwaysTopCheck</tabstop>
-  <tabstop>closeScreenCheck</tabstop>
   <tabstop>serialBox</tabstop>
   <tabstop>startServerBtn</tabstop>
   <tabstop>stopServerBtn</tabstop>

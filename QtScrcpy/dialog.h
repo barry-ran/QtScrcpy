@@ -41,10 +41,6 @@ private slots:
 
     void on_recordPathEdt_textChanged(const QString &arg1);
 
-    void on_alwaysTopCheck_stateChanged(int arg1);
-
-    void on_closeScreenCheck_stateChanged(int arg1);
-
     void on_adbCommandBtn_clicked();
 
     void on_stopAdbBtn_clicked();

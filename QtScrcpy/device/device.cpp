@@ -169,6 +169,7 @@ void Device::startServer()
         params.crop = "-";
         params.sendFrameMeta = m_recorder ? true : false;
         params.control = true;
+        params.useReverse = m_params.useReverse;
         m_server->start(params);
     });
 }

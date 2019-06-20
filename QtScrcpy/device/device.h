@@ -24,6 +24,7 @@ public:
         quint16 maxSize = 0;
         quint32 bitRate = 8000000;
         bool closeScreen = false;
+        bool useReverse = true;
     };
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();

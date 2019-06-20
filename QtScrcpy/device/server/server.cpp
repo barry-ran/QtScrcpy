@@ -181,7 +181,18 @@ bool Server::connectTo()
             qWarning("video socket connect to server failed");
             emit connectToResult(false, "", QSize());
             return false;
+        }        
+
+        // control socket
+        m_controlSocket = new QTcpSocket();
+        m_controlSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
+        if (!m_controlSocket->waitForConnected(1000)) {
+            stop();
+            qWarning("control socket connect to server failed");
+            emit connectToResult(false, "", QSize());
+            return false;
         }
+
         if (QTcpSocket::ConnectedState == m_videoSocket->state()) {
             // connect will success even if devices offline, recv data is real connect success
             // because connect is to pc adb server
@@ -200,17 +211,7 @@ bool Server::connectTo()
             success = false;
         }
 
-        // control socket
-        m_controlSocket = new QTcpSocket();
-        m_controlSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
-        if (!m_controlSocket->waitForConnected(1000)) {
-            stop();
-            qWarning("control socket connect to server failed");
-            emit connectToResult(false, "", QSize());
-            return false;
-        }
-
-        if (success) {            
+        if (success) {
             // we don't need the adb tunnel anymore
             disableTunnelForward();
             m_tunnelEnabled = false;
@@ -358,13 +359,12 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
             switch (m_serverStartStep) {
             case SSS_PUSH:
                 if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
-#if 1
-                    m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
-#else
-                    // test tunnelForward
-                    m_tunnelForward = true;
-                    m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
-#endif
+                    if (m_params.useReverse) {
+                        m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
+                    } else {
+                        m_tunnelForward = true;
+                        m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
+                    }
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult){
                     qCritical("adb push failed");
