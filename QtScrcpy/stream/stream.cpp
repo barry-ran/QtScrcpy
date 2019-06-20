@@ -13,7 +13,8 @@
 
 typedef qint32 (*ReadPacketFunc)(void*, quint8*, qint32);
 
-Stream::Stream()
+Stream::Stream(QObject *parent)
+    : QThread(parent)
 {
     m_quit.store(0);
 }

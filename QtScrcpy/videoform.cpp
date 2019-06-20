@@ -19,7 +19,9 @@
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
-//#include "controlmsg.h"
+#include "filehandler.h"
+#include "stream.h"
+#include "server.h"
 #include "mousetap/mousetap.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, bool closeScreen, QWidget *parent) :
@@ -33,16 +35,20 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     initUI();    
 
     m_closeScreen = closeScreen;
-    m_server = new Server();
+
     m_vb = new VideoBuffer();
     m_vb->init();
-    m_decoder = new Decoder(m_vb);
-    m_stream.setDecoder(m_decoder);
+
+    m_server = new Server(this);
+    m_decoder = new Decoder(m_vb, this);
+    m_stream = new Stream(this);
+    m_stream->setDecoder(m_decoder);
     m_controller = new Controller(this);
+    m_fileHandler = new FileHandler(this);
 
     if (!fileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(fileName.trimmed());
-        m_stream.setRecoder(m_recorder);
+        m_stream->setRecoder(m_recorder);
     }
 
     initSignals();
@@ -78,12 +84,14 @@ VideoForm::~VideoForm()
 {
     m_server->stop();
     // server must stop before decoder, because decoder block main thread
-    m_stream.stopDecode();
-    delete m_server;
+    m_stream->stopDecode();
+
     if (m_recorder) {
         delete m_recorder;
-    }
-    m_vb->deInit();
+    }    
+    m_vb->deInit();    
+    delete m_vb;
+
     delete ui;
 }
 
@@ -139,7 +147,7 @@ void VideoForm::initUI()
 
 void VideoForm::initSignals()
 {
-    connect(&m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult){
+    connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult){
         if (FileHandler::FAR_IS_RUNNING == processResult) {
             QMessageBox::warning(this, "QtScrcpy", tr("wait current file transfer to complete"), QMessageBox::Ok);
         }
@@ -183,8 +191,8 @@ void VideoForm::initSignals()
             }
 
             // init decoder
-            m_stream.setVideoSocket(m_server->getVideoSocket());
-            m_stream.startDecode();
+            m_stream->setVideoSocket(m_server->getVideoSocket());
+            m_stream->startDecode();
 
             // init controller
             m_controller->setControlSocket(m_server->getControlSocket());
@@ -200,7 +208,7 @@ void VideoForm::initSignals()
         qDebug() << "server process stop";
     });
 
-    connect(&m_stream, &Stream::onStreamStop, this, [this](){
+    connect(m_stream, &Stream::onStreamStop, this, [this](){
         close();
         qDebug() << "stream thread stop";
     });
@@ -468,8 +476,8 @@ void VideoForm::dropEvent(QDropEvent *event)
     }
 
     if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
-        m_fileHandler.installApkRequest(m_serial, file);
+        m_fileHandler->installApkRequest(m_serial, file);
         return;
     }
-    m_fileHandler.pushFileRequest(m_serial, file);
+    m_fileHandler->pushFileRequest(m_serial, file);
 }

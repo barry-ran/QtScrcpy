@@ -5,9 +5,6 @@
 #include <QPointer>
 #include <QTime>
 
-#include "server.h"
-#include "stream.h"
-#include "filehandler.h"
 #include "controller.h"
 
 namespace Ui {
@@ -18,6 +15,9 @@ class ToolForm;
 class Recorder;
 class VideoBuffer;
 class Decoder;
+class FileHandler;
+class Stream;
+class Server;
 class VideoForm : public QWidget
 {
     Q_OBJECT
@@ -59,13 +59,14 @@ private:
     QPointer<QWidget> m_loadingWidget;
 
     // server relevant
-    Server* m_server = Q_NULLPTR;    
-    VideoBuffer* m_vb = Q_NULLPTR;
-    Decoder* m_decoder = Q_NULLPTR;
-    Recorder* m_recorder = Q_NULLPTR;
+    QPointer<Server> m_server;
+    QPointer<Decoder> m_decoder;
     QPointer<Controller> m_controller;
-    Stream m_stream;
-    FileHandler m_fileHandler;
+    QPointer<FileHandler> m_fileHandler;
+    QPointer<Stream> m_stream;
+
+    VideoBuffer* m_vb = Q_NULLPTR;
+    Recorder* m_recorder = Q_NULLPTR;    
 
     // server params
     QString m_serial = "";

@@ -4,8 +4,8 @@
 #include "videobuffer.h"
 #include "decoder.h"
 
-Decoder::Decoder(VideoBuffer* vb)
-    : QObject(Q_NULLPTR)
+Decoder::Decoder(VideoBuffer* vb, QObject *parent)
+    : QObject(parent)
     , m_vb(vb)
 {
 

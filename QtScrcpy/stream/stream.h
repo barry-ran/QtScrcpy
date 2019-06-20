@@ -30,7 +30,7 @@ public:
         qint32 remaining; // remaining bytes to receive for the current frame
     } ReceiverState;
 
-    Stream();
+    Stream(QObject *parent = Q_NULLPTR);
     virtual ~Stream();
 
 public:
