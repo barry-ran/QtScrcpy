@@ -25,11 +25,12 @@ public:
     struct ServerParams {
         QString serial = "";
         quint16 localPort = 27183;
-        quint16 maxSize = 0;
+        quint16 maxSize = 750;
         quint32 bitRate = 8000000;
         QString crop = "-";
         bool sendFrameMeta = false;
         bool control = true;
+        bool useReverse = true;
     };
 
     explicit Server(QObject *parent = nullptr);
