@@ -5,19 +5,16 @@
 #include "inputconvertnormal.h"
 
 #define MULTI_TOUCH_MAX_NUM 10
-class InputConvertGame : public QObject, public InputConvertNormal
+class InputConvertGame : public InputConvertNormal
 {
     Q_OBJECT
 public:
-    InputConvertGame(QObject* parent = Q_NULLPTR);
+    InputConvertGame(Controller* controller);
     virtual ~InputConvertGame();
 
     virtual void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
     virtual void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
     virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
-
-signals:
-    void grabCursor(bool grab);
 
 protected:
     void updateSize(const QSize& frameSize, const QSize& showSize);

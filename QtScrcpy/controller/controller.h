@@ -4,8 +4,9 @@
 #include <QObject>
 #include <QPointer>
 
+#include "inputconvertgame.h"
+
 class QTcpSocket;
-class ControlMsg;
 class Receiver;
 class Controller : public QObject
 {
@@ -15,9 +16,16 @@ public:
     virtual ~Controller();
 
     void setControlSocket(QTcpSocket* controlSocket);
-    QTcpSocket* getControlSocket();
     void postControlMsg(ControlMsg* controlMsg);
     void test(QRect rc);
+
+    // for input convert
+    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
+    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
+    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+
+signals:
+    void grabCursor(bool grab);
 
 protected:
     bool event(QEvent *event);
@@ -28,6 +36,7 @@ private:
 private:
     QPointer<QTcpSocket> m_controlSocket;
     QPointer<Receiver> m_receiver;
+    QPointer<InputConvertBase> m_inputConvert;
 };
 
 #endif // CONTROLLER_H

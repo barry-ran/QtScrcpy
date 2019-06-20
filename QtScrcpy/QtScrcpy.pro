@@ -55,7 +55,7 @@ include ($$PWD/decoder/decoder.pri)
 include ($$PWD/render/render.pri)
 include ($$PWD/stream/stream.pri)
 include ($$PWD/android/android.pri)
-include ($$PWD/inputcontrol/inputcontrol.pri)
+include ($$PWD/controller/controller.pri)
 include ($$PWD/uibase/uibase.pri)
 include ($$PWD/fontawesome/fontawesome.pri)
 include ($$PWD/filehandler/filehandler.pri)
@@ -72,7 +72,7 @@ INCLUDEPATH += \
         $$PWD/render \
         $$PWD/stream \
         $$PWD/android \
-        $$PWD/inputcontrol \
+        $$PWD/controller \
         $$PWD/uibase \
         $$PWD/filehandler \
         $$PWD/recorder \

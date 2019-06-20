@@ -4,14 +4,16 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
+#include <QPointer>
 
 #include "controlmsg.h"
-#include "controller.h"
 
-class InputConvertBase
+class Controller;
+class InputConvertBase : public QObject
 {
+    Q_OBJECT
 public:
-    InputConvertBase();
+    InputConvertBase(Controller* controller);
     virtual ~InputConvertBase();
 
     // the frame size may be different from the real device size, so we need the size
@@ -20,11 +22,14 @@ public:
     virtual void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize) = 0;
     virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize) = 0;
 
-    void setControlSocket(QTcpSocket* controlSocket);
+signals:
+    void grabCursor(bool grab);
+
+protected:
     void sendControlMsg(ControlMsg* msg);
 
 private:
-    Controller m_controller;
+    QPointer<Controller> m_controller;
 };
 
 #endif // INPUTCONVERTBASE_H

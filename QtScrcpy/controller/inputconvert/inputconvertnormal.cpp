@@ -1,6 +1,7 @@
 #include "inputconvertnormal.h"
 
-InputConvertNormal::InputConvertNormal()
+InputConvertNormal::InputConvertNormal(Controller* controller)
+    : InputConvertBase(controller)
 {
 
 }

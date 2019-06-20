@@ -20,7 +20,7 @@
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
-#include "controlmsg.h"
+//#include "controlmsg.h"
 #include "mousetap/mousetap.h"
 
 VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, const QString& fileName, bool closeScreen, QWidget *parent) :
@@ -39,6 +39,8 @@ VideoForm::VideoForm(const QString& serial, quint16 maxSize, quint32 bitRate, co
     m_vb->init();
     m_decoder = new Decoder(m_vb);
     m_stream.setDecoder(m_decoder);
+    m_controller = new Controller(this);
+
     if (!fileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(fileName.trimmed());
         m_stream.setRecoder(m_recorder);
@@ -149,7 +151,8 @@ void VideoForm::initSignals()
             QMessageBox::information(this, "QtScrcpy", tr("file transfer failed"), QMessageBox::Ok);
         }
     });
-    connect(&m_inputConvert, &InputConvertGame::grabCursor, this, [this](bool grab){
+
+    connect(m_controller, &Controller::grabCursor, this, [this](bool grab){
 
 #ifdef Q_OS_WIN32
         MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
@@ -185,7 +188,7 @@ void VideoForm::initSignals()
             m_stream.startDecode();
 
             // init controller
-            m_inputConvert.setControlSocket(m_server->getControlSocket());
+            m_controller->setControlSocket(m_server->getControlSocket());
 
             if (m_closeScreen) {
                 setScreenPowerMode(ControlMsg::SPM_OFF);
@@ -358,7 +361,7 @@ void VideoForm::postTurnOn()
     if (!controlMsg) {
         return;
     }    
-    m_inputConvert.sendControlMsg(controlMsg);
+    m_controller->postControlMsg(controlMsg);
 }
 
 void VideoForm::expandNotificationPanel()
@@ -367,7 +370,7 @@ void VideoForm::expandNotificationPanel()
     if (!controlMsg) {
         return;
     }
-    m_inputConvert.sendControlMsg(controlMsg);
+    m_controller->postControlMsg(controlMsg);
 }
 
 void VideoForm::collapseNotificationPanel()
@@ -376,7 +379,7 @@ void VideoForm::collapseNotificationPanel()
     if (!controlMsg) {
         return;
     }    
-    m_inputConvert.sendControlMsg(controlMsg);
+    m_controller->postControlMsg(controlMsg);
 }
 
 void VideoForm::requestDeviceClipboard()
@@ -385,7 +388,7 @@ void VideoForm::requestDeviceClipboard()
     if (!controlMsg) {
         return;
     }
-    m_inputConvert.sendControlMsg(controlMsg);
+    m_controller->postControlMsg(controlMsg);
 }
 
 void VideoForm::setDeviceClipboard()
@@ -397,7 +400,7 @@ void VideoForm::setDeviceClipboard()
         return;
     }
     controlMsg->setSetClipboardMsgData(text);
-    m_inputConvert.sendControlMsg(controlMsg);
+    m_controller->postControlMsg(controlMsg);
 }
 
 void VideoForm::clipboardPaste()
@@ -414,7 +417,7 @@ void VideoForm::postTextInput(QString& text)
         return;
     }
     controlMsg->setInjectTextMsgData(text);
-    m_inputConvert.sendControlMsg(controlMsg);
+    m_controller->postControlMsg(controlMsg);
 }
 
 void VideoForm::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
@@ -424,7 +427,7 @@ void VideoForm::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
         return;
     }
     controlMsg->setSetScreenPowerModeData(mode);
-    m_inputConvert.sendControlMsg(controlMsg);
+    m_controller->postControlMsg(controlMsg);
 }
 
 void VideoForm::staysOnTop(bool top)
@@ -454,21 +457,21 @@ void VideoForm::postKeyCodeClick(AndroidKeycode keycode)
         return;
     }
     controlEventDown->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_DOWN, keycode, AMETA_NONE);
-    m_inputConvert.sendControlMsg(controlEventDown);
+    m_controller->postControlMsg(controlEventDown);
 
     ControlMsg* controlEventUp = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
     if (!controlEventUp) {
         return;
     }
     controlEventUp->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_UP, keycode, AMETA_NONE);
-    m_inputConvert.sendControlMsg(controlEventUp);
+    m_controller->postControlMsg(controlEventUp);
 }
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     if (ui->videoWidget->geometry().contains(event->pos())) {
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
     } else {
         if (event->button() == Qt::LeftButton) {
             m_dragPosition = event->globalPos() - frameGeometry().topLeft();
@@ -481,7 +484,7 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
     if (ui->videoWidget->geometry().contains(event->pos())) {
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
     }
 }
 
@@ -489,7 +492,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {    
     if (ui->videoWidget->geometry().contains(event->pos())) {
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_inputConvert.mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
     } else {
         if (event->buttons() & Qt::LeftButton) {
             move(event->globalPos() - m_dragPosition);
@@ -509,7 +512,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         */
         QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(),
                                event->buttons(), event->modifiers(), event->orientation());
-        m_inputConvert.wheelEvent(&wheelEvent, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        m_controller->wheelEvent(&wheelEvent, ui->videoWidget->frameSize(), ui->videoWidget->size());
     }
 }
 
@@ -533,13 +536,13 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
     }
 
     //qDebug() << "keyPressEvent" << event->isAutoRepeat();
-    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
     //qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
-    m_inputConvert.keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
 void VideoForm::paintEvent(QPaintEvent *paint)
