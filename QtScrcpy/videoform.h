@@ -25,33 +25,16 @@ public:
     explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, const QString& fileName = "", bool closeScreen = false, QWidget *parent = 0);
     ~VideoForm();
 
-    void switchFullScreen();
-    void postGoMenu();
-    void postGoHome();
-    void postGoBack();
-    void postAppSwitch();
-    void postPower();
-    void postVolumeUp();
-    void postVolumeDown();
-    // turn the screen on if it was off, press BACK otherwise
-    void postTurnOn();
-    void expandNotificationPanel();
-    void collapseNotificationPanel();
-    void requestDeviceClipboard();
-    void setDeviceClipboard();
-    void clipboardPaste();
-    void postTextInput(QString& text);
-    void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
-
+    void switchFullScreen();    
     void staysOnTop(bool top = true);
+    Controller* getController();
 
 private:
     void updateShowSize(const QSize &newSize);
     void updateStyleSheet(bool vertical);
     void initUI();
-    void initSignals();
-    void showToolFrom(bool show = true);
-    void postKeyCodeClick(AndroidKeycode keycode);    
+    void initSignals();    
+    void showToolForm(bool show = true);
 
 protected:
     void mousePressEvent(QMouseEvent *event);

@@ -11,7 +11,6 @@
 #include <QMimeData>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QClipboard>
 
 #include "videoform.h"
 #include "recorder.h"
@@ -191,7 +190,7 @@ void VideoForm::initSignals()
             m_controller->setControlSocket(m_server->getControlSocket());
 
             if (m_closeScreen) {
-                setScreenPowerMode(ControlMsg::SPM_OFF);
+                m_controller->setScreenPowerMode(ControlMsg::SPM_OFF);
             }
         }
     });
@@ -221,10 +220,10 @@ void VideoForm::initSignals()
         ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
         ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
         m_vb->unLock();
-    },Qt::QueuedConnection);
+    },Qt::QueuedConnection);        
 }
 
-void VideoForm::showToolFrom(bool show)
+void VideoForm::showToolForm(bool show)
 {
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
@@ -304,7 +303,7 @@ void VideoForm::switchFullScreen()
         //show();
 #endif
         updateStyleSheet(height() > width());
-        showToolFrom(true);
+        showToolForm(true);
 #ifdef Q_OS_WIN32
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
@@ -314,7 +313,7 @@ void VideoForm::switchFullScreen()
 #ifdef Q_OS_OSX
         //setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
 #endif
-        showToolFrom(false);
+        showToolForm(false);
         layout()->setContentsMargins(0, 0, 0, 0);
         showFullScreen();
 
@@ -325,110 +324,7 @@ void VideoForm::switchFullScreen()
     }
 }
 
-void VideoForm::postGoMenu()
-{
-    postKeyCodeClick(AKEYCODE_MENU);
-}
 
-void VideoForm::postGoBack()
-{
-    postKeyCodeClick(AKEYCODE_BACK);
-}
-
-void VideoForm::postAppSwitch()
-{
-    postKeyCodeClick(AKEYCODE_APP_SWITCH);
-}
-
-void VideoForm::postPower()
-{
-    postKeyCodeClick(AKEYCODE_POWER);
-}
-
-void VideoForm::postVolumeUp()
-{
-    postKeyCodeClick(AKEYCODE_VOLUME_UP);
-}
-
-void VideoForm::postVolumeDown()
-{
-    postKeyCodeClick(AKEYCODE_VOLUME_DOWN);
-}
-
-void VideoForm::postTurnOn()
-{
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
-    if (!controlMsg) {
-        return;
-    }    
-    m_controller->postControlMsg(controlMsg);
-}
-
-void VideoForm::expandNotificationPanel()
-{
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_EXPAND_NOTIFICATION_PANEL);
-    if (!controlMsg) {
-        return;
-    }
-    m_controller->postControlMsg(controlMsg);
-}
-
-void VideoForm::collapseNotificationPanel()
-{
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_COLLAPSE_NOTIFICATION_PANEL);
-    if (!controlMsg) {
-        return;
-    }    
-    m_controller->postControlMsg(controlMsg);
-}
-
-void VideoForm::requestDeviceClipboard()
-{
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_GET_CLIPBOARD);
-    if (!controlMsg) {
-        return;
-    }
-    m_controller->postControlMsg(controlMsg);
-}
-
-void VideoForm::setDeviceClipboard()
-{
-    QClipboard *board = QApplication::clipboard();
-    QString text = board->text();
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_SET_CLIPBOARD);
-    if (!controlMsg) {
-        return;
-    }
-    controlMsg->setSetClipboardMsgData(text);
-    m_controller->postControlMsg(controlMsg);
-}
-
-void VideoForm::clipboardPaste()
-{
-    QClipboard *board = QApplication::clipboard();
-    QString text = board->text();
-    postTextInput(text);
-}
-
-void VideoForm::postTextInput(QString& text)
-{
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TEXT);
-    if (!controlMsg) {
-        return;
-    }
-    controlMsg->setInjectTextMsgData(text);
-    m_controller->postControlMsg(controlMsg);
-}
-
-void VideoForm::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
-{
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_SET_SCREEN_POWER_MODE);
-    if (!controlMsg) {
-        return;
-    }
-    controlMsg->setSetScreenPowerModeData(mode);
-    m_controller->postControlMsg(controlMsg);
-}
 
 void VideoForm::staysOnTop(bool top)
 {
@@ -445,26 +341,9 @@ void VideoForm::staysOnTop(bool top)
     }
 }
 
-void VideoForm::postGoHome()
+Controller *VideoForm::getController()
 {
-    postKeyCodeClick(AKEYCODE_HOME);
-}
-
-void VideoForm::postKeyCodeClick(AndroidKeycode keycode)
-{
-    ControlMsg* controlEventDown = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
-    if (!controlEventDown) {
-        return;
-    }
-    controlEventDown->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_DOWN, keycode, AMETA_NONE);
-    m_controller->postControlMsg(controlEventDown);
-
-    ControlMsg* controlEventUp = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
-    if (!controlEventUp) {
-        return;
-    }
-    controlEventUp->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_UP, keycode, AMETA_NONE);
-    m_controller->postControlMsg(controlEventUp);
+    return m_controller;
 }
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
@@ -524,13 +403,13 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         switchFullScreen();
     }
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier)) {
-        requestDeviceClipboard();
+        m_controller->requestDeviceClipboard();
     }
     if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier)) {
         if (event->modifiers() & Qt::ShiftModifier) {
-            setDeviceClipboard();
+            m_controller->setDeviceClipboard();
         } else {
-            clipboardPaste();
+            m_controller->clipboardPaste();
         }
         return;
     }
@@ -558,7 +437,7 @@ void VideoForm::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event);
     if (!isFullScreen()) {
-        showToolFrom();
+        showToolForm();
     }
 }
 

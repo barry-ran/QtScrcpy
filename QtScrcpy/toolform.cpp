@@ -82,62 +82,62 @@ void ToolForm::on_fullScreenBtn_clicked()
 void ToolForm::on_returnBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postGoBack();
+        m_videoForm->getController()->postGoBack();
     }
 }
 
 void ToolForm::on_homeBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postGoHome();
+        m_videoForm->getController()->postGoHome();
     }
 }
 
 void ToolForm::on_menuBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postGoMenu();
+        m_videoForm->getController()->postGoMenu();
     }
 }
 
 void ToolForm::on_appSwitchBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postAppSwitch();
+        m_videoForm->getController()->postAppSwitch();
     }
 }
 
 void ToolForm::on_powerBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postPower();
+        m_videoForm->getController()->postPower();
     }
 }
 
 void ToolForm::on_volumeUpBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postVolumeUp();
+        m_videoForm->getController()->postVolumeUp();
     }
 }
 
 void ToolForm::on_volumeDownBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->postVolumeDown();
+        m_videoForm->getController()->postVolumeDown();
     }
 }
 
 void ToolForm::on_closeScreenBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->setScreenPowerMode(ControlMsg::SPM_OFF);
+        m_videoForm->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
     }
 }
 
 void ToolForm::on_expandNotifyBtn_clicked()
 {
     if (m_videoForm) {
-        m_videoForm->expandNotificationPanel();
+        m_videoForm->getController()->expandNotificationPanel();
     }
 }
