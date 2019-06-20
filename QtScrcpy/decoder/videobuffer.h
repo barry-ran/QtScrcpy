@@ -10,7 +10,7 @@
 typedef struct AVFrame AVFrame;
 
 class VideoBuffer
-{
+{    
 public:
     VideoBuffer();
     virtual ~VideoBuffer();
