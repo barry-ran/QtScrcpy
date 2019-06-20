@@ -2,95 +2,142 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
+    <name>Device</name>
+    <message>
+        <location filename="../../device/device.cpp" line="80"/>
+        <source>wait current file transfer to complete</source>
+        <translation>等待当前文件传输完成</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="83"/>
+        <source>file transfer complete</source>
+        <translation>文件传输完成</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="86"/>
+        <source>file transfer failed</source>
+        <translation>文件传输失败</translation>
+    </message>
+</context>
+<context>
     <name>Dialog</name>
     <message>
-        <location filename="../../dialog.ui" line="86"/>
+        <location filename="../../dialog.ui" line="32"/>
         <source>Wireless</source>
         <translation>无线</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="131"/>
+        <location filename="../../dialog.ui" line="77"/>
         <source>wireless connect</source>
         <translation>无线连接</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="138"/>
+        <location filename="../../dialog.ui" line="87"/>
         <source>wireless disconnect</source>
         <translation>无线断开</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="198"/>
+        <location filename="../../dialog.ui" line="119"/>
+        <source>Start Config</source>
+        <translation>启动配置</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="152"/>
         <source>record save path:</source>
         <translation>录像保存路径：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="212"/>
-        <location filename="../../dialog.cpp" line="219"/>
+        <location filename="../../dialog.ui" line="162"/>
+        <location filename="../../dialog.cpp" line="236"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="219"/>
+        <location filename="../../dialog.ui" line="182"/>
         <source>record format：</source>
         <translation>录制格式：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="226"/>
+        <location filename="../../dialog.ui" line="298"/>
+        <source>adb command:</source>
+        <translation>adb命令行：</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="308"/>
+        <source>terminate</source>
+        <translation>终止</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="315"/>
+        <source>execute</source>
+        <translation>执行</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="329"/>
+        <source>clear</source>
+        <translation>清理</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="172"/>
         <source>always top</source>
         <translation>置顶</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="236"/>
+        <location filename="../../dialog.ui" line="203"/>
+        <source>use reverse</source>
+        <translation>使用reverse</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="213"/>
         <source>close screen</source>
         <translation>关闭屏幕</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="32"/>
+        <location filename="../../dialog.ui" line="223"/>
         <source>USB line</source>
         <translation>USB线</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="45"/>
+        <location filename="../../dialog.ui" line="239"/>
         <source>stop server</source>
         <translation>停止服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="76"/>
+        <location filename="../../dialog.ui" line="279"/>
         <source>start server</source>
         <translation>启动服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="66"/>
+        <location filename="../../dialog.ui" line="269"/>
         <source>device serial:</source>
         <translation>设备序列号：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="158"/>
         <source>Config</source>
-        <translation>配置</translation>
+        <translation type="vanished">配置</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="191"/>
+        <location filename="../../dialog.ui" line="132"/>
         <source>bit rate:</source>
         <translation>比特率：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="167"/>
+        <location filename="../../dialog.ui" line="125"/>
         <source>video size:</source>
         <translation>视频尺寸：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="59"/>
+        <location filename="../../dialog.ui" line="259"/>
         <source>start adbd</source>
         <translation>启动adbd</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="38"/>
+        <location filename="../../dialog.ui" line="229"/>
         <source>get device ip</source>
         <translation>获取设备IP</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="52"/>
+        <location filename="../../dialog.ui" line="249"/>
         <source>update device</source>
         <translation>刷新设备列表</translation>
     </message>
@@ -98,17 +145,17 @@
 <context>
     <name>ToolForm</name>
     <message>
-        <location filename="../../toolform.ui" line="14"/>
+        <location filename="../../device/ui/toolform.ui" line="14"/>
         <source>Tool</source>
         <translation>工具</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="26"/>
+        <location filename="../../device/ui/toolform.ui" line="26"/>
         <source>full screen</source>
         <translation>全屏</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="49"/>
+        <location filename="../../device/ui/toolform.ui" line="49"/>
         <source>expand notify</source>
         <translation>下拉通知</translation>
     </message>
@@ -121,42 +168,42 @@
         <translation type="vanished">解锁</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="59"/>
+        <location filename="../../device/ui/toolform.ui" line="59"/>
         <source>close screen</source>
         <translation>关闭屏幕</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="69"/>
+        <location filename="../../device/ui/toolform.ui" line="69"/>
         <source>power</source>
         <translation>电源</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="79"/>
+        <location filename="../../device/ui/toolform.ui" line="79"/>
         <source>volume up</source>
         <translation>音量加</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="89"/>
+        <location filename="../../device/ui/toolform.ui" line="89"/>
         <source>volume down</source>
         <translation>音量减</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="99"/>
+        <location filename="../../device/ui/toolform.ui" line="99"/>
         <source>app switch</source>
         <translation>切换应用</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="109"/>
+        <location filename="../../device/ui/toolform.ui" line="109"/>
         <source>menu</source>
         <translation>菜单</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="119"/>
+        <location filename="../../device/ui/toolform.ui" line="119"/>
         <source>home</source>
         <translation>主界面</translation>
     </message>
     <message>
-        <location filename="../../toolform.ui" line="129"/>
+        <location filename="../../device/ui/toolform.ui" line="129"/>
         <source>return</source>
         <translation>返回</translation>
     </message>
@@ -164,22 +211,19 @@
 <context>
     <name>VideoForm</name>
     <message>
-        <location filename="../../videoform.cpp" line="143"/>
         <source>wait current file transfer to complete</source>
-        <translation>等待当前文件传输完成</translation>
+        <translation type="vanished">等待当前文件传输完成</translation>
     </message>
     <message>
-        <location filename="../../videoform.cpp" line="146"/>
         <source>file transfer complete</source>
-        <translation>文件传输完成</translation>
+        <translation type="vanished">文件传输完成</translation>
     </message>
     <message>
-        <location filename="../../videoform.cpp" line="149"/>
         <source>file transfer failed</source>
-        <translation>文件传输失败</translation>
+        <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../videoform.cpp" line="584"/>
+        <location filename="../../device/ui/videoform.cpp" line="391"/>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
     </message>
