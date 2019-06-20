@@ -3,37 +3,38 @@
 
 #include <QWidget>
 #include <QPointer>
-#include <QTime>
-
-#include "controller.h"
 
 namespace Ui {
 class videoForm;
 }
 
+struct AVFrame;
 class ToolForm;
-class Recorder;
-class VideoBuffer;
-class Decoder;
+class Controller;
 class FileHandler;
-class Stream;
-class Server;
 class VideoForm : public QWidget
 {
     Q_OBJECT
 public:
-    explicit VideoForm(const QString& serial, quint16 maxSize = 720, quint32 bitRate = 8000000, const QString& fileName = "", bool closeScreen = false, QWidget *parent = 0);
+    explicit VideoForm(QWidget *parent = 0);
     ~VideoForm();
 
     void switchFullScreen();    
     void staysOnTop(bool top = true);
-    Controller* getController();
-
-private:
     void updateShowSize(const QSize &newSize);
+    void updateRender(const AVFrame *frame);
+    void setController(Controller *controller);
+    Controller* getController();
+    void setFileHandler(FileHandler *fileHandler);
+    void setSerial(const QString &serial);
+
+public slots:
+    void onGrabCursor(bool grab);
+
+private:    
     void updateStyleSheet(bool vertical);
     void initUI();
-    void initSignals();    
+    
     void showToolForm(bool show = true);
 
 protected:
@@ -58,27 +59,15 @@ private:
     QPointer<ToolForm> m_toolForm;
     QPointer<QWidget> m_loadingWidget;
 
-    // server relevant
-    QPointer<Server> m_server;
-    QPointer<Decoder> m_decoder;
-    QPointer<Controller> m_controller;
-    QPointer<FileHandler> m_fileHandler;
-    QPointer<Stream> m_stream;
-
-    VideoBuffer* m_vb = Q_NULLPTR;
-    Recorder* m_recorder = Q_NULLPTR;    
-
-    // server params
-    QString m_serial = "";
-    quint16 m_maxSize = 720;
-    quint32 m_bitRate = 8000000;
-
-    // assist member
+    //inside member
     QSize frameSize;
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
-    bool m_closeScreen = false;
-    QTime m_startTimeCount;
+
+    //outside member
+    QString m_serial = "";
+    QPointer<Controller> m_controller;
+    QPointer<FileHandler> m_fileHandler;
 };
 
 #endif // VIDEOFORM_H

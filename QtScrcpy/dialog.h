@@ -4,13 +4,13 @@
 #include <QDialog>
 #include <QPointer>
 
-#include "videoform.h"
 #include "adbprocess.h"
 
 namespace Ui {
 class Dialog;
 }
 
+class Device;
 class QYUVOpenGLWidget;
 class Dialog : public QDialog
 {
@@ -52,7 +52,7 @@ private:
 private:
     Ui::Dialog *ui;
     AdbProcess m_adb;
-    QPointer<VideoForm> m_videoForm;
+    QPointer<Device> m_device;
 };
 
 #endif // DIALOG_H

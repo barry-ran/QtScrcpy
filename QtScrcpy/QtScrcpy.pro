@@ -33,19 +33,13 @@ contains(DEFINES, USE_QTQUICK) {
 # 源码
 SOURCES += \
         main.cpp \
-        dialog.cpp \
-    videoform.cpp \
-    toolform.cpp
+        dialog.cpp
 
 HEADERS += \
-        dialog.h \
-    videoform.h \
-    toolform.h
+        dialog.h
 
 FORMS += \
-        dialog.ui \
-    videoform.ui \
-    toolform.ui
+        dialog.ui
 
 # 子工程
 include ($$PWD/common/common.pri)
@@ -61,6 +55,8 @@ include ($$PWD/fontawesome/fontawesome.pri)
 include ($$PWD/filehandler/filehandler.pri)
 include ($$PWD/recorder/recorder.pri)
 include ($$PWD/util/util.pri)
+include ($$PWD/device/device.pri)
+include ($$PWD/ui/ui.pri)
 
 # 附加包含路径
 INCLUDEPATH += \
@@ -77,6 +73,8 @@ INCLUDEPATH += \
         $$PWD/filehandler \
         $$PWD/recorder \
         $$PWD/util \
+        $$PWD/device \
+        $$PWD/ui \
         $$PWD/fontawesome
 
 
