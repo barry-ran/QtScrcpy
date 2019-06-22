@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QPointer>
 
-#include "inputconvertgame.h"
+#include "inputconvertnormal.h"
 
 class QTcpSocket;
 class Receiver;

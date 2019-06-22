@@ -11,9 +11,9 @@ Controller::Controller(QObject* parent) : QObject(parent)
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
 
-    m_inputConvert = new InputConvertGame(this);
+    m_inputConvert = new InputConvertNormal(this);
     Q_ASSERT(m_inputConvert);
-    connect(m_inputConvert, &InputConvertGame::grabCursor, this, &Controller::grabCursor);
+    connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
 
 Controller::~Controller()
