@@ -15,6 +15,7 @@ public:
 
     bool connectDevice(Device::DeviceParams params);
     bool disconnectDevice(const QString &serial);
+    void disconnectAllDevice();
 
 protected slots:
     void onDeviceDisconnect(QString serial);

@@ -47,6 +47,8 @@ private slots:
 
     void on_clearOut_clicked();
 
+    void on_stopAllServerBtn_clicked();
+
 private:
     bool checkAdbRun();
     void initUI();

@@ -60,6 +60,17 @@ bool DeviceManage::disconnectDevice(const QString &serial)
     return ret;
 }
 
+void DeviceManage::disconnectAllDevice()
+{
+    QMapIterator<QString, QPointer<Device>> i(m_devices);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()) {
+            i.value()->deleteLater();
+        }
+    }
+}
+
 void DeviceManage::onDeviceDisconnect(QString serial)
 {
     if (!serial.isEmpty() && m_devices.contains(serial)) {

@@ -28,6 +28,7 @@ Device::Device(DeviceParams params, QObject *parent)
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(this);
         m_videoForm = new VideoForm();
+        m_videoForm->setSerial(m_params.serial);
         if (m_controller) {
             m_videoForm->setController(m_controller);
         }
@@ -94,15 +95,21 @@ void Device::initSignals()
         connect(m_controller, &Controller::grabCursor, m_videoForm, &VideoForm::onGrabCursor);
     }
     if (m_fileHandler) {
-        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult){
+        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk){
+            QString tips = "";
+            if (isApk) {
+                tips = tr("install apk");
+            } else {
+                tips = tr("file transfer");
+            }
             if (FileHandler::FAR_IS_RUNNING == processResult && m_videoForm) {
-                QMessageBox::warning(m_videoForm, "QtScrcpy", tr("wait current file transfer to complete"), QMessageBox::Ok);
+                QMessageBox::warning(m_videoForm, "QtScrcpy", tr("wait current %1 to complete").arg(tips), QMessageBox::Ok);
             }
             if (FileHandler::FAR_SUCCESS_EXEC == processResult && m_videoForm) {
-                QMessageBox::information(m_videoForm, "QtScrcpy", tr("file transfer complete"), QMessageBox::Ok);
+                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 complete, save in %2").arg(tips).arg(m_fileHandler->getDevicePath()), QMessageBox::Ok);
             }
             if (FileHandler::FAR_ERROR_EXEC == processResult && m_videoForm) {
-                QMessageBox::information(m_videoForm, "QtScrcpy", tr("file transfer failed"), QMessageBox::Ok);
+                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 failed").arg(tips), QMessageBox::Ok);
             }
         });
     }
