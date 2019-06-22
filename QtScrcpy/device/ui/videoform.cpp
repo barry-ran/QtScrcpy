@@ -4,9 +4,6 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QPainter>
-#ifdef USE_QTQUICK
-#include <QQuickWidget>
-#endif
 #include <QtWidgets/QHBoxLayout>
 #include <QMimeData>
 #include <QFileInfo>
@@ -47,35 +44,6 @@ void VideoForm::initUI()
     if (phone.load(":/res/phone.png")) {
         m_widthHeightRatio = 1.0f * phone.width() / phone.height();
     }
-
-#ifdef USE_QTQUICK
-    // qml animation
-    QWidget *loadingWidget;
-    QHBoxLayout *horizontalLayout;
-    QQuickWidget *quickWidget;
-    loadingWidget = new QWidget(this);
-    loadingWidget->setObjectName(QStringLiteral("loadingWidget"));
-    loadingWidget->setAutoFillBackground(false);
-    loadingWidget->setStyleSheet(QStringLiteral(""));
-    loadingWidget->setAttribute(Qt::WA_DeleteOnClose);
-    m_loadingWidget = loadingWidget;
-    horizontalLayout = new QHBoxLayout(loadingWidget);
-    horizontalLayout->setSpacing(0);
-    horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-    horizontalLayout->setContentsMargins(0, 0, 0, 0);
-    quickWidget = new QQuickWidget(loadingWidget);
-    quickWidget->setObjectName(QStringLiteral("quickWidget"));
-    quickWidget->setAutoFillBackground(false);
-    quickWidget->setStyleSheet(QStringLiteral(""));
-    quickWidget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-    quickWidget->setSource(QUrl(QStringLiteral("qrc:/qml/pinwheel.qml")));
-    // 最后绘制，不设置最后绘制会影响父窗体异形异常（quickWidget的透明通道会形成穿透）
-    quickWidget->setAttribute(Qt::WA_AlwaysStackOnTop);
-    // 背景透明
-    quickWidget->setClearColor(QColor(Qt::transparent));
-    horizontalLayout->addWidget(quickWidget);
-    ui->verticalLayout->addWidget(loadingWidget);
-#endif
 
     // mac下去掉标题栏影响showfullscreen
 #ifndef Q_OS_OSX
