@@ -333,6 +333,8 @@ void Server::onConnectTimer()
     bool success = false;
 
     VideoSocket* videoSocket = new VideoSocket();
+    QTcpSocket *controlSocket = new QTcpSocket();
+
     videoSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
     if (!videoSocket->waitForConnected(1000)) {
         // 连接到adb很快的，这里失败不重试
@@ -341,7 +343,6 @@ void Server::onConnectTimer()
         goto result;
     }
 
-    QTcpSocket *controlSocket = new QTcpSocket();
     controlSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
     if (!controlSocket->waitForConnected(1000)) {
         // 连接到adb很快的，这里失败不重试
