@@ -131,7 +131,7 @@ Android部分至少需要API 21（Android 5.0）。
 
 ## 如何编译
 尽量提供了所有依赖资源，方便傻瓜式编译：
-- 目标平台上安装QtCreator
+- 目标平台上搭建Qt开发环境(QtCreator 5.9.7+)
 - 克隆该项目
 - 使用QtCreator打开项目根目录all.pro
 - 编译，运行即可
