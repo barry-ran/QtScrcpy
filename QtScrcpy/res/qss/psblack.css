@@ -632,6 +632,11 @@ background:#444444;
 border-color:#484848;
 }
 
+QMessageBox {
+background-color:#444444;
+color:#DCDCDC;
+}
+
 /*TextColor:#DCDCDC*/
 /*PanelColor:#444444*/
 /*BorderColor:#242424*/
