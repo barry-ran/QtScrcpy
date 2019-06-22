@@ -57,7 +57,7 @@ Android部分至少需要API 21（Android 5.0）。
 
  - [`QtScrcpy-win32-v1.0.1.zip`][direct-win32]   
 
-[direct-win32]: https://github.com/barry-ran/QtScrcpy/releases/v1.0.1/QtScrcpy-win32-v1.0.1.zip
+[direct-win32]: https://files.gitee.com/group1/M00/08/36/PaAvDF0ONLCAfmkIAf-oRojEVaw797.zip?token=3f67e2a5d4aa29c0b80602e32054c8d0&ts=1561213994&attname=QtScrcpy-win32-v1.0.1.zip&disposition=attachment
 
 你也可以[自己编译](#如何编译)
 
@@ -67,7 +67,7 @@ Android部分至少需要API 21（Android 5.0）。
 
  - [`QtScrcpy-mac64-v1.0.1.zip`][direct-mac64]
 
-[direct-mac64]: https://github.com/barry-ran/QtScrcpy/releases/v1.0.1/QtScrcpy-mac64-v1.0.1.zip
+[direct-mac64]: https://files.gitee.com/group1/M00/08/36/PaAvDF0OOr-AOWVbAlmscOl_Ugk670.dmg?token=02a644f1a0a85a10808cd983a0d1c640&ts=1561214057&attname=QtScrcpy-mac64-v1.0.1.dmg&disposition=attachment
 
 你也可以[自己编译](#如何编译)
 
