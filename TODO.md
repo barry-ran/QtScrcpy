@@ -1,17 +1,19 @@
-×îºóÍ¬²½scrcpy b91ecf52256da73f5c8dca04fb82c13ec826cbd7
+æœ€ååŒæ­¥scrcpy b91ecf52256da73f5c8dca04fb82c13ec826cbd7
 
 # TODO
-## µÍÓÅÏÈ¼¶
-0. ÖĞÎÄÊäÈë£¨serverĞèÒª¸ÄÎªapk£¬×÷ÎªÒ»¸öÊäÈë·¨£¬Ôİ²»ÊµÏÖ£©
-1. Êó±êÊÂ¼şÏà¹ØÏµÁĞ b35733edb6df2a00b6af9b1c98627d344c377963
-2. [Ìø¹ıÖ¡¸ÄÎª¶¯Ì¬ÅäÖÃ£¬¶ø²»ÊÇ¾²Ì¬±àÒë](https://github.com/Genymobile/scrcpy/commit/ebccb9f6cc111e8acfbe10d656cac5c1f1b744a0)
-3. [µ¥¶ÀÏß³ÌÍ³¼ÆÖ¡ÂÊ](https://github.com/Genymobile/scrcpy/commit/e2a272bf99ecf48fcb050177113f903b3fb323c4)
-4. uiÌá¹©show touchÉèÖÃ
+## ä½ä¼˜å…ˆçº§
+0. ä¸­æ–‡è¾“å…¥ï¼ˆserveréœ€è¦æ”¹ä¸ºapkï¼Œä½œä¸ºä¸€ä¸ªè¾“å…¥æ³•ï¼Œæš‚ä¸å®ç°ï¼‰
+1. é¼ æ ‡äº‹ä»¶ç›¸å…³ç³»åˆ— b35733edb6df2a00b6af9b1c98627d344c377963
+2. [è·³è¿‡å¸§æ”¹ä¸ºåŠ¨æ€é…ç½®ï¼Œè€Œä¸æ˜¯é™æ€ç¼–è¯‘](https://github.com/Genymobile/scrcpy/commit/ebccb9f6cc111e8acfbe10d656cac5c1f1b744a0)
+3. [å•ç‹¬çº¿ç¨‹ç»Ÿè®¡å¸§ç‡](https://github.com/Genymobile/scrcpy/commit/e2a272bf99ecf48fcb050177113f903b3fb323c4)
+4. uiæä¾›show touchè®¾ç½®
 
-## ÖĞÓÅÏÈ¼¶
-0. [½ØÆÁ±£´æÎªjpg](https://blog.csdn.net/m0_37684310/article/details/77950390)
+## ä¸­ä¼˜å…ˆçº§
+0. [æˆªå±ä¿å­˜ä¸ºjpg](https://blog.csdn.net/m0_37684310/article/details/77950390)
+1. macç‰ˆæœ¬å·
+2. linuxæ‰“åŒ…ä»¥åŠç‰ˆæœ¬å·
 
 # mark
-[ffmpeg±àÒë²ÎÊıÏê½â](https://www.cnblogs.com/wainiwann/p/4204230.html)
+[ffmpegç¼–è¯‘å‚æ•°è¯¦è§£](https://www.cnblogs.com/wainiwann/p/4204230.html)
 
-# ÒÑÖªbug
+# å·²çŸ¥bug
