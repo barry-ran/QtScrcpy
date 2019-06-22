@@ -2,9 +2,7 @@
     <qresource prefix="/">
         <file>font/fontawesome-webfont.ttf</file>
         <file>image/videoform/phone-h.png</file>
-        <file>image/videoform/phone-v.png</file>
-        <file>qml/pinwheel.qml</file>
-        <file>qml/images/pinwheel.png</file>
+        <file>image/videoform/phone-v.png</file>        
         <file>qss/psblack.css</file>
         <file>qss/psblack/add_bottom.png</file>
         <file>qss/psblack/add_left.png</file>
