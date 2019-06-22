@@ -7,11 +7,11 @@
 
 ![win](screenshot/win.png)
 
-![mac](screenshot/mac.png)
+![mac](screenshot/mac.jpg)
 
 ![linux](screenshot/ubuntu.png)
 
-基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢它。和原版scrcpy区别如下：
+基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢他。QtScrcpy和原版scrcpy区别如下：
 
 关键点|scrcpy|QtScrcpy
 --|:--:|:--:
@@ -87,9 +87,9 @@ Android部分至少需要API 21（Android 5.0）。
 
 ## 界面按钮介绍：
 
-- 启动配置：启动服务前的功能参数设置
+- 启动配置：启动服务前的功能参数设置    
 
-分别可以设置本地录制视频的比特率、分辨率、录制格式、录像保存路径等。
+    分别可以设置本地录制视频的比特率、分辨率、录制格式、录像保存路径等。
 
     - 仅后台录制：启动服务不现实界面，只是录制Android设备屏幕
     - 窗口置顶：Android设备视频窗口置顶显示
