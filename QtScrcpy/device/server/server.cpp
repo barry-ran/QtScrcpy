@@ -420,6 +420,8 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult){
+                    // 有一些设备reverse会报错more than o'ne device，adb的bug
+                    // https://github.com/Genymobile/scrcpy/issues/5
                     qCritical("adb reverse failed");
                     m_tunnelForward = true;
                     m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
