@@ -17,14 +17,17 @@ public:
     FileHandler(QObject *parent = nullptr);
     virtual ~FileHandler();
 
-    void pushFileRequest(const QString& serial, const QString& file);
+    void pushFileRequest(const QString& serial, const QString& file, const QString& devicePath = "");
     void installApkRequest(const QString& serial, const QString& apkFile);
+    const QString &getDevicePath();
 
 signals:
-    void fileHandlerResult(FILE_HANDLER_RESULT processResult);
+    void fileHandlerResult(FILE_HANDLER_RESULT processResult, bool isApk = false);
 
 private:
     AdbProcess m_adb;
+    bool m_isApk = false;
+    QString m_devicePath = "";
 };
 
 #endif // FILEHANDLER_H

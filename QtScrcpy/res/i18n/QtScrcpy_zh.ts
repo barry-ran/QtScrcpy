@@ -4,19 +4,46 @@
 <context>
     <name>Device</name>
     <message>
-        <location filename="../../device/device.cpp" line="92"/>
         <source>wait current file transfer to complete</source>
-        <translation>等待当前文件传输完成</translation>
+        <translation type="vanished">等待当前文件传输完成</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="95"/>
         <source>file transfer complete</source>
-        <translation>文件传输完成</translation>
+        <translation type="vanished">文件传输完成</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="98"/>
         <source>file transfer failed</source>
-        <translation>文件传输失败</translation>
+        <translation type="vanished">文件传输失败</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="101"/>
+        <source>install apk</source>
+        <translation>安装apk</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="103"/>
+        <source>file transfer</source>
+        <translation>文件传输</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="106"/>
+        <source>wait current %1 to complete</source>
+        <translation>等待当前%1完成</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="109"/>
+        <source>%1 complete, save in %2</source>
+        <translation>%1完成,保存在%2</translation>
+    </message>
+    <message>
+        <source>%1 complete
+ save in %2</source>
+        <translation type="vanished">%1完成\n 保存在 %2</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="112"/>
+        <source>%1 failed</source>
+        <translation>%1 失败</translation>
     </message>
 </context>
 <context>
@@ -63,29 +90,34 @@
         <translation>仅后台录制</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="308"/>
+        <location filename="../../dialog.ui" line="299"/>
+        <source>stop all server</source>
+        <translation>停止所有服务</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="315"/>
         <source>adb command:</source>
         <translation>adb命令行：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="318"/>
+        <location filename="../../dialog.ui" line="325"/>
         <source>terminate</source>
         <translation>终止</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="325"/>
+        <location filename="../../dialog.ui" line="332"/>
         <source>execute</source>
         <translation>执行</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="339"/>
+        <location filename="../../dialog.ui" line="346"/>
         <source>clear</source>
         <translation>清理</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="169"/>
         <source>always top</source>
-        <translation>置顶</translation>
+        <translation>窗口置顶</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="199"/>

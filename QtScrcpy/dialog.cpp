@@ -260,3 +260,8 @@ void Dialog::on_clearOut_clicked()
 {    
     ui->outEdit->clear();
 }
+
+void Dialog::on_stopAllServerBtn_clicked()
+{
+    m_deviceManage.disconnectAllDevice();
+}

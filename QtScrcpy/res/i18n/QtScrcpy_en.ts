@@ -4,19 +4,46 @@
 <context>
     <name>Device</name>
     <message>
-        <location filename="../../device/device.cpp" line="92"/>
         <source>wait current file transfer to complete</source>
-        <translation>wait current file transfer to complete</translation>
+        <translation type="vanished">wait current file transfer to complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="95"/>
         <source>file transfer complete</source>
-        <translation>file transfer complete</translation>
+        <translation type="vanished">file transfer complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="98"/>
         <source>file transfer failed</source>
-        <translation>file transfer failed</translation>
+        <translation type="vanished">file transfer failed</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="101"/>
+        <source>install apk</source>
+        <translation>install apk</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="103"/>
+        <source>file transfer</source>
+        <translation>file transfer</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="106"/>
+        <source>wait current %1 to complete</source>
+        <translation>wait current %1 to complete</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="109"/>
+        <source>%1 complete, save in %2</source>
+        <translation>%1 complete, save in %2</translation>
+    </message>
+    <message>
+        <source>%1 complete
+ save in %2</source>
+        <translation type="vanished">%1 complete\n save in %2</translation>
+    </message>
+    <message>
+        <location filename="../../device/device.cpp" line="112"/>
+        <source>%1 failed</source>
+        <translation>%1 failed</translation>
     </message>
 </context>
 <context>
@@ -63,22 +90,27 @@
         <translation>not display</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="308"/>
+        <location filename="../../dialog.ui" line="299"/>
+        <source>stop all server</source>
+        <translation>stop all server</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="315"/>
         <source>adb command:</source>
         <translation>adb command:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="318"/>
+        <location filename="../../dialog.ui" line="325"/>
         <source>terminate</source>
         <translation>terminate</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="325"/>
+        <location filename="../../dialog.ui" line="332"/>
         <source>execute</source>
         <translation>execute</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="339"/>
+        <location filename="../../dialog.ui" line="346"/>
         <source>clear</source>
         <translation>clear</translation>
     </message>
