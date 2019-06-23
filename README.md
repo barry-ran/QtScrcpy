@@ -5,11 +5,11 @@
 ![release](https://img.shields.io/badge/release-v1.0.1-brightgreen.svg)
 
 
-此应用程序提供USB(或通过TCP/IP)连接的Android设备的显示和控制。它不需要任何root访问权限。
+QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和控制。不需要root权限。
 
 单个应用程序最多支持16个安卓设备同时连接。
 
-它适用于GNU/Linux，Windows和MacOS。
+同时支持GNU/Linux，Windows和MacOS三大主流桌面平台
 
 ![win](screenshot/win.png)
 
@@ -50,7 +50,7 @@
 ## 要求
 Android部分至少需要API 21（Android 5.0）。
 
-确保在您的设备上[启用了adb调试][enable-adb]。
+您要确保在Android设备上[启用adb调试][enable-adb]。
 
 [enable-adb]: https://developer.android.com/studio/command-line/adb.html#Enabling
 
@@ -59,7 +59,7 @@ Android部分至少需要API 21（Android 5.0）。
 
 ### Windows
 
-对于windows平台，你可以直接使用我编译好的可执行程序:
+windows平台，你可以直接使用我编译好的可执行程序:
 
  - 国内下载 [`QtScrcpy-win32-v1.0.1.zip`][gitee-win32]
  - 国外下载 [`QtScrcpy-win32-v1.0.1.zip`][github-win32]
@@ -76,7 +76,7 @@ Android部分至少需要API 21（Android 5.0）。
 
 ### Mac OS
 
-对于Mac OS平台，你可以直接使用我编译好的可执行程序:
+Mac OS平台，你可以直接使用我编译好的可执行程序:
 
 - 国内下载 [`QtScrcpy-mac64-v1.0.1.zip`][gitee-mac64]
 - 国外下载 [`QtScrcpy-mac64-v1.0.1.zip`][github-mac64]
@@ -146,12 +146,19 @@ Android部分至少需要API 21（Android 5.0）。
 
 
 ## 如何编译
-尽量提供了所有依赖资源，方便傻瓜式编译：
-- 目标平台上搭建Qt开发环境(QtCreator 5.9.7+)
-- 克隆该项目
-- 使用QtCreator打开项目根目录all.pro
-- 编译，运行即可
+尽量提供了所有依赖资源，方便傻瓜式编译。
 
+### PC端
+1. 目标平台上搭建Qt开发环境(Qt 5.9.7+)
+2. 克隆该项目
+3. 使用QtCreator打开项目根目录all.pro
+4. 编译，运行即可
+
+### Android端 （没有修改需求的话直接使用自带的scrcpy-server.jar即可）
+1. 目标平台上搭建Android开发环境
+2. 使用Android Studio打开项目根目录中的server项目
+3. 编辑即可
+4. 编译出apk以后改名为scrcpy-server.jar并替换third_party/scrcpy-server.jar即可
 
 ## Licence
 由于是复刻的scrcpy，尊重它的Licence
