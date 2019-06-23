@@ -12,6 +12,7 @@
 0. [截屏保存为jpg](https://blog.csdn.net/m0_37684310/article/details/77950390)
 1. mac版本号
 2. linux打包以及版本号
+3. 自动打包脚本
 
 # mark
 [ffmpeg编译参数详解](https://www.cnblogs.com/wainiwann/p/4204230.html)
