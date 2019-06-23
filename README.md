@@ -1,4 +1,10 @@
-# QtScrcpy（v1.0.1）
+# QtScrcpy 
+
+![build state](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
+![release](https://img.shields.io/badge/release-v1.0.1-brightgreen.svg)
+
+
 此应用程序提供USB(或通过TCP/IP)连接的Android设备的显示和控制。它不需要任何root访问权限。
 
 单个应用程序最多支持16个安卓设备同时连接。
@@ -55,9 +61,13 @@ Android部分至少需要API 21（Android 5.0）。
 
 对于windows平台，你可以直接使用我编译好的可执行程序:
 
- - [`QtScrcpy-win32-v1.0.1.zip`][direct-win32]   
+ - 国内下载 [`QtScrcpy-win32-v1.0.1.zip`][gitee-win32]
+ - 国外下载 [`QtScrcpy-win32-v1.0.1.zip`][github-win32]
 
-[direct-win32]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98SAZd-KAf-R_j8Fei8293.zip?token=677250295122144e72ff23de768dbb3a&ts=1561262188&attname=QtScrcpy-win32-v1.0.1.zip&disposition=attachment
+ 
+[gitee-win32]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98SAZd-KAf-R_j8Fei8293.zip?token=677250295122144e72ff23de768dbb3a&ts=1561262188&attname=QtScrcpy-win32-v1.0.1.zip&disposition=attachment
+
+[github-win32]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98SAZd-KAf-R_j8Fei8293.zip?token=677250295122144e72ff23de768dbb3a&ts=1561262188&attname=QtScrcpy-win32-v1.0.1.zip&disposition=attachment
 
 
 你也可以[自己编译](#如何编译)
@@ -66,9 +76,12 @@ Android部分至少需要API 21（Android 5.0）。
 
 对于Mac OS平台，你可以直接使用我编译好的可执行程序:
 
- - [`QtScrcpy-mac64-v1.0.1.zip`][direct-mac64]
+- 国内下载 [`QtScrcpy-mac64-v1.0.1.zip`][gitee-mac64]
+- 国外下载 [`QtScrcpy-mac64-v1.0.1.zip`][github-mac64]
 
-[direct-mac64]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98mAEJDJAlpAtBTOOsE526.dmg?token=3fd6b4f6b255a2e0e0362b7e40935ee5&ts=1561262231&attname=QtScrcpy-mac64-v1.0.1.dmg&disposition=attachment
+[gitee-mac64]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98mAEJDJAlpAtBTOOsE526.dmg?token=3fd6b4f6b255a2e0e0362b7e40935ee5&ts=1561262231&attname=QtScrcpy-mac64-v1.0.1.dmg&disposition=attachment
+
+[github-mac64]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98mAEJDJAlpAtBTOOsE526.dmg?token=3fd6b4f6b255a2e0e0362b7e40935ee5&ts=1561262231&attname=QtScrcpy-mac64-v1.0.1.dmg&disposition=attachment
 
 你也可以[自己编译](#如何编译)
 
