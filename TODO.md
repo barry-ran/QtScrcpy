@@ -10,7 +10,7 @@
 
 ## 中优先级
 0. [截屏保存为jpg](https://blog.csdn.net/m0_37684310/article/details/77950390)
-1. mac版本号
+1. ~~mac版本号~~
 2. linux打包以及版本号
 3. 自动打包脚本
 
