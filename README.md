@@ -65,9 +65,11 @@ Android部分至少需要API 21（Android 5.0）。
  - 国外下载 [`QtScrcpy-win32-v1.0.1.zip`][github-win32]
 
  
+
+ 
 [gitee-win32]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98SAZd-KAf-R_j8Fei8293.zip?token=677250295122144e72ff23de768dbb3a&ts=1561262188&attname=QtScrcpy-win32-v1.0.1.zip&disposition=attachment
 
-[github-win32]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98SAZd-KAf-R_j8Fei8293.zip?token=677250295122144e72ff23de768dbb3a&ts=1561262188&attname=QtScrcpy-win32-v1.0.1.zip&disposition=attachment
+[github-win32]: https://github.com/barry-ran/QtScrcpy/releases/download/v1.0.1/QtScrcpy-win32-v1.0.1.zip
 
 
 你也可以[自己编译](#如何编译)
@@ -81,7 +83,7 @@ Android部分至少需要API 21（Android 5.0）。
 
 [gitee-mac64]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98mAEJDJAlpAtBTOOsE526.dmg?token=3fd6b4f6b255a2e0e0362b7e40935ee5&ts=1561262231&attname=QtScrcpy-mac64-v1.0.1.dmg&disposition=attachment
 
-[github-mac64]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98mAEJDJAlpAtBTOOsE526.dmg?token=3fd6b4f6b255a2e0e0362b7e40935ee5&ts=1561262231&attname=QtScrcpy-mac64-v1.0.1.dmg&disposition=attachment
+[github-mac64]: https://github.com/barry-ran/QtScrcpy/releases/download/v1.0.1/QtScrcpy-mac64-v1.0.1.zip
 
 你也可以[自己编译](#如何编译)
 
