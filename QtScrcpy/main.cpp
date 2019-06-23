@@ -26,8 +26,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     installTranslator();
-
+#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->initMouseEventTap();
+#endif
 
 #ifdef Q_OS_WIN32
     qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/win/adb.exe");
@@ -54,7 +55,10 @@ int main(int argc, char *argv[])
 
     int ret = a.exec();
 
+#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->quitMouseEventTap();
+#endif
+
     Stream::deInit();
     return ret;
 }
