@@ -109,6 +109,7 @@ macos {
 
     # mac application icon
     ICON = $$PWD/res/QtScrcpy.icns
+    QMAKE_INFO_PLIST = $$PWD/res/Info_mac.plist
 }
 
 # ***********************************************************
