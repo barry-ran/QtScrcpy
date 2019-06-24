@@ -4,6 +4,7 @@
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
 ![release](https://img.shields.io/badge/release-v1.0.1-brightgreen.svg)
 
+[English introduction (from Google Translate)](README_EN.md)
 
 QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和控制。不需要root权限。
 
