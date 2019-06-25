@@ -112,11 +112,15 @@ void VideoForm::updateStyleSheet(bool vertical)
     }
 }
 
+void VideoForm::updateScreenRatio(const QSize &newSize)
+{
+    m_widthHeightRatio = 1.0f * qMin(newSize.width(),newSize.height()) / qMax(newSize.width(),newSize.height());
+}
+
 void VideoForm::updateShowSize(const QSize &newSize)
 {
     if (frameSize != newSize) {
         frameSize = newSize;
-
         bool vertical = newSize.height() > newSize.width();
         QSize showSize = newSize;
         QDesktopWidget* desktop = QApplication::desktop();
