@@ -22,7 +22,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
+msvc{
+    QMAKE_CFLAGS += -source-charset:utf-8
+    QMAKE_CXXFLAGS += -source-charset:utf-8
+}
 # 源码
 SOURCES += \
         main.cpp \
@@ -58,24 +61,40 @@ INCLUDEPATH += \
 # Win平台下配置
 # ***********************************************************
 win32 {
-    # 输出目录
-    CONFIG(debug, debug|release) {
-        DESTDIR = $$PWD/../output/win/debug
+    contains(QMAKE_TARGET.arch, x86_64) {
+        message("x64")
+        # 输出目录
+        CONFIG(debug, debug|release) {
+            DESTDIR = $$PWD/../output/win-x64/debug
+        } else {
+            DESTDIR = $$PWD/../output/win-x64/release
+        }
+
+        # 依赖模块
+        LIBS += \
+                -L$$PWD/../third_party/ffmpeg/win64/lib -lavformat \
+                -L$$PWD/../third_party/ffmpeg/win64/lib -lavcodec \
+                -L$$PWD/../third_party/ffmpeg/win64/lib -lavutil \
+                -L$$PWD/../third_party/ffmpeg/win64/lib -lswscale
     } else {
-        DESTDIR = $$PWD/../output/win/release
+        message("x86")
+        # 输出目录
+        CONFIG(debug, debug|release) {
+            DESTDIR = $$PWD/../output/win/debug
+        } else {
+            DESTDIR = $$PWD/../output/win/release
+        }
+
+        # 依赖模块
+        LIBS += \
+                -L$$PWD/../third_party/ffmpeg/lib -lavformat \
+                -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
+                -L$$PWD/../third_party/ffmpeg/lib -lavutil \
+                -L$$PWD/../third_party/ffmpeg/lib -lswscale
     }
-
-    # 依赖模块
-    LIBS += \
-            -L$$PWD/../third_party/ffmpeg/lib -lavformat \
-            -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
-            -L$$PWD/../third_party/ffmpeg/lib -lavutil \
-            -L$$PWD/../third_party/ffmpeg/lib -lswscale
-
     # windows rc file
     RC_FILE = $$PWD/res/QtScrcpy.rc
 }
-
 # ***********************************************************
 # Mac平台下配置
 # ***********************************************************
