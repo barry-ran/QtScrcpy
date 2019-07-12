@@ -21,6 +21,8 @@ Dialog::Dialog(QWidget *parent) :
         bool newLine = true;
 
         switch (processResult) {
+        case AdbProcess::AER_ERROR_START:
+            break;
         case AdbProcess::AER_SUCCESS_START:
             log = "adb run";
             newLine = false;
@@ -131,6 +133,7 @@ void Dialog::on_startServerBtn_clicked()
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
+    params.supportGame = ui->gameForPeaceCheck->isChecked();
     m_deviceManage.connectDevice(params);
 
 /*

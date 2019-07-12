@@ -5,13 +5,18 @@
 #include "videosocket.h"
 #include "controlmsg.h"
 #include "receiver.h"
+#include "inputconvertgame.h"
 
-Controller::Controller(QObject* parent) : QObject(parent)
+Controller::Controller(bool supportGame, QObject* parent) : QObject(parent)
 {
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
 
-    m_inputConvert = new InputConvertNormal(this);
+    if (supportGame) {
+         m_inputConvert = new InputConvertGame(this);
+    } else {
+         m_inputConvert = new InputConvertNormal(this);
+    }
     Q_ASSERT(m_inputConvert);
     connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }

@@ -113,81 +113,7 @@
       <string>Start Config</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="3" colspan="5">
-       <widget class="QLineEdit" name="recordPathEdt">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="9">
-       <widget class="QComboBox" name="formatBox"/>
-      </item>
-      <item row="0" column="3" colspan="2">
-       <widget class="QComboBox" name="bitRateBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="currentText">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>record format：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="7">
-       <widget class="QComboBox" name="videoSizeBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="8" colspan="2">
-       <widget class="QPushButton" name="selectRecordPathBtn">
-        <property name="text">
-         <string>select path</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="3" colspan="3">
-       <widget class="QCheckBox" name="alwaysTopCheck">
-        <property name="text">
-         <string>always top</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QCheckBox" name="notDisplayCheck">
-        <property name="text">
-         <string>not display</string>
-        </property>
-        <property name="checkable">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>record save path:</string>
-        </property>
-        <property name="buddy">
-         <cstring>recordPathEdt</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="8" colspan="2">
+      <item row="2" column="9" colspan="2">
        <widget class="QCheckBox" name="useReverseCheck">
         <property name="text">
          <string>use reverse</string>
@@ -197,7 +123,41 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="6" colspan="2">
+      <item row="0" column="8">
+       <widget class="QComboBox" name="videoSizeBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="9" colspan="2">
+       <widget class="QPushButton" name="selectRecordPathBtn">
+        <property name="text">
+         <string>select path</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="9">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>record format：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6" colspan="2">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>video size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="10">
+       <widget class="QComboBox" name="formatBox"/>
+      </item>
+      <item row="2" column="7" colspan="2">
        <widget class="QCheckBox" name="closeScreenCheck">
         <property name="text">
          <string>close screen</string>
@@ -211,10 +171,57 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="5" colspan="2">
-       <widget class="QLabel" name="label_4">
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>video size:</string>
+         <string>record save path:</string>
+        </property>
+        <property name="buddy">
+         <cstring>recordPathEdt</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="4">
+       <widget class="QComboBox" name="bitRateBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="currentText">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="7">
+       <widget class="QLineEdit" name="recordPathEdt">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QCheckBox" name="gameForPeaceCheck">
+        <property name="text">
+         <string>Game for Peace</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5" colspan="2">
+       <widget class="QCheckBox" name="alwaysTopCheck">
+        <property name="text">
+         <string>always top</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2" colspan="2">
+       <widget class="QCheckBox" name="notDisplayCheck">
+        <property name="text">
+         <string>not display</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
         </property>
        </widget>
       </item>

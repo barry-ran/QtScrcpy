@@ -25,6 +25,7 @@ public:
         bool closeScreen = false;       // 启动时自动息屏
         bool useReverse = true;         // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
         bool display = true;            // 是否显示画面（或者仅仅后台录制）
+        bool supportGame = false;       // 是否支持游戏映射
     };
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
