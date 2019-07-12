@@ -86,6 +86,7 @@ private:
     quint32 m_acceptTimeoutTimer = 0;
     quint32 m_connectTimeoutTimer = 0;
     quint32 m_connectCount = 0;
+    quint32 m_restartCount = 0;
     QString m_deviceName = "";
     QSize m_deviceSize = QSize();
     ServerParams m_params;
