@@ -135,7 +135,7 @@ There are several reasons for this, and the proportions are arranged from large 
 Try to provide all the dependencies and make it easy to compile.
 
 ### PC client
-1. Set up the Qt development environment on the target platform (Qt 5.9.7+)
+1. Set up the Qt development environment on the target platform (Qt >= 5.9.7, vs >= 2015 (not support mingw))
 2. Clone the project
 3. Open the project root directory all.pro with QtCreator
 4. Compile and run
