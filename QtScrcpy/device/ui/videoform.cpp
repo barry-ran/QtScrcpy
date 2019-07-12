@@ -137,6 +137,12 @@ void VideoForm::updateShowSize(const QSize &newSize)
             if (isFullScreen()) {
                 switchFullScreen();
             }
+            if (layout()) {
+                QMargins m = layout()->contentsMargins();
+                showSize.setWidth(showSize.width() + m.left() + m.right());
+                showSize.setHeight(showSize.height() + m.top() + m.bottom());
+            }
+
             // 窗口居中
             move(screenRect.center() - QRect(0, 0, showSize.width(), showSize.height()).center());
         }
