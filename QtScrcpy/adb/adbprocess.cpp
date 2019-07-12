@@ -62,14 +62,16 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::readyReadStandardError, this,
             [this](){
-        m_errorOutput = QString::fromLocal8Bit(readAllStandardError()).trimmed();        
-        qWarning(QString("AdbProcess::error:%1").arg(m_errorOutput).toUtf8());
+        QString tmp = QString::fromLocal8Bit(readAllStandardError()).trimmed();
+        m_errorOutput += tmp;
+        qWarning(QString("AdbProcess::error:%1").arg(tmp).toUtf8());
     });
 
     connect(this, &QProcess::readyReadStandardOutput, this,
             [this](){
-        m_standardOutput = QString::fromLocal8Bit(readAllStandardOutput()).trimmed();
-        qInfo(QString("AdbProcess::out:%1").arg(m_standardOutput).toUtf8());
+        QString tmp = QString::fromLocal8Bit(readAllStandardOutput()).trimmed();
+        m_standardOutput += tmp;
+        qInfo(QString("AdbProcess::out:%1").arg(tmp).toUtf8());
     });
 
     connect(this, &QProcess::started, this,
@@ -125,12 +127,22 @@ QStringList AdbProcess::getDevicesSerialFromStdOut()
 QString AdbProcess::getDeviceIPFromStdOut()
 {
     QString ip = "";
+#if 0
     QString strIPExp = "inet [\\d.]*";
     QRegExp ipRegExp(strIPExp,Qt::CaseInsensitive);
     if (ipRegExp.indexIn(m_standardOutput) != -1) {
         ip = ipRegExp.cap(0);
         ip = ip.right(ip.size() - 5);
     }
+#else
+    QString strIPExp = "inet addr:[\\d.]*";
+    QRegExp ipRegExp(strIPExp,Qt::CaseInsensitive);
+    if (ipRegExp.indexIn(m_standardOutput) != -1) {
+        ip = ipRegExp.cap(0);
+        ip = ip.right(ip.size() - 10);
+    }
+#endif
+
     return ip;
 }
 

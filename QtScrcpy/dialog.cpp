@@ -45,6 +45,11 @@ Dialog::Dialog(QWidget *parent) :
                 if (!ip.isEmpty()) {
                     ui->deviceIpEdt->setText(ip);
                 }
+            } else if (args.contains("ifconfig") && args.contains("wlan0")) {
+                QString ip = m_adb.getDeviceIPFromStdOut();
+                if (!ip.isEmpty()) {
+                    ui->deviceIpEdt->setText(ip);
+                }
             }
             break;
         }
@@ -207,6 +212,7 @@ void Dialog::on_getIPBtn_clicked()
     // or
     // adb -s P7C0218510000537 shell ip -f inet addr show wlan0
     QStringList adbArgs;
+#if 0
     adbArgs << "shell";
     adbArgs << "ip";
     adbArgs << "-f";
@@ -214,6 +220,11 @@ void Dialog::on_getIPBtn_clicked()
     adbArgs << "addr";
     adbArgs << "show";
     adbArgs << "wlan0";
+#else
+    adbArgs << "shell";
+    adbArgs << "ifconfig";
+    adbArgs << "wlan0";
+#endif
     m_adb.execute(ui->serialBox->currentText().trimmed(), adbArgs);
 }
 
