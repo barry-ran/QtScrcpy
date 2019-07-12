@@ -246,12 +246,29 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (ui->videoWidget->geometry().contains(event->pos())) {
+    if (m_dragPosition.isNull()) {
         if (!m_controller) {
             return;
         }
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
+        // local check
+        QPointF local = event->localPos();
+        if (local.x() < 0) {
+            local.setX(0);
+        }
+        if (local.x() > ui->videoWidget->width()) {
+            local.setX(ui->videoWidget->width());
+        }
+        if (local.y() < 0) {
+            local.setY(0);
+        }
+        if (local.y() > ui->videoWidget->height()) {
+            local.setY(ui->videoWidget->height());
+        }
+        event->setLocalPos(local);
         m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    } else {
+        m_dragPosition = QPoint(0, 0);
     }
 }
 
@@ -263,7 +280,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
         }
         event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
         m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
-    } else {
+    } else if (!m_dragPosition.isNull()){
         if (event->buttons() & Qt::LeftButton) {
             move(event->globalPos() - m_dragPosition);
             event->accept();
