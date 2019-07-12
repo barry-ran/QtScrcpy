@@ -10,7 +10,8 @@
 #define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 #define DEVICE_NAME_FIELD_LENGTH 64
 #define SOCKET_NAME "qtscrcpy"
-#define MAX_CONNECT_COUNT 20
+#define MAX_CONNECT_COUNT 30
+#define MAX_RESTART_COUNT 1
 
 Server::Server(QObject *parent) : QObject(parent)
 {
@@ -385,6 +386,7 @@ result:
         // we don't need the adb tunnel anymore
         disableTunnelForward();
         m_tunnelEnabled = false;
+        m_restartCount = 0;
         emit connectToResult(success, deviceName, deviceSize);
         return;
     }
@@ -399,7 +401,13 @@ result:
     if (MAX_CONNECT_COUNT <= m_connectCount++) {
         stopConnectTimeoutTimer();
         stop();
-        emit connectToResult(false);
+        if (MAX_RESTART_COUNT > m_restartCount++) {
+            qWarning("restart server auto");
+            start(m_params);
+        } else {
+            m_restartCount = 0;
+            emit connectToResult(false);
+        }
     }
 }
 
