@@ -21,6 +21,7 @@ public:
 
     void switchFullScreen();    
     void staysOnTop(bool top = true);
+    void updateScreenRatio(const QSize &newSize);
     void updateShowSize(const QSize &newSize);
     void updateRender(const AVFrame *frame);
     void setController(Controller *controller);
