@@ -4,15 +4,16 @@
 #include <QObject>
 #include <QPointer>
 
-#include "inputconvertnormal.h"
+#include "inputconvertbase.h"
 
 class QTcpSocket;
 class Receiver;
+class InputConvertBase;
 class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(QObject* parent = Q_NULLPTR);
+    Controller(bool supportGame = false, QObject* parent = Q_NULLPTR);
     virtual ~Controller();
 
     void setControlSocket(QTcpSocket* controlSocket);    
