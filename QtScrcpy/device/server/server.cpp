@@ -10,6 +10,7 @@
 #define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 #define DEVICE_NAME_FIELD_LENGTH 64
 #define SOCKET_NAME "qtscrcpy"
+#define MAX_CONNECT_COUNT 20
 
 Server::Server(QObject *parent) : QObject(parent)
 {
@@ -200,6 +201,12 @@ QTcpSocket *Server::getControlSocket()
 
 void Server::stop()
 {
+    if (m_tunnelForward) {
+        stopConnectTimeoutTimer();
+    } else {
+        stopAcceptTimeoutTimer();
+    }
+
     if (m_videoSocket) {
         m_videoSocket->close();
         m_videoSocket->deleteLater();
@@ -327,7 +334,7 @@ void Server::onConnectTimer()
 {
     // device server need time to start
     // 这里连接太早时间不够导致安卓监听socket还没有建立，readInfo会失败，所以采取定时重试策略
-    // 每隔100ms尝试一次，最多尝试100次
+    // 每隔100ms尝试一次，最多尝试MAX_CONNECT_COUNT次
     QString deviceName;
     QSize deviceSize;
     bool success = false;
@@ -338,7 +345,7 @@ void Server::onConnectTimer()
     videoSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
     if (!videoSocket->waitForConnected(1000)) {
         // 连接到adb很快的，这里失败不重试
-        m_connectCount = 10;
+        m_connectCount = MAX_CONNECT_COUNT;
         qWarning("video socket connect to server failed");
         goto result;
     }
@@ -346,7 +353,7 @@ void Server::onConnectTimer()
     controlSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
     if (!controlSocket->waitForConnected(1000)) {
         // 连接到adb很快的，这里失败不重试
-        m_connectCount = 10;
+        m_connectCount = MAX_CONNECT_COUNT;
         qWarning("control socket connect to server failed");
         goto result;
     }
@@ -366,7 +373,7 @@ void Server::onConnectTimer()
         }
     } else {
         qWarning("connect to server failed");
-        m_connectCount = 10;
+        m_connectCount = MAX_CONNECT_COUNT;
         goto result;
     }
 
@@ -389,7 +396,7 @@ result:
         controlSocket->deleteLater();
     }
 
-    if (10 <= m_connectCount++) {
+    if (MAX_CONNECT_COUNT <= m_connectCount++) {
         stopConnectTimeoutTimer();
         stop();
         emit connectToResult(false);
