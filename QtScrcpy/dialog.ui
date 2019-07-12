@@ -6,19 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>685</width>
-    <height>762</height>
+    <width>533</width>
+    <height>608</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>685</width>
-    <height>0</height>
-   </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>685</width>
+    <width>600</width>
     <height>16777215</height>
    </size>
   </property>
@@ -99,7 +93,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>320</height>
+       <height>240</height>
       </size>
      </property>
      <property name="focusPolicy">
