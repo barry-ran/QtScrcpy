@@ -1,5 +1,6 @@
 #include <Windows.h>
 #include <QWidget>
+#include <QDebug>
 
 #include "winmousetap.h"
 
@@ -29,7 +30,7 @@ void WinMouseTap::enableMouseEventTap(QWidget *widget, bool enabled)
         return;
     }
     if(enabled) {
-        QRect rc(widget->mapToGlobal(widget->pos())
+        QRect rc(widget->parentWidget()->mapToGlobal(widget->pos())
                  , widget->size());
         RECT mainRect;
         mainRect.left = (LONG)rc.left();
