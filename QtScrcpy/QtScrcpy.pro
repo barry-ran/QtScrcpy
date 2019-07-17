@@ -61,7 +61,7 @@ INCLUDEPATH += \
 # Win平台下配置
 # ***********************************************************
 win32 {
-    contains(QMAKE_TARGET.arch, x86_64) {
+    contains(QT_ARCH, x86_64) {
         message("x64")
         # 输出目录
         CONFIG(debug, debug|release) {
