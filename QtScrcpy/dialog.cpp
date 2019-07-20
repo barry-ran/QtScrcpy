@@ -86,6 +86,11 @@ void Dialog::initUI()
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
+
+#ifndef Q_OS_WIN32
+    // game only windows
+    ui->gameForPeaceCheck->setEnabled(false);
+#endif
 }
 
 void Dialog::execAdbCmd()
