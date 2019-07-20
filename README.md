@@ -18,7 +18,7 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 ![linux](screenshot/ubuntu.png)
 
-## 游戏映射
+## 游戏映射（仅windows平台开启）
 额外针对和平精英手游进行键鼠映射，可以用键鼠像玩端游一样玩和平精英手游，默认按键映射如下：
 
 ![game](screenshot/game.jpg)
@@ -72,20 +72,15 @@ Android部分至少需要API 21（Android 5.0）。
 
 ## 下载这个软件
 
+[gitee-download]: https://gitee.com/Barryda/QtScrcpy/releases
+[github-download]: https://github.com/barry-ran/QtScrcpy/releases
+
 ### Windows
 
 windows平台，你可以直接使用我编译好的可执行程序:
 
- - 国内下载 [`QtScrcpy-win32-v1.0.1.zip`][gitee-win32]
- - 国外下载 [`QtScrcpy-win32-v1.0.1.zip`][github-win32]
-
- 
-
- 
-[gitee-win32]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98SAZd-KAf-R_j8Fei8293.zip?token=677250295122144e72ff23de768dbb3a&ts=1561262188&attname=QtScrcpy-win32-v1.0.1.zip&disposition=attachment
-
-[github-win32]: https://github.com/barry-ran/QtScrcpy/releases/download/v1.0.1/QtScrcpy-win32-v1.0.1.zip
-
+ - [国内下载][gitee-download]
+ - [国外下载][github-download]
 
 你也可以[自己编译](#如何编译)
 
@@ -93,12 +88,8 @@ windows平台，你可以直接使用我编译好的可执行程序:
 
 Mac OS平台，你可以直接使用我编译好的可执行程序:
 
-- 国内下载 [`QtScrcpy-mac64-v1.0.1.zip`][gitee-mac64]
-- 国外下载 [`QtScrcpy-mac64-v1.0.1.zip`][github-mac64]
-
-[gitee-mac64]: https://files.gitee.com/group1/M00/08/37/PaAvDF0O98mAEJDJAlpAtBTOOsE526.dmg?token=3fd6b4f6b255a2e0e0362b7e40935ee5&ts=1561262231&attname=QtScrcpy-mac64-v1.0.1.dmg&disposition=attachment
-
-[github-mac64]: https://github.com/barry-ran/QtScrcpy/releases/download/v1.0.1/QtScrcpy-mac64-v1.0.1.zip
+- [国内下载][gitee-download]
+- [国外下载][github-download]
 
 你也可以[自己编译](#如何编译)
 
