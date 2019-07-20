@@ -58,22 +58,20 @@ Make sure you enabled [adb debugging][enable-adb] on your device(s).
 
 ## Download
 
+[gitee-download]: https://gitee.com/Barryda/QtScrcpy/releases
+[github-download]: https://github.com/barry-ran/QtScrcpy/releases
+
 ### Windows
 For Windows, for simplicity, prebuilt archives with all the dependencies (including adb) are available:
 
- - [`QtScrcpy-win32-v1.0.1.zip`][github-win32]
-
-[github-win32]: https://github.com/barry-ran/QtScrcpy/releases/download/v1.0.1/QtScrcpy-win32-v1.0.1.zip
-
+ - [`QtScrcpy`][github-download]
 
 or you can [build it by yourself](#Build)
 
 ### Mac OS
 For Mac OS, for simplicity, prebuilt archives with all the dependencies (including adb) are available:
 
-- [`QtScrcpy-mac64-v1.0.1.zip`][github-mac64]
-
-[github-mac64]: https://github.com/barry-ran/QtScrcpy/releases/download/v1.0.1/QtScrcpy-mac64-v1.0.1.zip
+- [`QtScrcpy`][github-download]
 
 or you can [build it by yourself](#Build)
 
