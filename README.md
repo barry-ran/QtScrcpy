@@ -1,4 +1,4 @@
-# QtScrcpy 
+# QtScrcpy
 
 ![build state](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
@@ -17,6 +17,20 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 ![mac](screenshot/mac.jpg)
 
 ![linux](screenshot/ubuntu.png)
+
+## 游戏映射
+额外针对和平精英手游进行键鼠映射，可以用键鼠像玩端游一样玩和平精英手游，默认按键映射如下：
+
+![game](screenshot/game.jpg)
+
+操作方法如下：
+- 启动服务之前记得勾选和平精英选项
+- 连接手机以后进入游戏场景
+- 按~键（数字键1左边）切换为游戏映射模式即可体验
+- 再次按~键切换为正常控制模式
+- 要想wasd控制开车记得在载具设置中设置为单摇杆模式
+
+## 感谢
 
 基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢他。QtScrcpy和原版scrcpy区别如下：
 
@@ -43,9 +57,9 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 课程介绍：[https://blog.csdn.net/rankun1/article/details/87970523](https://blog.csdn.net/rankun1/article/details/87970523)
 
-或者你也可以加入我的QtScrcpy群，和志同道合的朋友一块互相交流技术：
+或者你也可以加入我的QtScrcpy QQ群，和志同道合的朋友一块互相交流技术：
 
-群号：901736468
+QQ群号：901736468
 
 
 ## 要求
