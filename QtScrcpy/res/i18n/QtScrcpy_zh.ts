@@ -49,103 +49,108 @@
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="../../dialog.ui" line="32"/>
+        <location filename="../../dialog.ui" line="26"/>
         <source>Wireless</source>
         <translation>无线</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="77"/>
+        <location filename="../../dialog.ui" line="71"/>
         <source>wireless connect</source>
         <translation>无线连接</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="87"/>
+        <location filename="../../dialog.ui" line="81"/>
         <source>wireless disconnect</source>
         <translation>无线断开</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="119"/>
+        <location filename="../../dialog.ui" line="113"/>
         <source>Start Config</source>
         <translation>启动配置</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="189"/>
+        <location filename="../../dialog.ui" line="177"/>
         <source>record save path:</source>
         <translation>录像保存路径：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="159"/>
-        <location filename="../../dialog.cpp" line="237"/>
+        <location filename="../../dialog.ui" line="136"/>
+        <location filename="../../dialog.cpp" line="251"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="145"/>
+        <location filename="../../dialog.ui" line="146"/>
         <source>record format：</source>
         <translation>录制格式：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="179"/>
+        <location filename="../../dialog.ui" line="204"/>
+        <source>Game for Peace</source>
+        <translation>和平精英</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="221"/>
         <source>not display</source>
         <translation>仅后台录制</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="299"/>
+        <location filename="../../dialog.ui" line="300"/>
         <source>stop all server</source>
         <translation>停止所有服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="315"/>
+        <location filename="../../dialog.ui" line="316"/>
         <source>adb command:</source>
         <translation>adb命令行：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="325"/>
+        <location filename="../../dialog.ui" line="326"/>
         <source>terminate</source>
         <translation>终止</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="332"/>
+        <location filename="../../dialog.ui" line="333"/>
         <source>execute</source>
         <translation>执行</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="346"/>
+        <location filename="../../dialog.ui" line="347"/>
         <source>clear</source>
         <translation>清理</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="169"/>
+        <location filename="../../dialog.ui" line="211"/>
         <source>always top</source>
         <translation>窗口置顶</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="199"/>
+        <location filename="../../dialog.ui" line="119"/>
         <source>use reverse</source>
         <translation>使用reverse</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="209"/>
+        <location filename="../../dialog.ui" line="163"/>
         <source>close screen</source>
         <translation>自动息屏</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="233"/>
+        <location filename="../../dialog.ui" line="234"/>
         <source>USB line</source>
         <translation>USB线</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="249"/>
+        <location filename="../../dialog.ui" line="250"/>
         <source>stop server</source>
         <translation>停止服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="289"/>
+        <location filename="../../dialog.ui" line="290"/>
         <source>start server</source>
         <translation>启动服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="279"/>
+        <location filename="../../dialog.ui" line="280"/>
         <source>device serial:</source>
         <translation>设备序列号：</translation>
     </message>
@@ -154,27 +159,27 @@
         <translation type="vanished">配置</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="216"/>
+        <location filename="../../dialog.ui" line="170"/>
         <source>bit rate:</source>
         <translation>比特率：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="223"/>
+        <location filename="../../dialog.ui" line="153"/>
         <source>video size:</source>
         <translation>视频尺寸：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="269"/>
+        <location filename="../../dialog.ui" line="270"/>
         <source>start adbd</source>
         <translation>启动adbd</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="239"/>
+        <location filename="../../dialog.ui" line="240"/>
         <source>get device ip</source>
         <translation>获取设备IP</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="259"/>
+        <location filename="../../dialog.ui" line="260"/>
         <source>update device</source>
         <translation>刷新设备列表</translation>
     </message>
@@ -260,7 +265,7 @@
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="391"/>
+        <location filename="../../device/ui/videoform.cpp" line="386"/>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
     </message>
