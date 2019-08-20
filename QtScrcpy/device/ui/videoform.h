@@ -34,6 +34,7 @@ public slots:
 
 private:    
     void updateStyleSheet(bool vertical);
+    QMargins getMargins(bool vertical);
     void initUI();
     
     void showToolForm(bool show = true);
@@ -61,7 +62,7 @@ private:
     QPointer<QWidget> m_loadingWidget;
 
     //inside member
-    QSize frameSize;
+    QSize m_frameSize;
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
 
