@@ -100,7 +100,6 @@ void VideoForm::updateStyleSheet(bool vertical)
                      border-width: 150px 142px 85px 142px;
                  }
                  )");
-        layout()->setContentsMargins(10, 68, 12, 62);
     } else {
         setStyleSheet(R"(
                  #videoForm {
@@ -108,8 +107,19 @@ void VideoForm::updateStyleSheet(bool vertical)
                      border-width: 142px 85px 142px 150px;
                  }
                  )");
-        layout()->setContentsMargins(68, 12, 62, 10);
     }
+    layout()->setContentsMargins(getMargins(vertical));
+}
+
+QMargins VideoForm::getMargins(bool vertical)
+{
+    QMargins margins;
+    if (vertical) {
+        margins = QMargins(10, 68, 12, 62);
+    } else {
+        margins = QMargins(68, 12, 62, 10);
+    }
+    return margins;
 }
 
 void VideoForm::updateScreenRatio(const QSize &newSize)
@@ -119,8 +129,8 @@ void VideoForm::updateScreenRatio(const QSize &newSize)
 
 void VideoForm::updateShowSize(const QSize &newSize)
 {
-    if (frameSize != newSize) {
-        frameSize = newSize;
+    if (m_frameSize != newSize) {
+        m_frameSize = newSize;
         bool vertical = newSize.height() > newSize.width();
         QSize showSize = newSize;
         QDesktopWidget* desktop = QApplication::desktop();
@@ -138,7 +148,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
                 switchFullScreen();
             }
             if (layout()) {
-                QMargins m = layout()->contentsMargins();
+                QMargins m = getMargins(vertical);
                 showSize.setWidth(showSize.width() + m.left() + m.right());
                 showSize.setHeight(showSize.height() + m.top() + m.bottom());
             }
