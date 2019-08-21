@@ -10,3 +10,8 @@ SOURCES += \
     $$PWD/inputconvertnormal.cpp \
     $$PWD/controlmsg.cpp
 
+include ($$PWD/keymap/keymap.pri)
+
+INCLUDEPATH += \
+        $$PWD/keymap
+
