@@ -4,7 +4,6 @@
 #include <QThread>
 #include <QPointer>
 #include <QMutex>
-#include <QAtomicInteger>
 
 extern "C"
 {
@@ -53,7 +52,7 @@ protected:
 
 private:
     QPointer<VideoSocket> m_videoSocket;
-    QAtomicInteger<qint8> m_quit;
+    std::atomic_bool m_quit;
 
     // for recorder
     Recorder* m_recorder = Q_NULLPTR;

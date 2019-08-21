@@ -16,7 +16,7 @@ typedef qint32 (*ReadPacketFunc)(void*, quint8*, qint32);
 Stream::Stream(QObject *parent)
     : QThread(parent)
 {
-    m_quit.store(0);
+    m_quit = false;
 }
 
 Stream::~Stream()
@@ -227,14 +227,14 @@ bool Stream::startDecode()
     if (!m_videoSocket) {
         return false;
     }
-    m_quit.store(0);
+    m_quit = false;
     start();
     return true;
 }
 
 void Stream::stopDecode()
 {
-    m_quit.store(1);
+    m_quit = true;
     if (m_decoder) {
         m_decoder->interrupt();
     }
@@ -316,7 +316,7 @@ void Stream::run()
     packet.size = 0;
 
     while (!av_read_frame(formatCtx, &packet)) {
-        if (m_quit.load()) {
+        if (m_quit) {
             // if the stream is stopped, the socket had been shutdown, so the
             // last packet is probably corrupted (but not detected as such by
             // FFmpeg) and will not be decoded correctly
