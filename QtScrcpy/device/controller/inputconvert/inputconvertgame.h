@@ -2,7 +2,9 @@
 #define INPUTCONVERTGAME_H
 
 #include <QPointF>
+
 #include "inputconvertnormal.h"
+#include "keymap.h"
 
 #define MULTI_TOUCH_MAX_NUM 10
 class InputConvertGame : public InputConvertNormal
@@ -30,13 +32,12 @@ protected:
     int getTouchID(int key);
 
     // steer wheel
-    bool isSteerWheelKeys(const QKeyEvent* from);
-    void processSteerWheel(const QKeyEvent* from);
-    int updateSteerWheelKeysPress(const QKeyEvent* from, int& keyPress1, int& keyPress2);
-    void steerWheelMove(int keysNum, int keyPress1, int keyPress2);
+    void processSteerWheel(KeyMap::KeyMapNode &node, const QKeyEvent* from);
+    int updateSteerWheelKeysPress(KeyMap::KeyMapNode &node, const QKeyEvent* from, int& keyPress1, int& keyPress2);
+    void steerWheelMove(KeyMap::KeyMapNode &node, int keysNum, int keyPress1, int keyPress2);
 
     // click
-    bool processKeyClick(const QKeyEvent* from);
+    void processKeyClick(QPointF clickPos, bool clickTwice, bool switchMap, const QKeyEvent* from);
 
     // mouse
     bool processMouseClick(const QMouseEvent* from);
@@ -67,24 +68,17 @@ private:
     QSize m_showSize;
     bool m_gameMap = false;
 
-    int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
+    int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };    
 
-    QPointF m_steerWheelPos = {0.16f, 0.75f};    
-    QRectF m_steerWheelOffset = {QPointF(0.1f, 0.27f), QPointF(0.1f, 0.2f)};
-    // order by SteerWheelDirection(up right down left)
-    int m_steerWheelKeys[4] = {Qt::Key_W, Qt::Key_D, Qt::Key_S, Qt::Key_A};
-    bool m_steerWheelKeysPress[4] = { false };
-    int m_steerWheelKeysNum = 0;
-    int m_steerWheelFirstTouchKey = 0;
-
-    // mouse move
-    QPointF m_mouseMoveStartPos = {0.57f, 0.26f};    
-    QPointF m_mouseMoveLastConverPos = m_mouseMoveStartPos;
+    // mouse move    
+    QPointF m_mouseMoveLastConverPos;
     QPointF m_mouseMoveLastPos = {0.0f, 0.0f};
     bool m_mouseMovePress = false;
     int m_mouseMoveTimer = 0;
 
     bool m_needSwitchGameAgain = false;
+
+    KeyMap m_keyMap;
 };
 
 #endif // INPUTCONVERTGAME_H
