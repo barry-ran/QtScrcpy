@@ -8,8 +8,8 @@
 
 InputConvertGame::InputConvertGame(Controller* controller)
     : InputConvertNormal(controller)
-{
-    m_keyMap.loadKeyMapNode();
+{    
+    m_keyMap.loadKeyMap("");
     if (m_keyMap.enableMouseMoveMap()) {
         m_mouseMoveLastConverPos = m_keyMap.getMouseMoveMap().startPos;
     }

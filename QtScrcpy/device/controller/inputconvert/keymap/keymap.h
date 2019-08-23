@@ -1,19 +1,22 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
+#include <QObject>
 #include <QPointF>
 #include <QVector>
 #include <QRectF>
 
 
-class KeyMap
-{
+class KeyMap : public QObject
+{    
+    Q_OBJECT
 public:
     enum KeyMapType {
         KMT_INVALID = -1,
         KMT_CLICK = 0,
         KMT_CLICK_TWICE,
         KMT_STEER_WHEEL,
-    };
+    };    
+    Q_ENUM(KeyMapType)
 
     struct KeyNode {
         int key = Qt::Key_unknown;
@@ -67,19 +70,23 @@ public:
         int speedRatio = 1;
     };
 
-    KeyMap();
+    KeyMap(QObject *parent = Q_NULLPTR);
+    virtual ~KeyMap();
 
-    void loadKeyMapNode();
+    void loadKeyMap(const QString &json);
     KeyMap::KeyMapNode getKeyMapNode(int key);
     int getSwitchKey();
     MouseMoveMap getMouseMoveMap();
     bool enableMouseMoveMap();
 
+protected:
+    const QString& getKeyMapPath();
+
 private:
     QVector<KeyMapNode> m_keyMapNodes;
     int m_switchKey = Qt::Key_QuoteLeft;
     MouseMoveMap m_mouseMoveMap;
-
+    static QString s_keyMapPath;
 };
 
 #endif // KEYMAP_H
