@@ -1,170 +1,269 @@
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QMetaEnum>
+#include <QFileInfo>
+#include <QCoreApplication>
+#include <QDebug>
+
 #include "keymap.h"
 
-KeyMap::KeyMap()
+QString KeyMap::s_keyMapPath = "";
+
+KeyMap::KeyMap(QObject *parent)
+    : QObject(parent)
+{
+    loadKeyMap("");
+}
+
+KeyMap::~KeyMap()
 {
 
 }
 
-void KeyMap::loadKeyMapNode()
+const QString& KeyMap::getKeyMapPath()
 {
-    KeyMapNode node;
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_Space; // 跳
-    node.click.keyNode.pos = QPointF(0.96f, 0.7f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    if (s_keyMapPath.isEmpty()) {
+        s_keyMapPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_KEYMAP_PATH"));
+        QFileInfo fileInfo(s_keyMapPath);
+        if (s_keyMapPath.isEmpty() || !fileInfo.isDir()) {
+            s_keyMapPath = QCoreApplication::applicationDirPath() + "/keymap";
+        }
+    }
+    return s_keyMapPath;
+}
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_M; // 地图
-    node.click.keyNode.pos = QPointF(0.98f, 0.03f);
-    node.click.switchMap = true;
-    m_keyMapNodes.push_back(node);
+void KeyMap::loadKeyMap(const QString &json)
+{
+    QString errorString;
+    QByteArray allData;
+    QJsonParseError jsonError;
+    QJsonDocument jsonDoc;
+    QJsonObject rootObj;
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_Tab; // 背包
-    node.click.keyNode.pos = QPointF(0.06f, 0.9f);
-    node.click.switchMap = true;
-    m_keyMapNodes.push_back(node);
+    QMetaEnum metaEnumKey = QMetaEnum::fromType<Qt::Key>();
+    QMetaEnum metaEnumMouseButtons = QMetaEnum::fromType<Qt::MouseButtons>();
+    QMetaEnum metaEnumKeyMapType = QMetaEnum::fromType<KeyMap::KeyMapType>();
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_Z; // 趴
-    node.click.keyNode.pos = QPointF(0.95f, 0.9f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    QFile loadFile(getKeyMapPath() + "/gameforpeace.json");
+    if(!loadFile.open(QIODevice::ReadOnly))
+    {
+        errorString = "json error: open file failed";
+        goto parseError;
+    }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_C; // 蹲
-    node.click.keyNode.pos = QPointF(0.86f, 0.92f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    allData = loadFile.readAll();
+    loadFile.close();
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_R; // 换弹
-    node.click.keyNode.pos = QPointF(0.795f, 0.93f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_Alt; // 小眼睛
-    node.click.keyNode.pos = QPointF(0.8f, 0.31f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    jsonDoc = QJsonDocument::fromJson(allData, &jsonError);
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_F; // 捡东西1
-    node.click.keyNode.pos = QPointF(0.7f, 0.34f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    if(jsonError.error != QJsonParseError::NoError)
+    {
+        errorString = QString("json error: %1").arg(jsonError.errorString());
+        goto parseError;
+    }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_G; // 捡东西2
-    node.click.keyNode.pos = QPointF(0.7f, 0.44f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    // switchKey
+    rootObj = jsonDoc.object();
+    if (rootObj.contains("switchKey") && rootObj.value("switchKey").isString()) {
+        Qt::Key key = (Qt::Key)metaEnumKey.keyToValue(rootObj.value("switchKey").toString().toStdString().c_str());
+        if (-1 == key) {
+            errorString = QString("json error: switchKey invalid");
+            goto parseError;
+        }
+        m_switchKey = key;
+    } else {
+        errorString = QString("json error: no find switchKey");
+        goto parseError;
+    }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_H; // 捡东西3
-    node.click.keyNode.pos = QPointF(0.7f, 0.54f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    // mouseMoveMap
+    if (rootObj.contains("mouseMoveMap") && rootObj.value("mouseMoveMap").isObject()) {
+        QJsonObject mouseMoveMap = rootObj.value("mouseMoveMap").toObject();
+        if (mouseMoveMap.contains("speedRatio") && mouseMoveMap.value("speedRatio").isDouble()) {
+            m_mouseMoveMap.speedRatio = mouseMoveMap.value("speedRatio").toInt();
+        } else {
+            errorString = QString("json error: mouseMoveMap on find speedRatio");
+            goto parseError;
+        }
+        if (mouseMoveMap.contains("startPos") && mouseMoveMap.value("startPos").isObject()) {
+            QJsonObject startPos = mouseMoveMap.value("startPos").toObject();
+            if (startPos.contains("x") && startPos.value("x").isDouble()) {
+                m_mouseMoveMap.startPos.setX(startPos.value("x").toDouble());
+            }
+            if (startPos.contains("y") && startPos.value("y").isDouble()) {
+                m_mouseMoveMap.startPos.setY(startPos.value("y").toDouble());
+            }
+        } else {
+            errorString = QString("json error: mouseMoveMap on find startPos");
+            goto parseError;
+        }
+    }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_1; // 换枪1
-    node.click.keyNode.pos = QPointF(0.45f, 0.9f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+    // keyMapNodes
+    if (rootObj.contains("keyMapNodes") && rootObj.value("keyMapNodes").isArray()) {
+        QJsonArray keyMapNodes = rootObj.value("keyMapNodes").toArray();
+        QJsonObject node;
+        int size = keyMapNodes.size();
+        for (int i = 0; i < size; i++) {
+            if (!keyMapNodes.at(i).isObject()) {
+                errorString = QString("json error: keyMapNodes node must be json object");
+                goto parseError;
+            }
+            node = keyMapNodes.at(i).toObject();
+            if (!node.contains("type") || !node.value("type").isString()) {
+                errorString = QString("json error: keyMapNodes no find node type");
+                goto parseError;
+            }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_2; // 换枪2
-    node.click.keyNode.pos = QPointF(0.55f, 0.9f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+            KeyMap::KeyMapType type = (KeyMap::KeyMapType)metaEnumKeyMapType.keyToValue(node.value("type").toString().toStdString().c_str());
+            switch (type) {
+            case KeyMap::KMT_CLICK:
+            {
+                // safe check
+                if (!node.contains("key") || !node.value("key").isString()
+                        || !node.contains("pos") || !node.value("pos").isObject()
+                        || !node.value("pos").toObject().contains("x") || !node.value("pos").toObject().value("x").isDouble()
+                        || !node.value("pos").toObject().contains("y") || !node.value("pos").toObject().value("y").isDouble()
+                        || !node.contains("switchMap") || !node.value("switchMap").isBool()
+                        ) {
+                    qWarning() << "json error: keyMapNodes node format error";
+                    break;
+                }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_3; // 手雷
-    node.click.keyNode.pos = QPointF(0.67f, 0.92f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+                Qt::Key key = (Qt::Key)metaEnumKey.keyToValue(node.value("key").toString().toStdString().c_str());
+                Qt::MouseButtons btn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("key").toString().toStdString().c_str());
+                if (-1 == key && -1 == btn) {
+                    qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
+                    break;
+                }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_4; // 快速打药
-    node.click.keyNode.pos = QPointF(0.33f, 0.95f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+                KeyMapNode keyMapNode;
+                keyMapNode.type = type;
+                if (key != -1) {
+                    keyMapNode.click.keyNode.key = key;
+                } else {
+                    keyMapNode.click.keyNode.key = btn;
+                }
+                keyMapNode.click.keyNode.pos = QPointF(node.value("pos").toObject().value("x").toDouble(),
+                                                       node.value("pos").toObject().value("y").toDouble());
+                keyMapNode.click.switchMap = node.value("switchMap").toBool();
+                m_keyMapNodes.push_back(keyMapNode);
+            }
+                break;
+            case KeyMap::KMT_CLICK_TWICE:
+            {
+                // safe check
+                if (!node.contains("key") || !node.value("key").isString()
+                        || !node.contains("pos") || !node.value("pos").isObject()
+                        || !node.value("pos").toObject().contains("x") || !node.value("pos").toObject().value("x").isDouble()
+                        || !node.value("pos").toObject().contains("y") || !node.value("pos").toObject().value("y").isDouble()
+                        ) {
+                    qWarning() << "json error: keyMapNodes node format error";
+                    break;
+                }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_5; // 下车
-    node.click.keyNode.pos = QPointF(0.92f, 0.4f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+                Qt::Key key = (Qt::Key)metaEnumKey.keyToValue(node.value("key").toString().toStdString().c_str());
+                Qt::MouseButtons btn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("key").toString().toStdString().c_str());
+                if (-1 == key && -1 == btn) {
+                    qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
+                    break;
+                }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_6; // 救人
-    node.click.keyNode.pos = QPointF(0.49f, 0.63f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+                KeyMapNode keyMapNode;
+                keyMapNode.type = type;
+                if (key != -1) {
+                    keyMapNode.clickTwice.keyNode.key = key;
+                } else {
+                    keyMapNode.clickTwice.keyNode.key = btn;
+                }
+                keyMapNode.clickTwice.keyNode.pos = QPointF(node.value("pos").toObject().value("x").toDouble(),
+                                                       node.value("pos").toObject().value("y").toDouble());
+                m_keyMapNodes.push_back(keyMapNode);
+            }
+                break;
+            case KeyMap::KMT_STEER_WHEEL:
+            {
+                // safe check
+                if (!node.contains("leftKey") || !node.value("leftKey").isString()
+                        || !node.contains("rightKey") || !node.value("rightKey").isString()
+                        || !node.contains("upKey") || !node.value("upKey").isString()
+                        || !node.contains("downKey") || !node.value("downKey").isString()
+                        || !node.contains("leftOffset") || !node.value("leftOffset").isDouble()
+                        || !node.contains("rightOffset") || !node.value("rightOffset").isDouble()
+                        || !node.contains("upOffset") || !node.value("upOffset").isDouble()
+                        || !node.contains("downOffset") || !node.value("downOffset").isDouble()
+                        || !node.contains("centerPos") || !node.value("centerPos").isObject()
+                        || !node.value("centerPos").toObject().contains("x") || !node.value("centerPos").toObject().value("x").isDouble()
+                        || !node.value("centerPos").toObject().contains("y") || !node.value("centerPos").toObject().value("y").isDouble()
+                        ) {
+                    qWarning() << "json error: keyMapNodes node format error";
+                    break;
+                }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_Shift; // 车加速
-    node.click.keyNode.pos = QPointF(0.82f, 0.8f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+                Qt::Key leftKey = (Qt::Key)metaEnumKey.keyToValue(node.value("leftKey").toString().toStdString().c_str());
+                Qt::MouseButtons leftBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("leftKey").toString().toStdString().c_str());
+                Qt::Key rightKey = (Qt::Key)metaEnumKey.keyToValue(node.value("rightKey").toString().toStdString().c_str());
+                Qt::MouseButtons rightBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("rightKey").toString().toStdString().c_str());
+                Qt::Key upKey = (Qt::Key)metaEnumKey.keyToValue(node.value("upKey").toString().toStdString().c_str());
+                Qt::MouseButtons upBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("upKey").toString().toStdString().c_str());
+                Qt::Key downKey = (Qt::Key)metaEnumKey.keyToValue(node.value("downKey").toString().toStdString().c_str());
+                Qt::MouseButtons downBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("downKey").toString().toStdString().c_str());
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_X; // 开关门
-    node.click.keyNode.pos = QPointF(0.7f, 0.7f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+                if ((-1 == leftKey && -1 == leftBtn)
+                        || (-1 == rightKey && -1 == rightBtn)
+                        || (-1 == upKey && -1 == upBtn)
+                        || (-1 == downKey && -1 == downBtn)
+                        ) {
+                    qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
+                    break;
+                }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::Key_T; // 舔包
-    node.click.keyNode.pos = QPointF(0.72f, 0.26f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
+                KeyMapNode keyMapNode;
+                keyMapNode.type = type;
+                if (leftKey != -1) {
+                    keyMapNode.steerWheel.leftKey = leftKey;
+                } else {
+                    keyMapNode.steerWheel.leftKey = leftBtn;
+                }
+                if (rightKey != -1) {
+                    keyMapNode.steerWheel.rightKey = rightKey;
+                } else {
+                    keyMapNode.steerWheel.rightKey = rightBtn;
+                }
+                if (upKey != -1) {
+                    keyMapNode.steerWheel.upKey = upKey;
+                } else {
+                    keyMapNode.steerWheel.upKey = upBtn;
+                }
+                if (downKey != -1) {
+                    keyMapNode.steerWheel.downKey = downKey;
+                } else {
+                    keyMapNode.steerWheel.downKey = downBtn;
+                }
+                keyMapNode.steerWheel.leftOffset = node.value("leftOffset").toDouble();
+                keyMapNode.steerWheel.rightOffset = node.value("rightOffset").toDouble();
+                keyMapNode.steerWheel.upOffset = node.value("upOffset").toDouble();
+                keyMapNode.steerWheel.downOffset = node.value("downOffset").toDouble();
+                keyMapNode.steerWheel.centerPos = QPointF(node.value("centerPos").toObject().value("x").toDouble(),
+                                                       node.value("centerPos").toObject().value("y").toDouble());
+                m_keyMapNodes.push_back(keyMapNode);
+            }
+                break;
+            default:
+                qWarning() << "json error: keyMapNodes invalid node type:" << node.value("type").toString();
+                break;
+            }
+        }
+    }
 
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::LeftButton; // 开枪
-    node.click.keyNode.pos = QPointF(0.86f, 0.72f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
-
-    node.type = KMT_CLICK;
-    node.click.keyNode.key = Qt::RightButton; // 开镜
-    node.click.keyNode.pos = QPointF(0.96f, 0.52f);
-    node.click.switchMap = false;
-    m_keyMapNodes.push_back(node);
-
-    KeyMapNode node2;
-    node2.type = KMT_CLICK_TWICE;
-    node2.clickTwice.keyNode.key = Qt::Key_Q; // 左探头
-    node2.clickTwice.keyNode.pos = QPointF(0.12f, 0.35f);
-    m_keyMapNodes.push_back(node2);
-
-    node2.type = KMT_CLICK_TWICE;
-    node2.clickTwice.keyNode.key = Qt::Key_E; // 右探头
-    node2.clickTwice.keyNode.pos = QPointF(0.2, 0.35f);
-    m_keyMapNodes.push_back(node2);
-
-    // 方向盘
-    KeyMapNode node3;
-    node3.type = KMT_STEER_WHEEL;
-    node3.steerWheel.centerPos = {0.16f, 0.75f};
-    node3.steerWheel.leftOffset = 0.1f;
-    node3.steerWheel.rightOffset = 0.1f;
-    node3.steerWheel.upOffset = 0.27f;
-    node3.steerWheel.downOffset = 0.2f;
-
-    node3.steerWheel.leftKey = Qt::Key_A;
-    node3.steerWheel.rightKey = Qt::Key_D;
-    node3.steerWheel.upKey = Qt::Key_W;
-    node3.steerWheel.downKey = Qt::Key_S;
-
-    m_keyMapNodes.push_back(node3);
-
-    m_mouseMoveMap.startPos = QPointF(0.57f, 0.26f);
-    m_mouseMoveMap.speedRatio = 10;
-
-    m_switchKey = Qt::Key_QuoteLeft;
+parseError:
+    if (!errorString.isEmpty()) {
+        qWarning() << errorString;
+    }
+    return;
 }
 
 KeyMap::KeyMapNode KeyMap::getKeyMapNode(int key)
