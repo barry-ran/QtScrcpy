@@ -79,8 +79,7 @@ public:
     MouseMoveMap getMouseMoveMap();
     bool enableMouseMoveMap();
 
-protected:
-    const QString& getKeyMapPath();
+    static const QString& getKeyMapPath();
 
 private:
     QVector<KeyMapNode> m_keyMapNodes;

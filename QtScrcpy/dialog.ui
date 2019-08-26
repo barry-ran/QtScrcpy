@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>608</height>
+    <width>600</width>
+    <height>637</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -21,214 +21,6 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="2" column="0">
-    <widget class="QGroupBox" name="wirelessGroupBox">
-     <property name="title">
-      <string>Wireless</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_4" columnstretch="2,0,0,1,2">
-      <item row="3" column="2">
-       <widget class="QLabel" name="label">
-        <property name="minimumSize">
-         <size>
-          <width>5</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>5</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string notr="true">:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="3">
-       <widget class="QLineEdit" name="devicePortEdt">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string notr="true">5555</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLineEdit" name="deviceIpEdt">
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string notr="true">192.168.0.1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="4">
-       <widget class="QPushButton" name="wirelessConnectBtn">
-        <property name="text">
-         <string>wireless connect</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="4">
-       <widget class="QPushButton" name="wirelessDisConnectBtn">
-        <property name="text">
-         <string>wireless disconnect</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QTextEdit" name="outEdit">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>240</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::ClickFocus</enum>
-     </property>
-     <property name="documentTitle">
-      <string/>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QGroupBox" name="configGroupBox">
-     <property name="title">
-      <string>Start Config</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="2" column="9" colspan="2">
-       <widget class="QCheckBox" name="useReverseCheck">
-        <property name="text">
-         <string>use reverse</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="8">
-       <widget class="QComboBox" name="videoSizeBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="9" colspan="2">
-       <widget class="QPushButton" name="selectRecordPathBtn">
-        <property name="text">
-         <string>select path</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="9">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>record format：</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="6" colspan="2">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>video size:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="10">
-       <widget class="QComboBox" name="formatBox"/>
-      </item>
-      <item row="2" column="7" colspan="2">
-       <widget class="QCheckBox" name="closeScreenCheck">
-        <property name="text">
-         <string>close screen</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>bit rate:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" colspan="2">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>record save path:</string>
-        </property>
-        <property name="buddy">
-         <cstring>recordPathEdt</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" colspan="4">
-       <widget class="QComboBox" name="bitRateBox">
-        <property name="toolTip">
-         <string/>
-        </property>
-        <property name="currentText">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="7">
-       <widget class="QLineEdit" name="recordPathEdt">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QCheckBox" name="gameForPeaceCheck">
-        <property name="text">
-         <string>Game for Peace</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="5" colspan="2">
-       <widget class="QCheckBox" name="alwaysTopCheck">
-        <property name="text">
-         <string>always top</string>
-        </property>
-        <property name="checked">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2" colspan="2">
-       <widget class="QCheckBox" name="notDisplayCheck">
-        <property name="text">
-         <string>not display</string>
-        </property>
-        <property name="checkable">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
     <widget class="QGroupBox" name="usbGroupBox">
      <property name="title">
       <string>USB line</string>
@@ -305,6 +97,93 @@
     </widget>
    </item>
    <item row="3" column="0">
+    <widget class="QGroupBox" name="wirelessGroupBox">
+     <property name="title">
+      <string>Wireless</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4" columnstretch="2,0,0,1,2">
+      <item row="3" column="2">
+       <widget class="QLabel" name="label">
+        <property name="minimumSize">
+         <size>
+          <width>5</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>5</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string notr="true">:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLineEdit" name="devicePortEdt">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string notr="true">5555</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLineEdit" name="deviceIpEdt">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string notr="true">192.168.0.1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QPushButton" name="wirelessConnectBtn">
+        <property name="text">
+         <string>wireless connect</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="4">
+       <widget class="QPushButton" name="wirelessDisConnectBtn">
+        <property name="text">
+         <string>wireless disconnect</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QTextEdit" name="outEdit">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>240</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
+     <property name="documentTitle">
+      <string/>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
     <widget class="QGroupBox" name="adbGroupBox">
      <property name="title">
       <string notr="true">adb</string>
@@ -351,6 +230,150 @@
      </layout>
     </widget>
    </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="configGroupBox">
+     <property name="title">
+      <string>Start Config</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>bit rate:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3" colspan="2">
+       <widget class="QCheckBox" name="notDisplayCheck">
+        <property name="text">
+         <string>not display</string>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" colspan="2">
+       <widget class="QComboBox" name="bitRateBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+        <property name="currentText">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6" colspan="2">
+       <widget class="QCheckBox" name="alwaysTopCheck">
+        <property name="text">
+         <string>always top</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="11" colspan="2">
+       <widget class="QCheckBox" name="useReverseCheck">
+        <property name="text">
+         <string>use reverse</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="12">
+       <widget class="QComboBox" name="formatBox"/>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>record save path:</string>
+        </property>
+        <property name="buddy">
+         <cstring>recordPathEdt</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="6">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>video size:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="9" colspan="2">
+       <widget class="QCheckBox" name="closeScreenCheck">
+        <property name="text">
+         <string>close screen</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" colspan="8">
+       <widget class="QLineEdit" name="recordPathEdt">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="7">
+       <widget class="QComboBox" name="videoSizeBox">
+        <property name="toolTip">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="11" colspan="2">
+       <widget class="QPushButton" name="selectRecordPathBtn">
+        <property name="text">
+         <string>select path</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="10">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>record format：</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="8" colspan="2">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="0" colspan="5">
+       <widget class="QComboBox" name="gameBox"/>
+      </item>
+      <item row="3" column="6" colspan="2">
+       <widget class="QPushButton" name="updateGameScriptBtn">
+        <property name="text">
+         <string>update script</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="10" colspan="2">
+       <widget class="QCheckBox" name="gameCheck">
+        <property name="text">
+         <string>Game for Peace</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
@@ -364,8 +387,6 @@
   <tabstop>wirelessDisConnectBtn</tabstop>
   <tabstop>adbCommandEdt</tabstop>
   <tabstop>adbCommandBtn</tabstop>
-  <tabstop>bitRateBox</tabstop>
-  <tabstop>videoSizeBox</tabstop>
   <tabstop>formatBox</tabstop>
   <tabstop>recordPathEdt</tabstop>
   <tabstop>selectRecordPathBtn</tabstop>

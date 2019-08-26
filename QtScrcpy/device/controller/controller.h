@@ -13,7 +13,7 @@ class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(bool supportGame = false, QObject* parent = Q_NULLPTR);
+    Controller(QString gameScript = "", QObject* parent = Q_NULLPTR);
     virtual ~Controller();
 
     void setControlSocket(QTcpSocket* controlSocket);    

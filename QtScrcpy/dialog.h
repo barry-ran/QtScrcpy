@@ -49,10 +49,14 @@ private slots:
 
     void on_stopAllServerBtn_clicked();
 
+    void on_updateGameScriptBtn_clicked();
+    void on_gameCheck_clicked(bool checked);
+
 private:
     bool checkAdbRun();
     void initUI();
     void execAdbCmd();
+    QString getGameScript(const QString& fileName);
 
 private:
     Ui::Dialog *ui;
