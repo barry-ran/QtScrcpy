@@ -9,10 +9,7 @@
 InputConvertGame::InputConvertGame(Controller* controller)
     : InputConvertNormal(controller)
 {    
-    m_keyMap.loadKeyMap("");
-    if (m_keyMap.enableMouseMoveMap()) {
-        m_mouseMoveLastConverPos = m_keyMap.getMouseMoveMap().startPos;
-    }
+
 }
 
 InputConvertGame::~InputConvertGame()
@@ -99,6 +96,14 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
         }
     } else {
         InputConvertNormal::keyEvent(from, frameSize, showSize);
+    }
+}
+
+void InputConvertGame::loadKeyMap(const QString &json)
+{
+    m_keyMap.loadKeyMap(json);
+    if (m_keyMap.enableMouseMoveMap()) {
+        m_mouseMoveLastConverPos = m_keyMap.getMouseMoveMap().startPos;
     }
 }
 

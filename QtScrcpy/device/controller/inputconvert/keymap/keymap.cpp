@@ -46,17 +46,6 @@ void KeyMap::loadKeyMap(const QString &json)
     QMetaEnum metaEnumMouseButtons = QMetaEnum::fromType<Qt::MouseButtons>();
     QMetaEnum metaEnumKeyMapType = QMetaEnum::fromType<KeyMap::KeyMapType>();
 
-    QFile loadFile(getKeyMapPath() + "/gameforpeace.json");
-    if(!loadFile.open(QIODevice::ReadOnly))
-    {
-        errorString = "json error: open file failed";
-        goto parseError;
-    }
-
-    allData = loadFile.readAll();
-    loadFile.close();
-
-
     jsonDoc = QJsonDocument::fromJson(allData, &jsonError);
 
     if(jsonError.error != QJsonParseError::NoError)

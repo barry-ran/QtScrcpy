@@ -8,6 +8,7 @@
 #include "ui_dialog.h"
 #include "device.h"
 #include "videoform.h"
+#include "keymap.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -89,7 +90,7 @@ void Dialog::initUI()
 
 #ifndef Q_OS_WIN32
     // game only windows
-    ui->gameForPeaceCheck->setEnabled(false);
+    ui->gameCheck->setEnabled(false);
 #endif
 }
 
@@ -101,6 +102,20 @@ void Dialog::execAdbCmd()
     QString cmd = ui->adbCommandEdt->text().trimmed();
     outLog("adb " + cmd, false);
     m_adb.execute("", cmd.split(" ", QString::SkipEmptyParts));
+}
+
+QString Dialog::getGameScript(const QString& fileName)
+{
+    QFile loadFile(KeyMap::getKeyMapPath() + "/" + fileName);
+    if(!loadFile.open(QIODevice::ReadOnly))
+    {
+        outLog("open file failed:" + fileName, true);
+        return "";
+    }
+
+    QString ret = loadFile.readAll();
+    loadFile.close();
+    return ret;
 }
 
 void Dialog::on_updateDevice_clicked()
@@ -138,7 +153,13 @@ void Dialog::on_startServerBtn_clicked()
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
-    params.supportGame = ui->gameForPeaceCheck->isChecked();
+    if (ui->gameCheck->isChecked()) {
+        if (ui->gameBox->currentText().isEmpty()) {
+            outLog("no keymap script selected", true);
+        } else {
+            params.gameScript = getGameScript(ui->gameBox->currentText());
+        }
+    }
     m_deviceManage.connectDevice(params);
 
 /*
@@ -283,4 +304,29 @@ void Dialog::on_clearOut_clicked()
 void Dialog::on_stopAllServerBtn_clicked()
 {
     m_deviceManage.disconnectAllDevice();
+}
+
+void Dialog::on_updateGameScriptBtn_clicked()
+{
+    ui->gameBox->clear();
+    QDir dir(KeyMap::getKeyMapPath());
+    if (!dir.exists()) {
+        outLog("keymap directory not find", true);
+        return;
+    }
+    dir.setFilter(QDir::Files | QDir::NoSymLinks);
+    QFileInfoList list = dir.entryInfoList();
+    QFileInfo fileInfo;
+    int size = list.size();
+    for (int i = 0; i < size; ++i) {
+        fileInfo = list.at(i);
+        ui->gameBox->addItem(fileInfo.fileName());
+    }
+}
+
+void Dialog::on_gameCheck_clicked(bool checked)
+{
+    if (checked) {
+        on_updateGameScriptBtn_clicked();
+    }
 }
