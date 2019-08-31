@@ -26,7 +26,7 @@ Device::Device(DeviceParams params, QObject *parent)
         m_vb->init();
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
-        m_controller = new Controller(params.supportGame, this);
+        m_controller = new Controller(params.gameScript, this);
         m_videoForm = new VideoForm();
         m_videoForm->setSerial(m_params.serial);
         if (m_controller) {
