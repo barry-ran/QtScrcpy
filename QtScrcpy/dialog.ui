@@ -364,10 +364,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="10" colspan="2">
+      <item row="3" column="9" colspan="4">
        <widget class="QCheckBox" name="gameCheck">
         <property name="text">
-         <string>Game for Peace</string>
+         <string>custom map</string>
         </property>
        </widget>
       </item>

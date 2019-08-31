@@ -60,7 +60,7 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
         return;
     }
 
-    KeyMap::KeyMapNode node = m_keyMap.getKeyMapNode(from->key());
+    KeyMap::KeyMapNode& node = m_keyMap.getKeyMapNode(from->key());
     // 处理特殊按键：可以在按键映射和普通映射间切换的按键
     if (m_needSwitchGameAgain
             && KeyMap::KMT_CLICK == node.type
@@ -192,7 +192,7 @@ void InputConvertGame::processSteerWheel(KeyMap::KeyMapNode &node, const QKeyEve
             int id = attachTouchID(node.steerWheel.firstPressKey);
             if (-1 == id) {
                 return;
-            }            
+            }
             sendTouchDownEvent(id, node.steerWheel.centerPos);
             needMove = true;
         } else if (2 == keysNum) {
@@ -200,7 +200,8 @@ void InputConvertGame::processSteerWheel(KeyMap::KeyMapNode &node, const QKeyEve
         }
     } else if (QEvent::KeyRelease == from->type()){
         if (0 == keysNum) {
-            sendTouchUpEvent(getTouchID(node.steerWheel.firstPressKey), node.steerWheel.centerPos);
+            int id = getTouchID(node.steerWheel.firstPressKey);
+            sendTouchUpEvent(id, node.steerWheel.centerPos);
             detachTouchID(node.steerWheel.firstPressKey);
             node.steerWheel.firstPressKey = 0;
         } else if (1 == keysNum) {
@@ -328,7 +329,7 @@ void InputConvertGame::processKeyClick(QPointF clickPos, bool clickTwice, bool s
 
 bool InputConvertGame::processMouseClick(const QMouseEvent *from)
 {
-    KeyMap::KeyMapNode node = m_keyMap.getKeyMapNode(from->button());
+    KeyMap::KeyMapNode& node = m_keyMap.getKeyMapNode(from->button());
     if (KeyMap::KMT_INVALID == node.type) {
         return false;
     }
