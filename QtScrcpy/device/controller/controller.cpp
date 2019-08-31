@@ -7,13 +7,15 @@
 #include "receiver.h"
 #include "inputconvertgame.h"
 
-Controller::Controller(bool supportGame, QObject* parent) : QObject(parent)
+Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
 {
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
 
-    if (supportGame) {
-         m_inputConvert = new InputConvertGame(this);
+    if (!gameScript.isEmpty()) {
+        InputConvertGame* convertgame = new InputConvertGame(this);
+        convertgame->loadKeyMap(gameScript);
+         m_inputConvert = convertgame;
     } else {
          m_inputConvert = new InputConvertNormal(this);
     }
