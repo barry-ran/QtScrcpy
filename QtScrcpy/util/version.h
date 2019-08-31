@@ -5,7 +5,7 @@
 
 #define QTSCRCPY_MAJOR 1
 #define QTSCRCPY_MINOR 0
-#define QTSCRCPY_PATCH 2
+#define QTSCRCPY_PATCH 3
 
 #define QTSCRCPY_VERSION_CHK(major, minor, patch) \
     (((major)<<16) | ((minor)<<8) | (patch))
