@@ -211,6 +211,13 @@ void KeyMap::loadKeyMap(const QString &json)
 
                 KeyMapNode keyMapNode;
                 keyMapNode.type = type;
+                keyMapNode.steerWheel.leftKeyPressed = false;
+                keyMapNode.steerWheel.rightKeyPressed = false;
+                keyMapNode.steerWheel.upKeyPressed = false;
+                keyMapNode.steerWheel.downKeyPressed = false;
+                keyMapNode.steerWheel.pressKeysNum = 0;
+                keyMapNode.steerWheel.firstPressKey = 0;
+
                 if (leftKey != -1) {
                     keyMapNode.steerWheel.leftKey = leftKey;
                 } else {
