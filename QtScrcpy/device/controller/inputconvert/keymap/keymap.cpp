@@ -14,7 +14,7 @@ QString KeyMap::s_keyMapPath = "";
 KeyMap::KeyMap(QObject *parent)
     : QObject(parent)
 {
-    loadKeyMap("");
+
 }
 
 KeyMap::~KeyMap()
@@ -37,7 +37,6 @@ const QString& KeyMap::getKeyMapPath()
 void KeyMap::loadKeyMap(const QString &json)
 {
     QString errorString;
-    QByteArray allData;
     QJsonParseError jsonError;
     QJsonDocument jsonDoc;
     QJsonObject rootObj;
@@ -46,7 +45,7 @@ void KeyMap::loadKeyMap(const QString &json)
     QMetaEnum metaEnumMouseButtons = QMetaEnum::fromType<Qt::MouseButtons>();
     QMetaEnum metaEnumKeyMapType = QMetaEnum::fromType<KeyMap::KeyMapType>();
 
-    jsonDoc = QJsonDocument::fromJson(allData, &jsonError);
+    jsonDoc = QJsonDocument::fromJson(json.toUtf8(), &jsonError);
 
     if(jsonError.error != QJsonParseError::NoError)
     {
@@ -255,44 +254,35 @@ parseError:
     return;
 }
 
-KeyMap::KeyMapNode KeyMap::getKeyMapNode(int key)
+KeyMap::KeyMapNode& KeyMap::getKeyMapNode(int key)
 {
-    KeyMapNode retNode;
-    bool find = false;
-    for (auto& node : m_keyMapNodes) {
-        switch (node.type) {
+    for (auto& itemNode : m_keyMapNodes) {
+        switch (itemNode.type) {
         case KMT_CLICK:
-            if (node.click.keyNode.key == key) {
-                retNode = node;
-                find = true;
+            if (itemNode.click.keyNode.key == key) {
+                return itemNode;
             }
             break;
         case KMT_CLICK_TWICE:
-            if (node.clickTwice.keyNode.key == key) {
-                retNode = node;
-                find = true;
+            if (itemNode.clickTwice.keyNode.key == key) {
+                return itemNode;
             }
             break;
         case KMT_STEER_WHEEL:
-            if (node.steerWheel.leftKey == key
-                    || node.steerWheel.rightKey == key
-                    || node.steerWheel.upKey == key
-                    || node.steerWheel.downKey == key
+            if (itemNode.steerWheel.leftKey == key
+                    || itemNode.steerWheel.rightKey == key
+                    || itemNode.steerWheel.upKey == key
+                    || itemNode.steerWheel.downKey == key
                     ) {
-                retNode = node;
-                find = true;
+                return itemNode;
             }
             break;
         default:
             break;
         }
-
-        if (find) {
-            break;
-        }
     }
 
-    return retNode;
+    return m_invalidNode;
 }
 
 int KeyMap::getSwitchKey()

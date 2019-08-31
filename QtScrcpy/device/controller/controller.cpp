@@ -13,7 +13,9 @@ Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
     Q_ASSERT(m_receiver);
 
     if (!gameScript.isEmpty()) {
-         m_inputConvert = new InputConvertGame(this);
+        InputConvertGame* convertgame = new InputConvertGame(this);
+        convertgame->loadKeyMap(gameScript);
+         m_inputConvert = convertgame;
     } else {
          m_inputConvert = new InputConvertNormal(this);
     }

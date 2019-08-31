@@ -74,7 +74,7 @@ public:
     virtual ~KeyMap();
 
     void loadKeyMap(const QString &json);
-    KeyMap::KeyMapNode getKeyMapNode(int key);
+    KeyMap::KeyMapNode& getKeyMapNode(int key);
     int getSwitchKey();
     MouseMoveMap getMouseMoveMap();
     bool enableMouseMoveMap();
@@ -83,6 +83,7 @@ public:
 
 private:
     QVector<KeyMapNode> m_keyMapNodes;
+    KeyMapNode m_invalidNode;
     int m_switchKey = Qt::Key_QuoteLeft;
     MouseMoveMap m_mouseMoveMap;
     static QString s_keyMapPath;
