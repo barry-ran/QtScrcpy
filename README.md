@@ -25,7 +25,7 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 ![game](screenshot/game.jpg)
 
-[这里有玩和平精英的视频演示]()
+[这里有玩和平精英的视频演示](http://mp.weixin.qq.com/mp/video?__biz=MzU1NTg5MjYyNw==&mid=100000015&sn=3e301fdc5a364bd16d6207fa674bc8b3&vid=wxv_968792362971430913&idx=1&vidsn=eec329cc13c3e24c187dc9b4d5eb8760&fromid=1&scene=20&xtrack=1&clicktime=1567346543&sessionid=1567346375&subscene=92&ascene=0&fasttmpl_type=0&fasttmpl_fullversion=4730859-zh_CN-zip&fasttmpl_flag=0&realreporttime=1567346543910#wechat_redirect)
 
 自定义按键映射操作方法如下：
 - 编写自定义脚本放入keymap目录
