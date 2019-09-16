@@ -21,15 +21,18 @@ extern "C"
 #include "libavutil/frame.h"
 }
 
-VideoForm::VideoForm(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::videoForm)
+VideoForm::VideoForm(bool skin, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::videoForm)
+    , m_skin(skin)
 {    
     ui->setupUi(this);
     initUI();
     updateShowSize(size());
     bool vertical = size().height() > size().width();
-    updateStyleSheet(vertical);
+    if (m_skin) {
+        updateStyleSheet(vertical);
+    }
 }
 
 VideoForm::~VideoForm()
@@ -40,18 +43,20 @@ VideoForm::~VideoForm()
 void VideoForm::initUI()
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    QPixmap phone;
-    if (phone.load(":/res/phone.png")) {
-        m_widthHeightRatio = 1.0f * phone.width() / phone.height();
-    }
+    if (m_skin) {
+        QPixmap phone;
+        if (phone.load(":/res/phone.png")) {
+            m_widthHeightRatio = 1.0f * phone.width() / phone.height();
+        }
 
-    // mac下去掉标题栏影响showfullscreen
 #ifndef Q_OS_OSX
-    // 去掉标题栏
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-    // 根据图片构造异形窗口
-    setAttribute(Qt::WA_TranslucentBackground);
+        // mac下去掉标题栏影响showfullscreen
+        // 去掉标题栏
+        setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+        // 根据图片构造异形窗口
+        setAttribute(Qt::WA_TranslucentBackground);
 #endif
+    }
 
     setMouseTracking(true);    
     ui->videoWidget->setMouseTracking(true);
@@ -167,7 +172,9 @@ void VideoForm::updateShowSize(const QSize &newSize)
 #else
             resize(showSize);
 #endif
-            updateStyleSheet(vertical);
+            if (m_skin) {
+                updateStyleSheet(vertical);
+            }
         }
     }
 }
@@ -181,7 +188,9 @@ void VideoForm::switchFullScreen()
         //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
         //show();
 #endif
-        updateStyleSheet(height() > width());
+        if (m_skin) {
+            updateStyleSheet(height() > width());
+        }
         showToolForm(true);
 #ifdef Q_OS_WIN32
         ::SetThreadExecutionState(ES_CONTINUOUS);
@@ -193,7 +202,9 @@ void VideoForm::switchFullScreen()
         //setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
 #endif
         showToolForm(false);
-        layout()->setContentsMargins(0, 0, 0, 0);
+        if (m_skin) {
+            layout()->setContentsMargins(0, 0, 0, 0);
+        }
         showFullScreen();
 
         // 全屏状态禁止电脑休眠、息屏
