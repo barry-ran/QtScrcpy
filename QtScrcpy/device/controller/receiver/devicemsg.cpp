@@ -45,6 +45,7 @@ qint32 DeviceMsg::deserialize(QByteArray& byteArray)
     m_data.type = (DeviceMsgType)c;
     switch (m_data.type) {
     case DMT_GET_CLIPBOARD: {
+        m_data.clipboardMsg.text = Q_NULLPTR;
         quint16 clipboardLen = BufferUtil::read16(buf);
         if (clipboardLen > len - 3) {
             ret = 0; // not available
