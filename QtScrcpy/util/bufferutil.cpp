@@ -16,11 +16,11 @@ void BufferUtil::write16(QBuffer &buffer, quint32 value)
 
 quint16 BufferUtil::read16(QBuffer &buffer)
 {
-    char c;
+    uchar c;
     quint16 ret = 0;
-    buffer.getChar(&c);
+    buffer.getChar(reinterpret_cast<char*>(&c));
     ret |= (c << 8);
-    buffer.getChar(&c);
+    buffer.getChar(reinterpret_cast<char*>(&c));
     ret |= c;
 
     return ret;
@@ -28,15 +28,15 @@ quint16 BufferUtil::read16(QBuffer &buffer)
 
 quint32 BufferUtil::read32(QBuffer &buffer)
 {
-    char c;
+    uchar c;
     quint32 ret = 0;
-    buffer.getChar(&c);
+    buffer.getChar(reinterpret_cast<char*>(&c));
     ret |= (c << 24);
-    buffer.getChar(&c);
+    buffer.getChar(reinterpret_cast<char*>(&c));
     ret |= (c << 16);
-    buffer.getChar(&c);
+    buffer.getChar(reinterpret_cast<char*>(&c));
     ret |= (c << 8);
-    buffer.getChar(&c);
+    buffer.getChar(reinterpret_cast<char*>(&c));
     ret |= c;
 
     return ret;
