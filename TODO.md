@@ -19,7 +19,7 @@
 6. 群控
 
 # BUG
-1. 魅族手机提示cant open video stream，与设备编码能力有关--自定义分辨率码率设置
+1. 魅族手机提示cant open video stream，解决方法 https://dim.red/2019/03/03/scrcpy_usage/
 
 # mark
 [ffmpeg编译参数详解](https://www.cnblogs.com/wainiwann/p/4204230.html)
