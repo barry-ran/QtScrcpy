@@ -11,11 +11,15 @@
 
 ## 中优先级
 0. [截屏保存为jpg](https://blog.csdn.net/m0_37684310/article/details/77950390)
+1. 版本号升级优化
 2. linux打包以及版本号
 3. 自动打包脚本
 4. 按键映射可配置
 5. 脚本
 6. 群控
+
+# BUG
+1. 魅族手机提示cant open video stream，与设备编码能力有关--自定义分辨率码率设置
 
 # mark
 [ffmpeg编译参数详解](https://www.cnblogs.com/wainiwann/p/4204230.html)
