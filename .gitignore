@@ -10,3 +10,4 @@
 /server/gradlew.bat
 /server/local.properties
 build
+*.DS_Store
