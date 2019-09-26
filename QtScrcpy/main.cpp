@@ -25,6 +25,11 @@ int main(int argc, char *argv[])
     Stream::init();
     QApplication a(argc, argv);
 
+    // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
+    // mac下拿到的是CFBundleVersion的值
+    qDebug() << a.applicationVersion();
+    qDebug() << a.applicationName();
+
     installTranslator();
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->initMouseEventTap();
