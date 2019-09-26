@@ -31,9 +31,9 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef Q_OS_WIN32
-    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/win/adb.exe");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server.jar");
-    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
+    qputenv("QTSCRCPY_ADB_PATH", "../../../../third_party/adb/win/adb.exe");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server.jar");
+    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../keymap");
 #endif
 
 #ifdef Q_OS_LINUX

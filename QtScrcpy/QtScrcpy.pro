@@ -65,33 +65,46 @@ win32 {
         message("x64")
         # 输出目录
         CONFIG(debug, debug|release) {
-            DESTDIR = $$PWD/../output/win-x64/debug
+            DESTDIR = $$PWD/../output/win/x64/debug
         } else {
-            DESTDIR = $$PWD/../output/win-x64/release
+            DESTDIR = $$PWD/../output/win/x64/release
         }
 
         # 依赖模块
         LIBS += \
-                -L$$PWD/../third_party/ffmpeg/win64/lib -lavformat \
-                -L$$PWD/../third_party/ffmpeg/win64/lib -lavcodec \
-                -L$$PWD/../third_party/ffmpeg/win64/lib -lavutil \
-                -L$$PWD/../third_party/ffmpeg/win64/lib -lswscale
+                -L$$PWD/../third_party/ffmpeg/lib/x64 -lavformat \
+                -L$$PWD/../third_party/ffmpeg/lib/x64 -lavcodec \
+                -L$$PWD/../third_party/ffmpeg/lib/x64 -lavutil \
+                -L$$PWD/../third_party/ffmpeg/lib/x64 -lswscale
+
+        WIN_FFMPEG_SRC = $$PWD/../third_party/ffmpeg/bin/x64/*.dll
     } else {
         message("x86")
         # 输出目录
         CONFIG(debug, debug|release) {
-            DESTDIR = $$PWD/../output/win/debug
+            DESTDIR = $$PWD/../output/win/x86/debug
         } else {
-            DESTDIR = $$PWD/../output/win/release
+            DESTDIR = $$PWD/../output/win/x86/release
         }
 
         # 依赖模块
         LIBS += \
-                -L$$PWD/../third_party/ffmpeg/lib -lavformat \
-                -L$$PWD/../third_party/ffmpeg/lib -lavcodec \
-                -L$$PWD/../third_party/ffmpeg/lib -lavutil \
-                -L$$PWD/../third_party/ffmpeg/lib -lswscale
+                -L$$PWD/../third_party/ffmpeg/lib/x86 -lavformat \
+                -L$$PWD/../third_party/ffmpeg/lib/x86 -lavcodec \
+                -L$$PWD/../third_party/ffmpeg/lib/x86 -lavutil \
+                -L$$PWD/../third_party/ffmpeg/lib/x86 -lswscale
+
+        WIN_FFMPEG_SRC = $$PWD/../third_party/ffmpeg/bin/x86/*.dll
     }
+
+    # 复制依赖库
+    WIN_DST = $$DESTDIR
+
+    WIN_FFMPEG_SRC ~= s,/,\\,g
+    WIN_DST ~= s,/,\\,g
+
+    QMAKE_POST_LINK += $$quote($$QMAKE_COPY $$WIN_FFMPEG_SRC $$WIN_DST$$escape_expand(\n\t))
+
     # windows rc file
     RC_FILE = $$PWD/res/QtScrcpy.rc
 }
