@@ -24,11 +24,11 @@ set keymap_path=%script_path%keymap
 
 if /i %cpu_mode% == x86 (
     set publish_path=%script_path%QtScrcpy-win32\
-    set release_path=%script_path%output\win\release
+    set release_path=%script_path%output\win\x86\release
     set qt_msvc_path=%qt_msvc_path%msvc2017\bin
 ) else (
     set publish_path=%script_path%QtScrcpy-win64\
-    set release_path=%script_path%output\win-x64\release
+    set release_path=%script_path%output\win\x64\release
     set qt_msvc_path=%qt_msvc_path%msvc2017_64\bin
 )
 set PATH=%qt_msvc_path%;%PATH%
