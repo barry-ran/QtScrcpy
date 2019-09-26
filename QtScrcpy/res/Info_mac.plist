@@ -19,22 +19,22 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-    <string>1.0.4</string>
+	<string>1.0.4</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>MacOSX</string>
-	</array>	
+	</array>
 	<key>CFBundleVersion</key>
-    <string>1.0.4</string>		
+	<string>1.0.4</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.10</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2018-2038 rankun. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-	<key>NSSupportsAutomaticGraphicsSwitching</key>	
-	<true/>	
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2018-2038 rankun. All rights reserved.</string>
+	<key>NSSupportsAutomaticGraphicsSwitching</key>
+	<true/>
 </dict>
 </plist>
