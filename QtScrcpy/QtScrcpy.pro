@@ -56,11 +56,24 @@ INCLUDEPATH += \
         $$PWD/devicemanage \
         $$PWD/fontawesome
 
+# 统一版本号入口,只修改这一个地方即可
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
+VERSION_PATCH = 4
+
+# qmake变量的方式定义版本号
+VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
 
 # ***********************************************************
 # Win平台下配置
 # ***********************************************************
 win32 {
+    # 通过rc的方式的话，VERSION变量rc中获取不到,定义为宏方便rc中使用
+    DEFINES += VERSION_MAJOR=$${VERSION_MAJOR}
+    DEFINES += VERSION_MINOR=$${VERSION_MINOR}
+    DEFINES += VERSION_PATCH=$${VERSION_PATCH}
+    DEFINES += VERSION_RC_STR=\\\"$${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}\\\"
+
     contains(QT_ARCH, x86_64) {
         message("x64")
         # 输出目录
@@ -142,6 +155,16 @@ macos {
     # mac application icon
     ICON = $$PWD/res/QtScrcpy.icns
     QMAKE_INFO_PLIST = $$PWD/res/Info_mac.plist
+
+    # 定义目标命令（修改版本号字段）
+    plistupdate.commands = /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $$VERSION\" \
+    -c \"Set :CFBundleVersion $$VERSION\" \
+    $$QMAKE_INFO_PLIST
+
+    # 增加额外目标
+    QMAKE_EXTRA_TARGETS += plistupdate
+    # 设置为前置依赖
+    PRE_TARGETDEPS += plistupdate
 }
 
 # ***********************************************************
