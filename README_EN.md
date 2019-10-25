@@ -18,9 +18,9 @@ Supports three major desktop platforms, GNU/Linux, Windows and MacOS.
 ![linux](screenshot/ubuntu.png)
 
 ## Custom keymap（only windows enable）
-You can write your own script to map the PC keyboard keys to the touch and click of the mobile phone according to your needs. [Here](按键映射说明.md) are the rules.
+You can write your own script to map the PC keyboard keys to the touch and click of the mobile phone according to your needs. [Here](docs/按键映射说明.md) are the rules.
 
-By default, it has its own mapping script for key and mouse mapping of "Game for peace" mobile games. When enabled, you can use key and mouse to play "Game for peace" mobile games like PC games. You can also write mapping files of other games according to [writing rules](按键映射说明.md). The default key mapping is as follows:
+By default, it has its own mapping script for key and mouse mapping of "Game for peace" mobile games. When enabled, you can use key and mouse to play "Game for peace" mobile games like PC games. You can also write mapping files of other games according to [writing rules](docs/按键映射说明.md). The default key mapping is as follows:
 
 ![game](screenshot/game.jpg)
 
@@ -151,10 +151,10 @@ Real-time mouse and keyboard control Android device
 - Background recording: record only, no display interface
 
 ## TODO
-[TODO](TODO.md)
+[TODO](docs/TODO.md)
 
 ## FAQ
-[FAQ](FAQ.md)
+[FAQ](docs/FAQ.md)
 
 ## Why develop QtScrcpy?
 There are several reasons for this, and the proportions are arranged from large to small:
