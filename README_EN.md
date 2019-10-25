@@ -7,7 +7,7 @@
 
 QtScrcpy can connect to Android devices via USB (or via TCP/IP) for display and control. No root privileges are required.
 
-A single application can support up to 16 Android devices to connect at the same time. Oot permission.
+A single application can support up to 16 Android devices to connect at the same time.
 
 Supports three major desktop platforms, GNU/Linux, Windows and MacOS.
 
@@ -16,6 +16,25 @@ Supports three major desktop platforms, GNU/Linux, Windows and MacOS.
 ![mac](screenshot/mac.jpg)
 
 ![linux](screenshot/ubuntu.png)
+
+## Custom keymap（only windows enable）
+You can write your own script to map the PC keyboard keys to the touch and click of the mobile phone according to your needs. [Here](按键映射说明.md) are the rules.
+
+By default, it has its own mapping script for key and mouse mapping of "Game for peace" mobile games. When enabled, you can use key and mouse to play "Game for peace" mobile games like PC games. You can also write mapping files of other games according to [writing rules](按键映射说明.md). The default key mapping is as follows:
+
+![game](screenshot/game.jpg)
+
+[Here is a video demonstration of playing "Game for peace"](http://mp.weixin.qq.com/mp/video?__biz=MzU1NTg5MjYyNw==&mid=100000015&sn=3e301fdc5a364bd16d6207fa674bc8b3&vid=wxv_968792362971430913&idx=1&vidsn=eec329cc13c3e24c187dc9b4d5eb8760&fromid=1&scene=20&xtrack=1&clicktime=1567346543&sessionid=1567346375&subscene=92&ascene=0&fasttmpl_type=0&fasttmpl_fullversion=4730859-zh_CN-zip&fasttmpl_flag=0&realreporttime=1567346543910#wechat_redirect)
+
+The operation method of custom key mapping is as follows：
+- Write a custom script and put it in the keymap directory
+- Check the custom mapping option and select the custom mapping script before starting the service
+- Enter the game scene after connecting the mobile phone
+- Press the ~ key (left side of the number key 1) to switch to the game mapping mode to experience (what key to press depends on the switchkey defined by your key script)
+- Press the ~ key again to switch to normal control mode
+- To start the WASD control car, remember to set it to single rocker mode in vehicle settings.
+
+## Thanks
 
 QtScrcpy is based on [Genymobile's](https://github.com/Genymobile) [scrcpy](https://github.com/Genymobile/scrcpy) project and is very grateful to him.
 
@@ -34,6 +53,7 @@ build|meson+gradle|Qt Creator
 - It's very easy to customize your interface with Qt
 - Asynchronous programming of Qt-based signal slot mechanism improves performance
 - Easy for novices to learn
+- Add multi touch support
 
 
 ## Learn
@@ -45,7 +65,7 @@ course introduction：[https://blog.csdn.net/rankun1/article/details/87970523](h
 
 Or you can join my QtScrcpy qq group and exchange ideas with like-minded friends.：
 
-Group number：901736468
+QQ Group number：901736468
 
 
 ## Requirements
@@ -85,6 +105,16 @@ Connect to your Android device on your computer, then run the program and click 
 
 ![run](screenshot/run.png)
 
+### Wireless connection steps (ensure that the mobile phone and computer are in the same LAN):
+1. Enable USB debugging in developer options on Android mobile terminal
+2. Connect Android phone to computer via USB
+3. Click update device, and you will see that the device number is updated.
+4. Click get ip
+5. Click start adbd
+6. Click wireless connect
+7. Click update device again, and another device with IP address beginning is found. Select this device.
+8. Click start service
+
 ## Interface button introduction：
 
 - Startup configuration: function parameter settings before starting the service    
@@ -120,6 +150,11 @@ Real-time mouse and keyboard control Android device
 - Transfer files: Drag files to the video window to send files to Android devices
 - Background recording: record only, no display interface
 
+## TODO
+[TODO](TODO.md)
+
+## FAQ
+[FAQ](FAQ.md)
 
 ## Why develop QtScrcpy?
 There are several reasons for this, and the proportions are arranged from large to small:
