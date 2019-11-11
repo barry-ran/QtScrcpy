@@ -71,7 +71,7 @@
     <message>
         <location filename="../../dialog.ui" line="292"/>
         <source>record save path:</source>
-        <translation>record save psth:</translation>
+        <translation>record save path:</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="330"/>
