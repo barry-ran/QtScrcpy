@@ -59,8 +59,7 @@ protected:
 
 private:
     const QString& getServerPath();
-    bool pushServer();
-    bool removeServer();
+    bool pushServer();    
     bool enableTunnelReverse();
     bool disableTunnelReverse();
     bool enableTunnelForward();
