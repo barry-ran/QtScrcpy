@@ -90,6 +90,13 @@ Server *Device::getServer()
     return m_server;
 }
 
+void Device::updateScript(QString script)
+{
+    if(m_controller){
+        m_controller->updateScript(script);
+    }
+}
+
 void Device::initSignals()
 {
     if (m_controller && m_videoForm) {

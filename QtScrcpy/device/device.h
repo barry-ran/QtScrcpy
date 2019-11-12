@@ -34,6 +34,8 @@ public:
     Controller *getController();
     Server *getServer();
 
+    void updateScript(QString script);
+
 signals:
     void deviceDisconnect(QString serial);
 

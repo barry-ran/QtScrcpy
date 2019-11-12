@@ -47,6 +47,17 @@ bool DeviceManage::connectDevice(Device::DeviceParams params)
     return true;
 }
 
+void DeviceManage::updateScript(QString script)
+{
+    QMapIterator<QString, QPointer<Device>> i(m_devices);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()) {
+            i.value()->updateScript(script);
+        }
+    }
+}
+
 bool DeviceManage::disconnectDevice(const QString &serial)
 {
     bool ret = false;
