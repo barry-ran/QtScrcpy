@@ -14,6 +14,8 @@ public:
     virtual ~DeviceManage();
 
     bool connectDevice(Device::DeviceParams params);
+    void updateScript(QString script);
+
     bool disconnectDevice(const QString &serial);
     void disconnectAllDevice();
 

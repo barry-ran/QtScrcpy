@@ -51,6 +51,18 @@ void Controller::test(QRect rc)
     postControlMsg(controlMsg);
 }
 
+void Controller::updateScript(QString gameScript)
+{
+    if (!gameScript.isEmpty()) {
+        InputConvertGame* convertgame = new InputConvertGame(this);
+        convertgame->loadKeyMap(gameScript);
+         m_inputConvert = convertgame;
+    } else {
+         m_inputConvert = new InputConvertNormal(this);
+    }
+
+}
+
 void Controller::postTurnOn()
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
@@ -159,6 +171,12 @@ void Controller::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
     }
     controlMsg->setSetScreenPowerModeData(mode);
     postControlMsg(controlMsg);
+}
+
+void Controller::screenShot()
+{
+    // TODO:
+    qDebug() << "screen shot";
 }
 
 void Controller::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)

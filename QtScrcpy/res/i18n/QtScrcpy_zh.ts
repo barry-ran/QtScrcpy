@@ -90,7 +90,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="249"/>
-        <source>not display</source>
+        <source>background</source>
         <translation>仅后台录制</translation>
     </message>
     <message>
@@ -120,7 +120,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="269"/>
-        <source>always top</source>
+        <source>always on top</source>
         <translation>窗口置顶</translation>
     </message>
     <message>
@@ -130,13 +130,13 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="309"/>
-        <source>close screen</source>
+        <source>auto screen-off</source>
         <translation>自动息屏</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="363"/>
-        <source>update script</source>
-        <translation>更新脚本</translation>
+        <source>refresh script</source>
+        <translation>刷新脚本</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="370"/>

@@ -90,8 +90,8 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="249"/>
-        <source>not display</source>
-        <translation>not display</translation>
+        <source>background</source>
+        <translation>background</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="92"/>
@@ -120,8 +120,8 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="269"/>
-        <source>always top</source>
-        <translation>always top</translation>
+        <source>always on top</source>
+        <translation>always on top</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="279"/>
@@ -135,8 +135,8 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="363"/>
-        <source>update script</source>
-        <translation>update script</translation>
+        <source>refresh script</source>
+        <translation>refresh script</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="370"/>
