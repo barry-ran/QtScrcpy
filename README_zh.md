@@ -4,7 +4,7 @@
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
 ![release](https://img.shields.io/badge/release-v1.0.1-brightgreen.svg)
 
-[English introduction (from Google Translate)](README.md)
+[English introduction](README.md)
 
 QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和控制。不需要root权限。
 
@@ -82,7 +82,7 @@ Android部分至少需要API 21（Android 5.0）。
 
 ### Windows
 
-windows平台，你可以直接使用我编译好的可执行程序:
+Windows平台，你可以直接使用我编译好的可执行程序:
 
  - [国内下载][gitee-download]
  - [国外下载][github-download]
@@ -116,13 +116,13 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 1. 安卓手机端在开发者选项中打开usb调试
 2. 通过usb连接安卓手机到电脑
 3. 点击刷新设备，会看到有设备号更新出来
-4. 点击获取设备ip
+4. 点击获取设备IP
 5. 点击启动adbd
 6. 无线连接
-7. 再次点击刷新设备，发现多出了一个ip地址开头的设备，选择这个设备
+7. 再次点击刷新设备，发现多出了一个IP地址开头的设备，选择这个设备
 8. 启动服务
 
-备注：启动adbd以后不用再usb线了，以后连接断开都不再需要，除非安卓adbd停了需要重新启动
+备注：启动adbd以后不用再连着usb线了，以后连接断开都不再需要，除非安卓adbd停了需要重新启动
 
 ## 界面按钮介绍：
 
@@ -135,7 +135,6 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
     - 自动息屏：启动服务以后，自动关闭Android设备屏幕节省电量
     - 使用reverse：服务启动模式，出现服务启动失败报错more than one device可以去掉这个勾选尝试连接
     
-
 - 刷新设备列表：刷新当前连接的设备
 - 启动服务：连接到Android设备
 - 停止服务：断开与Android设备的连接
@@ -192,13 +191,13 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 由于是复刻的scrcpy，尊重它的Licence
 
     Copyright (C) 2018 Genymobile
-
+    
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
+    
         http://www.apache.org/licenses/LICENSE-2.0
-
+    
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
