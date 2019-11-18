@@ -56,12 +56,20 @@ void KeyMap::loadKeyMap(const QString &json)
     // switchKey
     rootObj = jsonDoc.object();
     if (rootObj.contains("switchKey") && rootObj.value("switchKey").isString()) {
-        Qt::Key key = (Qt::Key)metaEnumKey.keyToValue(rootObj.value("switchKey").toString().toStdString().c_str());
-        if (-1 == key) {
+        QString name = rootObj.value("switchKey").toString();
+        int key = metaEnumKey.keyToValue(name.toStdString().c_str());
+        int btn = metaEnumMouseButtons.keyToValue(name.toStdString().c_str());
+        if(key == -1 && btn == -1){
             errorString = QString("json error: switchKey invalid");
             goto parseError;
         }
-        m_switchKey = key;
+        if(key != -1){
+            m_switchType = AT_KEY;
+            m_switchKey = key;
+        }else{
+            m_switchType = AT_MOUSE;
+            m_switchKey = btn;
+        }
     } else {
         errorString = QString("json error: no find switchKey");
         goto parseError;
@@ -253,6 +261,7 @@ void KeyMap::loadKeyMap(const QString &json)
             }
         }
     }
+    qWarning() << "Script updated.";
 
 parseError:
     if (!errorString.isEmpty()) {
@@ -290,6 +299,11 @@ KeyMap::KeyMapNode& KeyMap::getKeyMapNode(int key)
     }
 
     return m_invalidNode;
+}
+
+bool KeyMap::isSwitchOnKeyboard()
+{
+    return m_switchType == AT_KEY;
 }
 
 int KeyMap::getSwitchKey()

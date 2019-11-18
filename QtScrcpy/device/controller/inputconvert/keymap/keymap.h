@@ -18,6 +18,12 @@ public:
     };    
     Q_ENUM(KeyMapType)
 
+    enum ActionType {
+        AT_KEY = 0,
+        AT_MOUSE = 1,
+    };
+    Q_ENUM(ActionType)
+
     struct KeyNode {
         int key = Qt::Key_unknown;
         QPointF pos = QPointF(0, 0);
@@ -66,7 +72,7 @@ public:
     };
 
     struct MouseMoveMap {
-        QPointF startPos = {0.0f, 0.0f};
+        QPointF startPos = {0.0, 0.0};
         int speedRatio = 1;
     };
 
@@ -75,6 +81,7 @@ public:
 
     void loadKeyMap(const QString &json);
     KeyMap::KeyMapNode& getKeyMapNode(int key);
+    bool isSwitchOnKeyboard();
     int getSwitchKey();
     MouseMoveMap getMouseMoveMap();
     bool enableMouseMoveMap();
@@ -84,6 +91,7 @@ public:
 private:
     QVector<KeyMapNode> m_keyMapNodes;
     KeyMapNode m_invalidNode;
+    ActionType m_switchType = AT_KEY;
     int m_switchKey = Qt::Key_QuoteLeft;
     MouseMoveMap m_mouseMoveMap;
     static QString s_keyMapPath;

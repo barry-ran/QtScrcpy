@@ -12,13 +12,7 @@ Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
 
-    if (!gameScript.isEmpty()) {
-        InputConvertGame* convertgame = new InputConvertGame(this);
-        convertgame->loadKeyMap(gameScript);
-         m_inputConvert = convertgame;
-    } else {
-         m_inputConvert = new InputConvertNormal(this);
-    }
+    updateScript(gameScript);
     Q_ASSERT(m_inputConvert);
     connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
