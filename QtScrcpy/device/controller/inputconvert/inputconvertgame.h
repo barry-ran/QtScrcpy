@@ -74,7 +74,7 @@ private:
 
     // mouse move    
     QPointF m_mouseMoveLastConverPos;
-    QPointF m_mouseMoveLastPos = {0.0f, 0.0f};
+    QPointF m_mouseMoveLastPos = {0.0, 0.0};
     bool m_mouseMovePress = false;
     int m_mouseMoveTimer = 0;
 
