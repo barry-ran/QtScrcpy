@@ -2,7 +2,7 @@
 
 ![build state](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
-![release](https://img.shields.io/badge/release-v1.0.1-brightgreen.svg)
+![release](https://img.shields.io/badge/release-v1.0.3-brightgreen.svg)
 
 [中文介绍](README_zh.md)
 
@@ -30,15 +30,15 @@ A script for "PUBG mobile" mapping is provided by default. Once enabled, you can
 Here is the instruction of adding new customized mapping files.
 
 - Write a customized script and put it in the `keymap` directory
-- Select the script you need. Check the `custom map` option before starting the service
-- Connect your phone and enter the game scene
-- Press the ~ key (left side of the number key 1) to switch to the mapping mode (It can be changed in the script as `switchkey`)
+- Click `refresh script` to check whether it can be found
+- Connect your phone, start service and click `apply`
+- Start the game and press `~` key (left side of the number key 1) to switch to the mapping mode (It can be changed in the script as `switchkey`)
 - Press the ~ key again to switch back to normal mode
 - (For PUBG and similar games) If you want to drive cars with WASD, you need to check the `single rocker mode` in the game setting.
 
 ## Thanks
 
-QtScrcpy is based on [Genymobile's](https://github.com/Genymobile) [scrcpy](https://github.com/Genymobile/scrcpy) project and is very grateful to them.
+QtScrcpy is based on [Genymobile's](https://github.com/Genymobile) [scrcpy](https://github.com/Genymobile/scrcpy) project. Thanks
 
 The difference between QtScrcpy and the original scrcpy is as follows:
 

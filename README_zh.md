@@ -2,7 +2,7 @@
 
 ![build state](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
-![release](https://img.shields.io/badge/release-v1.0.1-brightgreen.svg)
+![release](https://img.shields.io/badge/release-v1.0.3-brightgreen.svg)
 
 [English introduction](README.md)
 
@@ -29,15 +29,15 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 自定义按键映射操作方法如下：
 - 编写自定义脚本放入keymap目录
-- 启动服务之前记得勾选自定义映射选项，并选择自定义映射脚本
-- 连接手机以后进入游戏场景
-- 按~键（数字键1左边）切换为游戏映射模式即可体验（具体按什么键要看你按键脚本定义的switchKey）
+- 点击刷新脚本，确保脚本可以被检测到
+- 连接手机并启动服务之后，点击应用脚本
+- 进入游戏场景，按~键（数字键1左边）切换为游戏映射模式即可体验（具体按什么键要看你按键脚本定义的switchKey）
 - 再次按~键切换为正常控制模式
 - 要想wasd控制开车记得在载具设置中设置为单摇杆模式
 
 ## 感谢
 
-基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢他。QtScrcpy和原版scrcpy区别如下：
+基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢。QtScrcpy和原版scrcpy区别如下：
 
 关键点|scrcpy|QtScrcpy
 --|:--:|:--:
