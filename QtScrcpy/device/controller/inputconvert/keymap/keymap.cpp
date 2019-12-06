@@ -313,12 +313,12 @@ void KeyMap::makeReverseMap()
 
 // ---- check and get of json item ----
 
-bool KeyMap::checkItemKey(const QJsonObject& node, QString name)
+bool KeyMap::checkItemKey(const QJsonObject& node, const QString& name)
 {
     return node.contains(name) && node.value(name).isString();
 }
 
-bool KeyMap::checkItemPos(const QJsonObject& node, QString name)
+bool KeyMap::checkItemPos(const QJsonObject& node, const QString& name)
 {
     if(node.contains(name) && node.value(name).isObject()){
         QJsonObject pos = node.value(name).toObject();
@@ -328,23 +328,23 @@ bool KeyMap::checkItemPos(const QJsonObject& node, QString name)
     return false;
 }
 
-bool KeyMap::checkItemDouble(const QJsonObject& node, QString name)
+bool KeyMap::checkItemDouble(const QJsonObject& node, const QString& name)
 {
     return node.contains(name) && node.value(name).isDouble();
 }
 
-bool KeyMap::checkItemSwitchMap(const QJsonObject& node, QString name)
+bool KeyMap::checkItemSwitchMap(const QJsonObject& node, const QString& name)
 {
     return !node.contains(name) || node.value(name).isBool();
 }
 
-KeyMap::KeyMapType KeyMap::getItemType(const QJsonObject& node, QString name)
+KeyMap::KeyMapType KeyMap::getItemType(const QJsonObject& node, const QString& name)
 {
     QString value = node.value(name).toString();
     return static_cast<KeyMap::KeyMapType>(m_metaEnumKeyMapType.keyToValue(value.toStdString().c_str()));
 }
 
-QPair<KeyMap::ActionType, int> KeyMap::getItemKey(const QJsonObject& node, QString name)
+QPair<KeyMap::ActionType, int> KeyMap::getItemKey(const QJsonObject& node, const QString& name)
 {
     QString value = node.value(name).toString();
     int key = m_metaEnumKey.keyToValue(value.toStdString().c_str());
@@ -358,18 +358,18 @@ QPair<KeyMap::ActionType, int> KeyMap::getItemKey(const QJsonObject& node, QStri
     }
 }
 
-QPointF KeyMap::getItemPos(const QJsonObject& node, QString name)
+QPointF KeyMap::getItemPos(const QJsonObject& node, const QString& name)
 {
     QJsonObject pos = node.value(name).toObject();
     return QPointF(pos.value("x").toDouble(), pos.value("y").toDouble());
 }
 
-double KeyMap::getItemNumber(const QJsonObject& node, QString name)
+double KeyMap::getItemNumber(const QJsonObject& node, const QString& name)
 {
     return node.value(name).toDouble();
 }
 
-bool KeyMap::getItemSwitchMap(const QJsonObject& node, QString name)
+bool KeyMap::getItemSwitchMap(const QJsonObject& node, const QString& name)
 {
     return node.value(name).toBool(false);
 }

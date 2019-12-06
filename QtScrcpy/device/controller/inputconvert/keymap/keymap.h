@@ -103,16 +103,16 @@ private:
     void makeReverseMap();
 
     // parse json of the mapping script
-    bool checkItemKey(const QJsonObject& node, QString name="key");
-    bool checkItemPos(const QJsonObject& node, QString name="pos");
-    bool checkItemDouble(const QJsonObject& node, QString name);
-    bool checkItemSwitchMap(const QJsonObject& node, QString name="switchMap");
+    bool checkItemKey(const QJsonObject& node, const QString& name="key");
+    bool checkItemPos(const QJsonObject& node, const QString& name="pos");
+    bool checkItemDouble(const QJsonObject& node, const QString& name);
+    bool checkItemSwitchMap(const QJsonObject& node, const QString& name="switchMap");
 
-    KeyMapType getItemType(const QJsonObject& node, QString name="type");
-    QPair<ActionType, int> getItemKey(const QJsonObject& node, QString name="key");
-    QPointF getItemPos(const QJsonObject& node, QString name="pos");
-    double getItemNumber(const QJsonObject& node, QString name);
-    bool getItemSwitchMap(const QJsonObject& node, QString name="switchMap");
+    KeyMapType getItemType(const QJsonObject& node, const QString& name="type");
+    QPair<ActionType, int> getItemKey(const QJsonObject& node, const QString& name="key");
+    QPointF getItemPos(const QJsonObject& node, const QString& name="pos");
+    double getItemNumber(const QJsonObject& node, const QString& name);
+    bool getItemSwitchMap(const QJsonObject& node, const QString& name="switchMap");
 
 private:
     bool checkForClick(const QJsonObject& node);

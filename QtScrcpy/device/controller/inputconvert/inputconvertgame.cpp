@@ -4,6 +4,37 @@
 
 #include "inputconvertgame.h"
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+
+#include <Windows.h>
+#include <windef.h>
+
+// restrict mouse into a window
+static void restrictMouse(const int left, const int right,
+                          const int top, const int bottom)
+{
+    RECT mainWinRect; // RECT is defined in <windef.h>
+    mainWinRect.left = static_cast<LONG>(left);
+    mainWinRect.right = static_cast<LONG>(right);
+    mainWinRect.top = static_cast<LONG>(top);
+    mainWinRect.bottom = static_cast<LONG>(bottom);
+    ClipCursor(&mainWinRect); // Windows API
+}
+static void freeMouse()
+{
+    ClipCursor(nullptr);
+}
+
+#else
+// dummy
+static void restrictMouse(const int left, const int right,
+                          const int top, const int bottom)
+{}
+static void freeMouse()
+{}
+#endif // _WINDOWS_
+
 #define CURSOR_POS_CHECK 50
 
 InputConvertGame::InputConvertGame(Controller* controller)
@@ -97,6 +128,11 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
         case KeyMap::KMT_CLICK_TWICE:
             processKeyClick(node.clickTwice.keyNode.pos, true, false, from);
             return;
+        case KeyMap::KMT_DRAG:
+            processKeyDrag(node.drag.startPos, node.drag.endPos, from);
+            return;
+        default:
+            break;
         }
     } else {
         InputConvertNormal::keyEvent(from, frameSize, showSize);
@@ -331,6 +367,17 @@ void InputConvertGame::processKeyClick(QPointF clickPos, bool clickTwice, bool s
     }
 }
 
+void InputConvertGame::processKeyDrag(QPointF startPos, QPointF endPos, const QKeyEvent* from)
+{
+    if(QEvent::KeyPress == from->type()){
+        int id = attachTouchID(from->key());
+        sendTouchDownEvent(id, startPos);
+        sendTouchMoveEvent(id, endPos);
+        sendTouchUpEvent(id, endPos);
+        detachTouchID(from->key());
+    }
+}
+
 bool InputConvertGame::processMouseClick(const QMouseEvent *from)
 {
     KeyMap::KeyMapNode& node = m_keyMap.getKeyMapNodeMouse(from->button());
@@ -451,7 +498,7 @@ bool InputConvertGame::switchGameMap()
     if (m_gameMap) {
         QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
     } else {
-        mouseMoveStopTouch();        
+        mouseMoveStopTouch();
         QGuiApplication::restoreOverrideCursor();
     }
     return m_gameMap;
