@@ -41,6 +41,9 @@ protected:
     // click
     void processKeyClick(QPointF clickPos, bool clickTwice, bool switchMap, const QKeyEvent* from);
 
+    // drag
+    void processKeyDrag(QPointF startPos, QPointF endPos, const QKeyEvent* from);
+
     // mouse
     bool processMouseClick(const QMouseEvent* from);
     bool processMouseMove(const QMouseEvent* from);
