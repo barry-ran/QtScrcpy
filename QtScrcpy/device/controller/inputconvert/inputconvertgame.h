@@ -48,14 +48,14 @@ protected:
     bool processMouseClick(const QMouseEvent* from);
     bool processMouseMove(const QMouseEvent* from);
     void moveCursorToStart(const QMouseEvent* from);
-    void moveCursorTo(const QMouseEvent* from, const QPoint& pos);
+    void moveCursorTo(const QMouseEvent* from, const QPoint& localPos);
     void startMouseMoveTimer();
     void stopMouseMoveTimer();
     void mouseMoveStartTouch(const QMouseEvent* from);
+    void mouseMoveMovingTouch(const QPointF& target);
     void mouseMoveStopTouch();
 
     bool switchGameMap();
-    bool checkCursorPos(const QMouseEvent* from);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -75,10 +75,9 @@ private:
 
     int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };    
 
-    // mouse move    
+    // mouse move
     QPointF m_mouseMoveLastConverPos;
-    QPointF m_mouseMoveLastPos = {0.0, 0.0};
-    bool m_mouseMovePress = false;
+    bool m_mouseMoving = false;
     int m_mouseMoveTimer = 0;
 
     bool m_needSwitchGameAgain = false;
