@@ -175,19 +175,18 @@ void KeyMap::loadKeyMap(const QString &json)
 
                 KeyMapNode keyMapNode;
                 keyMapNode.type = type;
-                keyMapNode.steerWheel.leftKeyPressed = false;
-                keyMapNode.steerWheel.rightKeyPressed = false;
-                keyMapNode.steerWheel.upKeyPressed = false;
-                keyMapNode.steerWheel.downKeyPressed = false;
-                keyMapNode.steerWheel.pressKeysNum = 0;
-                keyMapNode.steerWheel.firstPressKey = 0;
 
-                keyMapNode.steerWheel.left = { leftKey.first, leftKey.second, getItemNumber(node, "leftOffset") };
-                keyMapNode.steerWheel.right = { rightKey.first, rightKey.second, getItemNumber(node, "rightOffset") };
-                keyMapNode.steerWheel.up = { upKey.first, upKey.second, getItemNumber(node, "upOffset") };
-                keyMapNode.steerWheel.down = { downKey.first, downKey.second, getItemNumber(node, "downOffset") };
+                keyMapNode.steerWheel.left = { leftKey.first, leftKey.second,
+                                               getItemNumber(node, "leftOffset") };
+                keyMapNode.steerWheel.right = { rightKey.first, rightKey.second,
+                                                getItemNumber(node, "rightOffset") };
+                keyMapNode.steerWheel.up = { upKey.first, upKey.second,
+                                             getItemNumber(node, "upOffset") };
+                keyMapNode.steerWheel.down = { downKey.first, downKey.second,
+                                               getItemNumber(node, "downOffset") };
 
                 keyMapNode.steerWheel.centerPos = getItemPos(node, "centerPos");
+                m_idxSteerWheel = m_keyMapNodes.size();
                 m_keyMapNodes.push_back(keyMapNode);
             }
                 break;
@@ -230,7 +229,7 @@ parseError:
     return;
 }
 
-KeyMap::KeyMapNode& KeyMap::getKeyMapNode(int key)
+const KeyMap::KeyMapNode& KeyMap::getKeyMapNode(int key)
 {
     auto p = rmapKey.value(key, &m_invalidNode);
     if(p == &m_invalidNode)
@@ -238,12 +237,12 @@ KeyMap::KeyMapNode& KeyMap::getKeyMapNode(int key)
     return *p;
 }
 
-KeyMap::KeyMapNode& KeyMap::getKeyMapNodeKey(int key)
+const KeyMap::KeyMapNode& KeyMap::getKeyMapNodeKey(int key)
 {
     return *rmapKey.value(key, &m_invalidNode);
 }
 
-KeyMap::KeyMapNode& KeyMap::getKeyMapNodeMouse(int key)
+const KeyMap::KeyMapNode& KeyMap::getKeyMapNodeMouse(int key)
 {
     return *rmapMouse.value(key, &m_invalidNode);
 }
@@ -258,14 +257,24 @@ int KeyMap::getSwitchKey()
     return m_switchKey;
 }
 
-KeyMap::MouseMoveMap KeyMap::getMouseMoveMap()
+const KeyMap::MouseMoveMap& KeyMap::getMouseMoveMap()
 {
     return m_mouseMoveMap;
 }
 
-bool KeyMap::enableMouseMoveMap()
+const KeyMap::KeyMapNode& KeyMap::getSteerWheelMap()
+{
+    return m_keyMapNodes[m_idxSteerWheel];
+}
+
+bool KeyMap::isValidMouseMoveMap()
 {
     return !m_mouseMoveMap.startPos.isNull();
+}
+
+bool KeyMap::isValidSteerWheelMap()
+{
+    return m_idxSteerWheel != -1;
 }
 
 void KeyMap::makeReverseMap()

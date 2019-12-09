@@ -47,26 +47,13 @@ public:
                 KeyNode keyNode;
             } clickTwice;
             struct {
-                // 方向盘矩形中心位置
                 QPointF centerPos = {0.0, 0.0};
-
                 struct DirInfo{
                     ActionType type = AT_KEY; // keyboard/mouse
                     int key = Qt::Key_unknown; // key/button
                     double offset = 0.0;
                 };
                 DirInfo left, right, up, down;
-
-                // 辅助变量
-                // 方向键的按下状态
-                bool leftKeyPressed = false;
-                bool rightKeyPressed = false;
-                bool upKeyPressed = false;
-                bool downKeyPressed = false;
-                // 按下方向键的数量
-                int pressKeysNum = 0;
-                // 第一次按下的键
-                int firstPressKey = 0;
             } steerWheel;
             struct {
                 ActionType type = AT_KEY;
@@ -88,13 +75,16 @@ public:
     virtual ~KeyMap();
 
     void loadKeyMap(const QString &json);
-    KeyMap::KeyMapNode& getKeyMapNode(int key);
-    KeyMap::KeyMapNode& getKeyMapNodeKey(int key);
-    KeyMap::KeyMapNode& getKeyMapNodeMouse(int key);
+    const KeyMap::KeyMapNode& getKeyMapNode(int key);
+    const KeyMap::KeyMapNode& getKeyMapNodeKey(int key);
+    const KeyMap::KeyMapNode& getKeyMapNodeMouse(int key);
     bool isSwitchOnKeyboard();
     int getSwitchKey();
-    MouseMoveMap getMouseMoveMap();
-    bool enableMouseMoveMap();
+
+    bool isValidMouseMoveMap();
+    bool isValidSteerWheelMap();
+    const MouseMoveMap& getMouseMoveMap();
+    const KeyMapNode& getSteerWheelMap();
 
     static const QString& getKeyMapPath();
 
@@ -127,6 +117,8 @@ private:
     int m_switchKey = Qt::Key_QuoteLeft;
     MouseMoveMap m_mouseMoveMap;
     static QString s_keyMapPath;
+
+    int m_idxSteerWheel = -1;
 
     // mapping of key/mouse event name to index
     QMetaEnum m_metaEnumKey = QMetaEnum::fromType<Qt::Key>();
