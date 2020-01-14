@@ -185,7 +185,7 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 ### Android端 （没有修改需求的话直接使用自带的scrcpy-server.jar即可）
 1. 目标平台上搭建Android开发环境
 2. 使用Android Studio打开项目根目录中的server项目
-3. 第一次打开如果你没有对应版本的gradle会提示找不到gradle，是否升级gradle并创建，选择取消，取消后会弹出gradle选择已有gradle的位置，同样取消即可（会自动下载）
+3. 第一次打开如果你没有对应版本的gradle会提示找不到gradle，是否升级gradle并创建，选择取消，取消后会弹出选择已有gradle的位置，同样取消即可（会自动下载）
 4. 按需编辑代码即可，当然也可以不编辑
 4. 编译出apk以后改名为scrcpy-server.jar并替换third_party/scrcpy-server.jar即可
 

@@ -137,7 +137,7 @@ void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAct
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectTouchMsgData(id, action, QRect(calcFrameAbsolutePos(pos).toPoint(), m_frameSize));
+    controlMsg->setInjectTouchMsgData(id, action, (AndroidMotioneventButtons)0, QRect(calcFrameAbsolutePos(pos).toPoint(), m_frameSize), 1.0f);
     sendControlMsg(controlMsg);
 }
 

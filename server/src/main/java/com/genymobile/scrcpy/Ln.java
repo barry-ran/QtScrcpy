@@ -8,14 +8,11 @@ import android.util.Log;
  */
 public final class Ln {
 
-    private static final String TAG = "qtscrcpy";
+    private static final String TAG = "scrcpy";
     private static final String PREFIX = "[server] ";
 
     enum Level {
-        DEBUG,
-        INFO,
-        WARN,
-        ERROR;
+        DEBUG, INFO, WARN, ERROR
     }
 
     private static final Level THRESHOLD = BuildConfig.DEBUG ? Level.DEBUG : Level.INFO;

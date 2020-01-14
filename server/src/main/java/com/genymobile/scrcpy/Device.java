@@ -2,8 +2,8 @@ package com.genymobile.scrcpy;
 
 import com.genymobile.scrcpy.wrappers.ServiceManager;
 import com.genymobile.scrcpy.wrappers.SurfaceControl;
+import com.genymobile.scrcpy.wrappers.WindowManager;
 
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.IBinder;
@@ -74,7 +74,6 @@ public final class Device {
     @SuppressWarnings("checkstyle:MagicNumber")
     private static Size computeVideoSize(int w, int h, int maxSize) {
         // Compute the video size and the padding of the content inside this video.
-        /*
         // Principle:
         // - scale down the great side of the screen to maxSize (if necessary);
         // - scale down the other side so that the aspect ratio is preserved;
@@ -97,46 +96,7 @@ public final class Device {
             w = portrait ? minor : major;
             h = portrait ? major : minor;
         }
-        */
-
-        // Principle:480p/720p/1080p and not larger than device size.
-        w &= ~7; // in case it's not a multiple of 8
-        h &= ~7;
-        boolean vertival = h > w;
-        boolean validSize = false;
-        int newWidth = w;
-        int newHeight = h;
-        // 480p/720p/1080p
-        switch (maxSize) {
-            case 480: // 480p:640x480
-                newWidth = 640;
-                newHeight = 480;
-                validSize = true;
-                break;
-            case 720: // 720p:1280x720
-                newWidth = 1280;
-                newHeight = 720;
-                validSize = true;
-                break;
-            case 1080: // 1080p:1920x1080
-                newWidth = 1920;
-                newHeight = 1080;
-                validSize = true;
-                break;
-        }
-        // vertival convert
-        if (validSize && vertival) {
-            int temp = newWidth;
-            newWidth = newHeight;
-            newHeight = temp;
-        }
-        // not larger than device size.
-        if (newWidth > w || newHeight > h) {
-            newWidth = w;
-            newHeight = h;
-        }
-
-        return new Size(newWidth, newHeight);
+        return new Size(w, h);
     }
 
     public Point getPhysicalPoint(Position position) {
@@ -152,8 +112,8 @@ public final class Device {
         }
         Rect contentRect = screenInfo.getContentRect();
         Point point = position.getPoint();
-        int scaledX = contentRect.left + point.x * contentRect.width() / videoSize.getWidth();
-        int scaledY = contentRect.top + point.y * contentRect.height() / videoSize.getHeight();
+        int scaledX = contentRect.left + point.getX() * contentRect.width() / videoSize.getWidth();
+        int scaledY = contentRect.top + point.getY() * contentRect.height() / videoSize.getHeight();
         return new Point(scaledX, scaledY);
     }
 
@@ -202,9 +162,34 @@ public final class Device {
      * @param mode one of the {@code SCREEN_POWER_MODE_*} constants
      */
     public void setScreenPowerMode(int mode) {
-        IBinder d = SurfaceControl.getBuiltInDisplay(0);
+        IBinder d = SurfaceControl.getBuiltInDisplay();
+        if (d == null) {
+            Ln.e("Could not get built-in display");
+            return;
+        }
         SurfaceControl.setDisplayPowerMode(d, mode);
-        Ln.i("Device screen turned " + (mode == Device.POWER_MODE_OFF ? "off " : "on ") + mode);
+        Ln.i("Device screen turned " + (mode == Device.POWER_MODE_OFF ? "off" : "on"));
+    }
+
+    /**
+     * Disable auto-rotation (if enabled), set the screen rotation and re-enable auto-rotation (if it was enabled).
+     */
+    public void rotateDevice() {
+        WindowManager wm = serviceManager.getWindowManager();
+
+        boolean accelerometerRotation = !wm.isRotationFrozen();
+
+        int currentRotation = wm.getRotation();
+        int newRotation = (currentRotation & 1) ^ 1; // 0->1, 1->0, 2->1, 3->0
+        String newRotationString = newRotation == 0 ? "portrait" : "landscape";
+
+        Ln.i("Device rotation requested: " + newRotationString);
+        wm.freezeRotation(newRotation);
+
+        // restore auto-rotate if necessary
+        if (accelerometerRotation) {
+            wm.thawRotation();
+        }
     }
 
     static Rect flipRect(Rect crop) {

@@ -27,6 +27,7 @@ public:
         quint16 localPort = 27183;      // reverse时本地监听端口
         quint16 maxSize = 720;          // 视频分辨率
         quint32 bitRate = 8000000;      // 视频比特率
+        quint32 maxFps = 60;            // 视频最大帧率
         QString crop = "-";             // 视频裁剪
         bool sendFrameMeta = false;     // 是否发送mp4帧数据
         bool control = true;            // 安卓端是否接收键鼠控制

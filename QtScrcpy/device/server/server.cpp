@@ -9,7 +9,7 @@
 
 #define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 #define DEVICE_NAME_FIELD_LENGTH 64
-#define SOCKET_NAME "qtscrcpy"
+#define SOCKET_NAME "scrcpy"
 #define MAX_CONNECT_COUNT 30
 #define MAX_RESTART_COUNT 1
 
@@ -129,8 +129,13 @@ bool Server::execute()
     args << "app_process";
     args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
+    // version
+    QStringList versionList = QCoreApplication::applicationVersion().split(".");
+    QString version = versionList[0] + "." + versionList[1] + "." + versionList[2];
+    args << version;
     args << QString::number(m_params.maxSize);
     args << QString::number(m_params.bitRate);
+    args << QString::number(m_params.maxFps);
     args << (m_tunnelForward ? "true" : "false");
     if (m_params.crop.isEmpty()) {
         args << "-";
