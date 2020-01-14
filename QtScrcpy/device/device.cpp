@@ -203,6 +203,7 @@ void Device::startServer()
         params.localPort = m_params.localPort;
         params.maxSize = m_params.maxSize;
         params.bitRate = m_params.bitRate;
+        params.maxFps = m_params.maxFps;
         params.crop = "-";
         params.sendFrameMeta = m_recorder ? true : false;
         params.control = true;
