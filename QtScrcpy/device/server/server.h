@@ -29,7 +29,6 @@ public:
         quint32 bitRate = 8000000;      // 视频比特率
         quint32 maxFps = 60;            // 视频最大帧率
         QString crop = "-";             // 视频裁剪
-        bool sendFrameMeta = false;     // 是否发送mp4帧数据
         bool control = true;            // 安卓端是否接收键鼠控制
         bool useReverse = true;         // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
     };

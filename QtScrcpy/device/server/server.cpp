@@ -142,7 +142,7 @@ bool Server::execute()
     } else {
         args << m_params.crop;
     }
-    args << (m_params.sendFrameMeta ? "true" : "false");
+    args << "true"; // always send frame meta (packet boundaries + timestamp)
     args << (m_params.control ? "true" : "false");
 
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
