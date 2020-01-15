@@ -105,12 +105,23 @@ void Recorder::close()
 bool Recorder::write(AVPacket *packet)
 {
     if (!m_headerWritten) {
+        if (packet->pts != AV_NOPTS_VALUE) {
+            qCritical("The first packet is not a config packet");
+            return false;
+        }
         bool ok = recorderWriteHeader(packet);
         if (!ok) {
             return false;
         }
         m_headerWritten = true;
+        return true;
     }
+
+    if (packet->pts == AV_NOPTS_VALUE) {
+        // ignore config packets
+        return true;
+    }
+
     recorderRescalePacket(packet);
     return av_write_frame(m_formatCtx, packet) >= 0;
 }
@@ -154,9 +165,6 @@ bool Recorder::recorderWriteHeader(const AVPacket* packet)
     int ret = avformat_write_header(m_formatCtx, NULL);
     if (ret < 0) {
         qCritical("Failed to write header recorder file");
-        free(extradata);
-        avio_close(m_formatCtx->pb);
-        avformat_free_context(m_formatCtx);
         return false;
     }
     return true;
