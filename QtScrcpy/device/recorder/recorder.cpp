@@ -6,16 +6,86 @@
 
 static const AVRational SCRCPY_TIME_BASE = {1, 1000000}; // timestamps in us
 
-Recorder::Recorder(const QString& fileName)
-    : m_fileName(fileName)
+Recorder::Recorder(const QString& fileName, QObject* parent)
+    : QThread(parent)
+    , m_fileName(fileName)
     , m_format(guessRecordFormat(fileName))
 {
-
+    queueInit(&m_queue);
 }
 
 Recorder::~Recorder()
 {
 
+}
+
+Recorder::RecordPacket* Recorder::packetNew(const AVPacket *packet) {
+    RecordPacket* rec = new RecordPacket;
+    if (!rec) {
+        return Q_NULLPTR;
+    }
+    if (av_packet_ref(&rec->packet, packet)) {
+        delete rec;
+        return Q_NULLPTR;
+    }
+    rec->next = Q_NULLPTR;
+    return rec;
+}
+
+void Recorder::packetDelete(Recorder::RecordPacket *rec) {
+    av_packet_unref(&rec->packet);
+    delete rec;
+}
+
+void Recorder::queueInit(Recorder::RecorderQueue *queue) {
+    queue->first = Q_NULLPTR;
+    // queue->last is undefined if queue->first == NULL
+}
+
+bool Recorder::queueIsEmpty(Recorder::RecorderQueue *queue) {
+    return !queue->first;
+}
+
+bool Recorder::queuePush(Recorder::RecorderQueue *queue, const AVPacket *packet) {
+    RecordPacket *rec = packetNew(packet);
+    if (!rec) {
+        qCritical("Could not allocate record packet");
+        return false;
+    }
+    rec->next = Q_NULLPTR;
+
+    if (queueIsEmpty(queue)) {
+        queue->first = queue->last = rec;
+    } else {
+        // chain rec after the (current) last packet
+        queue->last->next = rec;
+        // the last packet is now rec
+        queue->last = rec;
+    }
+    return true;
+}
+
+Recorder::RecordPacket* Recorder::queueTake(Recorder::RecorderQueue *queue) {
+    assert(!queueIsEmpty(queue));
+
+    RecordPacket *rec = queue->first;
+    assert(rec);
+
+    queue->first = rec->next;
+    // no need to update queue->last if the queue is left empty:
+    // queue->last is undefined if queue->first == NULL
+
+    return rec;
+}
+
+void Recorder::queueClear(Recorder::RecorderQueue *queue) {
+    RecordPacket *rec = queue->first;
+    while (rec) {
+        RecordPacket *current = rec;
+        rec = rec->next;
+        packetDelete(current);
+    }
+    queue->first = Q_NULLPTR;
 }
 
 void Recorder::setFrameSize(const QSize &declaredFrameSize)
@@ -200,4 +270,63 @@ Recorder::RecorderFormat Recorder::guessRecordFormat(const QString &fileName)
     }
 
     return Recorder::RECORDER_FORMAT_NULL;
+}
+
+void Recorder::run() {
+    for (;;) {
+        QMutexLocker locker(&m_mutex);
+        while (!m_stopped && queueIsEmpty(&m_queue)) {
+            m_recvDataCond.wait(&m_mutex);
+        }
+
+        // if stopped is set, continue to process the remaining events (to
+        // finish the recording) before actually stopping
+        if (m_stopped && queueIsEmpty(&m_queue)) {
+            break;
+        }
+
+        RecordPacket *rec = queueTake(&m_queue);
+
+        //mutex_unlock(recorder->mutex);
+
+        bool ok = write(&rec->packet);
+        packetDelete(rec);
+        if (!ok) {
+            qCritical("Could not record packet");
+
+            QMutexLocker locker(&m_mutex);
+            m_failed = true;
+            // discard pending packets
+            queueClear(&m_queue);
+            break;
+        }
+
+    }
+
+    qDebug("Recorder thread ended");
+}
+
+bool Recorder::startRecorder() {
+    start();
+    return true;
+}
+
+void Recorder::stopRecorder() {
+    QMutexLocker locker(&m_mutex);
+    m_stopped = true;
+    m_recvDataCond.wakeOne();
+}
+
+bool Recorder::push(const AVPacket *packet) {
+    QMutexLocker locker(&m_mutex);
+    assert(!m_stopped);
+
+    if (m_failed) {
+        // reject any new packet (this will stop the stream)
+        return false;
+    }
+
+    bool ok = queuePush(&m_queue, packet);
+    m_recvDataCond.wakeOne();
+    return ok;
 }

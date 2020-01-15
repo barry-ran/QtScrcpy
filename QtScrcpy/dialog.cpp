@@ -64,7 +64,7 @@ Dialog::Dialog(QWidget *parent) :
 
 Dialog::~Dialog()
 {    
-    on_stopServerBtn_clicked();
+    m_deviceManage.disconnectAllDevice();
     delete ui;
 }
 
