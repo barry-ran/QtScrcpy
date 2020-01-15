@@ -30,6 +30,11 @@ int main(int argc, char *argv[])
     qDebug() << a.applicationVersion();
     qDebug() << a.applicationName();
 
+    //update version
+    QStringList versionList = QCoreApplication::applicationVersion().split(".");
+    QString version = versionList[0] + "." + versionList[1] + "." + versionList[2];
+    a.setApplicationVersion(version);
+
     installTranslator();
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->initMouseEventTap();
@@ -37,13 +42,13 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_WIN32
     qputenv("QTSCRCPY_ADB_PATH", "../../../../third_party/adb/win/adb.exe");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server.jar");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../keymap");
 #endif
 
 #ifdef Q_OS_LINUX
     qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/linux/adb");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server.jar");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server");
 #endif
 
     //加载样式表
@@ -58,6 +63,8 @@ int main(int argc, char *argv[])
 
     g_mainDlg = new Dialog;
     g_mainDlg->show();
+
+    qInfo(QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8());
 
     int ret = a.exec();
 

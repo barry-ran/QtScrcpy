@@ -174,11 +174,11 @@ Try to provide all the dependencies and make it easy to compile.
 3. Open the project root directory all.pro with QtCreator
 4. Compile and run
 
-### Android (If you do not need to modify the requirements, you can use the built-in scrcpy-server.jar directly)
+### Android (If you do not need to modify the requirements, you can use the built-in scrcpy-server directly)
 1. Set up an Android development environment on the target platform
 2. Open the server project in the project root directory using Android Studio
 3. Build it
-4. After compiling apk, rename it to scrcpy-server.jar and replace third_party/scrcpy-server.jar.
+4. After compiling apk, rename it to scrcpy-server and replace third_party/scrcpy-server
 
 ## Licence
 Since it is based on scrcpy, respect its Licence

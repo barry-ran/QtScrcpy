@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QFileInfo>
+#include <QCoreApplication>
 
 #include "compat.h"
 #include "recorder.h"
@@ -24,6 +25,10 @@ Recorder::RecordPacket* Recorder::packetNew(const AVPacket *packet) {
     if (!rec) {
         return Q_NULLPTR;
     }
+
+    // av_packet_ref() does not initialize all fields in old FFmpeg versions
+    av_init_packet(&rec->packet);
+
     if (av_packet_ref(&rec->packet, packet)) {
         delete rec;
         return Q_NULLPTR;
@@ -121,6 +126,10 @@ bool Recorder::open(const AVCodec* inputCodec)
 
     m_formatCtx->oformat = (AVOutputFormat*)format;
 
+    QString comment = "Recorded by QtScrcpy " + QCoreApplication::applicationVersion();
+    av_dict_set(&m_formatCtx->metadata, "comment",
+                comment.toUtf8(), 0);
+
     AVStream* outStream = avformat_new_stream(m_formatCtx, inputCodec);
     if (!outStream) {
         avformat_free_context(m_formatCtx);
@@ -152,7 +161,7 @@ bool Recorder::open(const AVCodec* inputCodec)
         avformat_free_context(m_formatCtx);
         m_formatCtx = Q_NULLPTR;
         return false;
-    }    
+    }
 
     return true;
 }
@@ -160,11 +169,17 @@ bool Recorder::open(const AVCodec* inputCodec)
 void Recorder::close()
 {
     if (Q_NULLPTR != m_formatCtx) {
-        int ret = av_write_trailer(m_formatCtx);
-        if (ret < 0) {
-            qCritical(QString("Failed to write trailer to %1").arg(m_fileName).toUtf8().toStdString().c_str());
+        if (m_headerWritten) {
+            int ret = av_write_trailer(m_formatCtx);
+            if (ret < 0) {
+                qCritical(QString("Failed to write trailer to %1").arg(m_fileName).toUtf8().toStdString().c_str());
+                m_failed = true;
+            } else {
+                qInfo(QString("success record %1").arg(m_fileName).toStdString().c_str());
+            }
         } else {
-            qInfo(QString("success record %1").arg(m_fileName).toStdString().c_str());
+            // the recorded file is empty
+            m_failed = true;
         }
         avio_close(m_formatCtx->pb);
         avformat_free_context(m_formatCtx);
@@ -274,23 +289,53 @@ Recorder::RecorderFormat Recorder::guessRecordFormat(const QString &fileName)
 
 void Recorder::run() {
     for (;;) {
-        QMutexLocker locker(&m_mutex);
-        while (!m_stopped && queueIsEmpty(&m_queue)) {
-            m_recvDataCond.wait(&m_mutex);
+        RecordPacket *rec = Q_NULLPTR;
+        {
+            QMutexLocker locker(&m_mutex);
+            while (!m_stopped && queueIsEmpty(&m_queue)) {
+                m_recvDataCond.wait(&m_mutex);
+            }
+
+            // if stopped is set, continue to process the remaining events (to
+            // finish the recording) before actually stopping
+            if (m_stopped && queueIsEmpty(&m_queue)) {
+                RecordPacket* last = m_previous;
+                if (last) {
+                    // assign an arbitrary duration to the last packet
+                    last->packet.duration = 100000;
+                    bool ok = write(&last->packet);
+                    if (!ok) {
+                        // failing to write the last frame is not very serious, no
+                        // future frame may depend on it, so the resulting file
+                        // will still be valid
+                        qWarning("Could not record last packet");
+                    }
+                    packetDelete(last);
+                }
+                break;
+            }
+
+            rec = queueTake(&m_queue);
         }
 
-        // if stopped is set, continue to process the remaining events (to
-        // finish the recording) before actually stopping
-        if (m_stopped && queueIsEmpty(&m_queue)) {
-            break;
+        // recorder->previous is only written from this thread, no need to lock
+        RecordPacket* previous = m_previous;
+        m_previous = rec;
+
+        if (!previous) {
+            // we just received the first packet
+            continue;
         }
 
-        RecordPacket *rec = queueTake(&m_queue);
+        // config packets have no PTS, we must ignore them
+        if (rec->packet.pts != AV_NOPTS_VALUE
+                && previous->packet.pts != AV_NOPTS_VALUE) {
+            // we now know the duration of the previous packet
+            previous->packet.duration = rec->packet.pts - previous->packet.pts;
+        }
 
-        //mutex_unlock(recorder->mutex);
-
-        bool ok = write(&rec->packet);
-        packetDelete(rec);
+        bool ok = write(&previous->packet);
+        packetDelete(previous);
         if (!ok) {
             qCritical("Could not record packet");
 
@@ -300,7 +345,6 @@ void Recorder::run() {
             queueClear(&m_queue);
             break;
         }
-
     }
 
     qDebug("Recorder thread ended");

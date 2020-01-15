@@ -140,7 +140,7 @@ macos {
             -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
 
     # mac bundle file
-    APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server.jar)
+    APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server)
     APP_SCRCPY_SERVER.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_SCRCPY_SERVER
 
