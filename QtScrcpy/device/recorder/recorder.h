@@ -73,6 +73,11 @@ private:
     bool m_stopped = false; // set on recorder_stop() by the stream reader
     bool m_failed = false; // set on packet write failure
     RecorderQueue m_queue;
+    // we can write a packet only once we received the next one so that we can
+    // set its duration (next_pts - current_pts)
+    // "previous" is only accessed from the recorder thread, so it does not
+    // need to be protected by the mutex
+    RecordPacket* m_previous = Q_NULLPTR;
 };
 
 #endif // RECORDER_H
