@@ -94,7 +94,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     }
 
     if (QtDebugMsg < type) {
-        if (g_mainDlg && !msg.contains("app_proces")) {
+        if (g_mainDlg && g_mainDlg->isVisible() && !msg.contains("app_proces")) {
             g_mainDlg->outLog(msg);
         }
     }

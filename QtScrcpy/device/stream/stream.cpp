@@ -147,10 +147,17 @@ void Stream::run()
         goto runQuit;
     }
 
-    if (m_recorder && !m_recorder->open(codec)) {
-        qCritical("Could not open recorder");
-        goto runQuit;
-    }
+    if (m_recorder) {
+        if (!m_recorder->open(codec)) {
+                qCritical("Could not open recorder");
+                goto runQuit;
+            }
+
+            if (!m_recorder->startRecorder()) {
+                qCritical("Could not start recorder");
+                goto runQuit;
+            }
+        }
 
     m_parser = av_parser_init(AV_CODEC_ID_H264);
     if (!m_parser) {
@@ -188,6 +195,10 @@ void Stream::run()
 
 runQuit:
     if (m_recorder) {
+        if (m_recorder->isRunning()) {
+            m_recorder->stopRecorder();
+            m_recorder->wait();
+        }
         m_recorder->close();
     }
     if (m_decoder) {
@@ -300,7 +311,7 @@ bool Stream::pushPacket(AVPacket *packet)
 
 bool Stream::processConfigPacket(AVPacket *packet)
 {
-    if (m_recorder && !m_recorder->write(packet)) {
+    if (m_recorder && !m_recorder->push(packet)) {
         qCritical("Could not send config packet to recorder");
         return false;
     }
@@ -344,7 +355,7 @@ bool Stream::processFrame(AVPacket *packet)
     if (m_recorder) {
         packet->dts = packet->pts;
 
-        if (!m_recorder->write(packet)) {
+        if (!m_recorder->push(packet)) {
             qCritical("Could not send packet to recorder");
             return false;
         }

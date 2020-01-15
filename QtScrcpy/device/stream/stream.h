@@ -3,7 +3,6 @@
 
 #include <QThread>
 #include <QPointer>
-#include <QMutex>
 
 extern "C"
 {
