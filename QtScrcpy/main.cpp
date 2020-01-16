@@ -18,9 +18,7 @@ void installTranslator();
 
 int main(int argc, char *argv[])
 {
-    //QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
-    //QApplication::setAttribute(Qt::AA_UseOpenGLES);
-    //QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Stream::init();
@@ -62,6 +60,15 @@ int main(int argc, char *argv[])
         qApp->setPalette(QPalette(QColor(paletteColor)));
         qApp->setStyleSheet(qss);
         file.close();
+    }
+
+    int opengl = Config::getInstance().getDesktopOpenGL();
+    if (0 == opengl) {
+        QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+    } else if (1 == opengl){
+        QApplication::setAttribute(Qt::AA_UseOpenGLES);
+    } else if (2 == opengl) {
+        QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     }
 
     g_mainDlg = new Dialog;

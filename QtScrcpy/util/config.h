@@ -14,6 +14,9 @@ public:
     QString getRecordPath();
     void setRecordPath(const QString& path);
     QString getServerVersion();
+    int getMaxFps();
+    int getDesktopOpenGL();
+    int getSkin();
 
 private:
     explicit Config(QObject *parent = nullptr);

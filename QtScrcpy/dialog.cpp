@@ -153,7 +153,7 @@ void Dialog::on_startServerBtn_clicked()
     params.maxSize = videoSize;
     params.bitRate = bitRate;
     // on devices with Android >= 10, the capture frame rate can be limited
-    params.maxFps = 60;
+    params.maxFps = Config::getInstance().getMaxFps();
     params.recordFileName = absFilePath;
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
