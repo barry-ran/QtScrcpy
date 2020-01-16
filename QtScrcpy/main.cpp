@@ -8,6 +8,7 @@
 #include "dialog.h"
 #include "stream.h"
 #include "mousetap/mousetap.h"
+#include "config.h"
 
 Dialog* g_mainDlg = Q_NULLPTR;
 
@@ -44,11 +45,13 @@ int main(int argc, char *argv[])
     qputenv("QTSCRCPY_ADB_PATH", "../../../../third_party/adb/win/adb.exe");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../keymap");
+    qputenv("QTSCRCPY_CONFIG_PATH", "../../../../config/config.ini");
 #endif
 
 #ifdef Q_OS_LINUX
     qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/linux/adb");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server");
+    qputenv("QTSCRCPY_CONFIG_PATH", "../../../config/config.ini");
 #endif
 
     //加载样式表
@@ -62,6 +65,7 @@ int main(int argc, char *argv[])
     }
 
     g_mainDlg = new Dialog;
+    g_mainDlg->setWindowTitle(Config::getInstance().getTitle());
     g_mainDlg->show();
 
     qInfo(QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8());

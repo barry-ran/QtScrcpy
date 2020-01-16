@@ -5,6 +5,7 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
+#include <QQueue>
 
 extern "C"
 {
@@ -41,23 +42,9 @@ private:
     RecorderFormat guessRecordFormat(const QString& fileName);
 
 private:
-    struct RecordPacket {
-        AVPacket packet;
-        RecordPacket *next;
-    };
-
-    struct RecorderQueue {
-        RecordPacket *first = Q_NULLPTR;
-        RecordPacket *last = Q_NULLPTR; // undefined if first is NULL
-    };
-
-    Recorder::RecordPacket* packetNew(const AVPacket *packet);
-    void packetDelete(Recorder::RecordPacket *rec);
-    void queueInit(Recorder::RecorderQueue *queue);
-    bool queueIsEmpty(Recorder::RecorderQueue *queue);
-    bool queuePush(Recorder::RecorderQueue *queue, const AVPacket *packet);
-    Recorder::RecordPacket* queueTake(Recorder::RecorderQueue *queue);
-    void queueClear(Recorder::RecorderQueue *queue);
+    AVPacket* packetNew(const AVPacket *packet);
+    void packetDelete(AVPacket* packet);
+    void queueClear();
 
 protected:
     void run();
@@ -72,12 +59,12 @@ private:
     QWaitCondition m_recvDataCond;
     bool m_stopped = false; // set on recorder_stop() by the stream reader
     bool m_failed = false; // set on packet write failure
-    RecorderQueue m_queue;
+    QQueue<AVPacket*> m_queue;
     // we can write a packet only once we received the next one so that we can
     // set its duration (next_pts - current_pts)
     // "previous" is only accessed from the recorder thread, so it does not
     // need to be protected by the mutex
-    RecordPacket* m_previous = Q_NULLPTR;
+    AVPacket* m_previous = Q_NULLPTR;
 };
 
 #endif // RECORDER_H

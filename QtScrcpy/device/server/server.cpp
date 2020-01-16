@@ -6,6 +6,7 @@
 #include <QFileInfo>
 
 #include "server.h"
+#include "config.h"
 
 #define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 #define DEVICE_NAME_FIELD_LENGTH 64
@@ -129,7 +130,7 @@ bool Server::execute()
     args << "app_process";
     args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
-    args << QCoreApplication::applicationVersion();
+    args << Config::getInstance().getServerVersion();
     args << QString::number(m_params.maxSize);
     args << QString::number(m_params.bitRate);
     args << QString::number(m_params.maxFps);
