@@ -9,6 +9,7 @@
 #include "device.h"
 #include "videoform.h"
 #include "keymap.h"
+#include "config.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -63,7 +64,7 @@ Dialog::Dialog(QWidget *parent) :
 }
 
 Dialog::~Dialog()
-{    
+{
     m_deviceManage.disconnectAllDevice();
     delete ui;
 }
@@ -92,6 +93,8 @@ void Dialog::initUI()
     // game only windows
     ui->gameCheck->setEnabled(false);
 #endif
+
+    ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
 }
 
 void Dialog::execAdbCmd()
@@ -287,6 +290,7 @@ void Dialog::on_selectRecordPathBtn_clicked()
 
 void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
 {
+    Config::getInstance().setRecordPath(arg1);
     ui->recordPathEdt->setToolTip(arg1.trimmed());
     ui->notDisplayCheck->setCheckable(!arg1.trimmed().isEmpty());
 }
