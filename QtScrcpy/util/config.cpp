@@ -15,6 +15,14 @@
 #define COMMON_SERVER_VERSION_KEY "ServerVersion"
 #define COMMON_SERVER_VERSION_DEF "1.12.1"
 
+#define COMMON_MAX_FPS_KEY "MaxFps"
+#define COMMON_MAX_FPS_DEF 60
+
+#define COMMON_DESKTOP_OPENGL_KEY "UseDesktopOpenGL"
+#define COMMON_DESKTOP_OPENGL_DEF -1
+
+#define COMMON_SKIN_KEY "UseSkin"
+#define COMMON_SKIN_DEF 1
 
 QString Config::s_configPath = "";
 
@@ -65,6 +73,33 @@ QString Config::getServerVersion()
     server = m_settings->value(COMMON_SERVER_VERSION_KEY, COMMON_SERVER_VERSION_DEF).toString();
     m_settings->endGroup();
     return server;
+}
+
+int Config::getMaxFps()
+{
+    int fps = 60;
+    m_settings->beginGroup(GROUP_COMMON);
+    fps = m_settings->value(COMMON_MAX_FPS_KEY, COMMON_MAX_FPS_DEF).toInt();
+    m_settings->endGroup();
+    return fps;
+}
+
+int Config::getDesktopOpenGL()
+{
+    int opengl = 0;
+    m_settings->beginGroup(GROUP_COMMON);
+    opengl = m_settings->value(COMMON_DESKTOP_OPENGL_KEY, COMMON_DESKTOP_OPENGL_DEF).toInt();
+    m_settings->endGroup();
+    return opengl;
+}
+
+int Config::getSkin()
+{
+    int skin = 1;
+    m_settings->beginGroup(GROUP_COMMON);
+    skin = m_settings->value(COMMON_SKIN_KEY, COMMON_SKIN_DEF).toInt();
+    m_settings->endGroup();
+    return skin;
 }
 
 QString Config::getTitle()
