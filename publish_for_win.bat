@@ -19,7 +19,7 @@ if /i "%1"=="x64" (
 :: 环境变量设置
 
 set adb_path=%script_path%third_party\adb\win\*.*
-set jar_path=%script_path%third_party\scrcpy-server.jar
+set jar_path=%script_path%third_party\scrcpy-server
 set keymap_path=%script_path%keymap
 set config_path=%script_path%config
 
