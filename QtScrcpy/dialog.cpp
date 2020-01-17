@@ -9,6 +9,7 @@
 #include "device.h"
 #include "videoform.h"
 #include "keymap.h"
+#include "config.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -63,8 +64,8 @@ Dialog::Dialog(QWidget *parent) :
 }
 
 Dialog::~Dialog()
-{    
-    on_stopServerBtn_clicked();
+{
+    m_deviceManage.disconnectAllDevice();
     delete ui;
 }
 
@@ -92,6 +93,8 @@ void Dialog::initUI()
     // game only windows
     ui->gameCheck->setEnabled(false);
 #endif
+
+    ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
 }
 
 void Dialog::execAdbCmd()
@@ -149,6 +152,8 @@ void Dialog::on_startServerBtn_clicked()
     params.serial = ui->serialBox->currentText().trimmed();
     params.maxSize = videoSize;
     params.bitRate = bitRate;
+    // on devices with Android >= 10, the capture frame rate can be limited
+    params.maxFps = Config::getInstance().getMaxFps();
     params.recordFileName = absFilePath;
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
@@ -285,6 +290,7 @@ void Dialog::on_selectRecordPathBtn_clicked()
 
 void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
 {
+    Config::getInstance().setRecordPath(arg1);
     ui->recordPathEdt->setToolTip(arg1.trimmed());
     ui->notDisplayCheck->setCheckable(!arg1.trimmed().isEmpty());
 }

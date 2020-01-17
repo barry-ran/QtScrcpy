@@ -64,7 +64,7 @@ bool DeviceManage::disconnectDevice(const QString &serial)
     if (!serial.isEmpty() && m_devices.contains(serial)) {
         auto it = m_devices.find(serial);
         if (it->data()) {
-            it->data()->deleteLater();
+            delete it->data();
             ret = true;
         }
     }
@@ -77,7 +77,7 @@ void DeviceManage::disconnectAllDevice()
     while (i.hasNext()) {
         i.next();
         if (i.value()) {
-            i.value()->deleteLater();
+            delete i.value();
         }
     }
 }

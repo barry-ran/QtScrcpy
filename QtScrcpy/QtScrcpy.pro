@@ -58,8 +58,8 @@ INCLUDEPATH += \
 
 # 统一版本号入口,只修改这一个地方即可
 VERSION_MAJOR = 1
-VERSION_MINOR = 0
-VERSION_PATCH = 4
+VERSION_MINOR = 1
+VERSION_PATCH = 0
 
 # qmake变量的方式定义版本号
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
@@ -140,7 +140,7 @@ macos {
             -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
 
     # mac bundle file
-    APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server.jar)
+    APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server)
     APP_SCRCPY_SERVER.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_SCRCPY_SERVER
 
@@ -151,6 +151,10 @@ macos {
     APP_FFMPEG.files = $$files($$PWD/../third_party/ffmpeg/lib/*.dylib)
     APP_FFMPEG.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_FFMPEG
+
+    APP_CONFIG.files = $$files($$PWD/../config/config.ini)
+    APP_CONFIG.path = Contents/MacOS
+    QMAKE_BUNDLE_DATA += APP_CONFIG
 
     # mac application icon
     ICON = $$PWD/res/QtScrcpy.icns

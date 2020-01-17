@@ -1,23 +1,21 @@
 package com.genymobile.scrcpy;
 
 /**
- * Union of all supported msg types, identified by their {@code type}.
+ * Union of all supported event types, identified by their {@code type}.
  */
 public final class ControlMessage {
 
     public static final int TYPE_INJECT_KEYCODE = 0;
     public static final int TYPE_INJECT_TEXT = 1;
-    public static final int TYPE_INJECT_MOUSE = 2;
-    public static final int TYPE_INJECT_SCROLL = 3;
+    public static final int TYPE_INJECT_TOUCH_EVENT = 2;
+    public static final int TYPE_INJECT_SCROLL_EVENT = 3;
     public static final int TYPE_BACK_OR_SCREEN_ON = 4;
     public static final int TYPE_EXPAND_NOTIFICATION_PANEL = 5;
     public static final int TYPE_COLLAPSE_NOTIFICATION_PANEL = 6;
     public static final int TYPE_GET_CLIPBOARD = 7;
     public static final int TYPE_SET_CLIPBOARD = 8;
     public static final int TYPE_SET_SCREEN_POWER_MODE = 9;
-
-    public static final int TYPE_INJECT_TOUCH = 10;
-
+    public static final int TYPE_ROTATE_DEVICE = 10;
 
     private int type;
     private String text;
@@ -25,7 +23,8 @@ public final class ControlMessage {
     private int action; // KeyEvent.ACTION_* or MotionEvent.ACTION_* or POWER_MODE_*
     private int keycode; // KeyEvent.KEYCODE_*
     private int buttons; // MotionEvent.BUTTON_*
-    private int id;
+    private long pointerId;
+    private float pressure;
     private Position position;
     private int hScroll;
     private int vScroll;
@@ -34,69 +33,62 @@ public final class ControlMessage {
     }
 
     public static ControlMessage createInjectKeycode(int action, int keycode, int metaState) {
-        ControlMessage event = new ControlMessage();
-        event.type = TYPE_INJECT_KEYCODE;
-        event.action = action;
-        event.keycode = keycode;
-        event.metaState = metaState;
-        return event;
+        ControlMessage msg = new ControlMessage();
+        msg.type = TYPE_INJECT_KEYCODE;
+        msg.action = action;
+        msg.keycode = keycode;
+        msg.metaState = metaState;
+        return msg;
     }
 
     public static ControlMessage createInjectText(String text) {
-        ControlMessage event = new ControlMessage();
-        event.type = TYPE_INJECT_TEXT;
-        event.text = text;
-        return event;
+        ControlMessage msg = new ControlMessage();
+        msg.type = TYPE_INJECT_TEXT;
+        msg.text = text;
+        return msg;
     }
 
-    public static ControlMessage createInjectMotion(int action, int buttons, Position position) {
-        ControlMessage event = new ControlMessage();
-        event.type = TYPE_INJECT_MOUSE;
-        event.action = action;
-        event.buttons = buttons;
-        event.position = position;
-        return event;
+    public static ControlMessage createInjectTouchEvent(int action, long pointerId, Position position, float pressure, int buttons) {
+        ControlMessage msg = new ControlMessage();
+        msg.type = TYPE_INJECT_TOUCH_EVENT;
+        msg.action = action;
+        msg.pointerId = pointerId;
+        msg.pressure = pressure;
+        msg.position = position;
+        msg.buttons = buttons;
+        return msg;
     }
 
-    public static ControlMessage createInjectMotionTouch(int id, int action, Position position) {
-        ControlMessage event = new ControlMessage();
-        event.type = TYPE_INJECT_TOUCH;
-        event.action = action;
-        event.id = id;
-        event.position = position;
-        return event;
-    }
-
-    public static ControlMessage createInjectScroll(Position position, int hScroll, int vScroll) {
-        ControlMessage event = new ControlMessage();
-        event.type = TYPE_INJECT_SCROLL;
-        event.position = position;
-        event.hScroll = hScroll;
-        event.vScroll = vScroll;
-        return event;
+    public static ControlMessage createInjectScrollEvent(Position position, int hScroll, int vScroll) {
+        ControlMessage msg = new ControlMessage();
+        msg.type = TYPE_INJECT_SCROLL_EVENT;
+        msg.position = position;
+        msg.hScroll = hScroll;
+        msg.vScroll = vScroll;
+        return msg;
     }
 
     public static ControlMessage createSetClipboard(String text) {
-        ControlMessage event = new ControlMessage();
-        event.type = TYPE_SET_CLIPBOARD;
-        event.text = text;
-        return event;
+        ControlMessage msg = new ControlMessage();
+        msg.type = TYPE_SET_CLIPBOARD;
+        msg.text = text;
+        return msg;
     }
 
     /**
      * @param mode one of the {@code Device.SCREEN_POWER_MODE_*} constants
      */
     public static ControlMessage createSetScreenPowerMode(int mode) {
-        ControlMessage event = new ControlMessage();
-        event.type = TYPE_SET_SCREEN_POWER_MODE;
-        event.action = mode;
-        return event;
+        ControlMessage msg = new ControlMessage();
+        msg.type = TYPE_SET_SCREEN_POWER_MODE;
+        msg.action = mode;
+        return msg;
     }
 
     public static ControlMessage createEmpty(int type) {
-        ControlMessage event = new ControlMessage();
-        event.type = type;
-        return event;
+        ControlMessage msg = new ControlMessage();
+        msg.type = type;
+        return msg;
     }
 
     public int getType() {
@@ -123,8 +115,12 @@ public final class ControlMessage {
         return buttons;
     }
 
-    public int getId() {
-        return id;
+    public long getPointerId() {
+        return pointerId;
+    }
+
+    public float getPressure() {
+        return pressure;
     }
 
     public Position getPosition() {
