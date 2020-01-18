@@ -16,22 +16,22 @@
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="101"/>
+        <location filename="../../device/device.cpp" line="108"/>
         <source>install apk</source>
         <translation>安装apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="103"/>
+        <location filename="../../device/device.cpp" line="110"/>
         <source>file transfer</source>
         <translation>文件传输</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="106"/>
+        <location filename="../../device/device.cpp" line="113"/>
         <source>wait current %1 to complete</source>
         <translation>等待当前%1完成</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="109"/>
+        <location filename="../../device/device.cpp" line="116"/>
         <source>%1 complete, save in %2</source>
         <translation>%1完成,保存在%2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1完成\n 保存在 %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="112"/>
+        <location filename="../../device/device.cpp" line="119"/>
         <source>%1 failed</source>
         <translation>%1 失败</translation>
     </message>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="330"/>
-        <location filename="../../dialog.cpp" line="277"/>
+        <location filename="../../dialog.cpp" line="286"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
@@ -129,6 +129,11 @@
         <translation>使用reverse</translation>
     </message>
     <message>
+        <location filename="../../dialog.ui" line="302"/>
+        <source>max size:</source>
+        <translation>最大尺寸</translation>
+    </message>
+    <message>
         <location filename="../../dialog.ui" line="309"/>
         <source>close screen</source>
         <translation>自动息屏</translation>
@@ -173,9 +178,8 @@
         <translation>比特率：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="302"/>
         <source>video size:</source>
-        <translation>视频尺寸：</translation>
+        <translation type="vanished">视频尺寸：</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="62"/>
@@ -274,7 +278,7 @@
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="396"/>
+        <location filename="../../device/ui/videoform.cpp" line="407"/>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
     </message>

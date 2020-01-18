@@ -80,11 +80,12 @@ void Dialog::initUI()
     ui->bitRateBox->addItem("10000000");
     ui->bitRateBox->setCurrentIndex(2);
 
-    ui->videoSizeBox->addItem("480");
-    ui->videoSizeBox->addItem("720");
-    ui->videoSizeBox->addItem("1080");
-    ui->videoSizeBox->addItem("native");
-    ui->videoSizeBox->setCurrentIndex(1);
+    ui->maxSizeBox->addItem("600");
+    ui->maxSizeBox->addItem("800");
+    ui->maxSizeBox->addItem("1000");
+    ui->maxSizeBox->addItem("1200");
+    ui->maxSizeBox->addItem("native");
+    ui->maxSizeBox->setCurrentIndex(2);
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
@@ -147,7 +148,7 @@ void Dialog::on_startServerBtn_clicked()
 
     quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
     // this is ok that "native" toUshort is 0
-    quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
+    quint16 videoSize = ui->maxSizeBox->currentText().trimmed().toUShort();
     Device::DeviceParams params;
     params.serial = ui->serialBox->currentText().trimmed();
     params.maxSize = videoSize;
