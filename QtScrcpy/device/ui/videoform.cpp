@@ -101,15 +101,15 @@ void VideoForm::updateStyleSheet(bool vertical)
     if (vertical) {
         setStyleSheet(R"(
                  #videoForm {
-                     border-image: url(:/image/videoform/phone-v.png) 150px 142px 85px 142px;
-                     border-width: 150px 142px 85px 142px;
+                     border-image: url(:/image/videoform/phone-v.png) 150px 65px 85px 65px;
+                     border-width: 150px 65px 85px 65px;
                  }
                  )");
     } else {
         setStyleSheet(R"(
                  #videoForm {
-                     border-image: url(:/image/videoform/phone-h.png) 142px 85px 142px 150px;
-                     border-width: 142px 85px 142px 150px;
+                     border-image: url(:/image/videoform/phone-h.png) 65px 85px 65px 150px;
+                     border-width: 65px 85px 65px 150px;
                  }
                  )");
     }
