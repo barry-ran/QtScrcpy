@@ -315,7 +315,7 @@ void Dialog::on_stopAllServerBtn_clicked()
     m_deviceManage.disconnectAllDevice();
 }
 
-void Dialog::on_updateGameScriptBtn_clicked()
+void Dialog::on_refreshGameScriptBtn_clicked()
 {
     ui->gameBox->clear();
     QDir dir(KeyMap::getKeyMapPath());
@@ -333,9 +333,14 @@ void Dialog::on_updateGameScriptBtn_clicked()
     }
 }
 
+void Dialog::on_applyScriptBtn_clicked()
+{
+    m_deviceManage.updateScript(getGameScript(ui->gameBox->currentText()));
+}
+
 void Dialog::on_gameCheck_clicked(bool checked)
 {
     if (checked) {
-        on_updateGameScriptBtn_clicked();
+        on_refreshGameScriptBtn_clicked();
     }
 }

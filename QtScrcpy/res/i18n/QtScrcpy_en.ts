@@ -16,22 +16,22 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="101"/>
+        <location filename="../../device/device.cpp" line="115"/>
         <source>install apk</source>
         <translation>install apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="103"/>
+        <location filename="../../device/device.cpp" line="117"/>
         <source>file transfer</source>
         <translation>file transfer</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="106"/>
+        <location filename="../../device/device.cpp" line="120"/>
         <source>wait current %1 to complete</source>
         <translation>wait current %1 to complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="109"/>
+        <location filename="../../device/device.cpp" line="123"/>
         <source>%1 complete, save in %2</source>
         <translation>%1 complete, save in %2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1 complete\n save in %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="112"/>
+        <location filename="../../device/device.cpp" line="126"/>
         <source>%1 failed</source>
         <translation>%1 failed</translation>
     </message>
@@ -54,92 +54,102 @@
         <translation>Wireless</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="147"/>
+        <location filename="../../dialog.ui" line="114"/>
         <source>wireless connect</source>
         <translation>wireless connect</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="157"/>
+        <location filename="../../dialog.ui" line="175"/>
         <source>wireless disconnect</source>
         <translation>wireless disconnect</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="236"/>
+        <location filename="../../dialog.ui" line="254"/>
         <source>Start Config</source>
         <translation>Start Config</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="292"/>
+        <location filename="../../dialog.ui" line="274"/>
         <source>record save path:</source>
         <translation>record save path:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="330"/>
-        <location filename="../../dialog.cpp" line="277"/>
+        <location filename="../../dialog.ui" line="362"/>
+        <location filename="../../dialog.cpp" line="280"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="340"/>
+        <location filename="../../dialog.ui" line="267"/>
         <source>record format：</source>
         <translation>record format:</translation>
     </message>
     <message>
-        <source>Game for Peace</source>
-        <translation type="vanished">Game for Peace</translation>
+        <source>PUBG mobile</source>
+        <translation type="vanished">PUBG mobile</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="249"/>
-        <source>not display</source>
-        <translation>not display</translation>
-    </message>
-    <message>
-        <location filename="../../dialog.ui" line="92"/>
+        <location filename="../../dialog.ui" line="72"/>
         <source>stop all server</source>
         <translation>stop all server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="195"/>
+        <location filename="../../dialog.ui" line="213"/>
         <source>adb command:</source>
         <translation>adb command:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="205"/>
+        <location filename="../../dialog.ui" line="223"/>
         <source>terminate</source>
         <translation>terminate</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="212"/>
+        <location filename="../../dialog.ui" line="230"/>
         <source>execute</source>
         <translation>execute</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="226"/>
+        <location filename="../../dialog.ui" line="244"/>
         <source>clear</source>
         <translation>clear</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="269"/>
-        <source>always top</source>
-        <translation>always top</translation>
+        <location filename="../../dialog.ui" line="339"/>
+        <source>background record</source>
+        <translation>background record</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="279"/>
-        <source>use reverse</source>
-        <translation>use reverse</translation>
+        <location filename="../../dialog.ui" line="392"/>
+        <source>apply</source>
+        <translation>apply</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="309"/>
-        <source>close screen</source>
-        <translation>close screen</translation>
+        <location filename="../../dialog.ui" line="300"/>
+        <source>reverse connection</source>
+        <translation>reverse connection</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="363"/>
-        <source>update script</source>
-        <translation>update script</translation>
+        <location filename="../../dialog.ui" line="42"/>
+        <source>get device IP</source>
+        <translation>get device IP</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="370"/>
+        <location filename="../../dialog.ui" line="355"/>
+        <source>screen-off</source>
+        <translation>turn screen off</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="323"/>
+        <source>always on top</source>
+        <translation>always on top</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="287"/>
+        <source>refresh script</source>
+        <translation>refresh script</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="310"/>
         <source>custom map</source>
         <translation>custom map</translation>
     </message>
@@ -149,17 +159,17 @@
         <translation>USB line</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="42"/>
+        <location filename="../../dialog.ui" line="79"/>
         <source>stop server</source>
         <translation>stop server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="82"/>
+        <location filename="../../dialog.ui" line="62"/>
         <source>start server</source>
         <translation>start server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="72"/>
+        <location filename="../../dialog.ui" line="35"/>
         <source>device serial:</source>
         <translation>device serial:</translation>
     </message>
@@ -168,29 +178,24 @@
         <translation type="vanished">Config</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="242"/>
+        <location filename="../../dialog.ui" line="260"/>
         <source>bit rate:</source>
         <translation>bit rate:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="302"/>
+        <location filename="../../dialog.ui" line="406"/>
         <source>video size:</source>
         <translation>video size:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="62"/>
+        <location filename="../../dialog.ui" line="89"/>
         <source>start adbd</source>
         <translation>start adbd</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="32"/>
-        <source>get device ip</source>
-        <translation>get device ip</translation>
-    </message>
-    <message>
         <location filename="../../dialog.ui" line="52"/>
-        <source>update device</source>
-        <translation>update device</translation>
+        <source>refresh devices</source>
+        <translation>refresh devices</translation>
     </message>
 </context>
 <context>
@@ -258,6 +263,11 @@
         <source>return</source>
         <translation>return</translation>
     </message>
+    <message>
+        <location filename="../../device/ui/toolform.ui" line="139"/>
+        <source>screen shot</source>
+        <translation>screen shot</translation>
+    </message>
 </context>
 <context>
     <name>VideoForm</name>
@@ -274,7 +284,7 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="396"/>
+        <location filename="../../device/ui/videoform.cpp" line="407"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>
