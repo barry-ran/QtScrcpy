@@ -20,8 +20,6 @@ public:
     void postControlMsg(ControlMsg* controlMsg);
     void test(QRect rc);
 
-    void updateScript(QString gameScript = "");
-
     // turn the screen on if it was off, press BACK otherwise
     void postTurnOn();
     void postGoHome();
@@ -38,7 +36,6 @@ public:
     void clipboardPaste();
     void postTextInput(QString& text);
     void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
-    void screenShot();
 
     // for input convert
     void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);

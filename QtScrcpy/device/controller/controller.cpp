@@ -12,7 +12,13 @@ Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
 
-    updateScript(gameScript);
+    if (!gameScript.isEmpty()) {
+        InputConvertGame* convertgame = new InputConvertGame(this);
+        convertgame->loadKeyMap(gameScript);
+         m_inputConvert = convertgame;
+    } else {
+         m_inputConvert = new InputConvertNormal(this);
+    }
     Q_ASSERT(m_inputConvert);
     connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
@@ -43,18 +49,6 @@ void Controller::test(QRect rc)
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
     controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE, AMOTION_EVENT_ACTION_DOWN, AMOTION_EVENT_BUTTON_PRIMARY, rc, 1.0f);
     postControlMsg(controlMsg);
-}
-
-void Controller::updateScript(QString gameScript)
-{
-    if (!gameScript.isEmpty()) {
-        InputConvertGame* convertgame = new InputConvertGame(this);
-        convertgame->loadKeyMap(gameScript);
-         m_inputConvert = convertgame;
-    } else {
-         m_inputConvert = new InputConvertNormal(this);
-    }
-
 }
 
 void Controller::postTurnOn()
@@ -165,12 +159,6 @@ void Controller::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
     }
     controlMsg->setSetScreenPowerModeData(mode);
     postControlMsg(controlMsg);
-}
-
-void Controller::screenShot()
-{
-    // TODO:
-    qDebug() << "screen shot";
 }
 
 void Controller::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
