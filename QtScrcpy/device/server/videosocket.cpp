@@ -55,7 +55,7 @@ bool VideoSocket::event(QEvent *event)
 void VideoSocket::onReadyRead()
 {
     QMutexLocker locker(&m_mutex);
-    if (m_buffer && 0 < bytesAvailable()) {
+    if (m_buffer && m_bufferSize <= bytesAvailable()) {
         // recv data
         qint64 readSize = qMin(bytesAvailable(), (qint64)m_bufferSize);
         m_dataSize = read((char*)m_buffer, readSize);

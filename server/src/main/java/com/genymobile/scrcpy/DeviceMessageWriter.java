@@ -27,7 +27,7 @@ public class DeviceMessageWriter {
                 output.write(rawBuffer, 0, buffer.position());
                 break;
             default:
-                Ln.w("Unknown device msg: " + msg.getType());
+                Ln.w("Unknown device message: " + msg.getType());
                 break;
         }
     }
