@@ -12,6 +12,17 @@ A single instance supports up to 16 Android device connections at the same time.
 
 It supports three major platforms: GNU/Linux, Windows and MacOS.
 
+It focuses on:
+
+ - **lightness** (native, displays only the device screen)
+ - **performance** (30~60fps)
+ - **quality** (1920×1080 or above)
+ - **low latency** ([35~70ms][lowlatency])
+ - **low startup time** (~1 second to display the first image)
+ - **non-intrusiveness** (nothing is left installed on the device)
+
+[lowlatency]: https://github.com/Genymobile/scrcpy/pull/646
+
 ![win](screenshot/win.png)
 
 ![mac](screenshot/mac.jpg)
@@ -153,14 +164,26 @@ Note: it is not necessary to keep you Android device connected via USB after you
 - Full-screen display
 - Display on the top
 - Install apk: drag and drop apk to the video window to install
-- Transfer files: drag files to the video window to send files to Android devices
-- Background recording: record only, no screen display
+- Transfer files: Drag files to the video window to send files to Android devices
+- Background recording: record only, no display interface
+- Copy-paste
+
+    It is possible to synchronize clipboards between the computer and the device, in
+    both directions:
+
+    - `Ctrl`+`c` copies the device clipboard to the computer clipboard;
+    - `Ctrl`+`Shift`+`v` copies the computer clipboard to the device clipboard;
+    - `Ctrl`+`v` _pastes_ the computer clipboard as a sequence of text events (but
+    breaks non-ASCII characters).
 
 ## TODO
 [TODO](docs/TODO.md)
 
 ## FAQ
 [FAQ](docs/FAQ.md)
+
+## DEVELOP
+[DEVELOP](docs/DEVELOP.md)
 
 ## Why develop QtScrcpy?
 There are several reasons listed as below according to importance (high to low).
@@ -180,10 +203,12 @@ All the dependencies are provided and it is easy to compile.
 4. Compile and run
 
 ### Android (If you do not have special requirements, you can directly use the built-in scrcpy-server.jar)
+
 1. Set up an Android development environment on the target platform
-2. Open the server project in the project root directory using Android Studio
-3. Build it
-4. After compiling apk, rename it to scrcpy-server.jar and replace third_party/scrcpy-server.jar.
+2. Open server project in project root with Android Studio
+3. The first time you open it, if you do not have the corresponding version of gradle, you will be prompted to find gradle, whether to upgrade gradle and create it. Select Cancel. After canceling, you will be prompted to select the location of the existing gradle. You can also cancel it (it will download automatically).
+4. Edit the code as needed, but of course you do n’t need to.
+4. After compiling the apk, rename it to scrcpy-server and replace third_party/scrcpy-server.
 
 ## Licence
 Since it is based on scrcpy, respect its Licence

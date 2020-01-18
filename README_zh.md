@@ -12,6 +12,18 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 同时支持GNU/Linux，Windows和MacOS三大主流桌面平台
 
+它专注于:
+
+ - **精致** (仅显示设备屏幕)
+ - **性能** (30~60fps)
+ - **质量** (1920×1080以上)
+ - **低延迟** ([35~70ms][低延迟])
+ - **快速启动** (1s内就可以看到第一帧图像)
+ - **非侵入性** (不在设备上安装任何软件)
+
+[低延迟]: https://github.com/Genymobile/scrcpy/pull/646
+
+
 ![win](screenshot/win.png)
 
 ![mac](screenshot/mac.jpg)
@@ -157,12 +169,21 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 - 安装apk：拖拽apk到视频窗口即可安装
 - 传输文件：拖拽文件到视频窗口即可发送文件到Android设备
 - 后台录制：只录制，不显示界面
+- 复制粘贴
+
+    在计算机和设备之间双向同步剪贴板：
+    - `Ctrl` + `c`将设备剪贴板复制到计算机剪贴板；
+    - `Ctrl` + `Shift` + `v`将计算机剪贴板复制到设备剪贴板；
+    - `Ctrl` +`v` 将计算机剪贴板作为一系列文本事件发送到设备（不支持非ASCII字符）。
 
 ## TODO
 [后期计划](docs/TODO.md)
 
 ## FAQ
 [常见问题说明](docs/FAQ.md)
+
+## 开发者
+[开发者相关](docs/DEVELOP.md)
 
 ## 为什么开发QtScrcpy？
 综合起来有以下几个原因，比重从大到小排列：
@@ -176,16 +197,17 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 尽量提供了所有依赖资源，方便傻瓜式编译。
 
 ### PC端
-1. 目标平台上搭建Qt开发环境(Qt >= 5.9.7, vs >= 2015 (不支持mingw))
+1. 目标平台上搭建Qt开发环境(Qt >= 5.9.7, vs >= 2015 (**不支持mingw**))
 2. 克隆该项目
 3. 使用QtCreator打开项目根目录all.pro
 4. 编译，运行即可
 
-### Android端 （没有修改需求的话直接使用自带的scrcpy-server.jar即可）
+### Android端 （没有修改需求的话直接使用自带的scrcpy-server即可）
 1. 目标平台上搭建Android开发环境
 2. 使用Android Studio打开项目根目录中的server项目
-3. 编辑即可
-4. 编译出apk以后改名为scrcpy-server.jar并替换third_party/scrcpy-server.jar即可
+3. 第一次打开如果你没有对应版本的gradle会提示找不到gradle，是否升级gradle并创建，选择取消，取消后会弹出选择已有gradle的位置，同样取消即可（会自动下载）
+4. 按需编辑代码即可，当然也可以不编辑
+4. 编译出apk以后改名为scrcpy-server并替换third_party/scrcpy-server即可
 
 ## Licence
 由于是复刻的scrcpy，尊重它的Licence

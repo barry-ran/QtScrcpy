@@ -10,6 +10,7 @@
 #include "stream.h"
 #include "videoform.h"
 #include "controller.h"
+#include "config.h"
 
 Device::Device(DeviceParams params, QObject *parent)
     : QObject(parent)
@@ -27,8 +28,7 @@ Device::Device(DeviceParams params, QObject *parent)
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(params.gameScript, this);
-        //m_videoForm = new VideoForm(false);
-        m_videoForm = new VideoForm();
+        m_videoForm = new VideoForm(Config::getInstance().getSkin());
         m_videoForm->setSerial(m_params.serial);
         if (m_controller) {
             m_videoForm->setController(m_controller);
@@ -204,14 +204,13 @@ void Device::startServer()
         //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
         // only one devices, serial can be null
         // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
-        // sendFrameMeta for recorder mp4
         Server::ServerParams params;
         params.serial = m_params.serial;
         params.localPort = m_params.localPort;
         params.maxSize = m_params.maxSize;
         params.bitRate = m_params.bitRate;
+        params.maxFps = m_params.maxFps;
         params.crop = "-";
-        params.sendFrameMeta = m_recorder ? true : false;
         params.control = true;
         params.useReverse = m_params.useReverse;
         m_server->start(params);

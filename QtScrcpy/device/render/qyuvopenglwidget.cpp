@@ -1,5 +1,6 @@
 #include <QCoreApplication>
 #include <QOpenGLTexture>
+#include <QSurfaceFormat>
 
 #include "qyuvopenglwidget.h"
 
@@ -64,7 +65,14 @@ static QString s_fragShader = R"(
 
 QYUVOpenGLWidget::QYUVOpenGLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
-
+    /*
+    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
+    format.setColorSpace(QSurfaceFormat::sRGBColorSpace);
+    format.setProfile(QSurfaceFormat::CompatibilityProfile);
+    format.setMajorVersion(3);
+    format.setMinorVersion(2);
+    QSurfaceFormat::setDefaultFormat(format);
+    */
 }
 
 QYUVOpenGLWidget::~QYUVOpenGLWidget()

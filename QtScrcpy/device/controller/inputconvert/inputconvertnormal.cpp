@@ -40,11 +40,11 @@ void InputConvertNormal::mouseEvent(const QMouseEvent* from, const QSize& frameS
     pos.setY(pos.y() * frameSize.height() / showSize.height());    
 
     // set data
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_MOUSE);
+    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectMouseMsgData(action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize));
+    controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE, action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize), 1.0f);
     sendControlMsg(controlMsg);
 }
 
