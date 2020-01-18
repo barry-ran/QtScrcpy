@@ -16,22 +16,22 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="101"/>
+        <location filename="../../device/device.cpp" line="108"/>
         <source>install apk</source>
         <translation>install apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="103"/>
+        <location filename="../../device/device.cpp" line="110"/>
         <source>file transfer</source>
         <translation>file transfer</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="106"/>
+        <location filename="../../device/device.cpp" line="113"/>
         <source>wait current %1 to complete</source>
         <translation>wait current %1 to complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="109"/>
+        <location filename="../../device/device.cpp" line="116"/>
         <source>%1 complete, save in %2</source>
         <translation>%1 complete, save in %2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1 complete\n save in %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="112"/>
+        <location filename="../../device/device.cpp" line="119"/>
         <source>%1 failed</source>
         <translation>%1 failed</translation>
     </message>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="330"/>
-        <location filename="../../dialog.cpp" line="277"/>
+        <location filename="../../dialog.cpp" line="286"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
@@ -129,6 +129,11 @@
         <translation>use reverse</translation>
     </message>
     <message>
+        <location filename="../../dialog.ui" line="302"/>
+        <source>max size:</source>
+        <translation>max size</translation>
+    </message>
+    <message>
         <location filename="../../dialog.ui" line="309"/>
         <source>close screen</source>
         <translation>close screen</translation>
@@ -173,9 +178,8 @@
         <translation>bit rate:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="302"/>
         <source>video size:</source>
-        <translation>video size:</translation>
+        <translation type="vanished">video size:</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="62"/>
@@ -274,7 +278,7 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="396"/>
+        <location filename="../../device/ui/videoform.cpp" line="407"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>

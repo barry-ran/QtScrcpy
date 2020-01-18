@@ -299,7 +299,7 @@
       <item row="0" column="6">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>video size:</string>
+         <string>max size:</string>
         </property>
        </widget>
       </item>
@@ -318,7 +318,7 @@
        </widget>
       </item>
       <item row="0" column="7">
-       <widget class="QComboBox" name="videoSizeBox">
+       <widget class="QComboBox" name="maxSizeBox">
         <property name="toolTip">
          <string/>
         </property>
