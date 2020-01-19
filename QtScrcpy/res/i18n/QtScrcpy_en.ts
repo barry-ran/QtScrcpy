@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="362"/>
-        <location filename="../../dialog.cpp" line="280"/>
+        <location filename="../../dialog.cpp" line="287"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
@@ -83,10 +83,6 @@
         <location filename="../../dialog.ui" line="267"/>
         <source>record format：</source>
         <translation>record format:</translation>
-    </message>
-    <message>
-        <source>PUBG mobile</source>
-        <translation type="vanished">PUBG mobile</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="72"/>
@@ -114,9 +110,24 @@
         <translation>clear</translation>
     </message>
     <message>
+        <location filename="../../dialog.ui" line="300"/>
+        <source>reverse connection</source>
+        <translation>reverse connection</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="310"/>
+        <source>auto enable</source>
+        <translation>auto enable</translation>
+    </message>
+    <message>
         <location filename="../../dialog.ui" line="339"/>
         <source>background record</source>
         <translation>background record</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="355"/>
+        <source>screen-off</source>
+        <translation>screen-off</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="392"/>
@@ -124,19 +135,9 @@
         <translation>apply</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="300"/>
-        <source>reverse connection</source>
-        <translation>reverse connection</translation>
-    </message>
-    <message>
-        <location filename="../../dialog.ui" line="42"/>
-        <source>get device IP</source>
-        <translation>get device IP</translation>
-    </message>
-    <message>
-        <location filename="../../dialog.ui" line="355"/>
-        <source>screen-off</source>
-        <translation>turn screen off</translation>
+        <location filename="../../dialog.ui" line="406"/>
+        <source>max size:</source>
+        <translation>max size:</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="323"/>
@@ -149,9 +150,9 @@
         <translation>refresh script</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="310"/>
-        <source>custom map</source>
-        <translation>custom map</translation>
+        <location filename="../../dialog.ui" line="42"/>
+        <source>get device IP</source>
+        <translation>get device IP</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="26"/>
@@ -181,11 +182,6 @@
         <location filename="../../dialog.ui" line="260"/>
         <source>bit rate:</source>
         <translation>bit rate:</translation>
-    </message>
-    <message>
-        <location filename="../../dialog.ui" line="406"/>
-        <source>video size:</source>
-        <translation>video size:</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="89"/>
@@ -284,7 +280,7 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="407"/>
+        <location filename="../../device/ui/videoform.cpp" line="408"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>

@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="362"/>
-        <location filename="../../dialog.cpp" line="280"/>
+        <location filename="../../dialog.cpp" line="287"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
@@ -83,10 +83,6 @@
         <location filename="../../dialog.ui" line="267"/>
         <source>record format：</source>
         <translation>录制格式：</translation>
-    </message>
-    <message>
-        <source>PUBG mobile</source>
-        <translation type="vanished">和平精英</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="72"/>
@@ -114,9 +110,24 @@
         <translation>清理</translation>
     </message>
     <message>
+        <location filename="../../dialog.ui" line="300"/>
+        <source>reverse connection</source>
+        <translation>反向连接</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="310"/>
+        <source>auto enable</source>
+        <translation>自动启用脚本</translation>
+    </message>
+    <message>
         <location filename="../../dialog.ui" line="339"/>
         <source>background record</source>
         <translation>后台录制</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="355"/>
+        <source>screen-off</source>
+        <translation>自动息屏</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="392"/>
@@ -124,19 +135,9 @@
         <translation>应用脚本</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="300"/>
-        <source>reverse connection</source>
-        <translation>反向连接</translation>
-    </message>
-    <message>
-        <location filename="../../dialog.ui" line="42"/>
-        <source>get device IP</source>
-        <translation>获取设备IP</translation>
-    </message>
-    <message>
-        <location filename="../../dialog.ui" line="355"/>
-        <source>screen-off</source>
-        <translation>自动息屏</translation>
+        <location filename="../../dialog.ui" line="406"/>
+        <source>max size:</source>
+        <translation>最大尺寸：</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="323"/>
@@ -149,9 +150,9 @@
         <translation>刷新脚本</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="310"/>
-        <source>custom map</source>
-        <translation>自定义映射</translation>
+        <location filename="../../dialog.ui" line="42"/>
+        <source>get device IP</source>
+        <translation>获取设备IP</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="26"/>
@@ -181,11 +182,6 @@
         <location filename="../../dialog.ui" line="260"/>
         <source>bit rate:</source>
         <translation>比特率：</translation>
-    </message>
-    <message>
-        <location filename="../../dialog.ui" line="406"/>
-        <source>video size:</source>
-        <translation>视频尺寸：</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="89"/>
@@ -284,7 +280,7 @@
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="407"/>
+        <location filename="../../device/ui/videoform.cpp" line="408"/>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
     </message>
