@@ -88,7 +88,7 @@ void ControlMsg::writePosition(QBuffer &buffer, const QRect& value)
 
 quint16 ControlMsg::toFixedPoint16(float f)
 {
-    assert(f >= 0.0f && f <= 1.0f);
+    Q_ASSERT(f >= 0.0f && f <= 1.0f);
     quint32 u = f * 0x1p16f; // 2^16
     if (u >= 0xffff) {
         u = 0xffff;

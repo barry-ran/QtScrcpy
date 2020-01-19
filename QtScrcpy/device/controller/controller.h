@@ -20,6 +20,8 @@ public:
     void postControlMsg(ControlMsg* controlMsg);
     void test(QRect rc);
 
+    void updateScript(QString gameScript = "");
+
     // turn the screen on if it was off, press BACK otherwise
     void postTurnOn();
     void postGoHome();

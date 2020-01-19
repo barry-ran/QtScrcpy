@@ -12,15 +12,7 @@ Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
 
-    if (!gameScript.isEmpty()) {
-        InputConvertGame* convertgame = new InputConvertGame(this);
-        convertgame->loadKeyMap(gameScript);
-         m_inputConvert = convertgame;
-    } else {
-         m_inputConvert = new InputConvertNormal(this);
-    }
-    Q_ASSERT(m_inputConvert);
-    connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
+    updateScript(gameScript);
 }
 
 Controller::~Controller()
@@ -49,6 +41,22 @@ void Controller::test(QRect rc)
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
     controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE, AMOTION_EVENT_ACTION_DOWN, AMOTION_EVENT_BUTTON_PRIMARY, rc, 1.0f);
     postControlMsg(controlMsg);
+}
+
+void Controller::updateScript(QString gameScript)
+{
+    if (m_inputConvert) {
+        delete m_inputConvert;
+    }
+    if (!gameScript.isEmpty()) {
+        InputConvertGame* convertgame = new InputConvertGame(this);
+        convertgame->loadKeyMap(gameScript);
+         m_inputConvert = convertgame;
+    } else {
+         m_inputConvert = new InputConvertNormal(this);
+    }
+    Q_ASSERT(m_inputConvert);
+    connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
 
 void Controller::postTurnOn()

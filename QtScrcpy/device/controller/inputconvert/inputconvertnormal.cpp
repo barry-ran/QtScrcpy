@@ -27,6 +27,10 @@ void InputConvertNormal::mouseEvent(const QMouseEvent* from, const QSize& frameS
         action = AMOTION_EVENT_ACTION_UP;
         break;
     case QEvent::MouseMove:
+        // only support left button drag
+        if (!(from->buttons() & Qt::LeftButton)) {
+            return;
+        }
         action = AMOTION_EVENT_ACTION_MOVE;
         break;
     default:
@@ -83,8 +87,8 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameS
 
 void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize& frameSize, const QSize& showSize)
 {
-    Q_UNUSED(frameSize);
-    Q_UNUSED(showSize);
+    Q_UNUSED(frameSize)
+    Q_UNUSED(showSize)
     if (!from) {
         return;
     }
