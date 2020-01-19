@@ -81,11 +81,12 @@ void Dialog::initUI()
     ui->bitRateBox->setCurrentIndex(2);
 
     ui->maxSizeBox->addItem("600");
-    ui->maxSizeBox->addItem("800");
+    ui->maxSizeBox->addItem("720");
     ui->maxSizeBox->addItem("1000");
-    ui->maxSizeBox->addItem("1200");
+    ui->maxSizeBox->addItem("1280");
+    ui->maxSizeBox->addItem("1920");
     ui->maxSizeBox->addItem("native");
-    ui->maxSizeBox->setCurrentIndex(2);
+    ui->maxSizeBox->setCurrentIndex(3);
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
@@ -316,7 +317,7 @@ void Dialog::on_stopAllServerBtn_clicked()
     m_deviceManage.disconnectAllDevice();
 }
 
-void Dialog::on_updateGameScriptBtn_clicked()
+void Dialog::on_refreshGameScriptBtn_clicked()
 {
     ui->gameBox->clear();
     QDir dir(KeyMap::getKeyMapPath());
@@ -334,9 +335,14 @@ void Dialog::on_updateGameScriptBtn_clicked()
     }
 }
 
+void Dialog::on_applyScriptBtn_clicked()
+{
+    m_deviceManage.updateScript(getGameScript(ui->gameBox->currentText()));
+}
+
 void Dialog::on_gameCheck_clicked(bool checked)
 {
     if (checked) {
-        on_updateGameScriptBtn_clicked();
+        on_refreshGameScriptBtn_clicked();
     }
 }

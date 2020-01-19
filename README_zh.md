@@ -2,9 +2,9 @@
 
 ![build state](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
-![release](https://img.shields.io/badge/release-v1.0.1-brightgreen.svg)
+![release](https://img.shields.io/badge/release-v1.0.3-brightgreen.svg)
 
-[English introduction (from Google Translate)](README.md)
+[English introduction](README.md)
 
 QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和控制。不需要root权限。
 
@@ -41,15 +41,15 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 自定义按键映射操作方法如下：
 - 编写自定义脚本放入keymap目录
-- 启动服务之前记得勾选自定义映射选项，并选择自定义映射脚本
-- 连接手机以后进入游戏场景
-- 按~键（数字键1左边）切换为游戏映射模式即可体验（具体按什么键要看你按键脚本定义的switchKey）
+- 点击刷新脚本，确保脚本可以被检测到
+- 连接手机并启动服务之后，点击应用脚本
+- 进入游戏场景，按~键（数字键1左边）切换为游戏映射模式即可体验（具体按什么键要看你按键脚本定义的switchKey）
 - 再次按~键切换为正常控制模式
 - 要想wasd控制开车记得在载具设置中设置为单摇杆模式
 
 ## 感谢
 
-基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢他。QtScrcpy和原版scrcpy区别如下：
+基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢。QtScrcpy和原版scrcpy区别如下：
 
 关键点|scrcpy|QtScrcpy
 --|:--:|:--:
@@ -94,7 +94,7 @@ Android部分至少需要API 21（Android 5.0）。
 
 ### Windows
 
-windows平台，你可以直接使用我编译好的可执行程序:
+Windows平台，你可以直接使用我编译好的可执行程序:
 
  - [国内下载][gitee-download]
  - [国外下载][github-download]
@@ -128,13 +128,13 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 1. 安卓手机端在开发者选项中打开usb调试
 2. 通过usb连接安卓手机到电脑
 3. 点击刷新设备，会看到有设备号更新出来
-4. 点击获取设备ip
+4. 点击获取设备IP
 5. 点击启动adbd
 6. 无线连接
-7. 再次点击刷新设备，发现多出了一个ip地址开头的设备，选择这个设备
+7. 再次点击刷新设备，发现多出了一个IP地址开头的设备，选择这个设备
 8. 启动服务
 
-备注：启动adbd以后不用再usb线了，以后连接断开都不再需要，除非安卓adbd停了需要重新启动
+备注：启动adbd以后不用再连着usb线了，以后连接断开都不再需要，除非安卓adbd停了需要重新启动
 
 ## 界面按钮介绍：
 
@@ -147,7 +147,6 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
     - 自动息屏：启动服务以后，自动关闭Android设备屏幕节省电量
     - 使用reverse：服务启动模式，出现服务启动失败报错more than one device可以去掉这个勾选尝试连接
     
-
 - 刷新设备列表：刷新当前连接的设备
 - 启动服务：连接到Android设备
 - 停止服务：断开与Android设备的连接
@@ -214,13 +213,13 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 由于是复刻的scrcpy，尊重它的Licence
 
     Copyright (C) 2018 Genymobile
-
+    
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
-
+    
         http://www.apache.org/licenses/LICENSE-2.0
-
+    
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.

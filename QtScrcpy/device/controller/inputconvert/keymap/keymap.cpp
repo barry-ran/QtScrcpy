@@ -41,10 +41,6 @@ void KeyMap::loadKeyMap(const QString &json)
     QJsonDocument jsonDoc;
     QJsonObject rootObj;
 
-    QMetaEnum metaEnumKey = QMetaEnum::fromType<Qt::Key>();
-    QMetaEnum metaEnumMouseButtons = QMetaEnum::fromType<Qt::MouseButtons>();
-    QMetaEnum metaEnumKeyMapType = QMetaEnum::fromType<KeyMap::KeyMapType>();
-
     jsonDoc = QJsonDocument::fromJson(json.toUtf8(), &jsonError);
 
     if(jsonError.error != QJsonParseError::NoError)
@@ -56,12 +52,13 @@ void KeyMap::loadKeyMap(const QString &json)
     // switchKey
     rootObj = jsonDoc.object();
     if (rootObj.contains("switchKey") && rootObj.value("switchKey").isString()) {
-        Qt::Key key = (Qt::Key)metaEnumKey.keyToValue(rootObj.value("switchKey").toString().toStdString().c_str());
-        if (-1 == key) {
+        QPair<ActionType, int> p = getItemKey(rootObj, "switchKey");
+        if(p.first == AT_INVALID){
             errorString = QString("json error: switchKey invalid");
             goto parseError;
         }
-        m_switchKey = key;
+        m_switchType = p.first;
+        m_switchKey = p.second;
     } else {
         errorString = QString("json error: no find switchKey");
         goto parseError;
@@ -106,153 +103,124 @@ void KeyMap::loadKeyMap(const QString &json)
                 goto parseError;
             }
 
-            KeyMap::KeyMapType type = (KeyMap::KeyMapType)metaEnumKeyMapType.keyToValue(node.value("type").toString().toStdString().c_str());
+            KeyMap::KeyMapType type = getItemType(node, "type");
             switch (type) {
             case KeyMap::KMT_CLICK:
             {
                 // safe check
-                if (!node.contains("key") || !node.value("key").isString()
-                        || !node.contains("pos") || !node.value("pos").isObject()
-                        || !node.value("pos").toObject().contains("x") || !node.value("pos").toObject().value("x").isDouble()
-                        || !node.value("pos").toObject().contains("y") || !node.value("pos").toObject().value("y").isDouble()
-                        || !node.contains("switchMap") || !node.value("switchMap").isBool()
-                        ) {
+                if (!checkForClick(node)) {
                     qWarning() << "json error: keyMapNodes node format error";
                     break;
                 }
-
-                Qt::Key key = (Qt::Key)metaEnumKey.keyToValue(node.value("key").toString().toStdString().c_str());
-                Qt::MouseButtons btn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("key").toString().toStdString().c_str());
-                if (-1 == key && -1 == btn) {
+                QPair<ActionType, int> key = getItemKey(node, "key");
+                if(key.first == AT_INVALID){
                     qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
                     break;
                 }
-
                 KeyMapNode keyMapNode;
                 keyMapNode.type = type;
-                if (key != -1) {
-                    keyMapNode.click.keyNode.key = key;
-                } else {
-                    keyMapNode.click.keyNode.key = btn;
-                }
-                keyMapNode.click.keyNode.pos = QPointF(node.value("pos").toObject().value("x").toDouble(),
-                                                       node.value("pos").toObject().value("y").toDouble());
-                keyMapNode.click.switchMap = node.value("switchMap").toBool();
+                keyMapNode.click.keyNode.type = key.first;
+                keyMapNode.click.keyNode.key = key.second;
+                keyMapNode.click.keyNode.pos = getItemPos(node, "pos");
+                keyMapNode.click.switchMap = getItemSwitchMap(node, "switchMap");
                 m_keyMapNodes.push_back(keyMapNode);
             }
                 break;
             case KeyMap::KMT_CLICK_TWICE:
             {
                 // safe check
-                if (!node.contains("key") || !node.value("key").isString()
-                        || !node.contains("pos") || !node.value("pos").isObject()
-                        || !node.value("pos").toObject().contains("x") || !node.value("pos").toObject().value("x").isDouble()
-                        || !node.value("pos").toObject().contains("y") || !node.value("pos").toObject().value("y").isDouble()
-                        ) {
+                if (!checkForClickDouble(node)) {
                     qWarning() << "json error: keyMapNodes node format error";
                     break;
                 }
 
-                Qt::Key key = (Qt::Key)metaEnumKey.keyToValue(node.value("key").toString().toStdString().c_str());
-                Qt::MouseButtons btn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("key").toString().toStdString().c_str());
-                if (-1 == key && -1 == btn) {
+                QPair<ActionType, int> key = getItemKey(node, "key");
+                if(key.first == AT_INVALID){
                     qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
                     break;
                 }
-
                 KeyMapNode keyMapNode;
                 keyMapNode.type = type;
-                if (key != -1) {
-                    keyMapNode.clickTwice.keyNode.key = key;
-                } else {
-                    keyMapNode.clickTwice.keyNode.key = btn;
-                }
-                keyMapNode.clickTwice.keyNode.pos = QPointF(node.value("pos").toObject().value("x").toDouble(),
-                                                       node.value("pos").toObject().value("y").toDouble());
+                keyMapNode.click.keyNode.type = key.first;
+                keyMapNode.click.keyNode.key = key.second;
+                keyMapNode.click.keyNode.pos = getItemPos(node, "pos");
+                keyMapNode.click.switchMap = getItemSwitchMap(node, "switchMap");
                 m_keyMapNodes.push_back(keyMapNode);
             }
                 break;
             case KeyMap::KMT_STEER_WHEEL:
             {
                 // safe check
-                if (!node.contains("leftKey") || !node.value("leftKey").isString()
-                        || !node.contains("rightKey") || !node.value("rightKey").isString()
-                        || !node.contains("upKey") || !node.value("upKey").isString()
-                        || !node.contains("downKey") || !node.value("downKey").isString()
-                        || !node.contains("leftOffset") || !node.value("leftOffset").isDouble()
-                        || !node.contains("rightOffset") || !node.value("rightOffset").isDouble()
-                        || !node.contains("upOffset") || !node.value("upOffset").isDouble()
-                        || !node.contains("downOffset") || !node.value("downOffset").isDouble()
-                        || !node.contains("centerPos") || !node.value("centerPos").isObject()
-                        || !node.value("centerPos").toObject().contains("x") || !node.value("centerPos").toObject().value("x").isDouble()
-                        || !node.value("centerPos").toObject().contains("y") || !node.value("centerPos").toObject().value("y").isDouble()
-                        ) {
+                if(!checkForSteerWhell(node)){
                     qWarning() << "json error: keyMapNodes node format error";
                     break;
                 }
-
-                Qt::Key leftKey = (Qt::Key)metaEnumKey.keyToValue(node.value("leftKey").toString().toStdString().c_str());
-                Qt::MouseButtons leftBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("leftKey").toString().toStdString().c_str());
-                Qt::Key rightKey = (Qt::Key)metaEnumKey.keyToValue(node.value("rightKey").toString().toStdString().c_str());
-                Qt::MouseButtons rightBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("rightKey").toString().toStdString().c_str());
-                Qt::Key upKey = (Qt::Key)metaEnumKey.keyToValue(node.value("upKey").toString().toStdString().c_str());
-                Qt::MouseButtons upBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("upKey").toString().toStdString().c_str());
-                Qt::Key downKey = (Qt::Key)metaEnumKey.keyToValue(node.value("downKey").toString().toStdString().c_str());
-                Qt::MouseButtons downBtn = (Qt::MouseButtons)metaEnumMouseButtons.keyToValue(node.value("downKey").toString().toStdString().c_str());
-
-                if ((-1 == leftKey && -1 == leftBtn)
-                        || (-1 == rightKey && -1 == rightBtn)
-                        || (-1 == upKey && -1 == upBtn)
-                        || (-1 == downKey && -1 == downBtn)
-                        ) {
-                    qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
+                QPair<ActionType, int> leftKey = getItemKey(node, "leftKey");
+                QPair<ActionType, int> rightKey = getItemKey(node, "rightKey");
+                QPair<ActionType, int> upKey = getItemKey(node, "upKey");
+                QPair<ActionType, int> downKey = getItemKey(node, "downKey");
+                if(leftKey.first == AT_INVALID || rightKey.first == AT_INVALID
+                        || upKey.first == AT_INVALID || downKey.first == AT_INVALID)
+                {
+                    if(leftKey.first == AT_INVALID)
+                        qWarning() << "json error: keyMapNodes node invalid key: " << node.value("leftKey").toString();
+                    if(rightKey.first == AT_INVALID)
+                        qWarning() << "json error: keyMapNodes node invalid key: " << node.value("rightKey").toString();
+                    if(upKey.first == AT_INVALID)
+                        qWarning() << "json error: keyMapNodes node invalid key: " << node.value("upKey").toString();
+                    if(downKey.first == AT_INVALID)
+                        qWarning() << "json error: keyMapNodes node invalid key: " << node.value("downKey").toString();
                     break;
                 }
 
                 KeyMapNode keyMapNode;
                 keyMapNode.type = type;
-                keyMapNode.steerWheel.leftKeyPressed = false;
-                keyMapNode.steerWheel.rightKeyPressed = false;
-                keyMapNode.steerWheel.upKeyPressed = false;
-                keyMapNode.steerWheel.downKeyPressed = false;
-                keyMapNode.steerWheel.pressKeysNum = 0;
-                keyMapNode.steerWheel.firstPressKey = 0;
 
-                if (leftKey != -1) {
-                    keyMapNode.steerWheel.leftKey = leftKey;
-                } else {
-                    keyMapNode.steerWheel.leftKey = leftBtn;
-                }
-                if (rightKey != -1) {
-                    keyMapNode.steerWheel.rightKey = rightKey;
-                } else {
-                    keyMapNode.steerWheel.rightKey = rightBtn;
-                }
-                if (upKey != -1) {
-                    keyMapNode.steerWheel.upKey = upKey;
-                } else {
-                    keyMapNode.steerWheel.upKey = upBtn;
-                }
-                if (downKey != -1) {
-                    keyMapNode.steerWheel.downKey = downKey;
-                } else {
-                    keyMapNode.steerWheel.downKey = downBtn;
-                }
-                keyMapNode.steerWheel.leftOffset = node.value("leftOffset").toDouble();
-                keyMapNode.steerWheel.rightOffset = node.value("rightOffset").toDouble();
-                keyMapNode.steerWheel.upOffset = node.value("upOffset").toDouble();
-                keyMapNode.steerWheel.downOffset = node.value("downOffset").toDouble();
-                keyMapNode.steerWheel.centerPos = QPointF(node.value("centerPos").toObject().value("x").toDouble(),
-                                                       node.value("centerPos").toObject().value("y").toDouble());
+                keyMapNode.steerWheel.left = { leftKey.first, leftKey.second,
+                                               getItemNumber(node, "leftOffset") };
+                keyMapNode.steerWheel.right = { rightKey.first, rightKey.second,
+                                                getItemNumber(node, "rightOffset") };
+                keyMapNode.steerWheel.up = { upKey.first, upKey.second,
+                                             getItemNumber(node, "upOffset") };
+                keyMapNode.steerWheel.down = { downKey.first, downKey.second,
+                                               getItemNumber(node, "downOffset") };
+
+                keyMapNode.steerWheel.centerPos = getItemPos(node, "centerPos");
+                m_idxSteerWheel = m_keyMapNodes.size();
                 m_keyMapNodes.push_back(keyMapNode);
             }
                 break;
+            case KeyMap::KMT_DRAG:
+            {
+                // safe check
+                if(!checkForDrag(node)){
+                    qWarning() << "json error: keyMapNodes node format error";
+                    break;
+                }
+
+                QPair<ActionType, int> key = getItemKey(node, "key");
+                if(key.first == AT_INVALID){
+                    qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
+                    break;
+                }
+                KeyMapNode keyMapNode;
+                keyMapNode.type = type;
+                keyMapNode.drag.type = key.first;
+                keyMapNode.drag.key = key.second;
+                keyMapNode.drag.startPos = getItemPos(node, "startPos");
+                keyMapNode.drag.endPos = getItemPos(node, "endPos");
+                m_keyMapNodes.push_back(keyMapNode);
+                break;
+            }
             default:
                 qWarning() << "json error: keyMapNodes invalid node type:" << node.value("type").toString();
                 break;
             }
         }
     }
+    // this must be called after m_keyMapNodes is stable
+    makeReverseMap();
+    qWarning() << "Script updated.";
 
 parseError:
     if (!errorString.isEmpty()) {
@@ -261,35 +229,27 @@ parseError:
     return;
 }
 
-KeyMap::KeyMapNode& KeyMap::getKeyMapNode(int key)
+const KeyMap::KeyMapNode& KeyMap::getKeyMapNode(int key)
 {
-    for (auto& itemNode : m_keyMapNodes) {
-        switch (itemNode.type) {
-        case KMT_CLICK:
-            if (itemNode.click.keyNode.key == key) {
-                return itemNode;
-            }
-            break;
-        case KMT_CLICK_TWICE:
-            if (itemNode.clickTwice.keyNode.key == key) {
-                return itemNode;
-            }
-            break;
-        case KMT_STEER_WHEEL:
-            if (itemNode.steerWheel.leftKey == key
-                    || itemNode.steerWheel.rightKey == key
-                    || itemNode.steerWheel.upKey == key
-                    || itemNode.steerWheel.downKey == key
-                    ) {
-                return itemNode;
-            }
-            break;
-        default:
-            break;
-        }
-    }
+    auto p = rmapKey.value(key, &m_invalidNode);
+    if(p == &m_invalidNode)
+        return *rmapMouse.value(key, &m_invalidNode);
+    return *p;
+}
 
-    return m_invalidNode;
+const KeyMap::KeyMapNode& KeyMap::getKeyMapNodeKey(int key)
+{
+    return *rmapKey.value(key, &m_invalidNode);
+}
+
+const KeyMap::KeyMapNode& KeyMap::getKeyMapNodeMouse(int key)
+{
+    return *rmapMouse.value(key, &m_invalidNode);
+}
+
+bool KeyMap::isSwitchOnKeyboard()
+{
+    return m_switchType == AT_KEY;
 }
 
 int KeyMap::getSwitchKey()
@@ -297,12 +257,159 @@ int KeyMap::getSwitchKey()
     return m_switchKey;
 }
 
-KeyMap::MouseMoveMap KeyMap::getMouseMoveMap()
+const KeyMap::MouseMoveMap& KeyMap::getMouseMoveMap()
 {
     return m_mouseMoveMap;
 }
 
-bool KeyMap::enableMouseMoveMap()
+const KeyMap::KeyMapNode& KeyMap::getSteerWheelMap()
+{
+    return m_keyMapNodes[m_idxSteerWheel];
+}
+
+bool KeyMap::isValidMouseMoveMap()
 {
     return !m_mouseMoveMap.startPos.isNull();
 }
+
+bool KeyMap::isValidSteerWheelMap()
+{
+    return m_idxSteerWheel != -1;
+}
+
+void KeyMap::makeReverseMap()
+{
+    rmapKey.clear();
+    rmapMouse.clear();
+    for(int i = 0 ;i < m_keyMapNodes.size(); ++i) {
+        auto& node = m_keyMapNodes[i];
+        switch (node.type) {
+        case KMT_CLICK:
+        {
+            QMultiHash<int, KeyMapNode*>& m = node.click.keyNode.type == AT_KEY ? rmapKey : rmapMouse;
+            m.insert(node.click.keyNode.key, &node);
+        }
+            break;
+        case KMT_CLICK_TWICE:
+        {
+            QMultiHash<int, KeyMapNode*>& m = node.clickTwice.keyNode.type == AT_KEY ? rmapKey : rmapMouse;
+            m.insert(node.clickTwice.keyNode.key, &node);
+        }
+            break;
+        case KMT_STEER_WHEEL:
+        {
+            QMultiHash<int, KeyMapNode*>& ml = node.steerWheel.left.type == AT_KEY ? rmapKey : rmapMouse;
+            ml.insert(node.steerWheel.left.key, &node);
+            QMultiHash<int, KeyMapNode*>& mr = node.steerWheel.right.type == AT_KEY ? rmapKey : rmapMouse;
+            mr.insert(node.steerWheel.right.key, &node);
+            QMultiHash<int, KeyMapNode*>& mu = node.steerWheel.up.type == AT_KEY ? rmapKey : rmapMouse;
+            mu.insert(node.steerWheel.up.key, &node);
+            QMultiHash<int, KeyMapNode*>& md = node.steerWheel.down.type == AT_KEY ? rmapKey : rmapMouse;
+            md.insert(node.steerWheel.down.key, &node);
+        }
+            break;
+        case KMT_DRAG:
+        {
+            QMultiHash<int, KeyMapNode*>& m = node.drag.type == AT_KEY ? rmapKey : rmapMouse;
+            m.insert(node.drag.key, &node);
+        }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+// ---- check and get of json item ----
+
+bool KeyMap::checkItemKey(const QJsonObject& node, const QString& name)
+{
+    return node.contains(name) && node.value(name).isString();
+}
+
+bool KeyMap::checkItemPos(const QJsonObject& node, const QString& name)
+{
+    if(node.contains(name) && node.value(name).isObject()){
+        QJsonObject pos = node.value(name).toObject();
+        return pos.contains("x") && pos.value("x").isDouble()
+                && pos.contains("y") && pos.value("y").isDouble();
+    }
+    return false;
+}
+
+bool KeyMap::checkItemDouble(const QJsonObject& node, const QString& name)
+{
+    return node.contains(name) && node.value(name).isDouble();
+}
+
+bool KeyMap::checkItemSwitchMap(const QJsonObject& node, const QString& name)
+{
+    return !node.contains(name) || node.value(name).isBool();
+}
+
+KeyMap::KeyMapType KeyMap::getItemType(const QJsonObject& node, const QString& name)
+{
+    QString value = node.value(name).toString();
+    return static_cast<KeyMap::KeyMapType>(m_metaEnumKeyMapType.keyToValue(value.toStdString().c_str()));
+}
+
+QPair<KeyMap::ActionType, int> KeyMap::getItemKey(const QJsonObject& node, const QString& name)
+{
+    QString value = node.value(name).toString();
+    int key = m_metaEnumKey.keyToValue(value.toStdString().c_str());
+    int btn = m_metaEnumMouseButtons.keyToValue(value.toStdString().c_str());
+    if(key == -1 && btn == -1){
+        return {AT_INVALID, -1};
+    }else if(key != -1){
+        return {AT_KEY, key};
+    }else{
+        return {AT_MOUSE, btn};
+    }
+}
+
+QPointF KeyMap::getItemPos(const QJsonObject& node, const QString& name)
+{
+    QJsonObject pos = node.value(name).toObject();
+    return QPointF(pos.value("x").toDouble(), pos.value("y").toDouble());
+}
+
+double KeyMap::getItemNumber(const QJsonObject& node, const QString& name)
+{
+    return node.value(name).toDouble();
+}
+
+bool KeyMap::getItemSwitchMap(const QJsonObject& node, const QString& name)
+{
+    return node.value(name).toBool(false);
+}
+
+
+// ---- check for key-map node ----
+
+bool KeyMap::checkForClick(const QJsonObject& node)
+{
+    return checkItemKey(node, "key") && checkItemPos(node, "pos")
+            && checkItemSwitchMap(node, "switchMap");
+}
+
+bool KeyMap::checkForClickDouble(const QJsonObject& node)
+{
+    return checkForClick(node);
+}
+
+bool KeyMap::checkForSteerWhell(const QJsonObject& node)
+{
+    return checkItemKey(node, "leftKey") && checkItemKey(node, "rightKey")
+            && checkItemKey(node, "upKey") && checkItemKey(node, "downKey")
+            && checkItemDouble(node, "leftOffset") && checkItemDouble(node, "rightOffset")
+            && checkItemDouble(node, "upOffset") && checkItemDouble(node, "downOffset")
+            && checkItemPos(node, "centerPos");
+}
+
+bool KeyMap::checkForDrag(const QJsonObject& node)
+{
+    return checkItemKey(node, "key")
+            && checkItemPos(node, "startPos") && checkItemPos(node, "endPos")
+            && checkItemSwitchMap(node, "switchMap");
+}
+
