@@ -27,6 +27,10 @@ void InputConvertNormal::mouseEvent(const QMouseEvent* from, const QSize& frameS
         action = AMOTION_EVENT_ACTION_UP;
         break;
     case QEvent::MouseMove:
+        // only support left button drag
+        if (!(from->buttons() & Qt::LeftButton)) {
+            return;
+        }
         action = AMOTION_EVENT_ACTION_MOVE;
         break;
     default:
