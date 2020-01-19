@@ -4,35 +4,6 @@
 
 #include "inputconvertgame.h"
 
-#ifdef _WIN32
-
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-#include <windef.h>
-// restrict mouse into a window
-static void restrictMouse(const int left, const int right,
-                          const int top, const int bottom)
-{
-    RECT mainWinRect; // RECT is defined in <windef.h>
-    mainWinRect.left = static_cast<LONG>(left);
-    mainWinRect.right = static_cast<LONG>(right);
-    mainWinRect.top = static_cast<LONG>(top);
-    mainWinRect.bottom = static_cast<LONG>(bottom);
-    ClipCursor(&mainWinRect); // Windows API
-}
-static void freeMouse()
-{
-    ClipCursor(nullptr);
-}
-
-#else // linux and macos
-static void restrictMouse(const int left, const int right,
-                          const int top, const int bottom)
-{}
-static void freeMouse()
-{}
-#endif
-
 #define CURSOR_POS_CHECK 50
 
 InputConvertGame::InputConvertGame(Controller* controller)
@@ -363,15 +334,14 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
     if (QEvent::MouseMove != from->type()) {
         return false;
     }
-    if(m_ctrlMouseMove.touching){
+    if (m_ctrlMouseMove.touching) {
         QPointF mousePos = from->localPos();
         mousePos.rx() /= m_showSize.width();
         mousePos.ry() /= m_showSize.height();
         QPointF offset = mousePos - m_ctrlMouseMove.startPosRel;
         //qDebug()<<from->localPos()<<" - "<<m_mouseMoveLastConverPos<<" - "<<offset<<" - "<<offset.manhattanLength();
 
-        if(mousePos.x()<0.05 || mousePos.x()>0.95 || mousePos.y()<0.05 || mousePos.y()>0.95)
-        {
+        if(mousePos.x()<0.05 || mousePos.x()>0.95 || mousePos.y()<0.05 || mousePos.y()>0.95) {
             //qDebug()<<"reset";
             mouseMoveStopTouch();
             mouseMoveStartTouch(from);
@@ -379,12 +349,11 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
         offset /= m_keyMap.getMouseMoveMap().speedRatio;
         m_ctrlMouseMove.lastPosRel = m_ctrlMouseMove.startPosRel + offset;
         mouseMoveMovingTouch(m_ctrlMouseMove.lastPosRel);
-    }else{
+    } else {
         m_ctrlMouseMove.touching = true;
         mouseMoveStartTouch(from);
         int left = from->globalX() - from->x();
         int top = from->globalY() - from->y();
-        restrictMouse(left, left + m_showSize.width(), top, top+m_showSize.height());
     }
     return true;
 }
@@ -444,12 +413,10 @@ bool InputConvertGame::switchGameMap()
         #else
             QGuiApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
         #endif
-        //restrictMouse(); // called at the first run of processMouseMove()
     } else {
         if(m_ctrlMouseMove.touching)
             mouseMoveStopTouch();
         QGuiApplication::restoreOverrideCursor();
-        freeMouse();
     }
     return m_gameMap;
 }
