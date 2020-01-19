@@ -68,7 +68,7 @@ void VideoForm::onGrabCursor(bool grab)
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
 #else
-    Q_UNUSED(grab);
+    Q_UNUSED(grab)
 #endif
 }
 
@@ -101,15 +101,15 @@ void VideoForm::updateStyleSheet(bool vertical)
     if (vertical) {
         setStyleSheet(R"(
                  #videoForm {
-                     border-image: url(:/image/videoform/phone-v.png) 150px 142px 85px 142px;
-                     border-width: 150px 142px 85px 142px;
+                     border-image: url(:/image/videoform/phone-v.png) 150px 65px 85px 65px;
+                     border-width: 150px 65px 85px 65px;
                  }
                  )");
     } else {
         setStyleSheet(R"(
                  #videoForm {
-                     border-image: url(:/image/videoform/phone-h.png) 142px 85px 142px 150px;
-                     border-width: 142px 85px 142px 150px;
+                     border-image: url(:/image/videoform/phone-h.png) 65px 85px 65px 150px;
+                     border-width: 65px 85px 65px 150px;
                  }
                  )");
     }
@@ -364,7 +364,7 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
 
 void VideoForm::paintEvent(QPaintEvent *paint)
 {
-    Q_UNUSED(paint);
+    Q_UNUSED(paint)
     QStyleOption opt;
     opt.init(this);
     QPainter p(this);
@@ -373,7 +373,7 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 
 void VideoForm::showEvent(QShowEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
     if (!isFullScreen()) {
         showToolForm();
     }
@@ -386,12 +386,12 @@ void VideoForm::dragEnterEvent(QDragEnterEvent *event)
 
 void VideoForm::dragMoveEvent(QDragMoveEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void VideoForm::dragLeaveEvent(QDragLeaveEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void VideoForm::dropEvent(QDropEvent *event)

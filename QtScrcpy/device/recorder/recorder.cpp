@@ -315,7 +315,7 @@ void Recorder::stopRecorder() {
 
 bool Recorder::push(const AVPacket *packet) {
     QMutexLocker locker(&m_mutex);
-    assert(!m_stopped);
+    Q_ASSERT(!m_stopped);
 
     if (m_failed) {
         // reject any new packet (this will stop the stream)

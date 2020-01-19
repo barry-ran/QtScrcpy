@@ -184,7 +184,7 @@
 		{
 			"comment": "下车",
 			"type": "KMT_CLICK",
-			"key": "Key_S",
+			"key": "Key_5",
 			"pos": {
 				"x": 0.92,
 				"y": 0.4

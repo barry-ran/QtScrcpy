@@ -20,6 +20,9 @@ ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     m_videoForm = dynamic_cast<VideoForm*>(adsorbWidget);
 
     initStyle();
+
+    // TODO
+    ui->screenShotBtn->hide();
 }
 
 ToolForm::~ToolForm()
@@ -40,6 +43,7 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->closeScreenBtn, QChar(0xf070), 15);
     IconHelper::Instance()->SetIcon(ui->powerBtn, QChar(0xf011), 15);
     IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), 15);
+    IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf05b), 15);
 }
 
 void ToolForm::mousePressEvent(QMouseEvent *event)
@@ -52,7 +56,7 @@ void ToolForm::mousePressEvent(QMouseEvent *event)
 
 void ToolForm::mouseReleaseEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
 }
 
 void ToolForm::mouseMoveEvent(QMouseEvent *event)
@@ -113,6 +117,11 @@ void ToolForm::on_powerBtn_clicked()
     if (m_videoForm && m_videoForm->getController()) {
         m_videoForm->getController()->postPower();
     }
+}
+
+void ToolForm::on_screenShotBtn_clicked()
+{
+    // TODO
 }
 
 void ToolForm::on_volumeUpBtn_clicked()

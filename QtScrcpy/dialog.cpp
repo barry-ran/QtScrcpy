@@ -80,11 +80,13 @@ void Dialog::initUI()
     ui->bitRateBox->addItem("10000000");
     ui->bitRateBox->setCurrentIndex(2);
 
-    ui->videoSizeBox->addItem("480");
-    ui->videoSizeBox->addItem("720");
-    ui->videoSizeBox->addItem("1080");
-    ui->videoSizeBox->addItem("native");
-    ui->videoSizeBox->setCurrentIndex(1);
+    ui->maxSizeBox->addItem("640");
+    ui->maxSizeBox->addItem("720");
+    ui->maxSizeBox->addItem("1080");
+    ui->maxSizeBox->addItem("1280");
+    ui->maxSizeBox->addItem("1920");
+    ui->maxSizeBox->addItem("native");
+    ui->maxSizeBox->setCurrentIndex(2);
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
@@ -147,7 +149,7 @@ void Dialog::on_startServerBtn_clicked()
 
     quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
     // this is ok that "native" toUshort is 0
-    quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
+    quint16 videoSize = ui->maxSizeBox->currentText().trimmed().toUShort();
     Device::DeviceParams params;
     params.serial = ui->serialBox->currentText().trimmed();
     params.maxSize = videoSize;
@@ -315,7 +317,7 @@ void Dialog::on_stopAllServerBtn_clicked()
     m_deviceManage.disconnectAllDevice();
 }
 
-void Dialog::on_updateGameScriptBtn_clicked()
+void Dialog::on_refreshGameScriptBtn_clicked()
 {
     ui->gameBox->clear();
     QDir dir(KeyMap::getKeyMapPath());
@@ -333,9 +335,14 @@ void Dialog::on_updateGameScriptBtn_clicked()
     }
 }
 
+void Dialog::on_applyScriptBtn_clicked()
+{
+    m_deviceManage.updateScript(getGameScript(ui->gameBox->currentText()));
+}
+
 void Dialog::on_gameCheck_clicked(bool checked)
 {
     if (checked) {
-        on_updateGameScriptBtn_clicked();
+        on_refreshGameScriptBtn_clicked();
     }
 }
