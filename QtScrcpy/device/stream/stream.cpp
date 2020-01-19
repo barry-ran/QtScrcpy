@@ -233,8 +233,8 @@ bool Stream::recvPacket(AVPacket *packet)
 
     quint64 pts = bufferRead64be(header);
     quint32 len = bufferRead32be(&header[8]);
-    assert(pts == NO_PTS || (pts & 0x8000000000000000) == 0);
-    assert(len);
+    Q_ASSERT(pts == NO_PTS || (pts & 0x8000000000000000) == 0);
+    Q_ASSERT(len);
 
     if (av_new_packet(packet, len)) {
         qCritical("Could not allocate packet");
@@ -329,9 +329,9 @@ bool Stream::parse(AVPacket *packet)
                              AV_NOPTS_VALUE, AV_NOPTS_VALUE, -1);
 
     // PARSER_FLAG_COMPLETE_FRAMES is set
-    assert(r == inLen);
+    Q_ASSERT(r == inLen);
     (void) r;
-    assert(outLen == inLen);
+    Q_ASSERT(outLen == inLen);
 
     if (m_parser->key_frame == 1) {
         packet->flags |= AV_PKT_FLAG_KEY;
