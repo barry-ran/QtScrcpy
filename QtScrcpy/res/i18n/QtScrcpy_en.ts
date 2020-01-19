@@ -280,7 +280,7 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="408"/>
+        <location filename="../../device/ui/videoform.cpp" line="407"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>
