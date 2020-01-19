@@ -80,13 +80,13 @@ void Dialog::initUI()
     ui->bitRateBox->addItem("10000000");
     ui->bitRateBox->setCurrentIndex(2);
 
-    ui->maxSizeBox->addItem("600");
+    ui->maxSizeBox->addItem("640");
     ui->maxSizeBox->addItem("720");
-    ui->maxSizeBox->addItem("1000");
+    ui->maxSizeBox->addItem("1080");
     ui->maxSizeBox->addItem("1280");
     ui->maxSizeBox->addItem("1920");
     ui->maxSizeBox->addItem("native");
-    ui->maxSizeBox->setCurrentIndex(3);
+    ui->maxSizeBox->setCurrentIndex(2);
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
