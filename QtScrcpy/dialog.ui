@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>513</width>
-    <height>637</height>
+    <width>600</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>16777215</height>
+    <height>2160</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -187,7 +187,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>200</height>
+       <height>240</height>
       </size>
      </property>
      <property name="focusPolicy">
@@ -307,7 +307,7 @@
       <item row="3" column="10" colspan="2">
        <widget class="QCheckBox" name="gameCheck">
         <property name="text">
-         <string>custom map</string>
+         <string>auto enable</string>
         </property>
        </widget>
       </item>
@@ -394,7 +394,7 @@
        </widget>
       </item>
       <item row="0" column="7" colspan="2">
-       <widget class="QComboBox" name="videoSizeBox">
+       <widget class="QComboBox" name="maxSizeBox">
         <property name="toolTip">
          <string/>
         </property>
@@ -403,7 +403,7 @@
       <item row="0" column="4" colspan="3">
        <widget class="QLabel" name="label_4">
         <property name="text">
-         <string>video size:</string>
+         <string>max size:</string>
         </property>
        </widget>
       </item>
