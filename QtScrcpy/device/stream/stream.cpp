@@ -23,8 +23,8 @@ Stream::~Stream()
 }
 
 static void avLogCallback(void *avcl, int level, const char *fmt, va_list vl) {
-    Q_UNUSED(avcl);
-    Q_UNUSED(vl);
+    Q_UNUSED(avcl)
+    Q_UNUSED(vl)
 
     QString localFmt = QString::fromUtf8(fmt);
     localFmt.prepend("[FFmpeg] ");

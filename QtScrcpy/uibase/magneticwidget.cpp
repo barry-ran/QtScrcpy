@@ -88,7 +88,7 @@ bool MagneticWidget::eventFilter(QObject *watched, QEvent *event)
 
 void MagneticWidget::moveEvent(QMoveEvent *event)
 {
-    Q_UNUSED(event);
+    Q_UNUSED(event)
     if (!m_adsorbWidget) {
         return;
     }

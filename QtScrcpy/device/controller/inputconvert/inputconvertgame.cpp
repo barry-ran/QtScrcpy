@@ -131,8 +131,10 @@ void InputConvertGame::sendTouchUpEvent(int id, QPointF pos)
 void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAction action)
 {
     if (0 > id || MULTI_TOUCH_MAX_NUM-1 < id) {
+        Q_ASSERT(0);
         return;
     }
+    qDebug() << "id:" << id << " pos:" << pos << " action" << action;
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
     if (!controlMsg) {
         return;
@@ -417,7 +419,7 @@ void InputConvertGame::stopMouseMoveTimer()
 
 void InputConvertGame::mouseMoveStartTouch(const QMouseEvent* from)
 {
-    Q_UNUSED(from);
+    Q_UNUSED(from)
     if (!m_mouseMovePress) {
         QPointF mouseMoveStartPos = m_keyMap.getMouseMoveMap().startPos;
         //moveCursorToStart(from);
