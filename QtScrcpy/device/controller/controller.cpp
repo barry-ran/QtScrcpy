@@ -13,8 +13,6 @@ Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
     Q_ASSERT(m_receiver);
 
     updateScript(gameScript);
-    Q_ASSERT(m_inputConvert);
-    connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
 
 Controller::~Controller()
@@ -47,6 +45,9 @@ void Controller::test(QRect rc)
 
 void Controller::updateScript(QString gameScript)
 {
+    if (m_inputConvert) {
+        delete m_inputConvert;
+    }
     if (!gameScript.isEmpty()) {
         InputConvertGame* convertgame = new InputConvertGame(this);
         convertgame->loadKeyMap(gameScript);
@@ -54,7 +55,8 @@ void Controller::updateScript(QString gameScript)
     } else {
          m_inputConvert = new InputConvertNormal(this);
     }
-
+    Q_ASSERT(m_inputConvert);
+    connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
 
 void Controller::postTurnOn()
