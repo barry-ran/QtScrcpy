@@ -49,10 +49,10 @@ InputConvertGame::~InputConvertGame()
 void InputConvertGame::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     // 处理开关按键
-    if (m_keyMap.isSwitchOnKeyboard() == false &&
-            from->type() == QEvent::MouseButtonPress &&
-            m_keyMap.getSwitchKey() == from->button())
-    {
+    if (m_keyMap.isSwitchOnKeyboard() == false && m_keyMap.getSwitchKey() == from->button()) {
+        if (from->type() != QEvent::MouseButtonPress) {
+            return;
+        }
         if (!switchGameMap()) {
             m_needSwitchGameAgain = false;
         }
@@ -89,10 +89,11 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
 {
     // 处理开关按键
     if (m_keyMap.isSwitchOnKeyboard() && m_keyMap.getSwitchKey() == from->key()) {
-        if (QEvent::KeyPress == from->type()) {
-            if (!switchGameMap()) {
-                m_needSwitchGameAgain = false;
-            }
+        if (QEvent::KeyPress != from->type()) {
+            return;
+        }
+        if (!switchGameMap()) {
+            m_needSwitchGameAgain = false;
         }
         return;
     }
