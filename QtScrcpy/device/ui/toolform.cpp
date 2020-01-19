@@ -20,6 +20,9 @@ ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     m_videoForm = dynamic_cast<VideoForm*>(adsorbWidget);
 
     initStyle();
+
+    // TODO
+    ui->screenShotBtn->hide();
 }
 
 ToolForm::~ToolForm()
@@ -118,9 +121,7 @@ void ToolForm::on_powerBtn_clicked()
 
 void ToolForm::on_screenShotBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->screenShot();
-    }
+    // TODO
 }
 
 void ToolForm::on_volumeUpBtn_clicked()

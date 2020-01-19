@@ -38,7 +38,6 @@ public:
     void clipboardPaste();
     void postTextInput(QString& text);
     void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
-    void screenShot();
 
     // for input convert
     void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);

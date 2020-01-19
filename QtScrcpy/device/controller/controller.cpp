@@ -169,12 +169,6 @@ void Controller::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
     postControlMsg(controlMsg);
 }
 
-void Controller::screenShot()
-{
-    // TODO:
-    qDebug() << "screen shot";
-}
-
 void Controller::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     if (m_inputConvert) {
