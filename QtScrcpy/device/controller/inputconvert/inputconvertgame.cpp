@@ -134,7 +134,7 @@ void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAct
         Q_ASSERT(0);
         return;
     }
-    qDebug() << "id:" << id << " pos:" << pos << " action" << action;
+    //qDebug() << "id:" << id << " pos:" << pos << " action" << action;
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
     if (!controlMsg) {
         return;
