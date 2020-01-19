@@ -56,12 +56,12 @@
     <message>
         <location filename="../../dialog.ui" line="114"/>
         <source>wireless connect</source>
-        <translation>wireless connect</translation>
+        <translation>无线连接</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="175"/>
         <source>wireless disconnect</source>
-        <translation>wireless disconnect</translation>
+        <translation>无线断开</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="254"/>
@@ -280,7 +280,7 @@
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="408"/>
+        <location filename="../../device/ui/videoform.cpp" line="407"/>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
     </message>
