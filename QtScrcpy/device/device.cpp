@@ -97,7 +97,7 @@ void Device::initSignals()
     }
     if (m_videoForm) {
         connect(m_videoForm, &VideoForm::destroyed, this, [this](QObject *obj){
-            Q_UNUSED(obj);
+            Q_UNUSED(obj)
             deleteLater();
         });
     }
