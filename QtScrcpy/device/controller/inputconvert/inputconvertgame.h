@@ -67,14 +67,14 @@ private:
     int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
 
     // steer wheel
-    struct{
-        bool valid = false;
-        bool touching = false;
-        int touchKey = Qt::Key_unknown; // the first key pressed
-        int nKeyPressed = 0;
-        bool pressedUp = false, pressedDown = false;
-        bool pressedLeft = false, pressedRight = false;
-        QPointF centerPos;
+    struct {
+        // the first key pressed
+        int touchKey = Qt::Key_unknown;
+        bool pressedUp = false;
+        bool pressedDown = false;
+        bool pressedLeft = false;
+        bool pressedRight = false;
+        // for last up
         QPointF lastOffset;
     } m_ctrlSteerWheel;
 

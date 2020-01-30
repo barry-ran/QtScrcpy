@@ -119,7 +119,6 @@ void InputConvertGame::loadKeyMap(const QString &json)
         m_ctrlMouseMove.startPosPixel = calcFrameAbsolutePos(m_ctrlMouseMove.startPosRel);
     }
     if(m_keyMap.isValidSteerWheelMap()){
-        m_ctrlSteerWheel.valid = true;
         m_ctrlMouseMove.touching = false;
     }
 }
@@ -222,46 +221,51 @@ void InputConvertGame::processSteerWheel(const KeyMap::KeyMapNode &node, const Q
     int key = from->key();
     bool flag = from->type() == QEvent::KeyPress;
     // identify keys
-    if(key == node.data.steerWheel.up.key){
+    if (key == node.data.steerWheel.up.key) {
         m_ctrlSteerWheel.pressedUp = flag;
-    }else if(key == node.data.steerWheel.right.key){
+    } else if (key == node.data.steerWheel.right.key) {
         m_ctrlSteerWheel.pressedRight = flag;
-    }else if(key == node.data.steerWheel.down.key){
+    } else if (key == node.data.steerWheel.down.key) {
         m_ctrlSteerWheel.pressedDown = flag;
-    }else{ // left
+    } else { // left
         m_ctrlSteerWheel.pressedLeft = flag;
     }
+
+    // calc offset and pressed number
     QPointF offset(0.0, 0.0);
-    int nPressed = 0;
-    if(m_ctrlSteerWheel.pressedUp){
-        ++nPressed;
+    int pressedNum = 0;
+    if (m_ctrlSteerWheel.pressedUp) {
+        ++pressedNum;
         offset.ry() -= node.data.steerWheel.up.extendOffset;
     }
-    if(m_ctrlSteerWheel.pressedRight){
-        ++nPressed;
+    if (m_ctrlSteerWheel.pressedRight) {
+        ++pressedNum;
         offset.rx() += node.data.steerWheel.right.extendOffset;
     }
-    if(m_ctrlSteerWheel.pressedDown){
-        ++nPressed;
+    if (m_ctrlSteerWheel.pressedDown) {
+        ++pressedNum;
         offset.ry() += node.data.steerWheel.down.extendOffset;
     }
-    if(m_ctrlSteerWheel.pressedLeft){
-        ++nPressed;
+    if (m_ctrlSteerWheel.pressedLeft) {
+        ++pressedNum;
         offset.rx() -= node.data.steerWheel.left.extendOffset;
     }
+
     // action
-    //qDebug()<<nPressed<<"-"<<char(from->key())<<"-"<<from->type()<<"-"<<offset;
-    if(nPressed == 0){ // release all
+    if(pressedNum == 0){
+        // touch up release all
         int id = getTouchID(m_ctrlSteerWheel.touchKey);
         sendTouchUpEvent(id, node.data.steerWheel.centerPos + m_ctrlSteerWheel.lastOffset);
         detachTouchID(m_ctrlSteerWheel.touchKey);
-    }else{
+    } else {
         int id;
-        if(nPressed == 1 && flag){ // first press
+        // first press, get key and touch down
+        if (pressedNum == 1 && flag) {
             m_ctrlSteerWheel.touchKey = from->key();
             id = attachTouchID(m_ctrlSteerWheel.touchKey);
             sendTouchDownEvent(id, node.data.steerWheel.centerPos);
-        }else{
+        } else {
+            // jsut get touch id and move
             id = getTouchID(m_ctrlSteerWheel.touchKey);
         }
         sendTouchMoveEvent(id, node.data.steerWheel.centerPos + offset);
