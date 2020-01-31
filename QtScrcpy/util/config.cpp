@@ -18,6 +18,9 @@
 #define COMMON_SERVER_VERSION_KEY "ServerVersion"
 #define COMMON_SERVER_VERSION_DEF "1.12.1"
 
+#define COMMON_SERVER_PATH_KEY "ServerPath"
+#define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
+
 #define COMMON_MAX_FPS_KEY "MaxFps"
 #define COMMON_MAX_FPS_DEF 60
 
@@ -112,6 +115,15 @@ QString Config::getPushFilePath()
     pushFile = m_settings->value(COMMON_PUSHFILE_KEY, COMMON_PUSHFILE_DEF).toString();
     m_settings->endGroup();
     return pushFile;
+}
+
+QString Config::getServerPath()
+{
+    QString serverPath;
+    m_settings->beginGroup(GROUP_COMMON);
+    serverPath = m_settings->value(COMMON_SERVER_PATH_KEY, COMMON_SERVER_PATH_DEF).toString();
+    m_settings->endGroup();
+    return serverPath;
 }
 
 QString Config::getTitle()

@@ -18,6 +18,7 @@ public:
     int getDesktopOpenGL();
     int getSkin();
     QString getPushFilePath();
+    QString getServerPath();
 
 private:
     explicit Config(QObject *parent = nullptr);
