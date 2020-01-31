@@ -46,14 +46,18 @@ Dialog::Dialog(QWidget *parent) :
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
-                if (!ip.isEmpty()) {
-                    ui->deviceIpEdt->setText(ip);
+                if (ip.isEmpty()) {
+                    log = "ip not find, connect to wifi?";
+                    break;
                 }
+                ui->deviceIpEdt->setText(ip);
             } else if (args.contains("ifconfig") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
-                if (!ip.isEmpty()) {
-                    ui->deviceIpEdt->setText(ip);
+                if (ip.isEmpty()) {
+                    log = "ip not find, connect to wifi?";
+                    break;
                 }
+                ui->deviceIpEdt->setText(ip);
             }
             break;
         }
