@@ -93,6 +93,8 @@ void VideoForm::showToolForm(bool show)
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
         m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
+
+        connect(m_toolForm, &ToolForm::screenshot, this, &VideoForm::screenshot);
     }
     m_toolForm->setVisible(show);
 }

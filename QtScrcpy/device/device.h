@@ -12,6 +12,7 @@ class FileHandler;
 class Stream;
 class VideoForm;
 class Controller;
+struct AVFrame;
 class Device : public QObject
 {
     Q_OBJECT
@@ -40,9 +41,13 @@ public:
 signals:
     void deviceDisconnect(QString serial);
 
+public slots:
+    void onScreenshot();
+
 private:
     void initSignals();
     void startServer();
+    bool saveFrame(const AVFrame* frame);
 
 private:
     // server relevant
@@ -59,6 +64,8 @@ private:
 
     QTime m_startTimeCount;
     DeviceParams m_params;
+
+    bool m_screenshot = false;
 };
 
 #endif // DEVICE_H
