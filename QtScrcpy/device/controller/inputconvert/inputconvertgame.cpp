@@ -112,24 +112,18 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
 void InputConvertGame::loadKeyMap(const QString &json)
 {
     m_keyMap.loadKeyMap(json);
-    if (m_keyMap.isValidMouseMoveMap()) {
-        m_ctrlMouseMove.valid = true;
-        m_ctrlMouseMove.touching = false;
-        m_ctrlMouseMove.startPosRel = m_keyMap.getMouseMoveMap().data.mouseMove.startPos;
-        m_ctrlMouseMove.startPosPixel = calcFrameAbsolutePos(m_ctrlMouseMove.startPosRel);
-    }
-    if(m_keyMap.isValidSteerWheelMap()){
-        m_ctrlMouseMove.touching = false;
-    }
 }
 
 void InputConvertGame::updateSize(const QSize &frameSize, const QSize &showSize)
 {
+    if (showSize != m_showSize) {
+        if (m_gameMap) {
+            // show size change, resize grab cursor
+            emit grabCursor(true);
+        }
+    }
     m_frameSize = frameSize;
     m_showSize = showSize;
-    if(m_ctrlMouseMove.valid){
-        m_ctrlMouseMove.startPosPixel = calcScreenAbsolutePos(m_ctrlMouseMove.startPosRel);
-    }
 }
 
 void InputConvertGame::sendTouchDownEvent(int id, QPointF pos)
@@ -158,7 +152,11 @@ void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAct
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectTouchMsgData(id, action, (AndroidMotioneventButtons)0, QRect(calcFrameAbsolutePos(pos).toPoint(), m_frameSize), 1.0f);
+    controlMsg->setInjectTouchMsgData(static_cast<quint64>(id),
+                                      action,
+                                      static_cast<AndroidMotioneventButtons>(0),
+                                      QRect(calcFrameAbsolutePos(pos).toPoint(),m_frameSize),
+                                      1.0f);
     sendControlMsg(controlMsg);
 }
 
@@ -180,25 +178,20 @@ QPointF InputConvertGame::calcScreenAbsolutePos(QPointF relativePos)
 
 int InputConvertGame::attachTouchID(int key)
 {
-    //QMetaEnum map = QMetaEnum::fromType<Qt::Key>();
     for (int i = 0; i < MULTI_TOUCH_MAX_NUM; i++) {
-        if (0 == multiTouchID[i]) {
-            multiTouchID[i] = key;
-            //qDebug() << "attach "<<key<<" ("<<map.valueToKey(key)<<") as "<<i;
+        if (0 == m_multiTouchID[i]) {
+            m_multiTouchID[i] = key;
             return i;
         }
     }
-    //qDebug() << "attach "<<key<<" ("<<map.valueToKey(key)<<") failed ";
     return -1;
 }
 
 void InputConvertGame::detachTouchID(int key)
 {
-    //QMetaEnum map = QMetaEnum::fromType<Qt::Key>();
     for (int i = 0; i < MULTI_TOUCH_MAX_NUM; i++) {
-        if (key == multiTouchID[i]) {
-            multiTouchID[i] = 0;
-            //qDebug() << "detach "<<key<<" ("<<map.valueToKey(key)<<") from "<<i;
+        if (key == m_multiTouchID[i]) {
+            m_multiTouchID[i] = 0;
             return;
         }
     }
@@ -207,7 +200,7 @@ void InputConvertGame::detachTouchID(int key)
 int InputConvertGame::getTouchID(int key)
 {
     for (int i = 0; i < MULTI_TOUCH_MAX_NUM; i++) {
-        if (key == multiTouchID[i]) {
+        if (key == m_multiTouchID[i]) {
             return i;
         }
     }
@@ -338,28 +331,59 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
     if (QEvent::MouseMove != from->type()) {
         return false;
     }
-    if (m_ctrlMouseMove.touching) {
-        QPointF mousePos = from->localPos();
-        mousePos.rx() /= m_showSize.width();
-        mousePos.ry() /= m_showSize.height();
-        QPointF offset = mousePos - m_ctrlMouseMove.startPosRel;
-        //qDebug()<<from->localPos()<<" - "<<m_mouseMoveLastConverPos<<" - "<<offset<<" - "<<offset.manhattanLength();
 
-        if(mousePos.x()<0.05 || mousePos.x()>0.95 || mousePos.y()<0.05 || mousePos.y()>0.95) {
-            //qDebug()<<"reset";
+    if (checkCursorPos(from)) {
+        m_ctrlMouseMove.lastPos = QPointF(0.0, 0.0);
+        return true;
+    }
+
+    if (!m_ctrlMouseMove.lastPos.isNull()) {
+        QPointF distance = from->localPos() - m_ctrlMouseMove.lastPos;
+        distance /= m_keyMap.getMouseMoveMap().data.mouseMove.speedRatio;
+
+        mouseMoveStartTouch(from);
+        startMouseMoveTimer();
+
+        m_ctrlMouseMove.lastConverPos.setX(m_ctrlMouseMove.lastConverPos.x() + distance.x() / m_showSize.width());
+        m_ctrlMouseMove.lastConverPos.setY(m_ctrlMouseMove.lastConverPos.y() + distance.y() / m_showSize.height());
+
+        if (m_ctrlMouseMove.lastConverPos.x() < 0.1
+                || m_ctrlMouseMove.lastConverPos.x() > 0.8
+                || m_ctrlMouseMove.lastConverPos.y() < 0.1
+                || m_ctrlMouseMove.lastConverPos.y() > 0.8) {
             mouseMoveStopTouch();
             mouseMoveStartTouch(from);
         }
-        offset /= m_keyMap.getMouseMoveMap().data.mouseMove.speedRatio;
-        m_ctrlMouseMove.lastPosRel = m_ctrlMouseMove.startPosRel + offset;
-        mouseMoveMovingTouch(m_ctrlMouseMove.lastPosRel);
-    } else {
-        m_ctrlMouseMove.touching = true;
-        mouseMoveStartTouch(from);
-        int left = from->globalX() - from->x();
-        int top = from->globalY() - from->y();
+
+        sendTouchMoveEvent(getTouchID(Qt::ExtraButton24), m_ctrlMouseMove.lastConverPos);
     }
+    m_ctrlMouseMove.lastPos = from->localPos();
     return true;
+}
+
+bool InputConvertGame::checkCursorPos(const QMouseEvent *from)
+{
+    bool moveCursor = false;
+    QPoint pos = from->pos();
+    if (pos.x() < CURSOR_POS_CHECK) {
+        pos.setX(m_showSize.width() - CURSOR_POS_CHECK);
+        moveCursor = true;
+    } else if (pos.x() > m_showSize.width() - CURSOR_POS_CHECK) {
+        pos.setX(CURSOR_POS_CHECK);
+        moveCursor = true;
+    } else if (pos.y() < CURSOR_POS_CHECK) {
+        pos.setY(m_showSize.height() - CURSOR_POS_CHECK);
+        moveCursor = true;
+    } else if (pos.y() > m_showSize.height() - CURSOR_POS_CHECK) {
+        pos.setY(CURSOR_POS_CHECK);
+        moveCursor = true;
+    }
+
+    if (moveCursor) {
+        moveCursorTo(from, pos);
+    }
+
+    return moveCursor;
 }
 
 void InputConvertGame::moveCursorTo(const QMouseEvent *from, const QPoint &localPosPixel)
@@ -373,37 +397,36 @@ void InputConvertGame::moveCursorTo(const QMouseEvent *from, const QPoint &local
 
 void InputConvertGame::mouseMoveStartTouch(const QMouseEvent* from)
 {
-    moveCursorTo(from, m_ctrlMouseMove.startPosPixel.toPoint());
-    int id = attachTouchID(m_ctrlMouseMove.touchKey);
-    sendTouchDownEvent(id, m_ctrlMouseMove.startPosRel);
-    m_ctrlMouseMove.lastPosRel = m_ctrlMouseMove.startPosRel;
-    m_ctrlMouseMove.touching = true;
-}
-
-void InputConvertGame::mouseMoveMovingTouch(const QPointF& target)
-{
-    sendTouchMoveEvent(getTouchID(m_ctrlMouseMove.touchKey), target);
+    Q_UNUSED(from)
+    if (!m_ctrlMouseMove.touching) {
+        QPointF mouseMoveStartPos = m_keyMap.getMouseMoveMap().data.mouseMove.startPos;
+        int id = attachTouchID(Qt::ExtraButton24);
+        sendTouchDownEvent(id, mouseMoveStartPos);
+        m_ctrlMouseMove.lastConverPos = mouseMoveStartPos;
+        m_ctrlMouseMove.touching = true;
+    }
 }
 
 void InputConvertGame::mouseMoveStopTouch()
 {
-    int id = getTouchID(m_ctrlMouseMove.touchKey);
-    sendTouchUpEvent(id, m_ctrlMouseMove.lastPosRel);
-    detachTouchID(m_ctrlMouseMove.touchKey);
-    m_ctrlMouseMove.touching = false;
+    if (m_ctrlMouseMove.touching) {
+        sendTouchUpEvent(getTouchID(Qt::ExtraButton24), m_ctrlMouseMove.lastConverPos);
+        detachTouchID(Qt::ExtraButton24);
+        m_ctrlMouseMove.touching = false;
+    }
 }
 
 void InputConvertGame::startMouseMoveTimer()
 {
     stopMouseMoveTimer();
-    m_mouseMoveTimer = startTimer(1000);
+    m_ctrlMouseMove.timer = startTimer(1000);
 }
 
 void InputConvertGame::stopMouseMoveTimer()
 {
-    if (0 != m_mouseMoveTimer) {
-        killTimer(m_mouseMoveTimer);
-        m_mouseMoveTimer = 0;
+    if (0 != m_ctrlMouseMove.timer) {
+        killTimer(m_ctrlMouseMove.timer);
+        m_ctrlMouseMove.timer = 0;
     }
 }
 
@@ -412,11 +435,11 @@ bool InputConvertGame::switchGameMap()
     m_gameMap = !m_gameMap;
     emit grabCursor(m_gameMap);
     if (m_gameMap) {
-        #ifdef QT_NO_DEBUG
-            QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
-        #else
-            QGuiApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-        #endif
+#ifdef QT_NO_DEBUG
+        QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+#else
+        QGuiApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+#endif
     } else {
         if(m_ctrlMouseMove.touching)
             mouseMoveStopTouch();
@@ -427,7 +450,7 @@ bool InputConvertGame::switchGameMap()
 
 void InputConvertGame::timerEvent(QTimerEvent *event)
 {
-    if (m_mouseMoveTimer == event->timerId()) {
+    if (m_ctrlMouseMove.timer == event->timerId()) {
         stopMouseMoveTimer();
         mouseMoveStopTouch();
     }

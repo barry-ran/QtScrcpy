@@ -48,13 +48,12 @@ protected:
     bool processMouseMove(const QMouseEvent* from);
     void moveCursorTo(const QMouseEvent* from, const QPoint& localPosPixel);
     void mouseMoveStartTouch(const QMouseEvent* from);
-    void mouseMoveMovingTouch(const QPointF& target);
     void mouseMoveStopTouch();
-
     void startMouseMoveTimer();
     void stopMouseMoveTimer();
 
     bool switchGameMap();
+    bool checkCursorPos(const QMouseEvent *from);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -63,8 +62,9 @@ private:
     QSize m_frameSize;
     QSize m_showSize;
     bool m_gameMap = false;
-
-    int multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
+    bool m_needSwitchGameAgain = false;
+    int m_multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
+    KeyMap m_keyMap;
 
     // steer wheel
     struct {
@@ -79,21 +79,12 @@ private:
     } m_ctrlSteerWheel;
 
     // mouse move
-    struct{
-        bool valid = false;
+    struct {
+        QPointF lastConverPos;
+        QPointF lastPos = {0.0, 0.0};
         bool touching = false;
-        const int touchKey = Qt::ExtraButton24;
-        QPointF startPosRel; // in [0, 1)
-        QPointF startPosPixel; // in [0, size)
-        QPointF lastPosRel;
-        //QPointF lastPosPixel;
+        int timer = 0;
     } m_ctrlMouseMove;
-
-    int m_mouseMoveTimer = 0;
-
-    bool m_needSwitchGameAgain = false;
-
-    KeyMap m_keyMap;
 };
 
 #endif // INPUTCONVERTGAME_H
