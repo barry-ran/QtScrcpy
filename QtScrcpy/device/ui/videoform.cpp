@@ -349,7 +349,6 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    //qDebug() << "keyPressEvent" << event->isAutoRepeat();
     m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
@@ -358,7 +357,6 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
     if (!m_controller) {
         return;
     }
-    //qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
     m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 

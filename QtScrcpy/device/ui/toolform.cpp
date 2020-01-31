@@ -69,11 +69,13 @@ void ToolForm::mouseMoveEvent(QMouseEvent *event)
 
 void ToolForm::showEvent(QShowEvent *event)
 {
+    Q_UNUSED(event)
     qDebug() << "show event";
 }
 
 void ToolForm::hideEvent(QHideEvent *event)
 {
+    Q_UNUSED(event)
     qDebug() << "hide event";
 }
 
