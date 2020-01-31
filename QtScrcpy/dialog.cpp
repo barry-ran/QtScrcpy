@@ -3,6 +3,7 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QTimer>
+#include <QDebug>
 
 #include "dialog.h"
 #include "ui_dialog.h"
@@ -136,14 +137,16 @@ void Dialog::on_startServerBtn_clicked()
     outLog("start server...", false);
 
     QString absFilePath;
-    QString fileDir(ui->recordPathEdt->text().trimmed());
-    if (!fileDir.isEmpty()) {
-        QDateTime dateTime = QDateTime::currentDateTime();
-        QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
-        QString ext = ui->formatBox->currentText().trimmed();
-        fileName = windowTitle() + fileName + "." + ext;
-        QDir dir(fileDir);
-        absFilePath = dir.absoluteFilePath(fileName);
+    if (ui->recordScreenCheck->isChecked()) {
+        QString fileDir(ui->recordPathEdt->text().trimmed());
+        if (!fileDir.isEmpty()) {
+            QDateTime dateTime = QDateTime::currentDateTime();
+            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
+            QString ext = ui->formatBox->currentText().trimmed();
+            fileName = windowTitle() + fileName + "." + ext;
+            QDir dir(fileDir);
+            absFilePath = dir.absoluteFilePath(fileName);
+        }
     }
 
     quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
@@ -342,4 +345,17 @@ void Dialog::on_refreshGameScriptBtn_clicked()
 void Dialog::on_applyScriptBtn_clicked()
 {
     m_deviceManage.updateScript(getGameScript(ui->gameBox->currentText()));
+}
+
+void Dialog::on_recordScreenCheck_clicked(bool checked)
+{
+    if (!checked) {
+        return;
+    }
+
+    QString fileDir(ui->recordPathEdt->text().trimmed());
+    if (fileDir.isEmpty()) {
+        qWarning() << "please select record save path!!!";
+        ui->recordScreenCheck->setChecked(false);
+    }
 }

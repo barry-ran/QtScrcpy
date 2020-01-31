@@ -271,7 +271,7 @@ bool Device::saveFrame(const AVFrame* frame)
     QString absFilePath;
     QString fileDir(Config::getInstance().getRecordPath());
     if (fileDir.isEmpty()) {
-        qWarning() << "please select record path!!!";
+        qWarning() << "please select record save path!!!";
         return false;
     }
     QDateTime dateTime = QDateTime::currentDateTime();
