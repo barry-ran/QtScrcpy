@@ -411,5 +411,5 @@ void VideoForm::dropEvent(QDropEvent *event)
         m_fileHandler->installApkRequest(m_serial, file);
         return;
     }
-    m_fileHandler->pushFileRequest(m_serial, file, Config::getInstance().getPushFilePath());
+    m_fileHandler->pushFileRequest(m_serial, file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }
