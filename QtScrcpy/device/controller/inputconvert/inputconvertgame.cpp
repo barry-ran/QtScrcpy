@@ -42,9 +42,8 @@ void InputConvertGame::mouseEvent(const QMouseEvent *from, const QSize &frameSiz
         if (processMouseClick(from)) {
             return;
         }
-    } else {
-        InputConvertNormal::mouseEvent(from, frameSize, showSize);
     }
+    InputConvertNormal::mouseEvent(from, frameSize, showSize);
 }
 
 void InputConvertGame::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
@@ -117,7 +116,7 @@ void InputConvertGame::loadKeyMap(const QString &json)
 void InputConvertGame::updateSize(const QSize &frameSize, const QSize &showSize)
 {
     if (showSize != m_showSize) {
-        if (m_gameMap) {
+        if (m_gameMap && m_keyMap.isValidMouseMoveMap()) {
             // show size change, resize grab cursor
             emit grabCursor(true);
         }
@@ -296,10 +295,14 @@ void InputConvertGame::processKeyClick(
 
 void InputConvertGame::processKeyDrag(const QPointF& startPos, QPointF endPos, const QKeyEvent* from)
 {
-    if(QEvent::KeyPress == from->type()){
+    if (QEvent::KeyPress == from->type()){
         int id = attachTouchID(from->key());
         sendTouchDownEvent(id, startPos);
         sendTouchMoveEvent(id, endPos);
+    }
+
+    if (QEvent::KeyRelease == from->type()) {
+        int id = getTouchID(from->key());
         sendTouchUpEvent(id, endPos);
         detachTouchID(from->key());
     }
@@ -314,16 +317,19 @@ bool InputConvertGame::processMouseClick(const QMouseEvent *from)
         return false;
     }
 
+    qDebug() << "mouse event " << from->type();
     if (QEvent::MouseButtonPress == from->type() || QEvent::MouseButtonDblClick == from->type()) {
         int id = attachTouchID(from->button());
         sendTouchDownEvent(id, node.data.click.keyNode.pos);
-    } else if (QEvent::MouseButtonRelease == from->type()) {
-        sendTouchUpEvent(getTouchID(from->button()), node.data.click.keyNode.pos);
-        detachTouchID(from->button());
-    } else {
-        return false;
+        return true;
     }
-    return true;
+    if (QEvent::MouseButtonRelease == from->type()) {
+        int id = getTouchID(from->button());
+        sendTouchUpEvent(id, node.data.click.keyNode.pos);
+        detachTouchID(from->button());
+        return true;
+    }
+    return false;
 }
 
 bool InputConvertGame::processMouseMove(const QMouseEvent *from)
@@ -433,6 +439,12 @@ void InputConvertGame::stopMouseMoveTimer()
 bool InputConvertGame::switchGameMap()
 {
     m_gameMap = !m_gameMap;
+
+    if (!m_keyMap.isValidMouseMoveMap()) {
+        return m_gameMap;
+    }
+
+    // grab cursor and set cursor only mouse move map
     emit grabCursor(m_gameMap);
     if (m_gameMap) {
 #ifdef QT_NO_DEBUG
@@ -441,8 +453,6 @@ bool InputConvertGame::switchGameMap()
         QGuiApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 #endif
     } else {
-        if(m_ctrlMouseMove.touching)
-            mouseMoveStopTouch();
         QGuiApplication::restoreOverrideCursor();
     }
     return m_gameMap;

@@ -134,7 +134,7 @@ void KeyMap::loadKeyMap(const QString &json)
             case KeyMap::KMT_CLICK_TWICE:
             {
                 // safe check
-                if (!checkForClickDouble(node)) {
+                if (!checkForClickTwice(node)) {
                     qWarning() << "json error: keyMapNodes node format error";
                     break;
                 }
@@ -386,12 +386,12 @@ bool KeyMap::checkItemDouble(const QJsonObject& node, const QString& name)
 
 bool KeyMap::checkItemBool(const QJsonObject& node, const QString& name)
 {
-    return !node.contains(name) || node.value(name).isBool();
+    return node.contains(name) && node.value(name).isBool();
 }
 
 bool KeyMap::checkItemObject(const QJsonObject &node, const QString &name)
 {
-    return !node.contains(name) || node.value(name).isObject();
+    return node.contains(name) && node.value(name).isObject();
 }
 
 bool KeyMap::checkItemPos(const QJsonObject& node, const QString& name)
@@ -406,13 +406,12 @@ bool KeyMap::checkItemPos(const QJsonObject& node, const QString& name)
 
 bool KeyMap::checkForClick(const QJsonObject& node)
 {
-    return checkItemString(node, "key") && checkItemPos(node, "pos")
-            && checkItemBool(node, "switchMap");
+    return checkForClickTwice(node) && checkItemBool(node, "switchMap");
 }
 
-bool KeyMap::checkForClickDouble(const QJsonObject& node)
+bool KeyMap::checkForClickTwice(const QJsonObject& node)
 {
-    return checkForClick(node);
+    return checkItemString(node, "key") && checkItemPos(node, "pos");
 }
 
 bool KeyMap::checkForSteerWhell(const QJsonObject& node)
