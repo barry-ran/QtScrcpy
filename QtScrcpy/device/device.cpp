@@ -1,5 +1,6 @@
 #include <QTimer>
 #include <QMessageBox>
+#include <QDir>
 
 #include "device.h"
 #include "recorder.h"
@@ -11,6 +12,11 @@
 #include "videoform.h"
 #include "controller.h"
 #include "config.h"
+#include "avframeconvert.h"
+extern "C"
+{
+#include "libavutil/imgutils.h"
+}
 
 Device::Device(DeviceParams params, QObject *parent)
     : QObject(parent)
@@ -97,10 +103,16 @@ void Device::updateScript(QString script)
     }
 }
 
+void Device::onScreenshot()
+{
+    m_screenshot = true;
+}
+
 void Device::initSignals()
 {
     if (m_controller && m_videoForm) {
         connect(m_controller, &Controller::grabCursor, m_videoForm, &VideoForm::onGrabCursor);
+        connect(m_videoForm, &VideoForm::screenshot, this, &Device::onScreenshot);
     }
     if (m_videoForm) {
         connect(m_videoForm, &VideoForm::destroyed, this, [this](QObject *obj){
@@ -138,7 +150,7 @@ void Device::initSignals()
         });
         connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
             if (success) {
-                float diff = m_startTimeCount.elapsed() / 1000.0f;
+                double diff = m_startTimeCount.elapsed() / 1000.0;
                 qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
 
                 // update ui
@@ -189,6 +201,12 @@ void Device::initSignals()
             if (m_videoForm) {
                 m_videoForm->updateRender(frame);
             }
+
+            // screenshot
+            if (m_screenshot) {
+                saveFrame(frame);
+                m_screenshot = false;
+            }
             m_vb->unLock();
         },Qt::QueuedConnection);
     }
@@ -215,4 +233,57 @@ void Device::startServer()
         params.useReverse = m_params.useReverse;
         m_server->start(params);
     });
+}
+
+bool Device::saveFrame(const AVFrame* frame)
+{
+    if (!frame) {
+        return false;
+    }
+
+    // create buffer
+    QImage rgbImage(frame->width, frame->height, QImage::Format_RGB32);
+    AVFrame* rgbFrame = av_frame_alloc();
+    if (!rgbFrame) {
+        return false;
+    }
+
+    // bind buffer to AVFrame
+    av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, rgbImage.bits(), AV_PIX_FMT_RGB32, frame->width, frame->height, 4);
+
+    // convert
+    AVFrameConvert convert;
+    convert.setSrcFrameInfo(frame->width, frame->height, AV_PIX_FMT_YUV420P);
+    convert.setDstFrameInfo(frame->width, frame->height, AV_PIX_FMT_RGB32);
+    bool ret = false;
+    ret = convert.init();
+    if (!ret) {
+        return false;
+    }
+    ret = convert.convert(frame, rgbFrame);
+    if (!ret) {
+        return false;
+    }
+    convert.deInit();
+    av_free(rgbFrame);
+
+    // save
+    QString absFilePath;
+    QString fileDir(Config::getInstance().getRecordPath());
+    if (fileDir.isEmpty()) {
+        qWarning() << "please select record path!!!";
+        return false;
+    }
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
+    fileName = Config::getInstance().getTitle() + fileName + ".jpg";
+    QDir dir(fileDir);
+    absFilePath = dir.absoluteFilePath(fileName);
+    ret = rgbImage.save(absFilePath);
+    if (!ret) {
+        return false;
+    }
+
+    qInfo() << "screenshot save to " << absFilePath;
+    return true;
 }

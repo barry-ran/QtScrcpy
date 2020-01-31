@@ -27,6 +27,9 @@ protected:
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
 
+signals:
+    void screenshot();
+
 private slots:
     void on_fullScreenBtn_clicked();
 

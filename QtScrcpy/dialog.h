@@ -51,6 +51,7 @@ private slots:
     void on_stopAllServerBtn_clicked();
 
     void on_refreshGameScriptBtn_clicked();
+
     void on_applyScriptBtn_clicked();
 
 private:
