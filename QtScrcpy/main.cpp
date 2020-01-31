@@ -91,6 +91,7 @@ void installTranslator() {
     static QTranslator translator;
     QLocale locale;
     QLocale::Language language = locale.language();
+    //language = QLocale::English;
     QString languagePath = ":/i18n/";
     switch (language) {
     case QLocale::Chinese:
@@ -112,7 +113,7 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     }
 
     if (QtDebugMsg < type) {
-        if (g_mainDlg && g_mainDlg->isVisible() && !msg.contains("app_proces")) {
+        if (g_mainDlg && g_mainDlg->isVisible() && !g_mainDlg->filterLog(msg)) {
             g_mainDlg->outLog(msg);
         }
     }

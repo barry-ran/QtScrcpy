@@ -221,6 +221,17 @@ void Dialog::outLog(const QString &log, bool newLine)
     });
 }
 
+bool Dialog::filterLog(const QString &log)
+{
+    if (log.contains("app_proces")) {
+        return true;
+    }
+    if (log.contains("Unable to set geometry")) {
+        return true;
+    }
+    return false;
+}
+
 bool Dialog::checkAdbRun()
 {
     if (m_adb.isRuning()) {
@@ -327,11 +338,4 @@ void Dialog::on_refreshGameScriptBtn_clicked()
 void Dialog::on_applyScriptBtn_clicked()
 {
     m_deviceManage.updateScript(getGameScript(ui->gameBox->currentText()));
-}
-
-void Dialog::on_gameCheck_clicked(bool checked)
-{
-    if (checked) {
-        on_refreshGameScriptBtn_clicked();
-    }
 }
