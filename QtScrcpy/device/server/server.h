@@ -82,8 +82,8 @@ private:
     QPointer<QTcpSocket> m_controlSocket = Q_NULLPTR;
     bool m_tunnelEnabled = false;
     bool m_tunnelForward = false; // use "adb forward" instead of "adb reverse"
-    quint32 m_acceptTimeoutTimer = 0;
-    quint32 m_connectTimeoutTimer = 0;
+    int m_acceptTimeoutTimer = 0;
+    int m_connectTimeoutTimer = 0;
     quint32 m_connectCount = 0;
     quint32 m_restartCount = 0;
     QString m_deviceName = "";
