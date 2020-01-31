@@ -10,9 +10,9 @@
 #include "mousetap/mousetap.h"
 #include "config.h"
 
-Dialog* g_mainDlg = Q_NULLPTR;
+static Dialog* g_mainDlg = Q_NULLPTR;
 
-QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
+static QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 void installTranslator();
 

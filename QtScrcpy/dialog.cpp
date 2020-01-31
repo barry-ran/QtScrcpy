@@ -91,11 +91,6 @@ void Dialog::initUI()
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
 
-#ifndef Q_OS_WIN32
-    // game only windows
-    ui->gameCheck->setEnabled(false);
-#endif
-
     ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
 }
 
@@ -155,18 +150,12 @@ void Dialog::on_startServerBtn_clicked()
     params.maxSize = videoSize;
     params.bitRate = bitRate;
     // on devices with Android >= 10, the capture frame rate can be limited
-    params.maxFps = Config::getInstance().getMaxFps();
+    params.maxFps = static_cast<quint32>(Config::getInstance().getMaxFps());
     params.recordFileName = absFilePath;
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
-    if (ui->gameCheck->isChecked()) {
-        if (ui->gameBox->currentText().isEmpty()) {
-            outLog("no keymap script selected", true);
-        } else {
-            params.gameScript = getGameScript(ui->gameBox->currentText());
-        }
-    }
+
     m_deviceManage.connectDevice(params);
 
 /*

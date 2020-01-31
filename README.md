@@ -42,8 +42,9 @@ Here is the instruction of adding new customized mapping files.
 
 - Write a customized script and put it in the `keymap` directory
 - Click `refresh script` to check whether it can be found
+- Select your script
 - Connect your phone, start service and click `apply`
-- Start the game and press `~` key (left side of the number key 1) to switch to the mapping mode (It can be changed in the script as `switchkey`)
+- Press `~` key (left side of the number key 1) to switch to the custom mapping mode (It can be changed in the script as `switchkey`)
 - Press the ~ key again to switch back to normal mode
 - (For PUBG and similar games) If you want to drive cars with WASD, you need to check the `single rocker mode` in the game setting.
 
