@@ -1,7 +1,5 @@
 #include "filehandler.h"
 
-#define DEVICE_SDCARD_PATH "/sdcard/"
-
 FileHandler::FileHandler(QObject *parent)
     : QObject (parent)
 {
@@ -32,12 +30,9 @@ void FileHandler::pushFileRequest(const QString &serial, const QString &file, co
         emit fileHandlerResult(FAR_IS_RUNNING, false);
         return;
     }
-    m_devicePath = devicePath;
-    if (m_devicePath.isEmpty()) {
-        m_devicePath = DEVICE_SDCARD_PATH;
-    }
+
     m_isApk = false;
-    m_adb.push(serial, file, m_devicePath);
+    m_adb.push(serial, file, devicePath);
 }
 
 void FileHandler::installApkRequest(const QString &serial, const QString &apkFile)
@@ -46,12 +41,6 @@ void FileHandler::installApkRequest(const QString &serial, const QString &apkFil
         emit fileHandlerResult(FAR_IS_RUNNING, true);
         return;
     }
-    m_devicePath = "";
     m_isApk = true;
     m_adb.install(serial, apkFile);
-}
-
-const QString &FileHandler::getDevicePath()
-{
-    return m_devicePath;
 }

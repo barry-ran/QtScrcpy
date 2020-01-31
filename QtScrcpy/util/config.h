@@ -17,6 +17,7 @@ public:
     int getMaxFps();
     int getDesktopOpenGL();
     int getSkin();
+    QString getPushFilePath();
 
 private:
     explicit Config(QObject *parent = nullptr);

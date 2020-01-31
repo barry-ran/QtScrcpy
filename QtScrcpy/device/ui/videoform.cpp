@@ -16,6 +16,7 @@
 #include "toolform.h"
 #include "controller.h"
 #include "filehandler.h"
+#include "config.h"
 extern "C"
 {
 #include "libavutil/frame.h"
@@ -410,5 +411,5 @@ void VideoForm::dropEvent(QDropEvent *event)
         m_fileHandler->installApkRequest(m_serial, file);
         return;
     }
-    m_fileHandler->pushFileRequest(m_serial, file);
+    m_fileHandler->pushFileRequest(m_serial, file, Config::getInstance().getPushFilePath());
 }
