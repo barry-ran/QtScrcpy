@@ -9,12 +9,11 @@
 - ui提供show touch设置
 
 ## 中优先级
-- [截屏保存为jpg](https://blog.csdn.net/m0_37684310/article/details/77950390)
 - 自动打包脚本
 - 脚本
 - 群控
 - 竖屏全屏不拉伸画面
-- 分辨率码率可自定义
+- 软解
 - opengles 3.0
 
 ## 高优先级
