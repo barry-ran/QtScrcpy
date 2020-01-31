@@ -120,7 +120,7 @@ void Device::initSignals()
                 QMessageBox::warning(m_videoForm, "QtScrcpy", tr("wait current %1 to complete").arg(tips), QMessageBox::Ok);
             }
             if (FileHandler::FAR_SUCCESS_EXEC == processResult && m_videoForm) {
-                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 complete, save in %2").arg(tips).arg(m_fileHandler->getDevicePath()), QMessageBox::Ok);
+                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 complete, save in %2").arg(tips).arg(Config::getInstance().getPushFilePath()), QMessageBox::Ok);
             }
             if (FileHandler::FAR_ERROR_EXEC == processResult && m_videoForm) {
                 QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 failed").arg(tips), QMessageBox::Ok);

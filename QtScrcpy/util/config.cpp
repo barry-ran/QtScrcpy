@@ -12,6 +12,9 @@
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
 
+#define COMMON_PUSHFILE_KEY "PushFilePath"
+#define COMMON_PUSHFILE_DEF "/sdcard/"
+
 #define COMMON_SERVER_VERSION_KEY "ServerVersion"
 #define COMMON_SERVER_VERSION_DEF "1.12.1"
 
@@ -100,6 +103,15 @@ int Config::getSkin()
     skin = m_settings->value(COMMON_SKIN_KEY, COMMON_SKIN_DEF).toInt();
     m_settings->endGroup();
     return skin;
+}
+
+QString Config::getPushFilePath()
+{
+    QString pushFile;
+    m_settings->beginGroup(GROUP_COMMON);
+    pushFile = m_settings->value(COMMON_PUSHFILE_KEY, COMMON_PUSHFILE_DEF).toString();
+    m_settings->endGroup();
+    return pushFile;
 }
 
 QString Config::getTitle()
