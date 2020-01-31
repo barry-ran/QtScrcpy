@@ -54,6 +54,8 @@ private slots:
 
     void on_applyScriptBtn_clicked();
 
+    void on_recordScreenCheck_clicked(bool checked);
+
 private:
     bool checkAdbRun();
     void initUI();
