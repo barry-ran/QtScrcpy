@@ -95,7 +95,7 @@ private:
 
     // safe check for KeyMapNode
     bool checkForClick(const QJsonObject& node);
-    bool checkForClickDouble(const QJsonObject& node);
+    bool checkForClickTwice(const QJsonObject& node);
     bool checkForSteerWhell(const QJsonObject& node);
     bool checkForDrag(const QJsonObject& node);
 
