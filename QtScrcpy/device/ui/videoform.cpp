@@ -247,6 +247,11 @@ void VideoForm::setSerial(const QString &serial)
     m_serial = serial;
 }
 
+const QString &VideoForm::getSerial()
+{
+    return m_serial;
+}
+
 void VideoForm::setController(Controller *controller)
 {
     m_controller = controller;
