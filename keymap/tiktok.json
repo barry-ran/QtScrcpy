@@ -1,0 +1,67 @@
+{
+	"switchKey": "Key_QuoteLeft",
+	"keyMapNodes": [
+		{
+			"comment": "暂停/继续",
+			"type": "KMT_CLICK",
+			"key": "Key_Space",
+			"pos": {
+				"x": 0.5,
+				"y": 0.5
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "上滑",
+			"type": "KMT_DRAG",
+			"key": "Key_Up",
+			"startPos": {
+				"x": 0.5,
+				"y": 0.7
+			},
+			"endPos": {
+				"x": 0.5,
+				"y": 0.3
+			}
+		},
+		{
+			"comment": "下滑",
+			"type": "KMT_DRAG",
+			"key": "Key_Down",
+			"startPos": {
+				"x": 0.5,
+				"y": 0.3
+			},
+			"endPos": {
+				"x": 0.5,
+				"y": 0.7
+			}
+		},
+		{
+			"comment": "左滑",
+			"type": "KMT_DRAG",
+			"key": "Key_Left",
+			"startPos": {
+				"x": 0.7,
+				"y": 0.5
+			},
+			"endPos": {
+				"x": 0.3,
+				"y": 0.5
+			}
+		},
+		{
+			"comment": "右滑",
+			"type": "KMT_DRAG",
+			"key": "Key_Right",
+			"startPos": {
+				"x": 0.3,
+				"y": 0.5
+			},
+			"endPos": {
+				"x": 0.7,
+				"y": 0.5
+			}
+		}
+	]
+}

@@ -21,6 +21,7 @@ public:
     ~Dialog();
 
     void outLog(const QString& log, bool newLine = true);
+    bool filterLog(const QString & log);
 
 private slots:
     void on_updateDevice_clicked();
@@ -50,8 +51,10 @@ private slots:
     void on_stopAllServerBtn_clicked();
 
     void on_refreshGameScriptBtn_clicked();
+
     void on_applyScriptBtn_clicked();
-    void on_gameCheck_clicked(bool checked);
+
+    void on_recordScreenCheck_clicked(bool checked);
 
 private:
     bool checkAdbRun();

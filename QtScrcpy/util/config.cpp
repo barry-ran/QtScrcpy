@@ -12,8 +12,14 @@
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
 
+#define COMMON_PUSHFILE_KEY "PushFilePath"
+#define COMMON_PUSHFILE_DEF "/sdcard/"
+
 #define COMMON_SERVER_VERSION_KEY "ServerVersion"
 #define COMMON_SERVER_VERSION_DEF "1.12.1"
+
+#define COMMON_SERVER_PATH_KEY "ServerPath"
+#define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
 
 #define COMMON_MAX_FPS_KEY "MaxFps"
 #define COMMON_MAX_FPS_DEF 60
@@ -23,6 +29,9 @@
 
 #define COMMON_SKIN_KEY "UseSkin"
 #define COMMON_SKIN_DEF 1
+
+#define COMMON_RENDER_EXPIRED_FRAMES_KEY "RenderExpiredFrames"
+#define COMMON_RENDER_EXPIRED_FRAMES_DEF 0
 
 QString Config::s_configPath = "";
 
@@ -100,6 +109,33 @@ int Config::getSkin()
     skin = m_settings->value(COMMON_SKIN_KEY, COMMON_SKIN_DEF).toInt();
     m_settings->endGroup();
     return skin;
+}
+
+int Config::getRenderExpiredFrames()
+{
+    int renderExpiredFrames = 1;
+    m_settings->beginGroup(GROUP_COMMON);
+    renderExpiredFrames = m_settings->value(COMMON_RENDER_EXPIRED_FRAMES_KEY, COMMON_RENDER_EXPIRED_FRAMES_DEF).toInt();
+    m_settings->endGroup();
+    return renderExpiredFrames;
+}
+
+QString Config::getPushFilePath()
+{
+    QString pushFile;
+    m_settings->beginGroup(GROUP_COMMON);
+    pushFile = m_settings->value(COMMON_PUSHFILE_KEY, COMMON_PUSHFILE_DEF).toString();
+    m_settings->endGroup();
+    return pushFile;
+}
+
+QString Config::getServerPath()
+{
+    QString serverPath;
+    m_settings->beginGroup(GROUP_COMMON);
+    serverPath = m_settings->value(COMMON_SERVER_PATH_KEY, COMMON_SERVER_PATH_DEF).toString();
+    m_settings->endGroup();
+    return serverPath;
 }
 
 QString Config::getTitle()

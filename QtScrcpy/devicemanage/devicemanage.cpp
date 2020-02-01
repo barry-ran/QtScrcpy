@@ -49,6 +49,10 @@ bool DeviceManage::connectDevice(Device::DeviceParams params)
 
 void DeviceManage::updateScript(QString script)
 {
+    if (m_devices.isEmpty()) {
+        qWarning() << "no device connect!!!";
+        return;
+    }
     QMapIterator<QString, QPointer<Device>> i(m_devices);
     while (i.hasNext()) {
         i.next();

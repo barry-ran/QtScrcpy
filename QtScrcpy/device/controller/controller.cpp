@@ -39,7 +39,10 @@ void Controller::postControlMsg(ControlMsg *controlMsg)
 void Controller::test(QRect rc)
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
-    controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE, AMOTION_EVENT_ACTION_DOWN, AMOTION_EVENT_BUTTON_PRIMARY, rc, 1.0f);
+    controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE,
+                                      AMOTION_EVENT_ACTION_DOWN,
+                                      AMOTION_EVENT_BUTTON_PRIMARY,
+                                      rc, 1.0f);
     postControlMsg(controlMsg);
 }
 
@@ -192,7 +195,7 @@ void Controller::keyEvent(const QKeyEvent *from, const QSize &frameSize, const Q
 
 bool Controller::event(QEvent *event)
 {
-    if (event && event->type() == ControlMsg::Control) {
+    if (event && static_cast<ControlMsg::Type>(event->type()) == ControlMsg::Control) {
         ControlMsg* controlMsg = dynamic_cast<ControlMsg*>(event);
         if (controlMsg) {
             sendControl(controlMsg->serializeData());
@@ -209,7 +212,7 @@ bool Controller::sendControl(const QByteArray &buffer)
     }
     qint32 len = 0;
     if (m_controlSocket) {
-        len = m_controlSocket->write(buffer.data(), buffer.length());
+        len = static_cast<qint32>(m_controlSocket->write(buffer.data(), buffer.length()));
     }
     return len == buffer.length() ? true : false;
 }

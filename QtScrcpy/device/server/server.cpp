@@ -8,7 +8,6 @@
 #include "server.h"
 #include "config.h"
 
-#define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 #define DEVICE_NAME_FIELD_LENGTH 64
 #define SOCKET_NAME "scrcpy"
 #define MAX_CONNECT_COUNT 30
@@ -68,7 +67,7 @@ bool Server::pushServer()
     if (m_workProcess.isRuning()) {
         m_workProcess.kill();
     }
-    m_workProcess.push(m_params.serial, getServerPath(), DEVICE_SERVER_PATH);
+    m_workProcess.push(m_params.serial, getServerPath(), Config::getInstance().getServerPath());
     return true;
 }
 
@@ -126,7 +125,7 @@ bool Server::execute()
     }
     QStringList args;
     args << "shell";
-    args << QString("CLASSPATH=%1").arg(DEVICE_SERVER_PATH);
+    args << QString("CLASSPATH=%1").arg(Config::getInstance().getServerPath());
     args << "app_process";
     args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
