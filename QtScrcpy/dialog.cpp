@@ -166,11 +166,9 @@ void Dialog::on_startServerBtn_clicked()
 
     m_deviceManage.connectDevice(params);
 
-/*
-        if (ui->alwaysTopCheck->isChecked() && m_device->getVideoForm()) {
-            m_device->getVideoForm()->staysOnTop();
-        }         
-    */
+    if (ui->alwaysTopCheck->isChecked()) {
+        m_deviceManage.staysOnTop(params.serial);
+    }
 }
 
 void Dialog::on_stopServerBtn_clicked()
