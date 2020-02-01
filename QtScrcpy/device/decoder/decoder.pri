@@ -9,6 +9,3 @@ SOURCES += \
     $$PWD/fpscounter.cpp \
     $$PWD/avframeconvert.cpp \
     $$PWD/videobuffer.cpp
-
-#DEFINES += SKIP_FRAMES
-

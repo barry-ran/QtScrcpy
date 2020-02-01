@@ -162,6 +162,7 @@ void Dialog::on_startServerBtn_clicked()
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
+    params.renderExpiredFrames = Config::getInstance().getRenderExpiredFrames();
 
     m_deviceManage.connectDevice(params);
 
