@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="144"/>
-        <location filename="../../dialog.cpp" line="294"/>
+        <location filename="../../dialog.cpp" line="293"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
@@ -225,46 +225,51 @@
     </message>
     <message>
         <location filename="../../device/ui/toolform.ui" line="59"/>
+        <source>touch switch</source>
+        <translation>触摸显示开关</translation>
+    </message>
+    <message>
+        <location filename="../../device/ui/toolform.ui" line="69"/>
         <source>close screen</source>
         <translation>关闭屏幕</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="69"/>
+        <location filename="../../device/ui/toolform.ui" line="79"/>
         <source>power</source>
         <translation>电源</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="79"/>
+        <location filename="../../device/ui/toolform.ui" line="89"/>
         <source>volume up</source>
         <translation>音量加</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="89"/>
+        <location filename="../../device/ui/toolform.ui" line="99"/>
         <source>volume down</source>
         <translation>音量减</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="99"/>
+        <location filename="../../device/ui/toolform.ui" line="109"/>
         <source>app switch</source>
         <translation>切换应用</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="109"/>
+        <location filename="../../device/ui/toolform.ui" line="119"/>
         <source>menu</source>
         <translation>菜单</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="119"/>
+        <location filename="../../device/ui/toolform.ui" line="129"/>
         <source>home</source>
         <translation>主界面</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="129"/>
+        <location filename="../../device/ui/toolform.ui" line="139"/>
         <source>return</source>
         <translation>返回</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="139"/>
+        <location filename="../../device/ui/toolform.ui" line="149"/>
         <source>screen shot</source>
         <translation>截图</translation>
     </message>
@@ -284,7 +289,7 @@
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="408"/>
+        <location filename="../../device/ui/videoform.cpp" line="413"/>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
     </message>
