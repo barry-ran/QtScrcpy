@@ -30,7 +30,7 @@ Device::Device(DeviceParams params, QObject *parent)
 
     if (params.display) {
         m_vb = new VideoBuffer();
-        m_vb->init();
+        m_vb->init(params.renderExpiredFrames);
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(params.gameScript, this);

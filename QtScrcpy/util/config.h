@@ -17,6 +17,7 @@ public:
     int getMaxFps();
     int getDesktopOpenGL();
     int getSkin();
+    int getRenderExpiredFrames();
     QString getPushFilePath();
     QString getServerPath();
 

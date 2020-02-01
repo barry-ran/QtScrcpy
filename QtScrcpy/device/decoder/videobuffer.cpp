@@ -15,8 +15,9 @@ VideoBuffer::~VideoBuffer()
 
 }
 
-bool VideoBuffer::init()
+bool VideoBuffer::init(bool renderExpiredFrames)
 {
+    m_renderExpiredFrames = renderExpiredFrames;
     m_decodingFrame = av_frame_alloc();
     if (!m_decodingFrame) {
         goto error;
@@ -71,17 +72,17 @@ void VideoBuffer::offerDecodedFrame(bool& previousFrameSkipped)
 {
     m_mutex.lock();
 
-#ifndef SKIP_FRAMES
-    // if SKIP_FRAMES is disabled, then the decoder must wait for the current
-    // frame to be consumed
-    while (!m_renderingFrameConsumed && !m_interrupted) {
-        m_renderingFrameConsumedCond.wait(&m_mutex);
-    }    
-#else
-    if (m_fpsCounter.isStarted() && !m_renderingFrameConsumed) {
-        m_fpsCounter.addSkippedFrame();
+    if (m_renderExpiredFrames) {
+        // if m_renderExpiredFrames is enable, then the decoder must wait for the current
+        // frame to be consumed
+        while (!m_renderingFrameConsumed && !m_interrupted) {
+            m_renderingFrameConsumedCond.wait(&m_mutex);
+        }
+    } else {
+        if (m_fpsCounter.isStarted() && !m_renderingFrameConsumed) {
+            m_fpsCounter.addSkippedFrame();
+        }
     }
-#endif
 
     swap();
     previousFrameSkipped = !m_renderingFrameConsumed;
@@ -96,23 +97,23 @@ const AVFrame *VideoBuffer::consumeRenderedFrame()
     if (m_fpsCounter.isStarted()) {
         m_fpsCounter.addRenderedFrame();
     }
-#ifndef SKIP_FRAMES
-    // if SKIP_FRAMES is disabled, then notify the decoder the current frame is
-    // consumed, so that it may push a new one
-    m_renderingFrameConsumedCond.wakeOne();
-#endif
+    if (m_renderExpiredFrames) {
+        // if m_renderExpiredFrames is enable, then notify the decoder the current frame is
+        // consumed, so that it may push a new one
+        m_renderingFrameConsumedCond.wakeOne();
+    }
     return m_renderingframe;
 }
 
 void VideoBuffer::interrupt()
 {
-#ifndef SKIP_FRAMES
-    m_mutex.lock();
-    m_interrupted = true;
-    m_mutex.unlock();
-    // wake up blocking wait
-    m_renderingFrameConsumedCond.wakeOne();
-#endif
+    if (m_renderExpiredFrames) {
+        m_mutex.lock();
+        m_interrupted = true;
+        m_mutex.unlock();
+        // wake up blocking wait
+        m_renderingFrameConsumedCond.wakeOne();
+    }
 }
 
 void VideoBuffer::swap()

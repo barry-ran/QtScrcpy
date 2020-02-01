@@ -30,6 +30,9 @@
 #define COMMON_SKIN_KEY "UseSkin"
 #define COMMON_SKIN_DEF 1
 
+#define COMMON_RENDER_EXPIRED_FRAMES_KEY "RenderExpiredFrames"
+#define COMMON_RENDER_EXPIRED_FRAMES_DEF 0
+
 QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
@@ -106,6 +109,15 @@ int Config::getSkin()
     skin = m_settings->value(COMMON_SKIN_KEY, COMMON_SKIN_DEF).toInt();
     m_settings->endGroup();
     return skin;
+}
+
+int Config::getRenderExpiredFrames()
+{
+    int renderExpiredFrames = 1;
+    m_settings->beginGroup(GROUP_COMMON);
+    renderExpiredFrames = m_settings->value(COMMON_RENDER_EXPIRED_FRAMES_KEY, COMMON_RENDER_EXPIRED_FRAMES_DEF).toInt();
+    m_settings->endGroup();
+    return renderExpiredFrames;
 }
 
 QString Config::getPushFilePath()
