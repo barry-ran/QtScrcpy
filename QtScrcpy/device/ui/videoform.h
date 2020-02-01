@@ -29,6 +29,9 @@ public:
     void setFileHandler(FileHandler *fileHandler);
     void setSerial(const QString &serial);
 
+signals:
+    void screenshot();
+
 public slots:
     void onGrabCursor(bool grab);
 

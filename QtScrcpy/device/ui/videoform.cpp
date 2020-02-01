@@ -16,6 +16,7 @@
 #include "toolform.h"
 #include "controller.h"
 #include "filehandler.h"
+#include "config.h"
 extern "C"
 {
 #include "libavutil/frame.h"
@@ -92,6 +93,8 @@ void VideoForm::showToolForm(bool show)
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
         m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
+
+        connect(m_toolForm, &ToolForm::screenshot, this, &VideoForm::screenshot);
     }
     m_toolForm->setVisible(show);
 }
@@ -349,7 +352,6 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    //qDebug() << "keyPressEvent" << event->isAutoRepeat();
     m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
@@ -358,7 +360,6 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
     if (!m_controller) {
         return;
     }
-    //qDebug() << "keyReleaseEvent" << event->isAutoRepeat();
     m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
 }
 
@@ -412,5 +413,5 @@ void VideoForm::dropEvent(QDropEvent *event)
         m_fileHandler->installApkRequest(m_serial, file);
         return;
     }
-    m_fileHandler->pushFileRequest(m_serial, file);
+    m_fileHandler->pushFileRequest(m_serial, file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }

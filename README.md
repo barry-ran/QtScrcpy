@@ -32,7 +32,7 @@ It focuses on:
 ## Customized key mapping (Windows only)
 You can write your own script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/按键映射说明.md) are the rules.
 
-A script for "PUBG mobile" mapping is provided by default. Once enabled, you can play the game with your keyboard and mouse as the PC version. You can also write your own mapping files for other games according to [writing rules](docs/按键映射说明.md). The default key mapping is as follows:
+A script for "PUBG mobile" and TikTok mapping is provided by default. Once enabled, you can play the game with your keyboard and mouse as the PC version. or you can use up/down/left/right direction keys to simulate up/down/left/right sliding. You can also write your own mapping files for other games according to [writing rules](docs/按键映射说明.md). The default key mapping is as follows:
 
 ![game](screenshot/game.jpg)
 
@@ -42,8 +42,9 @@ Here is the instruction of adding new customized mapping files.
 
 - Write a customized script and put it in the `keymap` directory
 - Click `refresh script` to check whether it can be found
+- Select your script
 - Connect your phone, start service and click `apply`
-- Start the game and press `~` key (left side of the number key 1) to switch to the mapping mode (It can be changed in the script as `switchkey`)
+- Press `~` key (left side of the number key 1) to switch to the custom mapping mode (It can be changed in the script as `switchkey`)
 - Press the ~ key again to switch back to normal mode
 - (For PUBG and similar games) If you want to drive cars with WASD, you need to check the `single rocker mode` in the game setting.
 
