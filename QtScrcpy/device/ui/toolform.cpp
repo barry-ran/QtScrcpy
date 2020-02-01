@@ -40,7 +40,7 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->closeScreenBtn, QChar(0xf070), 15);
     IconHelper::Instance()->SetIcon(ui->powerBtn, QChar(0xf011), 15);
     IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), 15);
-    IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf05b), 15);
+    IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf0c4), 15);
 }
 
 void ToolForm::mousePressEvent(QMouseEvent *event)
