@@ -16,22 +16,22 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="127"/>
+        <location filename="../../device/device.cpp" line="134"/>
         <source>install apk</source>
         <translation>install apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="129"/>
+        <location filename="../../device/device.cpp" line="136"/>
         <source>file transfer</source>
         <translation>file transfer</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="132"/>
+        <location filename="../../device/device.cpp" line="139"/>
         <source>wait current %1 to complete</source>
         <translation>wait current %1 to complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="135"/>
+        <location filename="../../device/device.cpp" line="142"/>
         <source>%1 complete, save in %2</source>
         <translation>%1 complete, save in %2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1 complete\n save in %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="138"/>
+        <location filename="../../device/device.cpp" line="145"/>
         <source>%1 failed</source>
         <translation>%1 failed</translation>
     </message>
@@ -197,6 +197,11 @@
         <source>refresh devices</source>
         <translation>refresh devices</translation>
     </message>
+    <message>
+        <location filename="../../dialog.cpp" line="93"/>
+        <source>original</source>
+        <translation>original</translation>
+    </message>
 </context>
 <context>
     <name>ToolForm</name>
@@ -289,7 +294,7 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="413"/>
+        <location filename="../../device/ui/videoform.cpp" line="415"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>

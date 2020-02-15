@@ -90,7 +90,7 @@ void Dialog::initUI()
     ui->maxSizeBox->addItem("1080");
     ui->maxSizeBox->addItem("1280");
     ui->maxSizeBox->addItem("1920");
-    ui->maxSizeBox->addItem("native");
+    ui->maxSizeBox->addItem(tr("original"));
     ui->maxSizeBox->setCurrentIndex(2);
 
     ui->formatBox->addItem("mp4");
