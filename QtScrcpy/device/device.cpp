@@ -105,7 +105,14 @@ void Device::updateScript(QString script)
 
 void Device::onScreenshot()
 {
-    m_screenshot = true;
+    if (!m_vb) {
+        return;
+    }
+
+    m_vb->lock();
+    // screenshot
+    saveFrame(m_vb->peekRenderedFrame());
+    m_vb->unLock();
 }
 
 void Device::initSignals()
@@ -200,12 +207,6 @@ void Device::initSignals()
             const AVFrame *frame = m_vb->consumeRenderedFrame();
             if (m_videoForm) {
                 m_videoForm->updateRender(frame);
-            }
-
-            // screenshot
-            if (m_screenshot) {
-                saveFrame(frame);
-                m_screenshot = false;
             }
             m_vb->unLock();
         },Qt::QueuedConnection);

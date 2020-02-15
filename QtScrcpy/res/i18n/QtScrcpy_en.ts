@@ -16,22 +16,22 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="127"/>
+        <location filename="../../device/device.cpp" line="134"/>
         <source>install apk</source>
         <translation>install apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="129"/>
+        <location filename="../../device/device.cpp" line="136"/>
         <source>file transfer</source>
         <translation>file transfer</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="132"/>
+        <location filename="../../device/device.cpp" line="139"/>
         <source>wait current %1 to complete</source>
         <translation>wait current %1 to complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="135"/>
+        <location filename="../../device/device.cpp" line="142"/>
         <source>%1 complete, save in %2</source>
         <translation>%1 complete, save in %2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1 complete\n save in %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="138"/>
+        <location filename="../../device/device.cpp" line="145"/>
         <source>%1 failed</source>
         <translation>%1 failed</translation>
     </message>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="144"/>
-        <location filename="../../dialog.cpp" line="294"/>
+        <location filename="../../dialog.cpp" line="293"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
@@ -197,6 +197,11 @@
         <source>refresh devices</source>
         <translation>refresh devices</translation>
     </message>
+    <message>
+        <location filename="../../dialog.cpp" line="93"/>
+        <source>original</source>
+        <translation>original</translation>
+    </message>
 </context>
 <context>
     <name>ToolForm</name>
@@ -225,46 +230,51 @@
     </message>
     <message>
         <location filename="../../device/ui/toolform.ui" line="59"/>
+        <source>touch switch</source>
+        <translation>touch switch</translation>
+    </message>
+    <message>
+        <location filename="../../device/ui/toolform.ui" line="69"/>
         <source>close screen</source>
         <translation>close screen</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="69"/>
+        <location filename="../../device/ui/toolform.ui" line="79"/>
         <source>power</source>
         <translation>power</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="79"/>
+        <location filename="../../device/ui/toolform.ui" line="89"/>
         <source>volume up</source>
         <translation>volume up</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="89"/>
+        <location filename="../../device/ui/toolform.ui" line="99"/>
         <source>volume down</source>
         <translation>volume down</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="99"/>
+        <location filename="../../device/ui/toolform.ui" line="109"/>
         <source>app switch</source>
         <translation>app switch</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="109"/>
+        <location filename="../../device/ui/toolform.ui" line="119"/>
         <source>menu</source>
         <translation>menu</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="119"/>
+        <location filename="../../device/ui/toolform.ui" line="129"/>
         <source>home</source>
         <translation>home</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="129"/>
+        <location filename="../../device/ui/toolform.ui" line="139"/>
         <source>return</source>
         <translation>return</translation>
     </message>
     <message>
-        <location filename="../../device/ui/toolform.ui" line="139"/>
+        <location filename="../../device/ui/toolform.ui" line="149"/>
         <source>screen shot</source>
         <translation>screen shot</translation>
     </message>
@@ -284,7 +294,7 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="408"/>
+        <location filename="../../device/ui/videoform.cpp" line="415"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>

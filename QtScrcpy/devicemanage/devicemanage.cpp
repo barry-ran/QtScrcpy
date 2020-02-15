@@ -2,6 +2,7 @@
 
 #include "devicemanage.h"
 #include "server.h"
+#include "videoform.h"
 
 #define DM_MAX_DEVICES_NUM 16
 
@@ -60,6 +61,21 @@ void DeviceManage::updateScript(QString script)
             i.value()->updateScript(script);
         }
     }
+}
+
+bool DeviceManage::staysOnTop(const QString &serial)
+{
+    if (!serial.isEmpty() && m_devices.contains(serial)) {
+        auto it = m_devices.find(serial);
+        if (!it->data()) {
+            return false;
+        }
+        if (!it->data()->getVideoForm()) {
+            return false;
+        }
+        it->data()->getVideoForm()->staysOnTop();
+    }
+    return true;
 }
 
 bool DeviceManage::disconnectDevice(const QString &serial)

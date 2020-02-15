@@ -105,6 +105,11 @@ const AVFrame *VideoBuffer::consumeRenderedFrame()
     return m_renderingframe;
 }
 
+const AVFrame *VideoBuffer::peekRenderedFrame()
+{
+    return m_renderingframe;
+}
+
 void VideoBuffer::interrupt()
 {
     if (m_renderExpiredFrames) {
