@@ -1,5 +1,6 @@
 #include <QTimer>
 #include <QMessageBox>
+#include <QDir>
 
 #include "device.h"
 #include "recorder.h"
@@ -10,6 +11,12 @@
 #include "stream.h"
 #include "videoform.h"
 #include "controller.h"
+#include "config.h"
+#include "avframeconvert.h"
+extern "C"
+{
+#include "libavutil/imgutils.h"
+}
 
 Device::Device(DeviceParams params, QObject *parent)
     : QObject(parent)
@@ -23,12 +30,11 @@ Device::Device(DeviceParams params, QObject *parent)
 
     if (params.display) {
         m_vb = new VideoBuffer();
-        m_vb->init();
+        m_vb->init(params.renderExpiredFrames);
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(params.gameScript, this);
-        //m_videoForm = new VideoForm(false);
-        m_videoForm = new VideoForm();
+        m_videoForm = new VideoForm(Config::getInstance().getSkin());
         m_videoForm->setSerial(m_params.serial);
         if (m_controller) {
             m_videoForm->setController(m_controller);
@@ -97,14 +103,27 @@ void Device::updateScript(QString script)
     }
 }
 
+void Device::onScreenshot()
+{
+    if (!m_vb) {
+        return;
+    }
+
+    m_vb->lock();
+    // screenshot
+    saveFrame(m_vb->peekRenderedFrame());
+    m_vb->unLock();
+}
+
 void Device::initSignals()
 {
     if (m_controller && m_videoForm) {
         connect(m_controller, &Controller::grabCursor, m_videoForm, &VideoForm::onGrabCursor);
+        connect(m_videoForm, &VideoForm::screenshot, this, &Device::onScreenshot);
     }
     if (m_videoForm) {
         connect(m_videoForm, &VideoForm::destroyed, this, [this](QObject *obj){
-            Q_UNUSED(obj);
+            Q_UNUSED(obj)
             deleteLater();
         });
     }
@@ -120,7 +139,7 @@ void Device::initSignals()
                 QMessageBox::warning(m_videoForm, "QtScrcpy", tr("wait current %1 to complete").arg(tips), QMessageBox::Ok);
             }
             if (FileHandler::FAR_SUCCESS_EXEC == processResult && m_videoForm) {
-                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 complete, save in %2").arg(tips).arg(m_fileHandler->getDevicePath()), QMessageBox::Ok);
+                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 complete, save in %2").arg(tips).arg(Config::getInstance().getPushFilePath()), QMessageBox::Ok);
             }
             if (FileHandler::FAR_ERROR_EXEC == processResult && m_videoForm) {
                 QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 failed").arg(tips), QMessageBox::Ok);
@@ -138,7 +157,7 @@ void Device::initSignals()
         });
         connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
             if (success) {
-                float diff = m_startTimeCount.elapsed() / 1000.0f;
+                double diff = m_startTimeCount.elapsed() / 1000.0;
                 qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
 
                 // update ui
@@ -204,16 +223,68 @@ void Device::startServer()
         //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
         // only one devices, serial can be null
         // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
-        // sendFrameMeta for recorder mp4
         Server::ServerParams params;
         params.serial = m_params.serial;
         params.localPort = m_params.localPort;
         params.maxSize = m_params.maxSize;
         params.bitRate = m_params.bitRate;
+        params.maxFps = m_params.maxFps;
         params.crop = "-";
-        params.sendFrameMeta = m_recorder ? true : false;
         params.control = true;
         params.useReverse = m_params.useReverse;
         m_server->start(params);
     });
+}
+
+bool Device::saveFrame(const AVFrame* frame)
+{
+    if (!frame) {
+        return false;
+    }
+
+    // create buffer
+    QImage rgbImage(frame->width, frame->height, QImage::Format_RGB32);
+    AVFrame* rgbFrame = av_frame_alloc();
+    if (!rgbFrame) {
+        return false;
+    }
+
+    // bind buffer to AVFrame
+    av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, rgbImage.bits(), AV_PIX_FMT_RGB32, frame->width, frame->height, 4);
+
+    // convert
+    AVFrameConvert convert;
+    convert.setSrcFrameInfo(frame->width, frame->height, AV_PIX_FMT_YUV420P);
+    convert.setDstFrameInfo(frame->width, frame->height, AV_PIX_FMT_RGB32);
+    bool ret = false;
+    ret = convert.init();
+    if (!ret) {
+        return false;
+    }
+    ret = convert.convert(frame, rgbFrame);
+    if (!ret) {
+        return false;
+    }
+    convert.deInit();
+    av_free(rgbFrame);
+
+    // save
+    QString absFilePath;
+    QString fileDir(Config::getInstance().getRecordPath());
+    if (fileDir.isEmpty()) {
+        qWarning() << "please select record save path!!!";
+        return false;
+    }
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
+    fileName = Config::getInstance().getTitle() + fileName + ".jpg";
+    QDir dir(fileDir);
+    absFilePath = dir.absoluteFilePath(fileName);
+    ret = rgbImage.save(absFilePath);
+    if (!ret) {
+        return false;
+    }
+
+    qInfo() << "screenshot save to " << absFilePath;
+    return true;
 }

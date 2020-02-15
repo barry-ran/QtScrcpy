@@ -42,18 +42,13 @@ void ControlMsg::setInjectTextMsgData(QString& text)
     m_data.injectText.text[tmp.length()] = '\0';
 }
 
-void ControlMsg::setInjectMouseMsgData(AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position)
+void ControlMsg::setInjectTouchMsgData(quint64 id, AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position, float pressure)
 {
-    m_data.injectMouse.action = action;
-    m_data.injectMouse.buttons = buttons;
-    m_data.injectMouse.position = position;
-}
-
-void ControlMsg::setInjectTouchMsgData(quint32 id, AndroidMotioneventAction action, QRect position)
-{
-    m_data.injectTouch.action = action;
     m_data.injectTouch.id = id;
+    m_data.injectTouch.action = action;
+    m_data.injectTouch.buttons = buttons;
     m_data.injectTouch.position = position;
+    m_data.injectTouch.pressure = pressure;
 }
 
 void ControlMsg::setInjectScrollMsgData(QRect position, qint32 hScroll, qint32 vScroll)
@@ -85,10 +80,20 @@ void ControlMsg::setSetScreenPowerModeData(ControlMsg::ScreenPowerMode mode)
 
 void ControlMsg::writePosition(QBuffer &buffer, const QRect& value)
 {
-    BufferUtil::write16(buffer, value.left());
-    BufferUtil::write16(buffer, value.top());
+    BufferUtil::write32(buffer, value.left());
+    BufferUtil::write32(buffer, value.top());
     BufferUtil::write16(buffer, value.width());
     BufferUtil::write16(buffer, value.height());
+}
+
+quint16 ControlMsg::toFixedPoint16(float f)
+{
+    Q_ASSERT(f >= 0.0f && f <= 1.0f);
+    quint32 u = f * 0x1p16f; // 2^16
+    if (u >= 0xffff) {
+        u = 0xffff;
+    }
+    return (quint16) u;
 }
 
 QByteArray ControlMsg::serializeData()
@@ -108,15 +113,15 @@ QByteArray ControlMsg::serializeData()
         BufferUtil::write16(buffer, strlen(m_data.injectText.text));
         buffer.write(m_data.injectText.text, strlen(m_data.injectText.text));
         break;
-    case CMT_INJECT_MOUSE:
-        buffer.putChar(m_data.injectMouse.action);
-        BufferUtil::write32(buffer, m_data.injectMouse.buttons);
-        writePosition(buffer, m_data.injectMouse.position);
-        break;
     case CMT_INJECT_TOUCH:
-        buffer.putChar(m_data.injectTouch.id);
+    {
         buffer.putChar(m_data.injectTouch.action);
+        BufferUtil::write64(buffer, m_data.injectTouch.id);
         writePosition(buffer, m_data.injectTouch.position);
+        quint16 pressure = toFixedPoint16(m_data.injectTouch.pressure);
+        BufferUtil::write16(buffer, pressure);
+        BufferUtil::write32(buffer, m_data.injectTouch.buttons);
+    }
         break;
     case CMT_INJECT_SCROLL:
         writePosition(buffer, m_data.injectScroll.position);

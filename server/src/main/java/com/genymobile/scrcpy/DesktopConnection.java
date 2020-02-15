@@ -15,7 +15,7 @@ public final class DesktopConnection implements Closeable {
 
     private static final int DEVICE_NAME_FIELD_LENGTH = 64;
 
-    private static final String SOCKET_NAME = "qtscrcpy";
+    private static final String SOCKET_NAME = "scrcpy";
 
     private final LocalSocket videoSocket;
     private final FileDescriptor videoFd;
@@ -23,7 +23,6 @@ public final class DesktopConnection implements Closeable {
     private final LocalSocket controlSocket;
     private final InputStream controlInputStream;
     private final OutputStream controlOutputStream;
-
 
     private final ControlMessageReader reader = new ControlMessageReader();
     private final DeviceMessageWriter writer = new DeviceMessageWriter();
@@ -90,7 +89,7 @@ public final class DesktopConnection implements Closeable {
         byte[] buffer = new byte[DEVICE_NAME_FIELD_LENGTH + 4];
 
         byte[] deviceNameBytes = deviceName.getBytes(StandardCharsets.UTF_8);
-        int len = Math.min(DEVICE_NAME_FIELD_LENGTH - 1, deviceNameBytes.length);
+        int len = StringUtils.getUtf8TruncationIndex(deviceNameBytes, DEVICE_NAME_FIELD_LENGTH - 1);
         System.arraycopy(deviceNameBytes, 0, buffer, 0, len);
         // byte[] are always 0-initialized in java, no need to set '\0' explicitly
 

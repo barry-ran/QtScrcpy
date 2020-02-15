@@ -1,6 +1,6 @@
 @echo off
-set vcvarsall="C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat"
-set qt_msvc_path="D:\Qt\Qt5.12.4\5.12.4\"
+set vcvarsall="D:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat"
+set qt_msvc_path="D:\Qt\Qt5.12.5\5.12.5\"
 
 :: 获取脚本绝对路径
 set script_path=%~dp0

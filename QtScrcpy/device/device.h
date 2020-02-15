@@ -12,20 +12,23 @@ class FileHandler;
 class Stream;
 class VideoForm;
 class Controller;
+struct AVFrame;
 class Device : public QObject
 {
     Q_OBJECT
 public:
     struct DeviceParams {
-        QString recordFileName = "";    // 视频录制文件名
-        QString serial = "";            // 设备序列号
-        quint16 localPort = 27183;      // reverse时本地监听端口
-        quint16 maxSize = 720;          // 视频分辨率
-        quint32 bitRate = 8000000;      // 视频比特率
-        bool closeScreen = false;       // 启动时自动息屏
-        bool useReverse = true;         // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
-        bool display = true;            // 是否显示画面（或者仅仅后台录制）
-        QString gameScript = "";        // 游戏映射脚本
+        QString recordFileName = "";        // 视频录制文件名
+        QString serial = "";                // 设备序列号
+        quint16 localPort = 27183;          // reverse时本地监听端口
+        quint16 maxSize = 720;              // 视频分辨率
+        quint32 bitRate = 8000000;          // 视频比特率
+        quint32 maxFps = 60;                // 视频最大帧率
+        bool closeScreen = false;           // 启动时自动息屏
+        bool useReverse = true;             // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
+        bool display = true;                // 是否显示画面（或者仅仅后台录制）
+        QString gameScript = "";            // 游戏映射脚本
+        bool renderExpiredFrames = false;   // 是否渲染延迟视频帧
     };
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
@@ -39,9 +42,13 @@ public:
 signals:
     void deviceDisconnect(QString serial);
 
+public slots:
+    void onScreenshot();
+
 private:
     void initSignals();
     void startServer();
+    bool saveFrame(const AVFrame* frame);
 
 private:
     // server relevant

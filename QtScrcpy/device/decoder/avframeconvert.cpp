@@ -12,7 +12,7 @@ AVFrameConvert::~AVFrameConvert()
 
 }
 
-void AVFrameConvert::setSrcFrameInfo(quint32 srcWidth, quint32 srcHeight, AVPixelFormat srcFormat)
+void AVFrameConvert::setSrcFrameInfo(int srcWidth, int srcHeight, AVPixelFormat srcFormat)
 {
     m_srcWidth = srcWidth;
     m_srcHeight = srcHeight;
@@ -20,21 +20,21 @@ void AVFrameConvert::setSrcFrameInfo(quint32 srcWidth, quint32 srcHeight, AVPixe
     qDebug() << "Convert::src frame info " << srcWidth << "x" << srcHeight;
 }
 
-void AVFrameConvert::getSrcFrameInfo(quint32& srcWidth, quint32& srcHeight, AVPixelFormat& srcFormat)
+void AVFrameConvert::getSrcFrameInfo(int& srcWidth, int& srcHeight, AVPixelFormat& srcFormat)
 {
     srcWidth = m_srcWidth;
     srcHeight = m_srcHeight;
     srcFormat = m_srcFormat;    
 }
 
-void AVFrameConvert::setDstFrameInfo(quint32 dstWidth, quint32 dstHeight, AVPixelFormat dstFormat)
+void AVFrameConvert::setDstFrameInfo(int dstWidth, int dstHeight, AVPixelFormat dstFormat)
 {
     m_dstWidth = dstWidth;
     m_dstHeight = dstHeight;
     m_dstFormat = dstFormat;
 }
 
-void AVFrameConvert::getDstFrameInfo(quint32& dstWidth, quint32& dstHeight, AVPixelFormat& dstFormat)
+void AVFrameConvert::getDstFrameInfo(int& dstWidth, int& dstHeight, AVPixelFormat& dstFormat)
 {
     dstWidth = m_dstWidth;
     dstHeight = m_dstHeight;
@@ -67,12 +67,15 @@ void AVFrameConvert::deInit()
     }
 }
 
-bool AVFrameConvert::convert(AVFrame* srcFrame, AVFrame* dstFrame)
+bool AVFrameConvert::convert(const AVFrame* srcFrame, AVFrame* dstFrame)
 {
     if(!m_convertCtx || !srcFrame || !dstFrame) {
         return false;
     }
-    qint32 ret = sws_scale(m_convertCtx, (const uint8_t* const*)srcFrame->data, srcFrame->linesize, 0, m_srcHeight, dstFrame->data, dstFrame->linesize);    
+    qint32 ret = sws_scale(m_convertCtx,
+                           static_cast<const uint8_t* const*>(srcFrame->data),
+                           srcFrame->linesize, 0, m_srcHeight, dstFrame->data,
+                           dstFrame->linesize);
     if (0 == ret) {
         return false;
     }

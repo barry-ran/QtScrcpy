@@ -62,16 +62,16 @@ void AdbProcess::initSignals()
 
     connect(this, &QProcess::readyReadStandardError, this,
             [this](){
-        QString tmp = QString::fromLocal8Bit(readAllStandardError()).trimmed();
+        QString tmp = QString::fromUtf8(readAllStandardError()).trimmed();
         m_errorOutput += tmp;
-        qWarning(QString("AdbProcess::error:%1").arg(tmp).toUtf8());
+        qWarning(QString("AdbProcess::error:%1").arg(tmp).toStdString().data());
     });
 
     connect(this, &QProcess::readyReadStandardOutput, this,
             [this](){
-        QString tmp = QString::fromLocal8Bit(readAllStandardOutput()).trimmed();
+        QString tmp = QString::fromUtf8(readAllStandardOutput()).trimmed();
         m_standardOutput += tmp;
-        qInfo(QString("AdbProcess::out:%1").arg(tmp).toUtf8());
+        qInfo(QString("AdbProcess::out:%1").arg(tmp).toStdString().data());
     });
 
     connect(this, &QProcess::started, this,

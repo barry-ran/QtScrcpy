@@ -27,8 +27,8 @@ public final class DeviceMessageSender {
                 text = clipboardText;
                 clipboardText = null;
             }
-            DeviceMessage msg = DeviceMessage.createClipboard(text);
-            connection.sendDeviceMessage(msg);
+            DeviceMessage event = DeviceMessage.createClipboard(text);
+            connection.sendDeviceMessage(event);
         }
     }
 }

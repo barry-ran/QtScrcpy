@@ -15,7 +15,7 @@ public:
     VideoBuffer();
     virtual ~VideoBuffer();
 
-    bool init();
+    bool init(bool renderExpiredFrames = false);
     void deInit();
     void lock();
     void unLock();
@@ -32,6 +32,8 @@ public:
     // unlocking m_mutex
     const AVFrame* consumeRenderedFrame();
 
+    const AVFrame* peekRenderedFrame();
+
     // wake up and avoid any blocking call
     void interrupt();
 
@@ -45,10 +47,12 @@ private:
     bool m_renderingFrameConsumed = true;
     FpsCounter m_fpsCounter;
 
-#ifndef SKIP_FRAMES
+    bool m_renderExpiredFrames = false;
     QWaitCondition m_renderingFrameConsumedCond;
-    bool m_interrupted = true;
-#endif
+
+    // interrupted is not used if expired frames are not rendered
+    // since offering a frame will never block
+    bool m_interrupted = false;
 };
 
 #endif // VIDEO_BUFFER_H

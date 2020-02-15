@@ -7,7 +7,8 @@
 		},
 		"speedRatio": 10
 	},
-	"keyMapNodes": [{
+	"keyMapNodes": [
+		{
 			"comment": "方向盘",
 			"type": "KMT_STEER_WHEEL",
 			"centerPos": {
@@ -184,7 +185,7 @@
 		{
 			"comment": "下车",
 			"type": "KMT_CLICK",
-			"key": "Key_S",
+			"key": "Key_5",
 			"pos": {
 				"x": 0.92,
 				"y": 0.4

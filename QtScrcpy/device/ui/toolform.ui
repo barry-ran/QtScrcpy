@@ -54,6 +54,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="touchBtn">
+     <property name="toolTip">
+      <string>touch switch</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="closeScreenBtn">
      <property name="toolTip">
       <string>close screen</string>

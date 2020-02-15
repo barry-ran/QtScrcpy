@@ -19,8 +19,9 @@ if /i "%1"=="x64" (
 :: 环境变量设置
 
 set adb_path=%script_path%third_party\adb\win\*.*
-set jar_path=%script_path%third_party\scrcpy-server.jar
+set jar_path=%script_path%third_party\scrcpy-server
 set keymap_path=%script_path%keymap
+set config_path=%script_path%config
 
 if /i %cpu_mode% == x86 (
     set publish_path=%script_path%QtScrcpy-win32\
@@ -42,6 +43,7 @@ xcopy %release_path% %publish_path% /E /Y
 xcopy %adb_path% %publish_path% /Y
 xcopy %jar_path% %publish_path% /Y
 xcopy %keymap_path% %publish_path%keymap\ /E /Y
+xcopy %config_path% %publish_path%config\ /E /Y
 
 :: 添加qt依赖包
 windeployqt %publish_path%\QtScrcpy.exe

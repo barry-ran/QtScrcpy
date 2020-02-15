@@ -9,9 +9,9 @@ import java.nio.charset.StandardCharsets;
 public class ControlMessageReader {
 
     private static final int INJECT_KEYCODE_PAYLOAD_LENGTH = 9;
-    private static final int INJECT_MOUSE_PAYLOAD_LENGTH = 13;
-    private static final int INJECT_SCROLL_PAYLOAD_LENGTH = 16;
-    private static final int INJECT_TOUCH_PAYLOAD_LENGTH = 10;
+    private static final int INJECT_MOUSE_EVENT_PAYLOAD_LENGTH = 17;
+    private static final int INJECT_TOUCH_EVENT_PAYLOAD_LENGTH = 21;
+    private static final int INJECT_SCROLL_EVENT_PAYLOAD_LENGTH = 20;
     private static final int SET_SCREEN_POWER_MODE_PAYLOAD_LENGTH = 1;
 
     public static final int TEXT_MAX_LENGTH = 300;
@@ -50,6 +50,7 @@ public class ControlMessageReader {
             return null;
         }
         int savedPosition = buffer.position();
+
         int type = buffer.get();
         ControlMessage msg;
         switch (type) {
@@ -59,14 +60,11 @@ public class ControlMessageReader {
             case ControlMessage.TYPE_INJECT_TEXT:
                 msg = parseInjectText();
                 break;
-            case ControlMessage.TYPE_INJECT_MOUSE:
-                msg = parseInjectMouse();
+            case ControlMessage.TYPE_INJECT_TOUCH_EVENT:
+                msg = parseInjectTouchEvent();
                 break;
-            case ControlMessage.TYPE_INJECT_TOUCH:
-                msg = parseInjectMouseTouch();
-                break;
-            case ControlMessage.TYPE_INJECT_SCROLL:
-                msg = parseInjectScroll();
+            case ControlMessage.TYPE_INJECT_SCROLL_EVENT:
+                msg = parseInjectScrollEvent();
                 break;
             case ControlMessage.TYPE_SET_CLIPBOARD:
                 msg = parseSetClipboard();
@@ -78,6 +76,7 @@ public class ControlMessageReader {
             case ControlMessage.TYPE_EXPAND_NOTIFICATION_PANEL:
             case ControlMessage.TYPE_COLLAPSE_NOTIFICATION_PANEL:
             case ControlMessage.TYPE_GET_CLIPBOARD:
+            case ControlMessage.TYPE_ROTATE_DEVICE:
                 msg = ControlMessage.createEmpty(type);
                 break;
             default:
@@ -123,34 +122,30 @@ public class ControlMessageReader {
         return ControlMessage.createInjectText(text);
     }
 
-    private ControlMessage parseInjectMouse() {
-        if (buffer.remaining() < INJECT_MOUSE_PAYLOAD_LENGTH) {
+    @SuppressWarnings("checkstyle:MagicNumber")
+    private ControlMessage parseInjectTouchEvent() {
+        if (buffer.remaining() < INJECT_TOUCH_EVENT_PAYLOAD_LENGTH) {
             return null;
         }
         int action = toUnsigned(buffer.get());
+        long pointerId = buffer.getLong();
+        Position position = readPosition(buffer);
+        // 16 bits fixed-point
+        int pressureInt = toUnsigned(buffer.getShort());
+        // convert it to a float between 0 and 1 (0x1p16f is 2^16 as float)
+        float pressure = pressureInt == 0xffff ? 1f : (pressureInt / 0x1p16f);
         int buttons = buffer.getInt();
-        Position position = readPosition(buffer);
-        return ControlMessage.createInjectMotion(action, buttons, position);
+        return ControlMessage.createInjectTouchEvent(action, pointerId, position, pressure, buttons);
     }
 
-    private ControlMessage parseInjectMouseTouch() {
-        if (buffer.remaining() < INJECT_TOUCH_PAYLOAD_LENGTH) {
-            return null;
-        }
-        int id = toUnsigned(buffer.get());
-        int action = toUnsigned(buffer.get());
-        Position position = readPosition(buffer);
-        return ControlMessage.createInjectMotionTouch(id, action, position);
-    }
-
-    private ControlMessage parseInjectScroll() {
-        if (buffer.remaining() < INJECT_SCROLL_PAYLOAD_LENGTH) {
+    private ControlMessage parseInjectScrollEvent() {
+        if (buffer.remaining() < INJECT_SCROLL_EVENT_PAYLOAD_LENGTH) {
             return null;
         }
         Position position = readPosition(buffer);
         int hScroll = buffer.getInt();
         int vScroll = buffer.getInt();
-        return ControlMessage.createInjectScroll(position, hScroll, vScroll);
+        return ControlMessage.createInjectScrollEvent(position, hScroll, vScroll);
     }
 
     private ControlMessage parseSetClipboard() {
@@ -170,8 +165,8 @@ public class ControlMessageReader {
     }
 
     private static Position readPosition(ByteBuffer buffer) {
-        int x = toUnsigned(buffer.getShort());
-        int y = toUnsigned(buffer.getShort());
+        int x = buffer.getInt();
+        int y = buffer.getInt();
         int screenWidth = toUnsigned(buffer.getShort());
         int screenHeight = toUnsigned(buffer.getShort());
         return new Position(x, y, screenWidth, screenHeight);

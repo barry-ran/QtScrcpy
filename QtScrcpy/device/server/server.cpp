@@ -6,10 +6,10 @@
 #include <QFileInfo>
 
 #include "server.h"
+#include "config.h"
 
-#define DEVICE_SERVER_PATH "/data/local/tmp/scrcpy-server.jar"
 #define DEVICE_NAME_FIELD_LENGTH 64
-#define SOCKET_NAME "qtscrcpy"
+#define SOCKET_NAME "scrcpy"
 #define MAX_CONNECT_COUNT 30
 #define MAX_RESTART_COUNT 1
 
@@ -56,7 +56,7 @@ const QString& Server::getServerPath()
         m_serverPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_SERVER_PATH"));
         QFileInfo fileInfo(m_serverPath);
         if (m_serverPath.isEmpty() || !fileInfo.isFile()) {
-            m_serverPath = QCoreApplication::applicationDirPath() + "/scrcpy-server.jar";
+            m_serverPath = QCoreApplication::applicationDirPath() + "/scrcpy-server";
         }
     }
     return m_serverPath;
@@ -67,7 +67,7 @@ bool Server::pushServer()
     if (m_workProcess.isRuning()) {
         m_workProcess.kill();
     }
-    m_workProcess.push(m_params.serial, getServerPath(), DEVICE_SERVER_PATH);
+    m_workProcess.push(m_params.serial, getServerPath(), Config::getInstance().getServerPath());
     return true;
 }
 
@@ -125,22 +125,24 @@ bool Server::execute()
     }
     QStringList args;
     args << "shell";
-    args << QString("CLASSPATH=%1").arg(DEVICE_SERVER_PATH);
+    args << QString("CLASSPATH=%1").arg(Config::getInstance().getServerPath());
     args << "app_process";
     args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
+    args << Config::getInstance().getServerVersion();
     args << QString::number(m_params.maxSize);
     args << QString::number(m_params.bitRate);
+    args << QString::number(m_params.maxFps);
     args << (m_tunnelForward ? "true" : "false");
     if (m_params.crop.isEmpty()) {
         args << "-";
     } else {
         args << m_params.crop;
     }
-    args << (m_params.sendFrameMeta ? "true" : "false");
+    args << "true"; // always send frame meta (packet boundaries + timestamp)
     args << (m_params.control ? "true" : "false");
 
-    // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server.jar app_process / com.genymobile.scrcpy.Server 0 8000000 false
+    // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server app_process / com.genymobile.scrcpy.Server 0 8000000 false
     // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
     // 这条adb命令是阻塞运行的，m_serverProcess进程不会退出了
     m_serverProcess.execute(m_params.serial, args);

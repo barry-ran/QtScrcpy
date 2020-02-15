@@ -3,12 +3,14 @@
 #include <QKeyEvent>
 #include <QFileDialog>
 #include <QTimer>
+#include <QDebug>
 
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "device.h"
 #include "videoform.h"
 #include "keymap.h"
+#include "config.h"
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
@@ -45,14 +47,18 @@ Dialog::Dialog(QWidget *parent) :
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
-                if (!ip.isEmpty()) {
-                    ui->deviceIpEdt->setText(ip);
+                if (ip.isEmpty()) {
+                    log = "ip not find, connect to wifi?";
+                    break;
                 }
+                ui->deviceIpEdt->setText(ip);
             } else if (args.contains("ifconfig") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
-                if (!ip.isEmpty()) {
-                    ui->deviceIpEdt->setText(ip);
+                if (ip.isEmpty()) {
+                    log = "ip not find, connect to wifi?";
+                    break;
                 }
+                ui->deviceIpEdt->setText(ip);
             }
             break;
         }
@@ -63,8 +69,8 @@ Dialog::Dialog(QWidget *parent) :
 }
 
 Dialog::~Dialog()
-{    
-    on_stopServerBtn_clicked();
+{
+    m_deviceManage.disconnectAllDevice();
     delete ui;
 }
 
@@ -79,19 +85,18 @@ void Dialog::initUI()
     ui->bitRateBox->addItem("10000000");
     ui->bitRateBox->setCurrentIndex(2);
 
-    ui->videoSizeBox->addItem("480");
-    ui->videoSizeBox->addItem("720");
-    ui->videoSizeBox->addItem("1080");
-    ui->videoSizeBox->addItem("native");
-    ui->videoSizeBox->setCurrentIndex(1);
+    ui->maxSizeBox->addItem("640");
+    ui->maxSizeBox->addItem("720");
+    ui->maxSizeBox->addItem("1080");
+    ui->maxSizeBox->addItem("1280");
+    ui->maxSizeBox->addItem("1920");
+    ui->maxSizeBox->addItem(tr("original"));
+    ui->maxSizeBox->setCurrentIndex(2);
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
 
-#ifndef Q_OS_WIN32
-    // game only windows
-    ui->gameCheck->setEnabled(false);
-#endif
+    ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
 }
 
 void Dialog::execAdbCmd()
@@ -101,7 +106,7 @@ void Dialog::execAdbCmd()
     }
     QString cmd = ui->adbCommandEdt->text().trimmed();
     outLog("adb " + cmd, false);
-    m_adb.execute("", cmd.split(" ", QString::SkipEmptyParts));
+    m_adb.execute(ui->serialBox->currentText().trimmed(), cmd.split(" ", QString::SkipEmptyParts));
 }
 
 QString Dialog::getGameScript(const QString& fileName)
@@ -132,41 +137,38 @@ void Dialog::on_startServerBtn_clicked()
     outLog("start server...", false);
 
     QString absFilePath;
-    QString fileDir(ui->recordPathEdt->text().trimmed());
-    if (!fileDir.isEmpty()) {
-        QDateTime dateTime = QDateTime::currentDateTime();
-        QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
-        QString ext = ui->formatBox->currentText().trimmed();
-        fileName = windowTitle() + fileName + "." + ext;
-        QDir dir(fileDir);
-        absFilePath = dir.absoluteFilePath(fileName);
+    if (ui->recordScreenCheck->isChecked()) {
+        QString fileDir(ui->recordPathEdt->text().trimmed());
+        if (!fileDir.isEmpty()) {
+            QDateTime dateTime = QDateTime::currentDateTime();
+            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
+            QString ext = ui->formatBox->currentText().trimmed();
+            fileName = windowTitle() + fileName + "." + ext;
+            QDir dir(fileDir);
+            absFilePath = dir.absoluteFilePath(fileName);
+        }
     }
 
     quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
     // this is ok that "native" toUshort is 0
-    quint16 videoSize = ui->videoSizeBox->currentText().trimmed().toUShort();
+    quint16 videoSize = ui->maxSizeBox->currentText().trimmed().toUShort();
     Device::DeviceParams params;
     params.serial = ui->serialBox->currentText().trimmed();
     params.maxSize = videoSize;
     params.bitRate = bitRate;
+    // on devices with Android >= 10, the capture frame rate can be limited
+    params.maxFps = static_cast<quint32>(Config::getInstance().getMaxFps());
     params.recordFileName = absFilePath;
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
-    if (ui->gameCheck->isChecked()) {
-        if (ui->gameBox->currentText().isEmpty()) {
-            outLog("no keymap script selected", true);
-        } else {
-            params.gameScript = getGameScript(ui->gameBox->currentText());
-        }
-    }
+    params.renderExpiredFrames = Config::getInstance().getRenderExpiredFrames();
+
     m_deviceManage.connectDevice(params);
 
-/*
-        if (ui->alwaysTopCheck->isChecked() && m_device->getVideoForm()) {
-            m_device->getVideoForm()->staysOnTop();
-        }         
-    */
+    if (ui->alwaysTopCheck->isChecked()) {
+        m_deviceManage.staysOnTop(params.serial);
+    }
 }
 
 void Dialog::on_stopServerBtn_clicked()
@@ -223,6 +225,17 @@ void Dialog::outLog(const QString &log, bool newLine)
             ui->outEdit->append("<br/>");
         }
     });
+}
+
+bool Dialog::filterLog(const QString &log)
+{
+    if (log.contains("app_proces")) {
+        return true;
+    }
+    if (log.contains("Unable to set geometry")) {
+        return true;
+    }
+    return false;
 }
 
 bool Dialog::checkAdbRun()
@@ -285,6 +298,7 @@ void Dialog::on_selectRecordPathBtn_clicked()
 
 void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
 {
+    Config::getInstance().setRecordPath(arg1);
     ui->recordPathEdt->setToolTip(arg1.trimmed());
     ui->notDisplayCheck->setCheckable(!arg1.trimmed().isEmpty());
 }
@@ -332,9 +346,15 @@ void Dialog::on_applyScriptBtn_clicked()
     m_deviceManage.updateScript(getGameScript(ui->gameBox->currentText()));
 }
 
-void Dialog::on_gameCheck_clicked(bool checked)
+void Dialog::on_recordScreenCheck_clicked(bool checked)
 {
-    if (checked) {
-        on_refreshGameScriptBtn_clicked();
+    if (!checked) {
+        return;
+    }
+
+    QString fileDir(ui->recordPathEdt->text().trimmed());
+    if (fileDir.isEmpty()) {
+        qWarning() << "please select record save path!!!";
+        ui->recordScreenCheck->setChecked(false);
     }
 }
