@@ -17,7 +17,23 @@
 ## 高优先级
 - linux打包以及版本号
 
-# BUG
-
 # mark
+## ffmpeg
 [ffmpeg编译参数详解](https://www.cnblogs.com/wainiwann/p/4204230.html)
+
+## adb
+以下是 ADB 和 Fastboot 的谷歌官方下载链接：
+
+ADB和Fastboot for Windows
+
+https://dl.google.com/android/repository/platform-tools-latest-windows.zip
+
+ADB和Fastboot for Mac
+
+https://dl.google.com/android/repository/platform-tools-latest-darwin.zip
+
+ADB和Fastboot for Linux
+
+https://dl.google.com/android/repository/platform-tools-latest-linux.zip
+
+由于这些是直接的 Google 链接，用户可以确保下载不仅是官方的，而且将始终能够获得最新版本的 ADB 和 Fastboot
