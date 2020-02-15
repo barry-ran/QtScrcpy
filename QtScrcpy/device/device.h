@@ -65,8 +65,6 @@ private:
 
     QTime m_startTimeCount;
     DeviceParams m_params;
-
-    bool m_screenshot = false;
 };
 
 #endif // DEVICE_H
