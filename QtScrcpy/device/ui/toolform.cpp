@@ -8,6 +8,7 @@
 #include "iconhelper.h"
 #include "videoform.h"
 #include "controller.h"
+#include "adbprocess.h"
 
 ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     : MagneticWidget(adsorbWidget, adsorbPos)
@@ -40,7 +41,8 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->closeScreenBtn, QChar(0xf070), 15);
     IconHelper::Instance()->SetIcon(ui->powerBtn, QChar(0xf011), 15);
     IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), 15);
-    IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf05b), 15);
+    IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf0c4), 15);
+    IconHelper::Instance()->SetIcon(ui->touchBtn, QChar(0xf111), 15);
 }
 
 void ToolForm::mousePressEvent(QMouseEvent *event)
@@ -149,4 +151,26 @@ void ToolForm::on_expandNotifyBtn_clicked()
     if (m_videoForm && m_videoForm->getController()) {
         m_videoForm->getController()->expandNotificationPanel();
     }
+}
+
+void ToolForm::on_touchBtn_clicked()
+{
+    if (!m_videoForm) {
+        return;
+    }
+
+    m_showTouch = !m_showTouch;
+
+    AdbProcess* adb = new AdbProcess();
+    if (!adb) {
+        return;
+    }
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+        if (AdbProcess::AER_SUCCESS_START != processResult) {
+            sender()->deleteLater();
+        }
+    });
+    adb->setShowTouchesEnabled(m_videoForm->getSerial(), m_showTouch);
+
+    qInfo() << "show touch " << (m_showTouch ? "enable" : "disable");
 }

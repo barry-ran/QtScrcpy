@@ -32,6 +32,8 @@ public:
     // unlocking m_mutex
     const AVFrame* consumeRenderedFrame();
 
+    const AVFrame* peekRenderedFrame();
+
     // wake up and avoid any blocking call
     void interrupt();
 

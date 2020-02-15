@@ -90,7 +90,7 @@ void Dialog::initUI()
     ui->maxSizeBox->addItem("1080");
     ui->maxSizeBox->addItem("1280");
     ui->maxSizeBox->addItem("1920");
-    ui->maxSizeBox->addItem("native");
+    ui->maxSizeBox->addItem(tr("original"));
     ui->maxSizeBox->setCurrentIndex(2);
 
     ui->formatBox->addItem("mp4");
@@ -106,7 +106,7 @@ void Dialog::execAdbCmd()
     }
     QString cmd = ui->adbCommandEdt->text().trimmed();
     outLog("adb " + cmd, false);
-    m_adb.execute("", cmd.split(" ", QString::SkipEmptyParts));
+    m_adb.execute(ui->serialBox->currentText().trimmed(), cmd.split(" ", QString::SkipEmptyParts));
 }
 
 QString Dialog::getGameScript(const QString& fileName)
@@ -166,11 +166,9 @@ void Dialog::on_startServerBtn_clicked()
 
     m_deviceManage.connectDevice(params);
 
-/*
-        if (ui->alwaysTopCheck->isChecked() && m_device->getVideoForm()) {
-            m_device->getVideoForm()->staysOnTop();
-        }         
-    */
+    if (ui->alwaysTopCheck->isChecked()) {
+        m_deviceManage.staysOnTop(params.serial);
+    }
 }
 
 void Dialog::on_stopServerBtn_clicked()

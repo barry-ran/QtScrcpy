@@ -26,7 +26,7 @@ VideoForm::VideoForm(bool skin, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::videoForm)
     , m_skin(skin)
-{    
+{
     ui->setupUi(this);
     initUI();
     updateShowSize(size());
@@ -37,7 +37,7 @@ VideoForm::VideoForm(bool skin, QWidget *parent)
 }
 
 VideoForm::~VideoForm()
-{   
+{
     delete ui;
 }
 
@@ -59,9 +59,9 @@ void VideoForm::initUI()
 #endif
     }
 
-    setMouseTracking(true);    
+    setMouseTracking(true);
     ui->videoWidget->setMouseTracking(true);
-    ui->videoWidget->hide();    
+    ui->videoWidget->hide();
 }
 
 void VideoForm::onGrabCursor(bool grab)
@@ -155,7 +155,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
             if (isFullScreen()) {
                 switchFullScreen();
             }
-            if (layout()) {
+            if (m_skin) {
                 QMargins m = getMargins(vertical);
                 showSize.setWidth(showSize.width() + m.left() + m.right());
                 showSize.setHeight(showSize.height() + m.top() + m.bottom());
@@ -165,9 +165,11 @@ void VideoForm::updateShowSize(const QSize &newSize)
             move(screenRect.center() - QRect(0, 0, showSize.width(), showSize.height()).center());
         }
 
-        // 减去标题栏高度 (mark:已经没有标题栏了)
-        //int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
-        //showSize.setHeight(showSize.height() - titleBarHeight);
+        if (!m_skin) {
+            // 减去标题栏高度 (mark:已经没有标题栏了)
+            int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
+            showSize.setHeight(showSize.height() - titleBarHeight);
+        }
 
         if (showSize != size()) {
 #ifdef Q_OS_OSX
@@ -247,6 +249,11 @@ void VideoForm::setSerial(const QString &serial)
     m_serial = serial;
 }
 
+const QString &VideoForm::getSerial()
+{
+    return m_serial;
+}
+
 void VideoForm::setController(Controller *controller)
 {
     m_controller = controller;
@@ -297,7 +304,7 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 }
 
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
-{    
+{
     if (ui->videoWidget->geometry().contains(event->pos())) {
         if (!m_controller) {
             return;

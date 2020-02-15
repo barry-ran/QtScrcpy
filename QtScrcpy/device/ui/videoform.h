@@ -28,6 +28,7 @@ public:
     Controller* getController();
     void setFileHandler(FileHandler *fileHandler);
     void setSerial(const QString &serial);
+    const QString& getSerial();
 
 signals:
     void screenshot();

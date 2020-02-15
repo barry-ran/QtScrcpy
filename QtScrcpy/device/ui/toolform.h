@@ -53,6 +53,8 @@ private slots:
 
     void on_expandNotifyBtn_clicked();
 
+    void on_touchBtn_clicked();
+
 private:
     void initStyle();
 
@@ -60,6 +62,7 @@ private:
     Ui::ToolForm *ui;
     QPoint m_dragPosition;
     QPointer<VideoForm> m_videoForm;
+    bool m_showTouch = false;
 };
 
 #endif // TOOLFORM_H
