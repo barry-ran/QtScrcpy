@@ -34,7 +34,11 @@ if /i "%2"=="x64" (
 )
 
 :: 提示
-echo 当前编译模式为debug %debug_mode% %cpu_mode%
+if /i %debug_mode% == "true" (
+    echo 当前编译模式为 debug %cpu_mode%
+) else (
+    echo 当前编译模式为debug release %cpu_mode%
+)
 
 :: 环境变量设置
 if /i %cpu_mode% == x86 (
