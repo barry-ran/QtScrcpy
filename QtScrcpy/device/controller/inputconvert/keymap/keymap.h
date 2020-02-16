@@ -36,6 +36,20 @@ public:
         QPointF pos = QPointF(0, 0); // normal key
         QPointF extendPos = QPointF(0, 0); // for drag
         double extendOffset = 0.0;  // for steerWheel
+
+        KeyNode(ActionType type = AT_INVALID,
+                int key = Qt::Key_unknown,
+                QPointF pos = QPointF(0, 0),
+                QPointF extendPos = QPointF(0, 0),
+                double extendOffset = 0.0)
+            : type(type)
+            , key(key)
+            , pos(pos)
+            , extendPos(extendPos)
+            , extendOffset(extendOffset)
+        {
+
+        }
     };
 
     struct KeyMapNode {
@@ -112,7 +126,7 @@ private:
     static QString s_keyMapPath;
 
     QVector<KeyMapNode> m_keyMapNodes;
-    KeyNode m_switchKey = { AT_KEY, Qt::Key_QuoteLeft };
+    KeyNode m_switchKey = {AT_KEY, Qt::Key_QuoteLeft};
 
     // just for return
     KeyMapNode m_invalidNode;
