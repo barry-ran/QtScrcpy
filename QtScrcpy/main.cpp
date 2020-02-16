@@ -31,8 +31,10 @@ int main(int argc, char *argv[])
 
     //update version
     QStringList versionList = QCoreApplication::applicationVersion().split(".");
-    QString version = versionList[0] + "." + versionList[1] + "." + versionList[2];
-    a.setApplicationVersion(version);
+    if (versionList.size() >= 3) {
+        QString version = versionList[0] + "." + versionList[1] + "." + versionList[2];
+        a.setApplicationVersion(version);
+    }
 
     installTranslator();
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
