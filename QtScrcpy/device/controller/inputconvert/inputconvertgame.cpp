@@ -98,7 +98,7 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize& frameSize, c
             processKeyClick(node.data.clickTwice.keyNode.pos, true, false, from);
             return;
         case KeyMap::KMT_DRAG:
-            processKeyDrag(node.data.drag.keyNode.pos, node.data.drag.keyNode.extendPos, from);
+            processKeyDrag(node.data.drag.keyNode.pos, node.data.drag.extendPos, from);
             return;
         default:
             break;
@@ -228,19 +228,19 @@ void InputConvertGame::processSteerWheel(const KeyMap::KeyMapNode &node, const Q
     int pressedNum = 0;
     if (m_ctrlSteerWheel.pressedUp) {
         ++pressedNum;
-        offset.ry() -= node.data.steerWheel.up.extendOffset;
+        offset.ry() -= node.data.steerWheel.up.offset;
     }
     if (m_ctrlSteerWheel.pressedRight) {
         ++pressedNum;
-        offset.rx() += node.data.steerWheel.right.extendOffset;
+        offset.rx() += node.data.steerWheel.right.offset;
     }
     if (m_ctrlSteerWheel.pressedDown) {
         ++pressedNum;
-        offset.ry() += node.data.steerWheel.down.extendOffset;
+        offset.ry() += node.data.steerWheel.down.offset;
     }
     if (m_ctrlSteerWheel.pressedLeft) {
         ++pressedNum;
-        offset.rx() -= node.data.steerWheel.left.extendOffset;
+        offset.rx() -= node.data.steerWheel.left.offset;
     }
 
     // action

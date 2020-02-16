@@ -104,13 +104,13 @@
 		},
 		{
 			"comment": "小眼睛",
-			"type": "KMT_CLICK",
+			"type": "KMT_FREE_LOOK",
 			"key": "Key_Alt",
 			"pos": {
 				"x": 0.8,
 				"y": 0.31
 			},
-			"switchMap": false
+			"speedRatio": 15
 		},
 		{
 			"comment": "捡东西1",

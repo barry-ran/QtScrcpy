@@ -19,7 +19,8 @@ public:
         KMT_CLICK_TWICE,
         KMT_STEER_WHEEL,
         KMT_DRAG,
-        KMT_MOUSE_MOVE
+        KMT_MOUSE_MOVE,
+        KMT_FREE_LOOK,
     };    
     Q_ENUM(KeyMapType)
 
@@ -31,43 +32,46 @@ public:
     Q_ENUM(ActionType)
 
     struct KeyNode {
-        ActionType type = AT_INVALID;
-        int key = Qt::Key_unknown;
-        QPointF pos = QPointF(0, 0); // normal key
-        QPointF extendPos = QPointF(0, 0); // for drag
-        double extendOffset = 0.0;  // for steerWheel
+        ActionType type = ActionType::AT_INVALID;
+        int key = -1;
+        QPointF pos = QPointF(0.0, 0.0);
     };
 
     struct KeyMapNode {
         KeyMapType type = KMT_INVALID;
-        union DATA {
+        union Data {
+            struct {
+                QPointF startPos;
+                double speedRatio = 1.0;
+            } mouseMove;
             struct {
                 KeyNode keyNode;
-                bool switchMap = false;
+                bool switchMap;
             } click;
             struct {
                 KeyNode keyNode;
             } clickTwice;
             struct {
-                QPointF centerPos = {0.0, 0.0};
-                KeyNode left, right, up, down;
+                QPointF centerPos;
+                struct Offset {
+                    ActionType type;
+                    int key;
+                    double offset;
+                };
+                Offset left, right, up, down;
             } steerWheel;
             struct {
                 KeyNode keyNode;
+                QPointF extendPos = QPointF(0, 0);
             } drag;
             struct {
-                QPointF startPos = {0.0, 0.0};
-                int speedRatio = 1;
-            } mouseMove;
-            DATA() {}
-            ~DATA() {}
+                KeyNode keyNode;
+                double speedRatio = 1.0;
+            } freeLook;
+            Data(){}
         } data;
-        KeyMapNode() {}
-        ~KeyMapNode() {}
+        KeyMapNode(){}
     };
-
-    KeyMap(QObject *parent = Q_NULLPTR);
-    virtual ~KeyMap();
 
     void loadKeyMap(const QString &json);
     const KeyMap::KeyMapNode& getKeyMapNode(int key);
@@ -83,6 +87,14 @@ public:
     static const QString& getKeyMapPath();
 
 private:
+    KeyMapNode generateMKNMouseMove(const QJsonObject& node);
+    KeyMapNode generateMKNClick(const QJsonObject& node);
+    KeyMapNode generateMKNClickTwice(const QJsonObject& node);
+    KeyMapNode generateMKNSteerWheel(const QJsonObject& node);
+    KeyMapNode generateMKNDrag(const QJsonObject& node);
+    KeyMapNode generateMKNFreeLook(const QJsonObject& node);
+
+private:
     // set up the reverse map from key/event event to keyMapNode
     void makeReverseMap();
 
@@ -94,16 +106,19 @@ private:
     bool checkItemPos(const QJsonObject& node, const QString& name);
 
     // safe check for KeyMapNode
+    bool checkForMouseMove(const QJsonObject& node);
     bool checkForClick(const QJsonObject& node);
     bool checkForClickTwice(const QJsonObject& node);
     bool checkForSteerWhell(const QJsonObject& node);
     bool checkForDrag(const QJsonObject& node);
+    bool checkForFreeLook(const QJsonObject& node);
 
-    // get keymap from json object
-    QString getItemString(const QJsonObject& node, const QString& name);
-    double getItemDouble(const QJsonObject& node, const QString& name);
-    bool getItemBool(const QJsonObject& node, const QString& name);
-    QJsonObject getItemObject(const QJsonObject& node, const QString& name);
+    // get keymap elements from json object
+    QString getItemString(const QJsonObject& node, const QString& name, const QString& def="");
+    double getItemDouble(const QJsonObject& node, const QString& name, const double def=0.0);
+    bool getItemBool(const QJsonObject& node, const QString& name, const bool def=false);
+    KeyNode getItemNodeCommon(const QJsonObject& node, const QString& keyName="key", const QString& posName="pos");
+
     QPointF getItemPos(const QJsonObject& node, const QString& name);
     QPair<ActionType, int> getItemKey(const QJsonObject& node, const QString& name);
     KeyMapType getItemKeyMapType(const QJsonObject& node, const QString& name);
