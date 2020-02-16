@@ -50,8 +50,19 @@ windeployqt %publish_path%\QtScrcpy.exe
 
 :: 删除多余qt依赖包
 rmdir /s/q %publish_path%\iconengines
-rmdir /s/q %publish_path%\imageformats
 rmdir /s/q %publish_path%\translations
+
+:: 截图功能需要qjpeg.dll
+del %publish_path%\imageformats\qgif.dll
+del %publish_path%\imageformats\qicns.dll
+del %publish_path%\imageformats\qico.dll
+::del %publish_path%\imageformats\qjpeg.dll
+del %publish_path%\imageformats\qsvg.dll
+del %publish_path%\imageformats\qtga.dll
+del %publish_path%\imageformats\qtiff.dll
+del %publish_path%\imageformats\qwbmp.dll
+del %publish_path%\imageformats\qwebp.dll
+
 if /i %cpu_mode% == x86 (
     del %publish_path%\vc_redist.x86.exe
 ) else (
