@@ -230,7 +230,7 @@
 				"x": 0.801,
 				"y": 0.244
 			},
-			"switchMap": false
+			"speedRatio": 2
 		}
 	]
 }
