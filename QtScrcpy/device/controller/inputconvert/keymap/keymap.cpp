@@ -355,6 +355,12 @@ void KeyMap::makeReverseMap()
             m.insert(node.data.drag.keyNode.key, &node);
         }
             break;
+        case KMT_FREE_LOOK:
+        {
+            QMultiHash<int, KeyMapNode*>& m = node.data.freeLook.keyNode.type == AT_KEY ? m_rmapKey : m_rmapMouse;
+            m.insert(node.data.freeLook.keyNode.key, &node);
+        }
+            break;
         default:
             break;
         }

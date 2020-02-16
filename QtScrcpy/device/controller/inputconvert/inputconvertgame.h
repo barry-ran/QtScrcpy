@@ -14,6 +14,7 @@ public:
     InputConvertGame(Controller* controller);
     virtual ~InputConvertGame();
 
+    //virtual void
     virtual void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
     virtual void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
     virtual void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
@@ -35,17 +36,23 @@ protected:
     int getTouchID(int key);
 
     // steer wheel
-    void processSteerWheel(const KeyMap::KeyMapNode &node, const QKeyEvent* from);
+    void processSteerWheel(const KeyMap::KeyMapNode &node,
+                           int keyButtonID, bool isPress);
 
     // click
-    void processKeyClick(const QPointF& clickPos, bool clickTwice, bool switchMap, const QKeyEvent* from);
+    void processClick(const QPointF& clickPos, bool clickTwice, bool switchMap,
+                      int keyButtonID, bool isPress, bool isRelease);
 
     // drag
-    void processKeyDrag(const QPointF& startPos, QPointF endPos, const QKeyEvent* from);
+    void processDrag(const QPointF& startPos, QPointF endPos,
+                     int keyButtonID, bool isPress, bool isRelease);
+
+    // free look
+    void processFreeLook(const QPointF& startPos, const double speedRatio,
+                         bool isPress, bool isRelease);
 
     // mouse
-    bool processMouseClick(const QMouseEvent* from);
-    bool processMouseMove(const QMouseEvent* from);
+    void processMouseMove(const QMouseEvent* from);
     void moveCursorTo(const QMouseEvent* from, const QPoint& localPosPixel);
     void mouseMoveStartTouch(const QMouseEvent* from);
     void mouseMoveStopTouch();
@@ -84,6 +91,11 @@ private:
         QPointF lastPos = {0.0, 0.0};
         bool touching = false;
         int timer = 0;
+        struct {
+            QPointF startPos;
+            double speedRatio;
+        } detail;
+        bool valid;
     } m_ctrlMouseMove;
 };
 

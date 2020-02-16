@@ -7,7 +7,7 @@
 			"x": 0.700,
 			"y": 0.410
 		},
-		"speedRatio": 2
+		"speedRatio": 5
 	},
 	"keyMapNodes": [{
 			"comment": "退出",
@@ -224,13 +224,13 @@
 		},
 		{
 			"comment": "小镜头",
-			"type": "KMT_CLICK",
+			"type": "KMT_FREE_LOOK",
 			"key": "Key_Alt",
 			"pos": {
 				"x": 0.801,
 				"y": 0.244
 			},
-			"switchMap": false
+			"speedRatio": 5
 		}
 	]
 }
