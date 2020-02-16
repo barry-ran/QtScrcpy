@@ -1,0 +1,236 @@
+{
+	"comment":"https://doc.qt.io/qt-5/qt.html#Key-enum",
+	"old-switchKey": "Key_QuoteLeft",
+	"switchKey": "RightButton",
+	"mouseMoveMap": {
+		"startPos": {
+			"x": 0.700,
+			"y": 0.410
+		},
+		"speedRatio": 2
+	},
+	"keyMapNodes": [{
+			"comment": "退出",
+			"type": "KMT_CLICK",
+			"key": "Key_Escape",
+			"pos": {
+				"x": 0.015,
+				"y": 0.042
+			},
+			"switchMap": true
+		},
+		{
+			"comment": "方向盘",
+			"type": "KMT_STEER_WHEEL",
+			"centerPos": {
+				"x": 0.16,
+				"y": 0.70
+			},
+			"leftOffset": 0.1,
+			"rightOffset": 0.1,
+			"upOffset": 0.1,
+			"downOffset": 0.1,
+			"leftKey": "Key_A",
+			"rightKey": "Key_D",
+			"upKey": "Key_W",
+			"downKey": "Key_S"
+		},
+		{
+			"comment": "动作",
+			"type": "KMT_CLICK",
+			"key": "LeftButton",
+			"pos": {
+				"x": 0.907,
+				"y": 0.842
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "动作",
+			"type": "KMT_CLICK",
+			"key": "Key_Space",
+			"pos": {
+				"x": 0.907,
+				"y": 0.842
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "蹲",
+			"type": "KMT_CLICK",
+			"key": "Key_Control",
+			"pos": {
+				"x": 0.8125,
+				"y": 0.912
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "走/翻越",
+			"type": "KMT_CLICK",
+			"key": "Key_C",
+			"pos": {
+				"x": 0.815,
+				"y": 0.761
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "跑/技能1",
+			"type": "KMT_CLICK",
+			"key": "Key_Z",
+			"pos": {
+				"x": 0.868,
+				"y": 0.636
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "技能2",
+			"type": "KMT_CLICK",
+			"key": "Key_E",
+			"pos": {
+				"x": 0.945,
+				"y": 0.619
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "特质/道具1",
+			"type": "KMT_CLICK",
+			"key": "Key_Q",
+			"pos": {
+				"x": 0.949,
+				"y": 0.458
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "底牌/切换1",
+			"type": "KMT_CLICK",
+			"key": "Key_Tab",
+			"pos": {
+				"x": 0.885,
+				"y": 0.488
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "发言/道具2",
+			"type": "KMT_CLICK",
+			"key": "Key_R",
+			"pos": {
+				"x": 0.950,
+				"y": 0.308
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "涂鸦",
+			"type": "KMT_CLICK",
+			"key": "Key_Y",
+			"pos": {
+				"x": 0.732,
+				"y": 0.904
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "盯红蝶/挂人",
+			"type": "KMT_CLICK",
+			"key": "Key_F",
+			"pos": {
+				"x": 0.815,
+				"y": 0.514
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "判定",
+			"type": "KMT_CLICK",
+			"key": "Key_T",
+			"pos": {
+				"x": 0.681,
+				"y": 0.750
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "中间",
+			"type": "KMT_CLICK",
+			"key": "Key_Shift",
+			"pos": {
+				"x": 0.5,
+				"y": 0.6
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "小丑零件1",
+			"type": "KMT_DRAG",
+			"key": "Key_1",
+			"startPos": {
+				"x": 0.951,
+				"y": 0.615
+			},
+			"endPos": {
+				"x": 0.911,
+				"y": 0.472
+			}
+		},
+		{
+			"comment": "小丑零件2",
+			"type": "KMT_DRAG",
+			"key": "Key_2",
+			"startPos": {
+				"x": 0.951,
+				"y": 0.615
+			},
+			"endPos": {
+				"x": 0.861,
+				"y": 0.615
+			}
+		},
+		{
+			"comment": "小丑零件3",
+			"type": "KMT_DRAG",
+			"key": "Key_3",
+			"startPos": {
+				"x": 0.951,
+				"y": 0.615
+			},
+			"endPos": {
+				"x": 0.907,
+				"y": 0.774
+			}
+		},
+		{
+			"comment": "挣扎左",
+			"type": "KMT_CLICK",
+			"key": "Key_Left",
+			"pos": {
+				"x": 0.267,
+				"y": 0.550
+			}
+		},
+		{
+			"comment": "挣扎右",
+			"type": "KMT_CLICK",
+			"key": "Key_Right",
+			"pos": {
+				"x": 0.736,
+				"y": 0.550
+			}
+		},
+		{
+			"comment": "小镜头",
+			"type": "KMT_CLICK",
+			"key": "Key_Alt",
+			"pos": {
+				"x": 0.801,
+				"y": 0.244
+			},
+			"speedRatio": 2
+		}
+	]
+}
