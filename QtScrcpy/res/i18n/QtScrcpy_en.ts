@@ -56,12 +56,12 @@
     <message>
         <location filename="../../dialog.ui" line="499"/>
         <source>wireless connect</source>
-        <translation>wireless connect</translation>
+        <translation>WL connect</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="515"/>
         <source>wireless disconnect</source>
-        <translation>wireless disconnect</translation>
+        <translation>WL disconnect</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="32"/>
