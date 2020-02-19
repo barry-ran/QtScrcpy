@@ -28,6 +28,7 @@ private:
 private:
     static QString s_configPath;
     QPointer<QSettings> m_settings;
+    QPointer<QSettings> m_userData;
 };
 
 #endif // CONFIG_H
