@@ -6,11 +6,9 @@
 
 #define GROUP_COMMON "common"
 
+// config
 #define COMMON_TITLE_KEY "WindowTitle"
 #define COMMON_TITLE_DEF QCoreApplication::applicationName()
-
-#define COMMON_RECORD_KEY "RecordPath"
-#define COMMON_RECORD_DEF ""
 
 #define COMMON_PUSHFILE_KEY "PushFilePath"
 #define COMMON_PUSHFILE_DEF "/sdcard/"
@@ -33,12 +31,19 @@
 #define COMMON_RENDER_EXPIRED_FRAMES_KEY "RenderExpiredFrames"
 #define COMMON_RENDER_EXPIRED_FRAMES_DEF 0
 
+// user data
+#define COMMON_RECORD_KEY "RecordPath"
+#define COMMON_RECORD_DEF ""
+
 QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
 {
-    m_settings = new QSettings(getConfigPath(), QSettings::IniFormat);
+    m_settings = new QSettings(getConfigPath() + "/config.ini", QSettings::IniFormat);
     m_settings->setIniCodec("UTF-8");
+
+    m_userData = new QSettings(getConfigPath() + "/userdata.ini", QSettings::IniFormat);
+    m_userData->setIniCodec("UTF-8");
 }
 
 Config &Config::getInstance()
@@ -52,8 +57,8 @@ const QString& Config::getConfigPath()
     if (s_configPath.isEmpty()) {
         s_configPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_CONFIG_PATH"));
         QFileInfo fileInfo(s_configPath);
-        if (s_configPath.isEmpty() || !fileInfo.isFile()) {
-            s_configPath = QCoreApplication::applicationDirPath() + "/config/config.ini";
+        if (s_configPath.isEmpty() || !fileInfo.isDir()) {
+            s_configPath = QCoreApplication::applicationDirPath() + "/config";
         }
     }
     return s_configPath;
@@ -62,17 +67,17 @@ const QString& Config::getConfigPath()
 QString Config::getRecordPath()
 {
     QString record;
-    m_settings->beginGroup(GROUP_COMMON);
-    record = m_settings->value(COMMON_RECORD_KEY, COMMON_RECORD_DEF).toString();
-    m_settings->endGroup();
+    m_userData->beginGroup(GROUP_COMMON);
+    record = m_userData->value(COMMON_RECORD_KEY, COMMON_RECORD_DEF).toString();
+    m_userData->endGroup();
     return record;
 }
 
 void Config::setRecordPath(const QString &path)
 {
-    m_settings->beginGroup(GROUP_COMMON);
-    m_settings->setValue(COMMON_RECORD_KEY, path);
-    m_settings->endGroup();
+    m_userData->beginGroup(GROUP_COMMON);
+    m_userData->setValue(COMMON_RECORD_KEY, path);
+    m_userData->endGroup();
 }
 
 QString Config::getServerVersion()
