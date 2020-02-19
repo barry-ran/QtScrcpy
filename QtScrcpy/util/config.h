@@ -10,9 +10,8 @@ class Config : public QObject
     Q_OBJECT
 public:
     static Config& getInstance();
+    // config
     QString getTitle();
-    QString getRecordPath();
-    void setRecordPath(const QString& path);
     QString getServerVersion();
     int getMaxFps();
     int getDesktopOpenGL();
@@ -20,6 +19,16 @@ public:
     int getRenderExpiredFrames();
     QString getPushFilePath();
     QString getServerPath();
+
+    // user data
+    QString getRecordPath();
+    void setRecordPath(const QString& path);
+    int getBitRateIndex();
+    void setBitRateIndex(int bitRateIndex);
+    int getMaxSizeIndex();
+    void setMaxSizeIndex(int maxSizeIndex);
+    int getRecordFormatIndex();
+    void setRecordFormatIndex(int recordFormatIndex);
 
 private:
     explicit Config(QObject *parent = nullptr);

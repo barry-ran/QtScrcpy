@@ -35,6 +35,17 @@
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
 
+#define COMMON_BITRATE_INDEX_KEY "BitRateIndex"
+#define COMMON_BITRATE_INDEX_DEF 2
+
+#define COMMON_MAX_SIZE_INDEX_KEY "MaxSizeIndex"
+#define COMMON_MAX_SIZE_INDEX_DEF 2
+
+#define COMMON_RECORD_FORMAT_INDEX_KEY "RecordFormatIndex"
+#define COMMON_RECORD_FORMAT_INDEX_DEF 0
+
+// 最大尺寸 录制格式
+
 QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
@@ -77,6 +88,54 @@ void Config::setRecordPath(const QString &path)
 {
     m_userData->beginGroup(GROUP_COMMON);
     m_userData->setValue(COMMON_RECORD_KEY, path);
+    m_userData->endGroup();
+}
+
+int Config::getBitRateIndex()
+{
+    int bitRateIndex;
+    m_userData->beginGroup(GROUP_COMMON);
+    bitRateIndex = m_userData->value(COMMON_BITRATE_INDEX_KEY, COMMON_BITRATE_INDEX_DEF).toInt();
+    m_userData->endGroup();
+    return bitRateIndex;
+}
+
+void Config::setBitRateIndex(int bitRateIndex)
+{
+    m_userData->beginGroup(GROUP_COMMON);
+    m_userData->setValue(COMMON_BITRATE_INDEX_KEY, bitRateIndex);
+    m_userData->endGroup();
+}
+
+int Config::getMaxSizeIndex()
+{
+    int maxSizeIndex;
+    m_userData->beginGroup(GROUP_COMMON);
+    maxSizeIndex = m_userData->value(COMMON_MAX_SIZE_INDEX_KEY, COMMON_MAX_SIZE_INDEX_DEF).toInt();
+    m_userData->endGroup();
+    return maxSizeIndex;
+}
+
+void Config::setMaxSizeIndex(int maxSizeIndex)
+{
+    m_userData->beginGroup(GROUP_COMMON);
+    m_userData->setValue(COMMON_MAX_SIZE_INDEX_KEY, maxSizeIndex);
+    m_userData->endGroup();
+}
+
+int Config::getRecordFormatIndex()
+{
+    int recordFormatIndex;
+    m_userData->beginGroup(GROUP_COMMON);
+    recordFormatIndex = m_userData->value(COMMON_RECORD_FORMAT_INDEX_KEY, COMMON_RECORD_FORMAT_INDEX_DEF).toInt();
+    m_userData->endGroup();
+    return recordFormatIndex;
+}
+
+void Config::setRecordFormatIndex(int recordFormatIndex)
+{
+    m_userData->beginGroup(GROUP_COMMON);
+    m_userData->setValue(COMMON_RECORD_FORMAT_INDEX_KEY, recordFormatIndex);
     m_userData->endGroup();
 }
 
