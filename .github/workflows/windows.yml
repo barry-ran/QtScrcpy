@@ -25,16 +25,16 @@ jobs:
         qt_ver: [5.12.7]
         qt_target: [desktop]
         # mingw用不了
-        # qt_arch: [win64_msvc2017_64, win32_msvc2017, win32_mingw53,win32_mingw73]
-        qt_arch: [win64_msvc2017_64, win32_msvc2017]
+        # qt_arch: [win64_msvc2019_64, win32_msvc2019, win32_mingw53,win32_mingw73]
+        qt_arch: [win64_msvc2019_64, win32_msvc2019]
         # 额外设置msvc_arch
         include:
-          - qt_arch: win64_msvc2017_64
+          - qt_arch: win64_msvc2019_64
             msvc_arch: x64
-            qt_arch_install: msvc2017_64
-          - qt_arch: win32_msvc2017
+            qt_arch_install: msvc2019_64
+          - qt_arch: win32_msvc2019
             msvc_arch: x86
-            qt_arch_install: msvc2017
+            qt_arch_install: msvc2019
     env:
       targetName: QtScrcpy.exe
     # 步骤
@@ -76,14 +76,14 @@ jobs:
         env:
           vc_arch: ${{ matrix.msvc_arch }}
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %vc_arch%
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" %vc_arch%
           qmake
           nmake
       # tag 打包
       - name: package
         if: startsWith(github.event.ref, 'refs/tags/')
         env:
-          VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC'
+          VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC'
           archiveName: ${{ matrix.qt_ver }}-${{ matrix.qt_target }}-${{ matrix.qt_arch }}
         shell: pwsh
         run: |
