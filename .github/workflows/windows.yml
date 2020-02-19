@@ -25,16 +25,16 @@ jobs:
         qt_ver: [5.12.7]
         qt_target: [desktop]
         # mingw用不了
-        # qt_arch: [win64_msvc2019_64, win32_msvc2019, win32_mingw53,win32_mingw73]
-        qt_arch: [win64_msvc2019_64, win32_msvc2019]
+        # qt_arch: [win64_msvc2017_64, win32_msvc2017, win32_mingw53,win32_mingw73]
+        qt_arch: [win64_msvc2017_64, win32_msvc2017]
         # 额外设置msvc_arch
         include:
-          - qt_arch: win64_msvc2019_64
+          - qt_arch: win64_msvc2017_64
             msvc_arch: x64
-            qt_arch_install: msvc2019_64
-          - qt_arch: win32_msvc2019
+            qt_arch_install: msvc2017_64
+          - qt_arch: win32_msvc2017
             msvc_arch: x86
-            qt_arch_install: msvc2019
+            qt_arch_install: msvc2017
     env:
       targetName: QtScrcpy.exe
     # 步骤
