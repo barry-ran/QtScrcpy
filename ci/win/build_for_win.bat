@@ -1,7 +1,6 @@
 @echo off
 set vcvarsall="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
-:: github action不需要在脚本中设置path
-:: set qt_msvc_path="d:\a\QtScrcpy\Qt\5.12.6\"
+set qt_msvc_path="d:\a\QtScrcpy\Qt\5.12.6\"
 set build_path_name="../build-win"
 
 :: 获取脚本绝对路径
