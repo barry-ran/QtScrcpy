@@ -1,6 +1,6 @@
 @echo off
 set vcvarsall="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
-set qt_msvc_path="d:\a\QtScrcpy\Qt\5.12.6\"
+set qt_msvc_path="d:\a\QtScrcpy\Qt\5.12.5\"
 set build_path_name="../build-win"
 
 :: 获取脚本绝对路径
@@ -51,7 +51,7 @@ if /i %cpu_mode% == x86 (
     set qt_msvc_path=%qt_msvc_path%msvc2017_64\bin
 )
 
-:: set PATH=%qt_msvc_path%;%PATH%
+set PATH=%qt_msvc_path%;%PATH%
 
 :: 注册vc环境
 if /i %cpu_mode% == x86 (

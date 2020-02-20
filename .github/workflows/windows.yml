@@ -22,7 +22,7 @@ jobs:
     strategy:
       # 矩阵配置
       matrix:
-        qt_ver: [5.12.6]
+        qt_ver: [5.12.5]
         qt_target: [desktop]
         # mingw用不了
         # qt_arch: [win64_msvc2017_64, win32_msvc2017, win32_mingw53,win32_mingw73]
