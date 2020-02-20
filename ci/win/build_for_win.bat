@@ -1,12 +1,15 @@
 @echo off
-set vcvarsall="D:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat"
-set qt_msvc_path="D:\Qt\Qt5.12.5\5.12.5\"
+set vcvarsall="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
+set qt_msvc_path="d:\a\QtScrcpy\Qt\5.12.7\"
+set build_path_name="../build-win"
 
 :: 获取脚本绝对路径
 set script_path=%~dp0
 :: 进入脚本所在目录,因为这会影响脚本中执行的程序的工作目录
 set old_cd=%cd%
 cd /d %~dp0
+
+set build_path=%script_path%%build_path_name%
 
 :: 启动参数声明
 set debug_mode="false"
@@ -47,7 +50,6 @@ if /i %cpu_mode% == x86 (
     set qt_msvc_path=%qt_msvc_path%msvc2017_64\bin
 )
 
-set build_path=%script_path%build
 set PATH=%qt_msvc_path%;%PATH%
 
 :: 注册vc环境
