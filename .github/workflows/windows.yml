@@ -1,14 +1,7 @@
 name: Windows
 on: 
   # push代码时触发workflow
-  push:
-    # 忽略部分文件
-    paths-ignore:
-      - 'README.md'
-      - 'README_zh.md'
-      - 'LICENSE'
-  # pull_request时触发workflow
-  pull_request:
+  [push, pull_request]:
     # 忽略部分文件
     paths-ignore:
       - 'README.md'
