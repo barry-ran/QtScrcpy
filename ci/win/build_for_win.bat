@@ -77,7 +77,7 @@ if exist %build_path% (
 md %build_path%
 cd %build_path%
 
-set qmake_params=-spec win32-msvc
+:: set qmake_params=-spec win32-msvc
 
 if /i %debug_mode% == "true" (
     set qmake_params=%qmake_params% "CONFIG+=debug" "CONFIG+=qml_debug"
