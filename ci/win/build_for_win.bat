@@ -1,8 +1,8 @@
 @echo off
 :: 从环境变量获取必要参数
-set vcvarsall=%ENV_VCVARSALL%
-set qt_msvc_path=%ENV_QT_MSVC%
-set build_path_name=%ENV_BUILD_DIR%
+set vcvarsall="%ENV_VCVARSALL%"
+set qt_msvc_path="%ENV_QT_MSVC%"
+set build_path_name="%ENV_BUILD_DIR%"
 
 echo ENV_VCVARSALL %ENV_VCVARSALL%
 echo ENV_QT_MSVC %ENV_QT_MSVC%
