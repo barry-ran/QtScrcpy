@@ -44,7 +44,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
-          key: ${{ runner.os }}-Qt-cache1/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+          key: ${{ runner.os }}-Qt-cache/${{matrix.qt_ver}}/${{matrix.qt_arch}}
       - name: setupQt
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
@@ -82,8 +82,6 @@ jobs:
         run: |
           call "ci\win\build_for_win.bat" release %vc_arch%
           call "ci\win\publish_for_win.bat" %vc_arch% %publish_dir%
-          # 打包zip
-          Compress-Archive -Path ${env:publish_dir} ${env:publish_dir}'.zip'
       # 上传artifact
       - name: upload-artifact
         env:
