@@ -51,7 +51,7 @@ if /i %cpu_mode% == x86 (
     set qt_msvc_path=%qt_msvc_path%msvc2017_64\bin
 )
 
-set PATH=%qt_msvc_path%;%PATH%
+:: set PATH=%qt_msvc_path%;%PATH%
 
 :: 注册vc环境
 if /i %cpu_mode% == x86 (
