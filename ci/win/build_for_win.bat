@@ -1,7 +1,8 @@
 @echo off
-set vcvarsall="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat"
-set qt_msvc_path="d:\a\QtScrcpy\Qt\5.12.7\"
-set build_path_name="../build-win"
+:: 从环境变量获取必要参数
+set vcvarsall=%ENV_VCVARSALL%
+set qt_msvc_path=%ENV_QT_MSVC%
+set build_path_name=%ENV_BUILD_DIR%
 
 :: 获取脚本绝对路径
 set script_path=%~dp0
@@ -46,9 +47,9 @@ if /i %debug_mode% == "true" (
 
 :: 环境变量设置
 if /i %cpu_mode% == x86 (
-    set qt_msvc_path=%qt_msvc_path%msvc2017\bin
+    set qt_msvc_path=%qt_msvc_path%\msvc2017\bin
 ) else (
-    set qt_msvc_path=%qt_msvc_path%msvc2017_64\bin
+    set qt_msvc_path=%qt_msvc_path%\msvc2017_64\bin
 )
 
 set PATH=%qt_msvc_path%;%PATH%
@@ -87,7 +88,6 @@ if /i %debug_mode% == "true" (
 
 :: qmake ../../all.pro -spec win32-msvc "CONFIG+=debug" "CONFIG+=qml_debug"
 qmake ../../all.pro %qmake_params%
-:: qmake ../../all.pro
 if not %errorlevel%==0 (
     echo "qmake failed"
     goto return
