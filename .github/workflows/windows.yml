@@ -44,7 +44,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
-          key: ${{ runner.os }}-Qt-cache/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+          key: ${{ runner.os }}-Qt-cache1/${{matrix.qt_ver}}/${{matrix.qt_arch}}
       - name: setupQt
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
@@ -75,13 +75,23 @@ jobs:
         shell: cmd
         env:
           vc_arch: ${{ matrix.msvc_arch }}
-          publish_dir: ..\build\QtScrcpy-win${{ matrix.msvc_arch }}-v1.1.1
+          publish_dir: ..\build\QtScrcpy-win-${{ matrix.msvc_arch }}-v1.1.1
           ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
           ENV_QT_MSVC: 'd:\a\QtScrcpy\Qt\5.12.7'
           ENV_PUBLISH_DIR: '..\build\QtScrcpy-win32'
         run: |
           call "ci\win\build_for_win.bat" release %vc_arch%
           call "ci\win\publish_for_win.bat" %vc_arch% %publish_dir%
+          # 打包zip
+          Compress-Archive -Path ${env:publish_dir} ${env:publish_dir}'.zip'
+      # 上传artifact
+      - name: upload-artifact
+        env:
+          publish_dir: ..\build\QtScrcpy-win-${{ matrix.msvc_arch }}-v1.1.1
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${env:publish_dir}'.zip'
+          path: ${env:publish_dir}
       # tag 打包
       - name: package
         if: startsWith(github.event.ref, 'refs/tags/')

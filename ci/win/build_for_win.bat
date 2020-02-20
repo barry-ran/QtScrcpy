@@ -13,7 +13,6 @@ echo ---------------------------------------------------------------
 
 echo ENV_VCVARSALL %ENV_VCVARSALL%
 echo ENV_QT_MSVC %ENV_QT_MSVC%
-echo ENV_BUILD_DIR %ENV_BUILD_DIR%
 
 :: 获取脚本绝对路径
 set script_path=%~dp0
