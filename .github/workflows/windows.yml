@@ -43,13 +43,13 @@ jobs:
         id: WindowsCacheQt
         uses: actions/cache@v1
         with:
-          path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
-          key: ${{ runner.os }}-Qt-cache/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+          path: ../../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
+          key: ${{ runner.os }}-cache-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
       - name: setupQt
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
         env:
-          QtPath: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
+          QtPath: ../../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
         run: |
           $qt_Path=${env:QtPath}
           echo "::set-env name=Qt5_Dir::$qt_Path"
@@ -77,7 +77,7 @@ jobs:
           vc_arch: ${{ matrix.msvc_arch }}
           publish_dir: ..\build\QtScrcpy-win-${{ matrix.msvc_arch }}-v1.1.1
           ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
-          ENV_QT_MSVC: 'd:\a\QtScrcpy\Qt\5.12.7'
+          ENV_QT_MSVC: 'd:\a\Qt\5.12.7'
           ENV_PUBLISH_DIR: '..\build\QtScrcpy-win32'
         run: |
           call "ci\win\build_for_win.bat" release %vc_arch%
@@ -88,7 +88,7 @@ jobs:
           publish_dir: ..\build\QtScrcpy-win-${{ matrix.msvc_arch }}-v1.1.1
         uses: actions/upload-artifact@v1
         with:
-          name: ${env:publish_dir}'.zip'
+          name: ${env:publish_dir}.zip
           path: ${env:publish_dir}
       # tag 打包
       - name: package
