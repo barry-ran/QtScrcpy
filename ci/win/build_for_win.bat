@@ -3,25 +3,26 @@ set vcvarsall="C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC
 set qt_msvc_path="d:\a\QtScrcpy\Qt\5.12.7\"
 set build_path_name="../build-win"
 
-:: »ñÈ¡½Å±¾¾ø¶ÔÂ·¾¶
+:: è·å–è„šæœ¬ç»å¯¹è·¯å¾„
 set script_path=%~dp0
-:: ½øÈë½Å±¾ËùÔÚÄ¿Â¼,ÒòÎªÕâ»áÓ°Ïì½Å±¾ÖĞÖ´ĞĞµÄ³ÌĞòµÄ¹¤×÷Ä¿Â¼
+:: è¿›å…¥è„šæœ¬æ‰€åœ¨ç›®å½•,å› ä¸ºè¿™ä¼šå½±å“è„šæœ¬ä¸­æ‰§è¡Œçš„ç¨‹åºçš„å·¥ä½œç›®å½•
 set old_cd=%cd%
 cd /d %~dp0
 
 set build_path=%script_path%%build_path_name%
 
-:: Æô¶¯²ÎÊıÉùÃ÷
+:: å¯åŠ¨å‚æ•°å£°æ˜
 set debug_mode="false"
 set cpu_mode=x86
+set errno=1
 
 echo=
 echo=
 echo ---------------------------------------------------------------
-echo ¼ì²é±àÒë²ÎÊı[debug/release x86/x64]
+echo check build param[debug/release x86/x64]
 echo ---------------------------------------------------------------
 
-:: ±àÒë²ÎÊı¼ì²é /iºöÂÔ´óĞ¡Ğ´
+:: ç¼–è¯‘å‚æ•°æ£€æŸ¥ /iå¿½ç•¥å¤§å°å†™
 if /i "%1"=="debug" (
     set debug_mode="true"
 )
@@ -36,14 +37,14 @@ if /i "%2"=="x64" (
     set cpu_mode=x64
 )
 
-:: ÌáÊ¾
+:: æç¤º
 if /i %debug_mode% == "true" (
-    echo µ±Ç°±àÒëÄ£Ê½Îª debug %cpu_mode%
+    echo current build mode: debug %cpu_mode%
 ) else (
-    echo µ±Ç°±àÒëÄ£Ê½Îªdebug release %cpu_mode%
+    echo current build mode: release %cpu_mode%
 )
 
-:: »·¾³±äÁ¿ÉèÖÃ
+:: ç¯å¢ƒå˜é‡è®¾ç½®
 if /i %cpu_mode% == x86 (
     set qt_msvc_path=%qt_msvc_path%msvc2017\bin
 ) else (
@@ -52,7 +53,7 @@ if /i %cpu_mode% == x86 (
 
 set PATH=%qt_msvc_path%;%PATH%
 
-:: ×¢²ávc»·¾³
+:: æ³¨å†Œvcç¯å¢ƒ
 if /i %cpu_mode% == x86 (
     call %vcvarsall% %cpu_mode%
 ) else (
@@ -67,7 +68,7 @@ if not %errorlevel%==0 (
 echo=
 echo=
 echo ---------------------------------------------------------------
-echo ¿ªÊ¼qmake±àÒë
+echo begin qmake build
 echo ---------------------------------------------------------------
 
 if exist %build_path% (          
@@ -85,7 +86,7 @@ if /i %debug_mode% == "true" (
 )
 
 :: qmake ../all.pro -spec win32-msvc "CONFIG+=debug" "CONFIG+=qml_debug"
-qmake ../all.pro %qmake_params%
+qmake ../../all.pro %qmake_params%
 
 nmake
 
@@ -97,8 +98,11 @@ if not %errorlevel%==0 (
 echo=
 echo=
 echo ---------------------------------------------------------------
-echo Íê³É£¡
+echo finish!!!
 echo ---------------------------------------------------------------
+
+set errno=0
 
 :return
 cd %old_cd%
+exit /B %errno%
