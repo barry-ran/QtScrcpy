@@ -88,8 +88,8 @@ jobs:
           publish_dir: ..\build\QtScrcpy-win-${{ matrix.msvc_arch }}-v1.1.1
         uses: actions/upload-artifact@v1
         with:
-          name: ${env:publish_dir}.zip
-          path: ${env:publish_dir}
+          name: ${{env:publish_dir}}
+          path: ${{env:publish_dir}}
       # tag 打包
       - name: package
         if: startsWith(github.event.ref, 'refs/tags/')
