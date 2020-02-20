@@ -44,7 +44,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
-          key: ${{ runner.os }}-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+          key: ${{ runner.os }}-Qt-cache/${{matrix.qt_ver}}/${{matrix.qt_arch}}
       - name: setupQt
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
