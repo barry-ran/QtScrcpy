@@ -1,13 +1,23 @@
 @echo off
-set qt_msvc_path="D:\Qt\Qt5.12.4\5.12.4\"
+:: ä»ç¯å¢ƒå˜é‡è·å–å¿…è¦å‚æ•°
+:: ä¾‹å¦‚ d:\a\QtScrcpy\Qt\5.12.7
+set qt_msvc_path="%ENV_QT_MSVC%"
 
-:: »ñÈ¡½Å±¾¾ø¶ÔÂ·¾¶
+echo=
+echo=
+echo ---------------------------------------------------------------
+echo check ENV
+echo ---------------------------------------------------------------
+
+echo ENV_QT_MSVC %ENV_QT_MSVC%
+
+:: è·å–è„šæœ¬ç»å¯¹è·¯å¾„
 set script_path=%~dp0
-:: ½øÈë½Å±¾ËùÔÚÄ¿Â¼,ÒòÎªÕâ»áÓ°Ïì½Å±¾ÖĞÖ´ĞĞµÄ³ÌĞòµÄ¹¤×÷Ä¿Â¼
+:: è¿›å…¥è„šæœ¬æ‰€åœ¨ç›®å½•,å› ä¸ºè¿™ä¼šå½±å“è„šæœ¬ä¸­æ‰§è¡Œçš„ç¨‹åºçš„å·¥ä½œç›®å½•
 set old_cd=%cd%
 cd /d %~dp0
 
-:: Æô¶¯²ÎÊıÉùÃ÷
+:: å¯åŠ¨å‚æ•°å£°æ˜
 set cpu_mode=x86
 if /i "%1"=="x86" (
     set cpu_mode=x86
@@ -16,21 +26,20 @@ if /i "%1"=="x64" (
     set cpu_mode=x64
 )
 
-:: »·¾³±äÁ¿ÉèÖÃ
-
-set adb_path=%script_path%third_party\adb\win\*.*
-set jar_path=%script_path%third_party\scrcpy-server
-set keymap_path=%script_path%keymap
-set config_path=%script_path%config
+:: ç¯å¢ƒå˜é‡è®¾ç½®
+set adb_path=%script_path%..\..\third_party\adb\win\*.*
+set jar_path=%script_path%..\..\third_party\scrcpy-server
+set keymap_path=%script_path%..\..\keymap
+set config_path=%script_path%..\..\config
 
 if /i %cpu_mode% == x86 (
-    set publish_path=%script_path%QtScrcpy-win32\
-    set release_path=%script_path%output\win\x86\release
-    set qt_msvc_path=%qt_msvc_path%msvc2017\bin
+    set publish_path=%script_path%..\build\QtScrcpy-win32\
+    set release_path=%script_path%..\..\output\win\x86\release
+    set qt_msvc_path=%qt_msvc_path%\msvc2017\bin
 ) else (
     set publish_path=%script_path%QtScrcpy-win64\
-    set release_path=%script_path%output\win\x64\release
-    set qt_msvc_path=%qt_msvc_path%msvc2017_64\bin
+    set release_path=%script_path%..\..\output\win\x64\release
+    set qt_msvc_path=%qt_msvc_path%\msvc2017_64\bin
 )
 set PATH=%qt_msvc_path%;%PATH%
 
@@ -38,21 +47,21 @@ if exist %publish_path% (
     rmdir /s/q %publish_path%
 )
 
-:: ¸´ÖÆÒª·¢²¼µÄ°ü
+:: å¤åˆ¶è¦å‘å¸ƒçš„åŒ…
 xcopy %release_path% %publish_path% /E /Y
 xcopy %adb_path% %publish_path% /Y
 xcopy %jar_path% %publish_path% /Y
 xcopy %keymap_path% %publish_path%keymap\ /E /Y
 xcopy %config_path% %publish_path%config\ /E /Y
 
-:: Ìí¼ÓqtÒÀÀµ°ü
+:: æ·»åŠ qtä¾èµ–åŒ…
 windeployqt %publish_path%\QtScrcpy.exe
 
-:: É¾³ı¶àÓàqtÒÀÀµ°ü
+:: åˆ é™¤å¤šä½™qtä¾èµ–åŒ…
 rmdir /s/q %publish_path%\iconengines
 rmdir /s/q %publish_path%\translations
 
-:: ½ØÍ¼¹¦ÄÜĞèÒªqjpeg.dll
+:: æˆªå›¾åŠŸèƒ½éœ€è¦qjpeg.dll
 del %publish_path%\imageformats\qgif.dll
 del %publish_path%\imageformats\qicns.dll
 del %publish_path%\imageformats\qico.dll
@@ -72,7 +81,7 @@ if /i %cpu_mode% == x86 (
 echo=
 echo=
 echo ---------------------------------------------------------------
-echo Íê³É£¡
+echo å®Œæˆï¼
 echo ---------------------------------------------------------------
 
 :return

@@ -39,6 +39,12 @@ jobs:
       targetName: QtScrcpy.exe
     # 步骤
     steps:
+      - name: cacheQt
+        id: WindowsCacheQt
+        uses: actions/cache@v1
+        with:
+          path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
+          key: ${{ runner.os }}-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
       - name: setupQt
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
@@ -74,6 +80,7 @@ jobs:
           ENV_BUILD_DIR: '../build-win'
         run: |
           call "ci\win\build_for_win.bat" release %vc_arch%
+          call "ci\win\publish_for_win.bat" %vc_arch%
       # tag 打包
       - name: package
         if: startsWith(github.event.ref, 'refs/tags/')

@@ -1,8 +1,17 @@
 @echo off
 :: 从环境变量获取必要参数
+:: 例如 C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat
 set vcvarsall="%ENV_VCVARSALL%"
+:: 例如 d:\a\QtScrcpy\Qt\5.12.7
 set qt_msvc_path="%ENV_QT_MSVC%"
+:: 例如 ../build-win
 set build_path_name="%ENV_BUILD_DIR%"
+
+echo=
+echo=
+echo ---------------------------------------------------------------
+echo check ENV
+echo ---------------------------------------------------------------
 
 echo ENV_VCVARSALL %ENV_VCVARSALL%
 echo ENV_QT_MSVC %ENV_QT_MSVC%
