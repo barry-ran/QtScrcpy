@@ -26,6 +26,13 @@ if /i "%1"=="x64" (
     set cpu_mode=x64
 )
 
+set publish_dir=%2
+set errno=1
+
+:: 提示
+echo current build mode: %cpu_mode%
+echo current publish dir: %publish_dir%
+
 :: 环境变量设置
 set adb_path=%script_path%..\..\third_party\adb\win\*.*
 set jar_path=%script_path%..\..\third_party\scrcpy-server
@@ -33,11 +40,11 @@ set keymap_path=%script_path%..\..\keymap
 set config_path=%script_path%..\..\config
 
 if /i %cpu_mode% == x86 (
-    set publish_path=%script_path%..\build\QtScrcpy-win32\
+    set publish_path=%script_path%%publish_dir%\
     set release_path=%script_path%..\..\output\win\x86\release
     set qt_msvc_path=%qt_msvc_path%\msvc2017\bin
 ) else (
-    set publish_path=%script_path%QtScrcpy-win64\
+    set publish_path=%script_path%%publish_dir%\
     set release_path=%script_path%..\..\output\win\x64\release
     set qt_msvc_path=%qt_msvc_path%\msvc2017_64\bin
 )
@@ -81,8 +88,11 @@ if /i %cpu_mode% == x86 (
 echo=
 echo=
 echo ---------------------------------------------------------------
-echo 完成！
+echo finish!!!
 echo ---------------------------------------------------------------
+
+set errno=0
 
 :return
 cd %old_cd%
+exit /B %errno%

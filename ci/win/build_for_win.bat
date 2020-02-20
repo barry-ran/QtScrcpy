@@ -4,8 +4,6 @@
 set vcvarsall="%ENV_VCVARSALL%"
 :: 例如 d:\a\QtScrcpy\Qt\5.12.7
 set qt_msvc_path="%ENV_QT_MSVC%"
-:: 例如 ../build-win
-set build_path_name="%ENV_BUILD_DIR%"
 
 echo=
 echo=
@@ -23,7 +21,8 @@ set script_path=%~dp0
 set old_cd=%cd%
 cd /d %~dp0
 
-set build_path=%script_path%%build_path_name%
+:: 临时文件目录
+set temp_path=%script_path%..\temp
 
 :: 启动参数声明
 set debug_mode="false"
@@ -85,11 +84,11 @@ echo ---------------------------------------------------------------
 echo begin qmake build
 echo ---------------------------------------------------------------
 
-if exist %build_path% (          
-    rmdir /q /s %build_path%
+if exist %temp_path% (          
+    rmdir /q /s %temp_path%
 )
-md %build_path%
-cd %build_path%
+md %temp_path%
+cd %temp_path%
 
 set qmake_params=-spec win32-msvc
 

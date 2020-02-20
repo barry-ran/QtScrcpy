@@ -75,12 +75,13 @@ jobs:
         shell: cmd
         env:
           vc_arch: ${{ matrix.msvc_arch }}
+          publish_dir: ..\build\QtScrcpy-win${{ matrix.msvc_arch }}-v1.1.1
           ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
           ENV_QT_MSVC: 'd:\a\QtScrcpy\Qt\5.12.7'
-          ENV_BUILD_DIR: '../build-win'
+          ENV_PUBLISH_DIR: '..\build\QtScrcpy-win32'
         run: |
           call "ci\win\build_for_win.bat" release %vc_arch%
-          call "ci\win\publish_for_win.bat" %vc_arch%
+          call "ci\win\publish_for_win.bat" %vc_arch% %publish_dir%
       # tag 打包
       - name: package
         if: startsWith(github.event.ref, 'refs/tags/')
