@@ -86,7 +86,8 @@ if /i %debug_mode% == "true" (
 )
 
 :: qmake ../../all.pro -spec win32-msvc "CONFIG+=debug" "CONFIG+=qml_debug"
-qmake ../../all.pro %qmake_params%
+:: qmake ../../all.pro %qmake_params%
+qmake ../../all.pro
 
 nmake
 
