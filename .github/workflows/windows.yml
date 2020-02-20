@@ -75,39 +75,27 @@ jobs:
         shell: cmd
         env:
           vc_arch: ${{ matrix.msvc_arch }}
-          publish_dir: ..\build\QtScrcpy-win-${{ matrix.msvc_arch }}-v1.1.1
           ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
           ENV_QT_MSVC: 'd:\a\Qt\5.12.7'
           ENV_PUBLISH_DIR: '..\build\QtScrcpy-win32'
         run: |
           call "ci\win\build_for_win.bat" release %vc_arch%
-          call "ci\win\publish_for_win.bat" %vc_arch% %publish_dir%
-      # 上传artifact
-      - name: upload-artifact
-        env:
-          publish_dir: ..\build\QtScrcpy-win-${{ matrix.msvc_arch }}-v1.1.1
-        uses: actions/upload-artifact@v1
-        with:
-          name: QtScrcpy-win32
-          path: ..\build\QtScrcpy-win-x86-v1.1.1
       # tag 打包
       - name: package
         if: startsWith(github.event.ref, 'refs/tags/')
         env:
           VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC'
-          archiveName: ${{ matrix.qt_ver }}-${{ matrix.qt_target }}-${{ matrix.qt_arch }}
+          vc_arch: ${{ matrix.msvc_arch }}
+          publish_dir: .QtScrcpy-win-${{ matrix.msvc_arch }}
         shell: pwsh
         run: |
-          # 创建文件夹
-          New-Item -ItemType Directory ${env:archiveName}
-          # 拷贝exe
-          Copy-Item bin\${env:targetName} ${env:archiveName}\
-          # 拷贝依赖
-          windeployqt --qmldir . ${env:archiveName}\${env:targetName}
+          [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
+          [string]$full_publish_dir = ${env:publish_dir} + ${tag}
+          call "ci\win\publish_for_win.bat" %vc_arch% '.\build\'$full_publish_dir
           # 打包zip
-          Compress-Archive -Path ${env:archiveName} ${env:archiveName}'.zip'
+          Compress-Archive -Path 'ci\win\build\'$full_publish_dir 'ci\win\build\'$full_publish_dir'.zip'
           # 记录环境变量packageName给后续step
-          $name = ${env:archiveName}
+          $name = $full_publish_dir
           echo "::set-env name=packageName::$name"
           # 打印环境变量packageName
           Write-Host 'packageName:'${env:packageName}
