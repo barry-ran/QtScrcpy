@@ -4,6 +4,10 @@ set vcvarsall=%ENV_VCVARSALL%
 set qt_msvc_path=%ENV_QT_MSVC%
 set build_path_name=%ENV_BUILD_DIR%
 
+echo ENV_VCVARSALL %ENV_VCVARSALL%
+echo ENV_QT_MSVC %ENV_QT_MSVC%
+echo ENV_BUILD_DIR %ENV_BUILD_DIR%
+
 :: 获取脚本绝对路径
 set script_path=%~dp0
 :: 进入脚本所在目录,因为这会影响脚本中执行的程序的工作目录
