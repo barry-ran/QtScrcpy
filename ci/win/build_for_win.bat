@@ -95,7 +95,6 @@ md %temp_path%
 cd %temp_path%
 
 set qmake_params=-spec win32-msvc
-
 if /i %debug_mode% == "true" (
     set qmake_params=%qmake_params% "CONFIG+=debug" "CONFIG+=qml_debug"
 ) else (
@@ -109,7 +108,9 @@ if not %errorlevel%==0 (
     goto return
 )
 
-nmake
+:: nmake
+:: jom是qt的多线程nmake工具
+jom -j8
 if not %errorlevel%==0 (
     echo "nmake failed"
     goto return
