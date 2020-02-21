@@ -18,7 +18,7 @@ jobs:
   build:
     name: Build
     # 运行平台， windows-latest目前是windows server 2019
-    runs-on: windows-latest
+    runs-on: windows-2016
     strategy:
       # 矩阵配置
       matrix:
