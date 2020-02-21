@@ -86,7 +86,7 @@ jobs:
         env:
           VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC'
           vc_arch: ${{ matrix.msvc_arch }}
-          publish_dir: .QtScrcpy-win-${{ matrix.msvc_arch }}
+          publish_dir: QtScrcpy-win-${{ matrix.msvc_arch }}
           ref: ${{ github.event.ref }}
         shell: pwsh
         run: |
@@ -94,7 +94,7 @@ jobs:
           [string]$full_publish_dir = ${env:publish_dir} + ${tag}
           cmd.exe /c ci\win\publish_for_win.bat %vc_arch% ..\build\$full_publish_dir
           # 打包zip
-          Compress-Archive -Path 'ci\win\build\'$full_publish_dir 'ci\win\build\'$full_publish_dir'.zip'
+          Compress-Archive -Path ci\build\$full_publish_dir ci\build\${full_publish_dir}.zip
           # 记录环境变量packageName给后续step
           $name = $full_publish_dir
           echo "::set-env name=packageName::$name"
@@ -172,6 +172,6 @@ jobs:
         uses: actions/upload-release-asset@v1.0.1
         with:
           upload_url: ${{ env.uploadUrl }}
-          asset_path: ./${{ env.packageName }}.zip
+          asset_path: ci\build\${{ env.packageName }}.zip
           asset_name: ${{ env.packageName }}.zip
           asset_content_type: application/zip
