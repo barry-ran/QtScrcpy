@@ -39,13 +39,13 @@ jobs:
       targetName: QtScrcpy.exe
     # 步骤
     steps:
-      - name: cacheQt
+      - name: Cache Qt
         id: WindowsCacheQt
         uses: actions/cache@v1
         with:
           path: ../../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
           key: ${{ runner.os }}-cache-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
-      - name: setupQt
+      - name: Setup Qt
         if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
         env:
@@ -71,7 +71,7 @@ jobs:
         with:
           fetch-depth: 1
       # 编译msvc
-      - name: build-msvc
+      - name: Build MSVC
         shell: cmd
         env:
           ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
@@ -79,18 +79,16 @@ jobs:
         run: |
           call "ci\win\build_for_win.bat" release ${{ matrix.msvc_arch }}
       # tag 打包
-      - name: package
+      - name: Package
         if: startsWith(github.event.ref, 'refs/tags/')
         env:
-          VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC'
-          vc_arch: ${{ matrix.msvc_arch }}
-          publish_dir: QtScrcpy-win-${{ matrix.msvc_arch }}
+          publish_dir: QtScrcpy-win-${{matrix.msvc_arch}}
           ref: ${{ github.event.ref }}
         shell: pwsh
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$full_publish_dir = ${env:publish_dir} + ${tag}
-          cmd.exe /c ci\win\publish_for_win.bat %vc_arch% ..\build\$full_publish_dir
+          [string]$full_publish_dir = ${env:publish_dir} + '-' + ${tag}
+          cmd.exe /c ci\win\publish_for_win.bat ${{matrix.msvc_arch}} ..\build\$full_publish_dir
           # 打包zip
           Compress-Archive -Path ci\build\$full_publish_dir ci\build\${full_publish_dir}.zip
           # 记录环境变量packageName给后续step
@@ -99,7 +97,7 @@ jobs:
           # 打印环境变量packageName
           Write-Host 'packageName:'${env:packageName}
       # tag 查询github-Release
-      - name: queryReleaseWin
+      - name: Query Release Win
         id: queryReleaseWin
         if: startsWith(github.event.ref, 'refs/tags/')
         shell: pwsh
@@ -126,7 +124,7 @@ jobs:
             echo "::set-output name=needCreateRelease::true"  
           }
       # tag 创建github-Release
-      - name: createReleaseWin
+      - name: Create Release Win
         id: createReleaseWin
         if: startsWith(github.event.ref, 'refs/tags/') && steps.queryReleaseWin.outputs.needCreateRelease == 'true'
         env:
@@ -139,7 +137,7 @@ jobs:
           draft: false
           prerelease: false
       # 重定向upload_url到环境变量uploadUrl。
-      - name: getLatestTagRelease
+      - name: Get Latest Tag Release
         # tag 上一步无论成功还是失败都执行
         if: startsWith(github.event.ref, 'refs/tags/')
         shell: pwsh
@@ -162,7 +160,7 @@ jobs:
           echo "::set-env name=uploadUrl::$latestUpUrl"
           Write-Host 'env uploadUrl:'${env:uploadUrl}
       # tag 上传Release
-      - name: uploadRelease
+      - name: Upload Release
         id: uploadRelease
         if: startsWith(github.event.ref, 'refs/tags/')
         env:
