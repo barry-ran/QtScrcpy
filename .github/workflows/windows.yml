@@ -96,78 +96,8 @@ jobs:
           echo "::set-env name=packageName::$name"
           # 打印环境变量packageName
           Write-Host 'packageName:'${env:packageName}
-      # tag 查询github-Release
-      - name: Query Release Win
-        id: queryReleaseWin
-        if: startsWith(github.event.ref, 'refs/tags/')
-        shell: pwsh
-        env:
-          githubFullName: ${{ github.event.repository.full_name }}
-          ref: ${{ github.event.ref }}
-        run: |
-          [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
-          $response={}
-          try {
-            $response = Invoke-RestMethod -Uri $url -Method Get
-          } catch {
-            Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-            Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
-            # 没查到，输出
-            echo "::set-output name=needCreateRelease::true"  
-            return
-          }
-          [string]$latestUpUrl = $response.upload_url
-          Write-Host 'latestUpUrl:'$latestUpUrl
-          if ($latestUpUrl.Length -eq 0) {
-            # 没查到，输出
-            echo "::set-output name=needCreateRelease::true"  
-          }
-      # tag 创建github-Release
-      - name: Create Release Win
-        id: createReleaseWin
-        if: startsWith(github.event.ref, 'refs/tags/') && steps.queryReleaseWin.outputs.needCreateRelease == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: actions/create-release@v1.0.0
+      # 上传artifact
+      - uses: actions/upload-artifact@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: ${{ github.event.head_commit.message }}
-          draft: false
-          prerelease: false
-      # 重定向upload_url到环境变量uploadUrl。
-      - name: Get Latest Tag Release
-        # tag 上一步无论成功还是失败都执行
-        if: startsWith(github.event.ref, 'refs/tags/')
-        shell: pwsh
-        env:
-          githubFullName: ${{ github.event.repository.full_name }}
-          upUrl: ${{ steps.createReleaseWin.outputs.upload_url }}
-          ref: ${{ github.event.ref }}
-        run: |
-          # upUrl不为空，导出就完事
-          if (${env:upUrl}.Length -gt 0) {
-              $v=${env:upUrl}
-              echo "::set-env name=uploadUrl::$v"
-              return
-          } 
-          [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
-          $response = Invoke-RestMethod -Uri $url -Method Get
-          [string]$latestUpUrl = $response.upload_url
-          Write-Host 'latestUpUrl:'$latestUpUrl
-          echo "::set-env name=uploadUrl::$latestUpUrl"
-          Write-Host 'env uploadUrl:'${env:uploadUrl}
-      # tag 上传Release
-      - name: Upload Release
-        id: uploadRelease
-        if: startsWith(github.event.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: actions/upload-release-asset@v1.0.1
-        with:
-          upload_url: ${{ env.uploadUrl }}
-          asset_path: ci\build\${{ env.packageName }}.zip
-          asset_name: ${{ env.packageName }}.zip
-          asset_content_type: application/zip
+          name: ${{ env.packageName }}
+          path: ci\build\${{ env.packageName }}.zip
