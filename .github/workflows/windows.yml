@@ -100,7 +100,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: artifact-${{ env.packageName }}
-          path: ci\build\${{ env.packageName }}.zip
+          path: ci\build\${ env.packageName }.zip
       # tag 查询github-Release
       - name: Query Release Win
         id: queryReleaseWin
