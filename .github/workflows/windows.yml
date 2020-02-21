@@ -87,6 +87,7 @@ jobs:
           VCINSTALLDIR: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC'
           vc_arch: ${{ matrix.msvc_arch }}
           publish_dir: .QtScrcpy-win-${{ matrix.msvc_arch }}
+          ref: ${{ github.event.ref }}
         shell: pwsh
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
