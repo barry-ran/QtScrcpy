@@ -17,7 +17,9 @@ on:
 jobs:
   build:
     name: Build
-    # 运行平台， windows-latest目前是windows server 2019
+    # 运行平台， windows-latest目前是windows server 2019,选择2016是2016安装的是vs2017
+    # https://github.com/actions/virtual-environments/blob/master/images/win/Windows2019-Readme.md
+    # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
     runs-on: windows-2016
     strategy:
       # 矩阵配置
@@ -74,7 +76,7 @@ jobs:
       - name: Build MSVC
         shell: cmd
         env:
-          ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
+          ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
           ENV_QT_MSVC: 'd:\a\Qt5\5.12.6'
         run: |
           call "ci\win\build_for_win.bat" release ${{ matrix.msvc_arch }}
