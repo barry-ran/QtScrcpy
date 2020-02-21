@@ -77,7 +77,7 @@ jobs:
         shell: cmd
         env:
           ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
-          ENV_QT_MSVC: 'd:\a\Qt5\5.12.6'
+          ENV_QT_PATH: 'd:\a\Qt5\5.12.6'
         run: |
           call "ci\win\build_for_win.bat" release ${{ matrix.msvc_arch }}
       # tag 打包
