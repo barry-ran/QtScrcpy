@@ -92,7 +92,7 @@ jobs:
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$full_publish_dir = ${env:publish_dir} + ${tag}
-          Start-Process 'ci\win\publish_for_win.bat' %vc_arch% '.\build\'$full_publish_dir
+          Start-Process ci\win\publish_for_win.bat %vc_arch% '.\build\'$full_publish_dir
           # 打包zip
           Compress-Archive -Path 'ci\win\build\'$full_publish_dir 'ci\win\build\'$full_publish_dir'.zip'
           # 记录环境变量packageName给后续step
