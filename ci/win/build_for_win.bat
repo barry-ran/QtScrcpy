@@ -7,9 +7,9 @@ echo check ENV
 echo ---------------------------------------------------------------
 
 :: 从环境变量获取必要参数
-:: 例如 C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat
+:: example: D:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat
 set vcvarsall="%ENV_VCVARSALL%"
-:: 例如 d:\a\QtScrcpy\Qt\5.12.7
+:: example: D:\Qt\Qt5.12.5\5.12.5
 set qt_msvc_path="%ENV_QT_PATH%"
 
 echo ENV_VCVARSALL %ENV_VCVARSALL%
@@ -95,7 +95,7 @@ md %temp_path%
 cd %temp_path%
 
 set qmake_params=-spec win32-msvc
-if /i %debug_mode% == "true" (
+if /i %build_mode% == debug (
     set qmake_params=%qmake_params% "CONFIG+=debug" "CONFIG+=qml_debug"
 ) else (
     set qmake_params=%qmake_params% "CONFIG+=qtquickcompiler"
@@ -109,8 +109,8 @@ if not %errorlevel%==0 (
 )
 
 :: nmake
-:: jom是qt的多线程nmake工具
-jom -j8
+:: jom是qt的多进程nmake工具
+..\win\jom -j8
 if not %errorlevel%==0 (
     echo "nmake failed"
     goto return
