@@ -48,6 +48,7 @@ jobs:
         run: |
           export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/build_for_mac.sh release
+          ci/mac/publish_for_mac.sh ../build
       # tag 打包
       - name: Package
         if: startsWith(github.event.ref, 'refs/tags/')
@@ -57,9 +58,6 @@ jobs:
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$name = 'QtScrcpy-mac-x64-' + ${tag} + '.zip'
-          # package
-          export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
-          ci/mac/publish_for_mac.sh ../build
           # 打包zip
           Compress-Archive -Path ci\build\QtScrcpy.app ci\build\$name
           # 记录环境变量packageName给后续step
