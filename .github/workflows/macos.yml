@@ -52,13 +52,12 @@ jobs:
       - name: Package
         if: startsWith(github.event.ref, 'refs/tags/')
         run: |
-          # 组拼名称
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$name = 'QtScrcpy-mac-x64-' + ${tag} + '.zip'
-          # 打包
+          # package
           export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/publish_for_mac.sh ../build
-          # 压缩zip
+          # package zip
           zip -r $name ../build/QtScrcpy.app
           # 记录环境变量packageName给后续step
           echo "::set-env name=packageName::$name"
