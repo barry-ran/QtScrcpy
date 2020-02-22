@@ -51,6 +51,8 @@ jobs:
       # tag 打包
       - name: Package
         if: startsWith(github.event.ref, 'refs/tags/')
+        env:
+          ref: ${{ github.event.ref }}
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$name = 'QtScrcpy-mac-x64-' + ${tag} + '.zip'
