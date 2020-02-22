@@ -26,7 +26,7 @@ jobs:
         with:
           path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
           key: ${{ runner.os }}-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
-      - name: setupQt
+      - name: Setup Qt
         if: steps.MacosCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
         env:
@@ -46,14 +46,13 @@ jobs:
           fetch-depth: 1
       - name: Build MacOS
         env:
-          ENV_QT_PATH: '/a/Qt/5.12.6'
+          ENV_QT_PATH: '/Users/runner/runners/2.165.2/work/QtScrcpy/Qt/5.12.6'
         run: |
           ci/mac/build_for_mac.sh release
       # tag 打包
-      - name: package
-        if: startsWith(github.event.ref, 'refs/tags/')
+      - name: Package
         run: |
-          macdeployqt bin/${targetName}.app -qmldir=. -verbose=1 -dmg
+          ci/mac/publish_for_mac.sh ..\build
       # tag 查询github-Release
       - name: queryRelease
         id: queryReleaseMacos
