@@ -45,13 +45,13 @@ int main(int argc, char *argv[])
     qputenv("QTSCRCPY_ADB_PATH", "../../../../third_party/adb/win/adb.exe");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../keymap");
-    qputenv("QTSCRCPY_CONFIG_PATH", "../../../../config/config.ini");
+    qputenv("QTSCRCPY_CONFIG_PATH", "../../../../config");
 #endif
 
 #ifdef Q_OS_LINUX
     qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/linux/adb");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server");
-    qputenv("QTSCRCPY_CONFIG_PATH", "../../../config/config.ini");
+    qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
 #endif
 
     //加载样式表
@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
     g_mainDlg->setWindowTitle(Config::getInstance().getTitle());
     g_mainDlg->show();
 
+    qInfo(QObject::tr("This software is completely open source and free, you can download it at the following address:").toUtf8());
     qInfo(QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8());
 
     int ret = a.exec();
