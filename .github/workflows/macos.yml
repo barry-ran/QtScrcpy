@@ -51,6 +51,7 @@ jobs:
       # tag 打包
       - name: Package
         if: startsWith(github.event.ref, 'refs/tags/')
+        shell: pwsh
         env:
           ref: ${{ github.event.ref }}
         run: |
@@ -59,8 +60,8 @@ jobs:
           # package
           export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/publish_for_mac.sh ../build
-          # package zip
-          zip -r $name ../build/QtScrcpy.app
+          # 打包zip
+          Compress-Archive -Path ci\build\QtScrcpy.app ci\build\$name
           # 记录环境变量packageName给后续step
           echo "::set-env name=packageName::$name"
       # 查询Release
@@ -112,6 +113,6 @@ jobs:
         uses: actions/upload-release-asset@v1.0.1
         with:
           upload_url: ${{ env.uploadUrl }}
-          asset_path: ci\build\${{ env.packageName }}
+          asset_path: ci/build/${{ env.packageName }}
           asset_name: ${{ env.packageName }}
           asset_content_type: application/zip
