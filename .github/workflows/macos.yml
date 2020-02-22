@@ -4,6 +4,7 @@ on:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
+      - '.github/workflows/**'
   pull_request:
     paths:
       - 'QtScrcpy/**'

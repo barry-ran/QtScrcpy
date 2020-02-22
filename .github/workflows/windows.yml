@@ -5,6 +5,7 @@ on:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
+      - '.github/workflows/**'
   # pull_request时触发workflow
   pull_request:
     paths:
