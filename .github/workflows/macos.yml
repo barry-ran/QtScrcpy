@@ -57,9 +57,9 @@ jobs:
           ref: ${{ github.event.ref }}
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$name = 'QtScrcpy-mac-x64-' + ${tag} + '.zip'
+          [string]$name = 'QtScrcpy-mac-x64-' + ${tag}
           # 打包zip
-          Compress-Archive -Path ci\build\QtScrcpy.app ci\build\$name
+          Compress-Archive -Path ci\build\QtScrcpy.app ci\build\${name}.zip
           # 记录环境变量packageName给后续step
           echo "::set-env name=packageName::$name"
       # 查询Release
@@ -111,6 +111,6 @@ jobs:
         uses: actions/upload-release-asset@v1.0.1
         with:
           upload_url: ${{ env.uploadUrl }}
-          asset_path: ci/build/${{ env.packageName }}
-          asset_name: ${{ env.packageName }}
+          asset_path: ci/build/${{ env.packageName }}.zip
+          asset_name: ${{ env.packageName }}.zip
           asset_content_type: application/zip
