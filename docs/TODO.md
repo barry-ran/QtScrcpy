@@ -7,12 +7,14 @@
 - text转换 https://github.com/Genymobile/scrcpy/commit/c916af0984f72a60301d13fa8ef9a85112f54202?tdsourcetag=s_pctim_aiomsg
 
 ## 中优先级
-- 自动打包脚本
+- mac自动打包脚本
 - 脚本
 - 群控
 - 竖屏全屏不拉伸画面
 - 软解
 - opengles 3.0
+- github action
+- 打包版本截图无效？
 
 ## 高优先级
 - linux打包以及版本号
