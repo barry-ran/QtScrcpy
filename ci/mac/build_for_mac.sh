@@ -7,7 +7,7 @@ echo ---------------------------------------------------------------
 
 # 从环境变量获取必要参数
 # 例如 /Users/barry/Qt5.12.5/5.12.5
-echo ENV_QT_PATH $ENV_QT_PATH
+echo ENV_QT_CLANG $ENV_QT_CLANG
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -39,7 +39,7 @@ fi
 echo current build mode: $build_mode
 
 # 环境变量设置
-export PATH=$PATH:$ENV_QT_PATH/clang_64/bin
+export PATH=$PATH:$ENV_QT_CLANG/bin
 
 echo
 echo
