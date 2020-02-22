@@ -51,8 +51,10 @@ jobs:
           ci/mac/build_for_mac.sh release
       # tag 打包
       - name: Package
+        env:
+          ENV_QT_PATH: '/Users/runner/runners/2.165.2/work/QtScrcpy/Qt/5.12.6'
         run: |
-          ci/mac/publish_for_mac.sh ..\build
+          ci/mac/publish_for_mac.sh ../build
       # tag 查询github-Release
       - name: queryRelease
         id: queryReleaseMacos
