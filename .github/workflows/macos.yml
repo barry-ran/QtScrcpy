@@ -1,13 +1,13 @@
 name: MacOS
 on: 
   push:
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
+    paths:
+      - 'QtScrcpy/**'
+      - '!QtScrcpy/res/**'
   pull_request:
-    paths-ignore:
-      - 'README.md'
-      - 'LICENSE'
+    paths:
+      - 'QtScrcpy/**'
+      - '!QtScrcpy/res/**'
 jobs:
   build:
     name: Build
@@ -48,6 +48,10 @@ jobs:
         run: |
           export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/build_for_mac.sh release
+      - name: Publish
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: |
+          export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/publish_for_mac.sh ../build
       # tag 打包
       - name: Package
@@ -62,6 +66,8 @@ jobs:
           Compress-Archive -Path ci\build\QtScrcpy.app ci\build\${name}.zip
           # 记录环境变量packageName给后续step
           echo "::set-env name=packageName::$name"
+          # 打印环境变量packageName
+          Write-Host 'packageName:'${env:packageName}
       # 查询Release
       - name: Query Release
         if: startsWith(github.event.ref, 'refs/tags/')
