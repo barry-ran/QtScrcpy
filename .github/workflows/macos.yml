@@ -1,12 +1,10 @@
-name: Windows
+name: MacOS
 on: 
-  # push代码时触发workflow
   push:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
       - '.github/workflows/**'
-  # pull_request时触发workflow
   pull_request:
     paths:
       - 'QtScrcpy/**'
@@ -14,84 +12,61 @@ on:
 jobs:
   build:
     name: Build
-    # 运行平台， windows-latest目前是windows server 2019,选择2016是2016安装的是vs2017
-    # https://github.com/actions/virtual-environments/blob/master/images/win/Windows2019-Readme.md
-    # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
-    runs-on: windows-2016
+    runs-on: ${{ matrix.os }}
     strategy:
-      # 矩阵配置
       matrix:
+        os: [macos-latest]
         qt_ver: [5.12.6]
-        qt_target: [desktop]
-        # mingw用不了
-        # qt_arch: [win64_msvc2017_64, win32_msvc2017, win32_mingw53,win32_mingw73]
-        qt_arch: [win64_msvc2017_64, win32_msvc2017]
-        # 额外设置msvc_arch
-        include:
-          - qt_arch: win64_msvc2017_64
-            msvc_arch: x64
-            qt_arch_install: msvc2017_64
-          - qt_arch: win32_msvc2017
-            msvc_arch: x86
-            qt_arch_install: msvc2017
+        qt_arch: [clang_64]
     env:
-      targetName: QtScrcpy.exe
-    # 步骤
+      targetName: QtScrcpy
     steps:
       - name: Cache Qt
-        id: WindowsCacheQt
+        id: MacosCacheQt
         uses: actions/cache@v1
         with:
-          path: ../../Qt5/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
-          key: ${{ runner.os }}-Qt5.12.6/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+          path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+          key: ${{ runner.os }}-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
       - name: Setup Qt
-        if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
+        if: steps.MacosCacheQt.outputs.cache-hit == 'true'
         shell: pwsh
         env:
-          QtPath: ../../Qt5/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
+          QtPath: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
         run: |
           $qt_Path=${env:QtPath}
           echo "::set-env name=Qt5_Dir::$qt_Path"
-          echo "::add-path::$qt_Path/bin"          
-      # 安装Qt
+          echo "::add-path::$qt_Path/bin"    
       - name: Install Qt
-        if: steps.WindowsCacheQt.outputs.cache-hit != 'true'
-        # 使用外部action。这个action专门用来安装Qt
+        if: steps.MacosCacheQt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v2.0.0
         with:
-          # Version of Qt to install
           version: ${{ matrix.qt_ver }}
-          # Target platform for build
-          target: ${{ matrix.qt_target }}
-          # Architecture for Windows/Android
-          arch: ${{ matrix.qt_arch }}
-      # 拉取代码
+      
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-      # 编译msvc
-      - name: Build MSVC
-        shell: cmd
-        env:
-          ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
-          ENV_QT_PATH: 'd:\a\Qt5\5.12.6'
+      - name: Build MacOS
         run: |
-          call "ci\win\build_for_win.bat" release ${{ matrix.msvc_arch }}
+          export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
+          ci/mac/build_for_mac.sh release
+      - name: Publish
+        if: startsWith(github.event.ref, 'refs/tags/')
+        run: |
+          export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
+          ci/mac/publish_for_mac.sh ../build
       # tag 打包
       - name: Package
+        id: package
         if: startsWith(github.event.ref, 'refs/tags/')
-        env:
-          publish_dir: QtScrcpy-win-${{matrix.msvc_arch}}
-          ref: ${{ github.event.ref }}
         shell: pwsh
+        env:
+          ref: ${{ github.event.ref }}
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$full_publish_dir = ${env:publish_dir} + '-' + ${tag}
-          cmd.exe /c ci\win\publish_for_win.bat ${{matrix.msvc_arch}} ..\build\$full_publish_dir
+          [string]$name = 'QtScrcpy-mac-x64-' + ${tag}
           # 打包zip
-          Compress-Archive -Path ci\build\$full_publish_dir ci\build\${full_publish_dir}.zip
+          Compress-Archive -Path ci\build\QtScrcpy.app ci\build\${name}.zip
           # 记录环境变量packageName给后续step
-          $name = $full_publish_dir
           echo "::set-env name=packageName::$name"
           # 打印环境变量packageName
           Write-Host 'packageName:'${env:packageName}
@@ -144,6 +119,6 @@ jobs:
         uses: actions/upload-release-asset@v1.0.1
         with:
           upload_url: ${{ env.uploadUrl }}
-          asset_path: ci\build\${{ env.packageName }}.zip
-          asset_name: ${{ env.packageName }}.zip
+          asset_path: ci\build\${{ steps.package.env.packageName }}.zip
+          asset_name: ${{ steps.package.env.packageName }}.zip
           asset_content_type: application/zip
