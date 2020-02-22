@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="144"/>
-        <location filename="../../dialog.cpp" line="294"/>
+        <location filename="../../dialog.cpp" line="293"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
@@ -201,14 +201,6 @@
         <location filename="../../dialog.cpp" line="93"/>
         <source>original</source>
         <translation>original</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../../main.cpp" line="80"/>
-        <source>This software is completely open source and free, you can download it at the following address:</source>
-        <translation>This software is completely open source and free, you can download it at the following address:</translation>
     </message>
 </context>
 <context>

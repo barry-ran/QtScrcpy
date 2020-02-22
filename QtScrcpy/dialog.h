@@ -56,12 +56,6 @@ private slots:
 
     void on_recordScreenCheck_clicked(bool checked);
 
-    void on_bitRateBox_activated(int index);
-
-    void on_maxSizeBox_activated(int index);
-
-    void on_formatBox_activated(int index);
-
 private:
     bool checkAdbRun();
     void initUI();

@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="144"/>
-        <location filename="../../dialog.cpp" line="294"/>
+        <location filename="../../dialog.cpp" line="293"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
@@ -201,14 +201,6 @@
         <location filename="../../dialog.cpp" line="93"/>
         <source>original</source>
         <translation>原始</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../../main.cpp" line="80"/>
-        <source>This software is completely open source and free, you can download it at the following address:</source>
-        <translation>本软件完全开源免费，你可以在下面的地址下载：</translation>
     </message>
 </context>
 <context>
