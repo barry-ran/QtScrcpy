@@ -50,12 +50,20 @@ jobs:
           ci/mac/build_for_mac.sh release
       # tag 打包
       - name: Package
+        if: startsWith(github.event.ref, 'refs/tags/')
         run: |
+          # 组拼名称
+          [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
+          [string]$name = 'QtScrcpy-mac-x64-' + ${tag} + '.zip'
+          # 打包
           export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/publish_for_mac.sh ../build
-      # tag 查询github-Release
-      - name: queryRelease
-        id: queryReleaseMacos
+          # 压缩zip
+          zip -r $name ../build/QtScrcpy.app
+          # 记录环境变量packageName给后续step
+          echo "::set-env name=packageName::$name"
+      # 查询Release
+      - name: Query Release
         if: startsWith(github.event.ref, 'refs/tags/')
         shell: pwsh
         env:
@@ -70,45 +78,23 @@ jobs:
           } catch {
             Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__ 
             Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
-            # 没查到，输出
-            echo "::set-output name=needCreateRelease::true"  
-            return
+            # 没查到
+            return 1
           }
           [string]$latestUpUrl = $response.upload_url
           Write-Host 'latestUpUrl:'$latestUpUrl
           if ($latestUpUrl.Length -eq 0) {
-            # 没查到，输出
-            echo "::set-output name=needCreateRelease::true"  
+            # 没查到
+            return 1
           }
-      # tag 创建github-Release
-      - name: createReleaseWin
-        id: createReleaseWin
-        if: startsWith(github.event.ref, 'refs/tags/') && steps.queryReleaseMacos.outputs.needCreateRelease == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: actions/create-release@v1.0.0
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body: ${{ github.event.head_commit.message }}
-          draft: false
-          prerelease: false
-      # 重定向upload_url到环境变量uploadUrl。
-      - name: getLatestTagRelease
-        # tag 上一步无论成功还是失败都执行
+      # 获取上传url
+      - name: Get Release Url
         if: startsWith(github.event.ref, 'refs/tags/')
         shell: pwsh
         env:
           githubFullName: ${{ github.event.repository.full_name }}
-          upUrl: ${{ steps.queryReleaseMacos.outputs.upload_url }}
           ref: ${{ github.event.ref }}
         run: |
-          # upUrl不为空，导出就完事
-          if (${env:upUrl}.Length -gt 0) {
-              $v=${env:upUrl}
-              echo "::set-env name=uploadUrl::$v"
-              return
-          } 
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
           $response = Invoke-RestMethod -Uri $url -Method Get
@@ -117,7 +103,7 @@ jobs:
           echo "::set-env name=uploadUrl::$latestUpUrl"
           Write-Host 'env uploadUrl:'${env:uploadUrl}
       # tag 上传Release
-      - name: uploadRelease
+      - name: Upload Release
         id: uploadRelease
         if: startsWith(github.event.ref, 'refs/tags/')
         env:
@@ -125,6 +111,6 @@ jobs:
         uses: actions/upload-release-asset@v1.0.1
         with:
           upload_url: ${{ env.uploadUrl }}
-          asset_path: ./bin/${{ env.targetName }}.dmg
-          asset_name: ${{ env.targetName }}.dmg
-          asset_content_type: application/applefile
+          asset_path: ci\build\${{ env.packageName }}
+          asset_name: ${{ env.packageName }}
+          asset_content_type: application/zip
