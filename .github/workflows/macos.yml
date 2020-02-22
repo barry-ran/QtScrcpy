@@ -54,6 +54,7 @@ jobs:
         env:
           ENV_QT_PATH: '/Users/runner/runners/2.165.2/work/QtScrcpy/Qt/5.12.6'
         run: |
+          echo ${{env.Qt5_Dir}}
           ci/mac/publish_for_mac.sh ../build
       # tag 查询github-Release
       - name: queryRelease
