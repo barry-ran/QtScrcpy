@@ -153,7 +153,7 @@ macos {
     QMAKE_BUNDLE_DATA += APP_FFMPEG
 
     APP_CONFIG.files = $$files($$PWD/../config/config.ini)
-    APP_CONFIG.path = Contents/MacOS/config
+    APP_CONFIG.path = Contents/MacOS
     QMAKE_BUNDLE_DATA += APP_CONFIG
 
     # mac application icon

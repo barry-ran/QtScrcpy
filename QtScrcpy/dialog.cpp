@@ -83,7 +83,7 @@ void Dialog::initUI()
     ui->bitRateBox->addItem("6000000");
     ui->bitRateBox->addItem("8000000");
     ui->bitRateBox->addItem("10000000");
-    ui->bitRateBox->setCurrentIndex(Config::getInstance().getBitRateIndex());
+    ui->bitRateBox->setCurrentIndex(2);
 
     ui->maxSizeBox->addItem("640");
     ui->maxSizeBox->addItem("720");
@@ -91,14 +91,13 @@ void Dialog::initUI()
     ui->maxSizeBox->addItem("1280");
     ui->maxSizeBox->addItem("1920");
     ui->maxSizeBox->addItem(tr("original"));
-    ui->maxSizeBox->setCurrentIndex(Config::getInstance().getMaxSizeIndex());
+    ui->maxSizeBox->setCurrentIndex(2);
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
-    ui->formatBox->setCurrentIndex(Config::getInstance().getRecordFormatIndex());
 
     ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
- }
+}
 
 void Dialog::execAdbCmd()
 {
@@ -358,19 +357,4 @@ void Dialog::on_recordScreenCheck_clicked(bool checked)
         qWarning() << "please select record save path!!!";
         ui->recordScreenCheck->setChecked(false);
     }
-}
-
-void Dialog::on_bitRateBox_activated(int index)
-{
-    Config::getInstance().setBitRateIndex(index);
-}
-
-void Dialog::on_maxSizeBox_activated(int index)
-{
-    Config::getInstance().setMaxSizeIndex(index);
-}
-
-void Dialog::on_formatBox_activated(int index)
-{
-    Config::getInstance().setRecordFormatIndex(index);
 }
