@@ -1,7 +1,4 @@
 @echo off
-:: 从环境变量获取必要参数
-:: 例如 d:\a\QtScrcpy\Qt\5.12.7
-set qt_msvc_path="%ENV_QT_MSVC%"
 
 echo=
 echo=
@@ -9,7 +6,11 @@ echo ---------------------------------------------------------------
 echo check ENV
 echo ---------------------------------------------------------------
 
-echo ENV_QT_MSVC %ENV_QT_MSVC%
+:: 从环境变量获取必要参数
+:: 例如 d:\a\QtScrcpy\Qt\5.12.7
+set qt_msvc_path="%ENV_QT_PATH%"
+
+echo ENV_QT_PATH %ENV_QT_PATH%
 
 :: 获取脚本绝对路径
 set script_path=%~dp0
@@ -19,15 +20,15 @@ cd /d %~dp0
 
 :: 启动参数声明
 set cpu_mode=x86
+set publish_dir=%2
+set errno=1
+
 if /i "%1"=="x86" (
     set cpu_mode=x86
 )
 if /i "%1"=="x64" (
     set cpu_mode=x64
 )
-
-set publish_dir=%2
-set errno=1
 
 :: 提示
 echo current build mode: %cpu_mode%
