@@ -118,6 +118,6 @@ jobs:
         uses: actions/upload-release-asset@v1.0.1
         with:
           upload_url: ${{ env.uploadUrl }}
-          asset_path: ci/build/${{ env.packageName }}.zip
+          asset_path: ci\build\${{ env.packageName }}.zip
           asset_name: ${{ env.packageName }}.zip
           asset_content_type: application/zip
