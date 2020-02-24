@@ -127,10 +127,17 @@ jobs:
         env:
           githubFullName: ${{ github.event.repository.full_name }}
           ref: ${{ github.event.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
-          $response = Invoke-RestMethod -Uri $url -Method Get
+          # github token防止api rate limite，否则一个小时只能60个api请求
+          $token = ${env:github_token}
+          $authInfo = ("{0}" -f $token)
+          $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
+          $authInfo = [System.Convert]::ToBase64String($authInfo)
+          $headers = @{Authorization=("barry-ran {0}" -f $authInfo)}
+          $response = Invoke-RestMethod -Uri $url -ContentType 'text/json' -Headers $headers -Method Get
           [string]$latestUpUrl = $response.upload_url
           Write-Host 'latestUpUrl:'$latestUpUrl
           echo "::set-env name=uploadUrl::$latestUpUrl"
