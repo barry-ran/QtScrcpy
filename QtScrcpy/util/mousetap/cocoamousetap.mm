@@ -62,10 +62,14 @@ static CGEventRef Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type
     eventLocation = CGEventGetUnflippedLocation(event);
     windowRect = [nswindow contentRectForFrameRect:[nswindow frame]];
 
+    windowRect.origin.x += 100;
+    windowRect.origin.y += 30;
+    windowRect.size.width -= 180;
+    windowRect.size.height -= 60;
+
     newWindowRect = NSMakeRect(windowRect.origin.x, windowRect.origin.y,
                             windowRect.size.width - 10, windowRect.size.height - 10);
-    qDebug() << newWindowRect.origin.x << newWindowRect.origin.y
-             << newWindowRect.size.width << newWindowRect.size.height;
+    //qDebug() << newWindowRect.origin.x << newWindowRect.origin.y << newWindowRect.size.width << newWindowRect.size.height;
 
     if (!NSMouseInRect(NSPointFromCGPoint(eventLocation), newWindowRect, NO)) {
 
