@@ -98,6 +98,11 @@ void Dialog::initUI()
     ui->formatBox->setCurrentIndex(Config::getInstance().getRecordFormatIndex());
 
     ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
+
+#ifdef Q_OS_OSX
+    // mac need more width
+    setFixedWidth(520);
+#endif
  }
 
 void Dialog::execAdbCmd()
