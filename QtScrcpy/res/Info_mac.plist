@@ -28,6 +28,8 @@
 	<string>1.2.0</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>10.10</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>play game need this</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2018-2038 rankun. All rights reserved.</string>
 	<key>NSMainStoryboardFile</key>
