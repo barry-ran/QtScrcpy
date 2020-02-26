@@ -172,11 +172,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
         }
 
         if (showSize != size()) {
-#ifdef Q_OS_OSX
-            setFixedSize(showSize);
-#else
             resize(showSize);
-#endif
             if (m_skin) {
                 updateStyleSheet(vertical);
             }
