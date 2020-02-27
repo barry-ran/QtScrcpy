@@ -184,23 +184,12 @@ void MagneticWidget::moveEvent(QMoveEvent *event)
 
 void MagneticWidget::getGeometry(QRect &relativeWidgetRect, QRect &targetWidgetRect)
 {
-    QRect parentRect = m_adsorbWidget->geometry();
-    QRect targetRect = geometry();
+    relativeWidgetRect.setTopLeft(m_adsorbWidget->pos());
+    relativeWidgetRect.setWidth(m_adsorbWidget->width());
+    relativeWidgetRect.setHeight(m_adsorbWidget->height());
 
-    if (!m_adsorbWidget->windowFlags().testFlag(Qt::FramelessWindowHint)) {
-        // title bar height
-        int titleBarHeight = m_adsorbWidget->style()->pixelMetric(QStyle::PM_TitleBarHeight);
-        parentRect.translate(0, -titleBarHeight);
-        parentRect.setHeight(parentRect.height() + titleBarHeight);
-    }
-
-    if (!windowFlags().testFlag(Qt::FramelessWindowHint)) {
-        // title bar height
-        int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
-        targetRect.translate(0, -titleBarHeight);
-        targetRect.setHeight(targetRect.height() + titleBarHeight);
-    }
-    relativeWidgetRect = parentRect;
-    targetWidgetRect = targetRect;
+    targetWidgetRect.setTopLeft(pos());
+    targetWidgetRect.setWidth(width());
+    targetWidgetRect.setHeight(height());
 }
 
