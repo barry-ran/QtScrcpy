@@ -5,8 +5,8 @@ echo check ENV
 echo ---------------------------------------------------------------
 
 # 从环境变量获取必要参数
-# 例如 /Users/barry/Qt5.12.5/5.12.5
-echo ENV_QT_CLANG $ENV_QT_CLANG
+# 例如 /home/barry/Qt5.9.6/5.9.6/gcc_64
+echo ENV_QT_GCC $ENV_QT_GCC
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -29,9 +29,9 @@ keymap_path=$script_path/../../keymap
 # config_path=$script_path/../../config
 
 publish_path=$script_path/$publish_dir
-release_path=$script_path/../../output/mac/release
+release_path=$script_path/../../output/linux/release
 
-export PATH=$ENV_QT_CLANG/bin:$PATH
+export PATH=$ENV_QT_GCC/bin:$PATH
 
 if [ -d "$publish_path" ]; then
     rm -rf $publish_path
