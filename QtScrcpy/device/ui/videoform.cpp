@@ -166,7 +166,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
         }
 
         if (!m_skin) {
-            // 减去标题栏高度 (mark:已经没有标题栏了)
+            // 减去标题栏高度
             int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
             showSize.setHeight(showSize.height() - titleBarHeight);
         }
