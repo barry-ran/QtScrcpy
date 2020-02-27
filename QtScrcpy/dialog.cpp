@@ -103,6 +103,11 @@ void Dialog::initUI()
     // mac need more width
     setFixedWidth(520);
 #endif
+
+#ifdef Q_OS_LINUX
+    // linux need more width
+    setFixedWidth(480);
+#endif
  }
 
 void Dialog::execAdbCmd()
