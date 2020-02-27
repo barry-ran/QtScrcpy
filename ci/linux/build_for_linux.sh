@@ -6,8 +6,8 @@ echo check ENV
 echo ---------------------------------------------------------------
 
 # 从环境变量获取必要参数
-# 例如 /Users/barry/Qt5.12.5/5.12.5/clang_64
-echo ENV_QT_CLANG $ENV_QT_CLANG
+# 例如 /home/barry/Qt5.9.6/5.9.6/gcc_64
+echo ENV_QT_GCC $ENV_QT_GCC
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -39,7 +39,7 @@ fi
 echo current build mode: $build_mode
 
 # 环境变量设置
-export PATH=$ENV_QT_CLANG/bin:$PATH
+export PATH=$ENV_QT_GCC/bin:$PATH
 
 echo
 echo
@@ -48,7 +48,7 @@ echo begin qmake build
 echo ---------------------------------------------------------------
 
 # 删除输出目录
-output_path=$script_path../../output/mac/$build_mode
+output_path=$script_path../../output/linux/$build_mode
 if [ -d "$output_path" ]; then
     rm -rf $output_path
 fi
@@ -60,14 +60,14 @@ fi
 mkdir $temp_path
 cd $temp_path
 
-qmake_params="-spec macx-clang"
+qmake_params="-spec linux-g++"
 if [ $build_mode == "debug" ]; then
     qmake_params="$qmake_params CONFIG+=debug CONFIG+=x86_64 CONFIG+=qml_debug"
 else
     qmake_params="$qmake_params CONFIG+=x86_64 CONFIG+=qtquickcompiler"
 fi
 
-# qmake ../../all.pro -spec macx-clang CONFIG+=debug CONFIG+=x86_64 CONFIG+=qml_debug
+# qmake ../../all.pro -spec linux-g++ CONFIG+=debug CONFIG+=x86_64 CONFIG+=qml_debug
 qmake ../../all.pro $qmake_params
 if [ $? -ne 0 ] ;then
     echo "qmake failed"
