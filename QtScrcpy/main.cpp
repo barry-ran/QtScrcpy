@@ -4,6 +4,7 @@
 #include <QTcpServer>
 #include <QTranslator>
 #include <QFile>
+#include <QSurfaceFormat>
 
 #include "dialog.h"
 #include "stream.h"
@@ -48,6 +49,19 @@ int main(int argc, char *argv[])
     }
 
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    QSurfaceFormat varFormat = QSurfaceFormat::defaultFormat();
+    varFormat.setVersion(2, 0);
+    varFormat.setProfile(QSurfaceFormat::NoProfile);
+    /*
+    varFormat.setSamples(4);
+    varFormat.setAlphaBufferSize(8);
+    varFormat.setBlueBufferSize(8);
+    varFormat.setRedBufferSize(8);
+    varFormat.setGreenBufferSize(8);
+    varFormat.setDepthBufferSize(24);
+    */
+    QSurfaceFormat::setDefaultFormat(varFormat);
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Stream::init();
