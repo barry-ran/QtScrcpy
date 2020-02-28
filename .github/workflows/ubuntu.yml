@@ -1,0 +1,51 @@
+name: Ubuntu
+# Qt官方没有linux平台的x86包
+on: 
+  push:
+    paths:
+      - 'QtScrcpy/**'
+      - '!QtScrcpy/res/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'QtScrcpy/**'
+      - '!QtScrcpy/res/**'
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-16.04,ubuntu-18.04]
+        qt_ver: [5.12.6]
+        qt_arch: [gcc_64]
+    steps:
+      - name: Cache Qt
+        id: UbuntuCacheQt
+        uses: actions/cache@v1
+        with:
+          path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+          key: ${{ runner.os }}-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}    
+      - name: Setup Qt
+        if: steps.UbuntuCacheQt.outputs.cache-hit == 'true'
+        shell: pwsh
+        env:
+          QtPath: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
+        run: |
+          $qt_Path=${env:QtPath}
+          echo "::set-env name=Qt5_Dir::$qt_Path"
+          echo "::add-path::$qt_Path/bin"
+      - name: Install Qt
+        if: steps.UbuntuCacheQt.outputs.cache-hit != 'true'
+        uses: jurplel/install-qt-action@v2.0.0
+        with:
+          version: ${{ matrix.qt_ver }}
+      - name: Ubuntu install GL library
+        run: sudo apt-get install -y libglew-dev libglfw3-dev
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - name: Build Ubuntu
+        run: |
+          export ENV_QT_GCC=$(pwd)/${{env.Qt5_Dir}}
+          ci/linux/build_for_ubuntu.sh release
