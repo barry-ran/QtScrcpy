@@ -10,6 +10,7 @@ on:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
+      - '.github/workflows/ubuntu.yml'
 jobs:
   build:
     name: Build
