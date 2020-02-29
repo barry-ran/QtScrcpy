@@ -9,6 +9,7 @@ on:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
+      - '.github/workflows/macos.yml'
 jobs:
   build:
     name: Build
