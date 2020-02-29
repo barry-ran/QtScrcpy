@@ -4,6 +4,7 @@
 #include <QTcpServer>
 #include <QTranslator>
 #include <QFile>
+#include <QSurfaceFormat>
 
 #include "dialog.h"
 #include "stream.h"
@@ -18,7 +19,49 @@ void installTranslator();
 
 int main(int argc, char *argv[])
 {
+    // set env
+#ifdef Q_OS_WIN32
+    qputenv("QTSCRCPY_ADB_PATH", "../../../../third_party/adb/win/adb.exe");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server");
+    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../keymap");
+    qputenv("QTSCRCPY_CONFIG_PATH", "../../../../config");
+#endif
+
+#ifdef Q_OS_OSX
+    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../../../keymap");
+#endif
+
+#ifdef Q_OS_LINUX
+    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/linux/adb");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server");
+    qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
+    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
+#endif
+
+    // set on QApplication before
+    int opengl = Config::getInstance().getDesktopOpenGL();
+    if (0 == opengl) {
+        QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
+    } else if (1 == opengl){
+        QApplication::setAttribute(Qt::AA_UseOpenGLES);
+    } else if (2 == opengl) {
+        QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+    }
+
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    QSurfaceFormat varFormat = QSurfaceFormat::defaultFormat();
+    varFormat.setVersion(2, 0);
+    varFormat.setProfile(QSurfaceFormat::NoProfile);
+    /*
+    varFormat.setSamples(4);
+    varFormat.setAlphaBufferSize(8);
+    varFormat.setBlueBufferSize(8);
+    varFormat.setRedBufferSize(8);
+    varFormat.setGreenBufferSize(8);
+    varFormat.setDepthBufferSize(24);
+    */
+    QSurfaceFormat::setDefaultFormat(varFormat);
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Stream::init();
@@ -41,24 +84,6 @@ int main(int argc, char *argv[])
     MouseTap::getInstance()->initMouseEventTap();
 #endif
 
-#ifdef Q_OS_WIN32
-    qputenv("QTSCRCPY_ADB_PATH", "../../../../third_party/adb/win/adb.exe");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server");
-    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../keymap");
-    qputenv("QTSCRCPY_CONFIG_PATH", "../../../../config");
-#endif
-
-#ifdef Q_OS_OSX
-    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../../../keymap");
-#endif
-
-#ifdef Q_OS_LINUX
-    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/linux/adb");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server");
-    qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
-    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
-#endif
-
     //加载样式表
     QFile file(":/qss/psblack.css");
     if (file.open(QFile::ReadOnly)) {
@@ -67,15 +92,6 @@ int main(int argc, char *argv[])
         qApp->setPalette(QPalette(QColor(paletteColor)));
         qApp->setStyleSheet(qss);
         file.close();
-    }
-
-    int opengl = Config::getInstance().getDesktopOpenGL();
-    if (0 == opengl) {
-        QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
-    } else if (1 == opengl){
-        QApplication::setAttribute(Qt::AA_UseOpenGLES);
-    } else if (2 == opengl) {
-        QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     }
 
     g_mainDlg = new Dialog;

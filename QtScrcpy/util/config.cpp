@@ -69,7 +69,8 @@ const QString& Config::getConfigPath()
         s_configPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_CONFIG_PATH"));
         QFileInfo fileInfo(s_configPath);
         if (s_configPath.isEmpty() || !fileInfo.isDir()) {
-            s_configPath = QCoreApplication::applicationDirPath() + "/config";
+            // default application dir
+            s_configPath = "config";
         }
     }
     return s_configPath;
