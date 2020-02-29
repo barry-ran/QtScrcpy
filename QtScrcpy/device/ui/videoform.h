@@ -21,7 +21,6 @@ public:
 
     void switchFullScreen();    
     void staysOnTop(bool top = true);
-    void updateScreenRatio(const QSize &newSize);
     void updateShowSize(const QSize &newSize);
     void updateRender(const AVFrame *frame);
     void setController(Controller *controller);
@@ -42,6 +41,7 @@ private:
     void initUI();
     
     void showToolForm(bool show = true);
+    void moveCenter();
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -70,6 +70,7 @@ private:
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
     bool m_skin = true;
+    QPoint m_fullScreenBeforePos;
 
     //outside member
     QString m_serial = "";

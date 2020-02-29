@@ -163,7 +163,6 @@ void Device::initSignals()
                 // update ui
                 if (m_videoForm) {
                     m_videoForm->setWindowTitle(deviceName);
-                    m_videoForm->updateScreenRatio(size);
                     m_videoForm->updateShowSize(size);
                 }
 

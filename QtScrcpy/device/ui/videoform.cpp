@@ -98,6 +98,18 @@ void VideoForm::showToolForm(bool show)
     m_toolForm->setVisible(show);
 }
 
+void VideoForm::moveCenter()
+{
+    QDesktopWidget* desktop = QApplication::desktop();
+    if (!desktop) {
+        qWarning() << "QApplication::desktop() is nullptr";
+        return;
+    }
+    QRect screenRect = desktop->availableGeometry();
+    // 窗口居中
+    move(screenRect.center() - QRect(0, 0, size().width(), size().height()).center());
+}
+
 void VideoForm::updateStyleSheet(bool vertical)
 {
     if (vertical) {
@@ -129,45 +141,35 @@ QMargins VideoForm::getMargins(bool vertical)
     return margins;
 }
 
-void VideoForm::updateScreenRatio(const QSize &newSize)
-{
-    m_widthHeightRatio = 1.0f * qMin(newSize.width(),newSize.height()) / qMax(newSize.width(),newSize.height());
-}
-
 void VideoForm::updateShowSize(const QSize &newSize)
 {
     if (m_frameSize != newSize) {
         m_frameSize = newSize;
-        bool vertical = newSize.height() > newSize.width();
+        m_widthHeightRatio = 1.0f * newSize.width() / newSize.height();
+
+        bool vertical = m_widthHeightRatio < 1 ? true : false;
         QSize showSize = newSize;
         QDesktopWidget* desktop = QApplication::desktop();
-        if (desktop) {
-            QRect screenRect = desktop->availableGeometry();
-            if (vertical) {
-                showSize.setHeight(qMin(newSize.height(), screenRect.height() - 200));
-                showSize.setWidth(showSize.height() * m_widthHeightRatio);
-            } else {
-                showSize.setWidth(qMin(newSize.width(), screenRect.width()/2));
-                showSize.setHeight(showSize.width() * m_widthHeightRatio);
-            }
-
-            if (isFullScreen()) {
-                switchFullScreen();
-            }
-            if (m_skin) {
-                QMargins m = getMargins(vertical);
-                showSize.setWidth(showSize.width() + m.left() + m.right());
-                showSize.setHeight(showSize.height() + m.top() + m.bottom());
-            }
-
-            // 窗口居中
-            move(screenRect.center() - QRect(0, 0, showSize.width(), showSize.height()).center());
+        if (!desktop) {
+            qWarning() << "QApplication::desktop() is nullptr";
+            return;
+        }
+        QRect screenRect = desktop->availableGeometry();
+        if (vertical) {
+            showSize.setHeight(qMin(newSize.height(), screenRect.height() - 200));
+            showSize.setWidth(showSize.height() * m_widthHeightRatio);
+        } else {
+            showSize.setWidth(qMin(newSize.width(), screenRect.width()/2));
+            showSize.setHeight(showSize.width() / m_widthHeightRatio);
         }
 
-        if (!m_skin) {
-            // 减去标题栏高度
-            int titleBarHeight = style()->pixelMetric(QStyle::PM_TitleBarHeight);
-            showSize.setHeight(showSize.height() - titleBarHeight);
+        if (isFullScreen()) {
+            switchFullScreen();
+        }
+        if (m_skin) {
+            QMargins m = getMargins(vertical);
+            showSize.setWidth(showSize.width() + m.left() + m.right());
+            showSize.setHeight(showSize.height() + m.top() + m.bottom());
         }
 
         if (showSize != size()) {
@@ -175,6 +177,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
             if (m_skin) {
                 updateStyleSheet(vertical);
             }
+            moveCenter();
         }
     }
 }
@@ -183,6 +186,8 @@ void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         showNormal();
+        // fullscreen window will move (0,0). qt bug?
+        move(m_fullScreenBeforePos);
 
 #ifdef Q_OS_OSX
         //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
@@ -196,6 +201,7 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
+        m_fullScreenBeforePos = pos();
         // 这种临时增加标题栏再全屏的方案会导致收不到mousemove事件，导致setmousetrack失效
         // mac fullscreen must show title bar
 #ifdef Q_OS_OSX
