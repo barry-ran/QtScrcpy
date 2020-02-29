@@ -11,6 +11,7 @@ on:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
+      - '.github/workflows/windows.yml'
 jobs:
   build:
     name: Build
