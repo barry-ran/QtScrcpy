@@ -5,11 +5,12 @@ on:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
-      - '.github/workflows/**'
+      - '.github/workflows/ubuntu.yml'
   pull_request:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
+      - '.github/workflows/ubuntu.yml'
 jobs:
   build:
     name: Build
@@ -47,5 +48,5 @@ jobs:
           fetch-depth: 1
       - name: Build Ubuntu
         run: |
-          export ENV_QT_GCC=${{env.Qt5_Dir}}
+          export ENV_QT_GCC=$(pwd)/${{env.Qt5_Dir}}
           ci/linux/build_for_ubuntu.sh release
