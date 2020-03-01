@@ -193,6 +193,11 @@ void VideoForm::updateShowSize(const QSize &newSize)
 void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
+        // 横屏全屏铺满全屏，恢复时，恢复保持宽高比
+        if (m_widthHeightRatio > 1.0f) {
+            ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+        }
+
         showNormal();
         // fullscreen window will move (0,0). qt bug?
         move(m_fullScreenBeforePos);
@@ -209,6 +214,11 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
+        // 横屏全屏铺满全屏，不保持宽高比
+        if (m_widthHeightRatio > 1.0f) {
+            ui->keepRadioWidget->setWidthHeightRadio(-1.0f);
+        }
+
         m_fullScreenBeforePos = pos();
         // 这种临时增加标题栏再全屏的方案会导致收不到mousemove事件，导致setmousetrack失效
         // mac fullscreen must show title bar
