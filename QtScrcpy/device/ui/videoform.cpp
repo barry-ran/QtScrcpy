@@ -60,12 +60,14 @@ void VideoForm::initUI()
 #endif
     }
 
-    setMouseTracking(true);
     m_videoWidget = new QYUVOpenGLWidget();
-    m_videoWidget->setMouseTracking(true);
     m_videoWidget->hide();
     ui->keepRadioWidget->setWidget(m_videoWidget);
     ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+
+    setMouseTracking(true);
+    m_videoWidget->setMouseTracking(true);
+    ui->keepRadioWidget->setMouseTracking(true);
 }
 
 void VideoForm::onGrabCursor(bool grab)
