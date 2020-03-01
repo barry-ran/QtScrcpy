@@ -39,15 +39,15 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QYUVOpenGLWidget" name="videoWidget" native="true"/>
+    <widget class="KeepRadioWidget" name="keepRadioWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QYUVOpenGLWidget</class>
+   <class>KeepRadioWidget</class>
    <extends>QWidget</extends>
-   <header>qyuvopenglwidget.h</header>
+   <header location="global">keepradiowidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

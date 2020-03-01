@@ -12,6 +12,7 @@ struct AVFrame;
 class ToolForm;
 class Controller;
 class FileHandler;
+class QYUVOpenGLWidget;
 class VideoForm : public QWidget
 {
     Q_OBJECT
@@ -53,6 +54,7 @@ protected:
 
     void paintEvent(QPaintEvent *);
     void showEvent(QShowEvent *event);
+    void resizeEvent(QResizeEvent *event);
 
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
@@ -64,6 +66,7 @@ private:
     Ui::videoForm *ui;    
     QPointer<ToolForm> m_toolForm;
     QPointer<QWidget> m_loadingWidget;
+    QPointer<QYUVOpenGLWidget> m_videoWidget;
 
     //inside member
     QSize m_frameSize;

@@ -10,6 +10,7 @@
 #include <QMessageBox>
 
 #include "videoform.h"
+#include "qyuvopenglwidget.h"
 #include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "iconhelper.h"
@@ -60,14 +61,17 @@ void VideoForm::initUI()
     }
 
     setMouseTracking(true);
-    ui->videoWidget->setMouseTracking(true);
-    ui->videoWidget->hide();
+    m_videoWidget = new QYUVOpenGLWidget();
+    m_videoWidget->setMouseTracking(true);
+    m_videoWidget->hide();
+    ui->keepRadioWidget->setWidget(m_videoWidget);
+    ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
 }
 
 void VideoForm::onGrabCursor(bool grab)
 {
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
-    MouseTap::getInstance()->enableMouseEventTap(ui->videoWidget, grab);
+    MouseTap::getInstance()->enableMouseEventTap(m_videoWidget, grab);
 #else
     Q_UNUSED(grab)
 #endif
@@ -75,16 +79,16 @@ void VideoForm::onGrabCursor(bool grab)
 
 void VideoForm::updateRender(const AVFrame *frame)
 {
-    if (ui->videoWidget->isHidden()) {
+    if (m_videoWidget->isHidden()) {
         if (m_loadingWidget) {
             m_loadingWidget->close();
         }
-        ui->videoWidget->show();
+        m_videoWidget->show();
     }
 
     updateShowSize(QSize(frame->width, frame->height));
-    ui->videoWidget->setFrameSize(QSize(frame->width, frame->height));
-    ui->videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2],
+    m_videoWidget->setFrameSize(QSize(frame->width, frame->height));
+    m_videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2],
             frame->linesize[0], frame->linesize[1], frame->linesize[2]);
 }
 
@@ -145,9 +149,11 @@ void VideoForm::updateShowSize(const QSize &newSize)
 {
     if (m_frameSize != newSize) {
         m_frameSize = newSize;
-        m_widthHeightRatio = 1.0f * newSize.width() / newSize.height();
 
-        bool vertical = m_widthHeightRatio < 1 ? true : false;
+        m_widthHeightRatio = 1.0f * newSize.width() / newSize.height();
+        ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+
+        bool vertical = m_widthHeightRatio < 1.0f ? true : false;
         QSize showSize = newSize;
         QDesktopWidget* desktop = QApplication::desktop();
         if (!desktop) {
@@ -262,12 +268,12 @@ void VideoForm::setController(Controller *controller)
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-    if (ui->videoWidget->geometry().contains(event->pos())) {
+    if (m_videoWidget->geometry().contains(event->pos())) {
         if (!m_controller) {
             return;
         }
-        event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
+        m_controller->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else {
         if (event->button() == Qt::LeftButton) {
             m_dragPosition = event->globalPos() - frameGeometry().topLeft();
@@ -282,23 +288,23 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
         if (!m_controller) {
             return;
         }
-        event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
+        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
         // local check
         QPointF local = event->localPos();
         if (local.x() < 0) {
             local.setX(0);
         }
-        if (local.x() > ui->videoWidget->width()) {
-            local.setX(ui->videoWidget->width());
+        if (local.x() > m_videoWidget->width()) {
+            local.setX(m_videoWidget->width());
         }
         if (local.y() < 0) {
             local.setY(0);
         }
-        if (local.y() > ui->videoWidget->height()) {
-            local.setY(ui->videoWidget->height());
+        if (local.y() > m_videoWidget->height()) {
+            local.setY(m_videoWidget->height());
         }
         event->setLocalPos(local);
-        m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        m_controller->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else {
         m_dragPosition = QPoint(0, 0);
     }
@@ -306,12 +312,12 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
-    if (ui->videoWidget->geometry().contains(event->pos())) {
+    if (m_videoWidget->geometry().contains(event->pos())) {
         if (!m_controller) {
             return;
         }
-        event->setLocalPos(ui->videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_controller->mouseEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
+        m_controller->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else if (!m_dragPosition.isNull()){
         if (event->buttons() & Qt::LeftButton) {
             move(event->globalPos() - m_dragPosition);
@@ -322,11 +328,11 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
-    if (ui->videoWidget->geometry().contains(event->pos())) {
+    if (m_videoWidget->geometry().contains(event->pos())) {
         if (!m_controller) {
             return;
         }
-        QPointF pos = ui->videoWidget->mapFrom(this, event->pos());
+        QPointF pos = m_videoWidget->mapFrom(this, event->pos());
         /*
         QWheelEvent(const QPointF &pos, const QPointF& globalPos, int delta,
                 Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers,
@@ -334,7 +340,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         */
         QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(),
                                event->buttons(), event->modifiers(), event->orientation());
-        m_controller->wheelEvent(&wheelEvent, ui->videoWidget->frameSize(), ui->videoWidget->size());
+        m_controller->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
 
@@ -360,7 +366,7 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         return;
     }
 
-    m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    m_controller->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
@@ -368,7 +374,7 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
     if (!m_controller) {
         return;
     }
-    m_controller->keyEvent(event, ui->videoWidget->frameSize(), ui->videoWidget->size());
+    m_controller->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
 }
 
 void VideoForm::paintEvent(QPaintEvent *paint)
@@ -385,6 +391,32 @@ void VideoForm::showEvent(QShowEvent *event)
     Q_UNUSED(event)
     if (!isFullScreen()) {
         showToolForm();
+    }
+}
+
+void VideoForm::resizeEvent(QResizeEvent *event)
+{
+    Q_UNUSED(event)
+    QSize goodSize = ui->keepRadioWidget->goodSize();
+    if (goodSize.isEmpty()) {
+        return;
+    }
+    QSize curSize = size();
+    // 限制VideoForm尺寸不能小于keepRadioWidget good size
+    if (m_widthHeightRatio > 1.0f) {
+        // hor
+        if (curSize.height() <= goodSize.height()) {
+            setMinimumHeight(goodSize.height());
+        } else {
+            setMinimumHeight(0);
+        }
+    } else {
+        // ver
+        if (curSize.width() <= goodSize.width()) {
+            setMinimumWidth(goodSize.width());
+        } else {
+            setMinimumWidth(0);
+        }
     }
 }
 
