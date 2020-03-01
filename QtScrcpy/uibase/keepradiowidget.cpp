@@ -1,4 +1,5 @@
 #include <QResizeEvent>
+#include <cmath>
 
 #include "keepradiowidget.h"
 
@@ -24,7 +25,7 @@ void KeepRadioWidget::setWidget(QWidget *w)
 
 void KeepRadioWidget::setWidthHeightRadio(float widthHeightRadio)
 {
-    if (fabs(m_widthHeightRadio - widthHeightRadio) < 0.000001f) {
+    if (abs(m_widthHeightRadio - widthHeightRadio) < 0.000001f) {
         return;
     }
     m_widthHeightRadio = widthHeightRadio;
