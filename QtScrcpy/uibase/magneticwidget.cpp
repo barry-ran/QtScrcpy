@@ -3,7 +3,6 @@
 #include <QStyle>
 
 #include "magneticwidget.h"
-#include "ui_magneticwidget.h"
 
 MagneticWidget::MagneticWidget(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     : QWidget(Q_NULLPTR)
