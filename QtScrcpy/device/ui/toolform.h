@@ -10,7 +10,7 @@ namespace Ui {
 class ToolForm;
 }
 
-class VideoForm;
+class Device;
 class ToolForm : public MagneticWidget
 {
     Q_OBJECT
@@ -18,6 +18,8 @@ class ToolForm : public MagneticWidget
 public:
     explicit ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos);
     ~ToolForm();
+
+    void setDevice(Device *device);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -55,13 +57,16 @@ private slots:
 
     void on_touchBtn_clicked();
 
+    void on_groupControlBtn_clicked();
+
 private:
     void initStyle();
+    void updateGroupControl();
 
 private:
     Ui::ToolForm *ui;
     QPoint m_dragPosition;
-    QPointer<VideoForm> m_videoForm;
+    QPointer<Device> m_device;
     bool m_showTouch = false;
 };
 

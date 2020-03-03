@@ -10,7 +10,7 @@ class videoForm;
 
 struct AVFrame;
 class ToolForm;
-class Controller;
+class Device;
 class FileHandler;
 class QYUVOpenGLWidget;
 class VideoForm : public QWidget
@@ -24,14 +24,14 @@ public:
     void staysOnTop(bool top = true);
     void updateShowSize(const QSize &newSize);
     void updateRender(const AVFrame *frame);
-    void setController(Controller *controller);
-    Controller* getController();
-    void setFileHandler(FileHandler *fileHandler);
-    void setSerial(const QString &serial);
-    const QString& getSerial();
+    void setDevice(Device *device);
+    Device* getDevice();
+    void setMainControl(bool mainControl);
+    bool mainControl();
 
 signals:
     void screenshot();
+    void mainControlChange(VideoForm* videoFrom, bool mainControl);
 
 public slots:
     void onGrabCursor(bool grab);
@@ -74,11 +74,10 @@ private:
     float m_widthHeightRatio = 0.5f;
     bool m_skin = true;
     QPoint m_fullScreenBeforePos;
+    bool m_mainControl = false;
 
     //outside member
-    QString m_serial = "";
-    QPointer<Controller> m_controller;
-    QPointer<FileHandler> m_fileHandler;
+    QPointer<Device> m_device;
 };
 
 #endif // VIDEOFORM_H

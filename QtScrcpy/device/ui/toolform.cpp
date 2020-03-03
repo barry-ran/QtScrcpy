@@ -6,6 +6,7 @@
 #include "toolform.h"
 #include "ui_toolform.h"
 #include "iconhelper.h"
+#include "device.h"
 #include "videoform.h"
 #include "controller.h"
 #include "adbprocess.h"
@@ -18,14 +19,17 @@ ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     //setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
 
-    m_videoForm = dynamic_cast<VideoForm*>(adsorbWidget);
-
     initStyle();
 }
 
 ToolForm::~ToolForm()
 {
     delete ui;
+}
+
+void ToolForm::setDevice(Device *device)
+{
+    m_device = device;
 }
 
 void ToolForm::initStyle()
@@ -43,6 +47,19 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), 15);
     IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf0c4), 15);
     IconHelper::Instance()->SetIcon(ui->touchBtn, QChar(0xf111), 15);
+    IconHelper::Instance()->SetIcon(ui->groupControlBtn, QChar(0xf0c0), 15);
+}
+
+void ToolForm::updateGroupControl()
+{
+    if (!m_device || !m_device->getVideoForm()) {
+        return;
+    }
+    if (m_device->getVideoForm()->mainControl()) {
+        ui->groupControlBtn->setStyleSheet("color: red");
+    } else {
+        ui->groupControlBtn->setStyleSheet("color: #DCDCDC");
+    }
 }
 
 void ToolForm::mousePressEvent(QMouseEvent *event)
@@ -80,44 +97,50 @@ void ToolForm::hideEvent(QHideEvent *event)
 
 void ToolForm::on_fullScreenBtn_clicked()
 {
-    if (m_videoForm) {
-        m_videoForm->switchFullScreen();
+    if (!m_device || !m_device->getVideoForm()) {
+        return;
     }
+    m_device->getVideoForm()->switchFullScreen();
 }
 
 void ToolForm::on_returnBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->postGoBack();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->postGoBack();
 }
 
 void ToolForm::on_homeBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->postGoHome();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->postGoHome();
 }
 
 void ToolForm::on_menuBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->postGoMenu();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->postGoMenu();
 }
 
 void ToolForm::on_appSwitchBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->postAppSwitch();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->postAppSwitch();
 }
 
 void ToolForm::on_powerBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->postPower();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->postPower();
 }
 
 void ToolForm::on_screenShotBtn_clicked()
@@ -127,35 +150,39 @@ void ToolForm::on_screenShotBtn_clicked()
 
 void ToolForm::on_volumeUpBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->postVolumeUp();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->postVolumeUp();
 }
 
 void ToolForm::on_volumeDownBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->postVolumeDown();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->postVolumeDown();
 }
 
 void ToolForm::on_closeScreenBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+     m_device->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
 }
 
 void ToolForm::on_expandNotifyBtn_clicked()
 {
-    if (m_videoForm && m_videoForm->getController()) {
-        m_videoForm->getController()->expandNotificationPanel();
+    if (!m_device || !m_device->getController()) {
+        return;
     }
+    m_device->getController()->expandNotificationPanel();
 }
 
 void ToolForm::on_touchBtn_clicked()
 {
-    if (!m_videoForm) {
+    if (!m_device) {
         return;
     }
 
@@ -170,7 +197,16 @@ void ToolForm::on_touchBtn_clicked()
             sender()->deleteLater();
         }
     });
-    adb->setShowTouchesEnabled(m_videoForm->getSerial(), m_showTouch);
+    adb->setShowTouchesEnabled(m_device->getSerial(), m_showTouch);
 
     qInfo() << "show touch " << (m_showTouch ? "enable" : "disable");
+}
+
+void ToolForm::on_groupControlBtn_clicked()
+{
+    if (!m_device || !m_device->getVideoForm()) {
+        return;
+    }
+    m_device->getVideoForm()->setMainControl(!m_device->getVideoForm()->mainControl());
+    updateGroupControl();
 }

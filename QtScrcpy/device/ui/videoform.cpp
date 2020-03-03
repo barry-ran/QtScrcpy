@@ -15,6 +15,7 @@
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
+#include "device.h"
 #include "controller.h"
 #include "filehandler.h"
 #include "config.h"
@@ -98,6 +99,7 @@ void VideoForm::showToolForm(bool show)
 {
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
+        m_toolForm->setDevice(m_device);
         connect(m_toolForm, &ToolForm::screenshot, this, &VideoForm::screenshot);
     }
     m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
@@ -253,39 +255,38 @@ void VideoForm::staysOnTop(bool top)
     }
 }
 
-Controller *VideoForm::getController()
+Device *VideoForm::getDevice()
 {
-    return m_controller;
+    return m_device;
 }
 
-void VideoForm::setFileHandler(FileHandler *fileHandler)
+void VideoForm::setMainControl(bool mainControl)
 {
-    m_fileHandler = fileHandler;
+    if (m_mainControl == mainControl) {
+        return;
+    }
+    m_mainControl = mainControl;
+    emit mainControlChange(this, m_mainControl);
 }
 
-void VideoForm::setSerial(const QString &serial)
+bool VideoForm::mainControl()
 {
-    m_serial = serial;
+    return m_mainControl;
 }
 
-const QString &VideoForm::getSerial()
+void VideoForm::setDevice(Device *device)
 {
-    return m_serial;
-}
-
-void VideoForm::setController(Controller *controller)
-{
-    m_controller = controller;
+    m_device = device;
 }
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     if (m_videoWidget->geometry().contains(event->pos())) {
-        if (!m_controller) {
+        if (!m_device || !m_device->getController()) {
             return;
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_controller->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        m_device->getController()->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else {
         if (event->button() == Qt::LeftButton) {
             m_dragPosition = event->globalPos() - frameGeometry().topLeft();
@@ -297,7 +298,7 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_dragPosition.isNull()) {
-        if (!m_controller) {
+        if (!m_device || !m_device->getController()) {
             return;
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
@@ -316,7 +317,7 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
             local.setY(m_videoWidget->height());
         }
         event->setLocalPos(local);
-        m_controller->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        m_device->getController()->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else {
         m_dragPosition = QPoint(0, 0);
     }
@@ -325,11 +326,11 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_videoWidget->geometry().contains(event->pos())) {
-        if (!m_controller) {
+        if (!m_device || !m_device->getController()) {
             return;
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_controller->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        m_device->getController()->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else if (!m_dragPosition.isNull()){
         if (event->buttons() & Qt::LeftButton) {
             move(event->globalPos() - m_dragPosition);
@@ -341,7 +342,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
     if (m_videoWidget->geometry().contains(event->pos())) {
-        if (!m_controller) {
+        if (!m_device || !m_device->getController()) {
             return;
         }
         QPointF pos = m_videoWidget->mapFrom(this, event->pos());
@@ -352,7 +353,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         */
         QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(),
                                event->buttons(), event->modifiers(), event->orientation());
-        m_controller->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
+        m_device->getController()->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
 
@@ -363,30 +364,30 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
             && isFullScreen()) {
         switchFullScreen();
     }
-    if (!m_controller) {
+    if (!m_device || !m_device->getController()) {
         return;
     }
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier)) {
-        m_controller->requestDeviceClipboard();
+        m_device->getController()->requestDeviceClipboard();
     }
     if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier)) {
         if (event->modifiers() & Qt::ShiftModifier) {
-            m_controller->setDeviceClipboard();
+            m_device->getController()->setDeviceClipboard();
         } else {
-            m_controller->clipboardPaste();
+            m_device->getController()->clipboardPaste();
         }
         return;
     }
 
-    m_controller->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+    m_device->getController()->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
-    if (!m_controller) {
+    if (!m_device || !m_device->getController()) {
         return;
     }
-    m_controller->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+    m_device->getController()->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
 }
 
 void VideoForm::paintEvent(QPaintEvent *paint)
@@ -449,7 +450,7 @@ void VideoForm::dragLeaveEvent(QDragLeaveEvent *event)
 
 void VideoForm::dropEvent(QDropEvent *event)
 {
-    if (!m_fileHandler) {
+    if (!m_device || !m_device->getFileHandler()) {
         return;
     }
     const QMimeData* qm = event->mimeData();
@@ -462,8 +463,8 @@ void VideoForm::dropEvent(QDropEvent *event)
     }
 
     if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
-        m_fileHandler->installApkRequest(m_serial, file);
+        m_device->getFileHandler()->installApkRequest(m_device->getSerial(), file);
         return;
     }
-    m_fileHandler->pushFileRequest(m_serial, file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
+    m_device->getFileHandler()->pushFileRequest(m_device->getSerial(), file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }
