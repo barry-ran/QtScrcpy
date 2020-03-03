@@ -35,13 +35,7 @@ Device::Device(DeviceParams params, QObject *parent)
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(params.gameScript, this);
         m_videoForm = new VideoForm(Config::getInstance().getSkin());
-        m_videoForm->setSerial(m_params.serial);
-        if (m_controller) {
-            m_videoForm->setController(m_controller);
-        }
-        if (m_fileHandler) {
-            m_videoForm->setFileHandler(m_fileHandler);
-        }
+        m_videoForm->setDevice(this);
         m_videoForm->show();
     }
 
@@ -91,9 +85,19 @@ Controller *Device::getController()
     return m_controller;
 }
 
+FileHandler *Device::getFileHandler()
+{
+    return m_fileHandler;
+}
+
 Server *Device::getServer()
 {
     return m_server;
+}
+
+const QString &Device::getSerial()
+{
+    return m_params.serial;
 }
 
 void Device::updateScript(QString script)

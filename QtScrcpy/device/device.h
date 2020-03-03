@@ -35,7 +35,9 @@ public:
 
     VideoForm *getVideoForm();
     Controller *getController();
+    FileHandler *getFileHandler();
     Server *getServer();
+    const QString &getSerial();
 
     void updateScript(QString script);
 
