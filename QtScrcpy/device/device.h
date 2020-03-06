@@ -4,6 +4,11 @@
 #include <QPointer>
 #include <QTime>
 
+#include "controlmsg.h"
+
+class QMouseEvent;
+class QWheelEvent;
+class QKeyEvent;
 class Recorder;
 class Server;
 class VideoBuffer;
@@ -34,21 +39,46 @@ public:
     virtual ~Device();
 
     VideoForm *getVideoForm();
-    Controller *getController();
-    FileHandler *getFileHandler();
     Server *getServer();
     const QString &getSerial();
 
     void updateScript(QString script);
-    void setMainControl(bool mainControl);
     bool mainControl();
 
 signals:
     void deviceDisconnect(QString serial);
-    void mainControlChange(Device* device, bool mainControl);
+
+    void switchFullScreen();
+    void postGoBack();
+    void postGoHome();
+    void postGoMenu();
+    void postAppSwitch();
+    void postPower();
+    void postVolumeUp();
+    void postVolumeDown();
+    void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
+    void expandNotificationPanel();
+    void screenshot();
+    void showTouch(bool show);
+    void setMainControl(Device* device, bool mainControl);
+
+    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
+    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
+    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+
+    void postTurnOn();
+    void postTextInput(QString& text);
+    void requestDeviceClipboard();
+    void setDeviceClipboard();
+    void clipboardPaste();
+
+    void pushFileRequest(const QString& serial, const QString& file, const QString& devicePath = "");
+    void installApkRequest(const QString& serial, const QString& apkFile);
 
 public slots:
     void onScreenshot();
+    void onShowTouch(bool show);
+    void onSetMainControl(Device* device, bool mainControl);
 
 private:
     void initSignals();

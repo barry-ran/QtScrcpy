@@ -62,7 +62,7 @@ void Controller::updateScript(QString gameScript)
     connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
 
-void Controller::postTurnOn()
+void Controller::onPostTurnOn()
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
     if (!controlMsg) {
@@ -71,42 +71,42 @@ void Controller::postTurnOn()
     postControlMsg(controlMsg);
 }
 
-void Controller::postGoHome()
+void Controller::onPostGoHome()
 {
     postKeyCodeClick(AKEYCODE_HOME);
 }
 
-void Controller::postGoMenu()
+void Controller::onPostGoMenu()
 {
     postKeyCodeClick(AKEYCODE_MENU);
 }
 
-void Controller::postGoBack()
+void Controller::onPostGoBack()
 {
     postKeyCodeClick(AKEYCODE_BACK);
 }
 
-void Controller::postAppSwitch()
+void Controller::onPostAppSwitch()
 {
     postKeyCodeClick(AKEYCODE_APP_SWITCH);
 }
 
-void Controller::postPower()
+void Controller::onPostPower()
 {
     postKeyCodeClick(AKEYCODE_POWER);
 }
 
-void Controller::postVolumeUp()
+void Controller::onPostVolumeUp()
 {
     postKeyCodeClick(AKEYCODE_VOLUME_UP);
 }
 
-void Controller::postVolumeDown()
+void Controller::onPostVolumeDown()
 {
     postKeyCodeClick(AKEYCODE_VOLUME_DOWN);
 }
 
-void Controller::expandNotificationPanel()
+void Controller::onExpandNotificationPanel()
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_EXPAND_NOTIFICATION_PANEL);
     if (!controlMsg) {
@@ -115,7 +115,7 @@ void Controller::expandNotificationPanel()
     postControlMsg(controlMsg);
 }
 
-void Controller::collapseNotificationPanel()
+void Controller::onCollapseNotificationPanel()
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_COLLAPSE_NOTIFICATION_PANEL);
     if (!controlMsg) {
@@ -124,7 +124,7 @@ void Controller::collapseNotificationPanel()
     postControlMsg(controlMsg);
 }
 
-void Controller::requestDeviceClipboard()
+void Controller::onRequestDeviceClipboard()
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_GET_CLIPBOARD);
     if (!controlMsg) {
@@ -133,7 +133,7 @@ void Controller::requestDeviceClipboard()
     postControlMsg(controlMsg);
 }
 
-void Controller::setDeviceClipboard()
+void Controller::onSetDeviceClipboard()
 {
     QClipboard *board = QApplication::clipboard();
     QString text = board->text();
@@ -145,14 +145,14 @@ void Controller::setDeviceClipboard()
     postControlMsg(controlMsg);
 }
 
-void Controller::clipboardPaste()
+void Controller::onClipboardPaste()
 {
     QClipboard *board = QApplication::clipboard();
     QString text = board->text();
-    postTextInput(text);
+    onPostTextInput(text);
 }
 
-void Controller::postTextInput(QString& text)
+void Controller::onPostTextInput(QString& text)
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TEXT);
     if (!controlMsg) {
@@ -162,7 +162,7 @@ void Controller::postTextInput(QString& text)
     postControlMsg(controlMsg);
 }
 
-void Controller::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
+void Controller::onSetScreenPowerMode(ControlMsg::ScreenPowerMode mode)
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_SET_SCREEN_POWER_MODE);
     if (!controlMsg) {
@@ -172,21 +172,21 @@ void Controller::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
     postControlMsg(controlMsg);
 }
 
-void Controller::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
+void Controller::onMouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     if (m_inputConvert) {
         m_inputConvert->mouseEvent(from, frameSize, showSize);
     }
 }
 
-void Controller::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
+void Controller::onWheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     if (m_inputConvert) {
         m_inputConvert->wheelEvent(from, frameSize, showSize);
     }
 }
 
-void Controller::keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
+void Controller::onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     if (m_inputConvert) {
         m_inputConvert->keyEvent(from, frameSize, showSize);

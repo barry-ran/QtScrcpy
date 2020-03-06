@@ -20,17 +20,14 @@ public:
     explicit VideoForm(bool skin = true, QWidget *parent = 0);
     ~VideoForm();
 
-    void switchFullScreen();    
     void staysOnTop(bool top = true);
     void updateShowSize(const QSize &newSize);
     void updateRender(const AVFrame *frame);
     void setDevice(Device *device);
 
-signals:
-    void screenshot();
-
 public slots:
     void onGrabCursor(bool grab);
+    void onSwitchFullScreen();
 
 private:    
     void updateStyleSheet(bool vertical);
