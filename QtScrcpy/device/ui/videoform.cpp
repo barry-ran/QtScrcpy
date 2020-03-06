@@ -100,7 +100,6 @@ void VideoForm::showToolForm(bool show)
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
         m_toolForm->setDevice(m_device);
-        connect(m_toolForm, &ToolForm::screenshot, this, &VideoForm::screenshot);
     }
     m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
     m_toolForm->setVisible(show);
@@ -174,7 +173,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
         }
 
         if (isFullScreen()) {
-            switchFullScreen();
+            onSwitchFullScreen();
         }
         if (m_skin) {
             QMargins m = getMargins(vertical);
@@ -192,7 +191,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
     }
 }
 
-void VideoForm::switchFullScreen()
+void VideoForm::onSwitchFullScreen()
 {
     if (isFullScreen()) {
         // 横屏全屏铺满全屏，恢复时，恢复保持宽高比
@@ -263,11 +262,11 @@ void VideoForm::setDevice(Device *device)
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     if (m_videoWidget->geometry().contains(event->pos())) {
-        if (!m_device || !m_device->getController()) {
+        if (!m_device) {
             return;
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_device->getController()->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        emit m_device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else {
         if (event->button() == Qt::LeftButton) {
             m_dragPosition = event->globalPos() - frameGeometry().topLeft();
@@ -279,7 +278,7 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
     if (m_dragPosition.isNull()) {
-        if (!m_device || !m_device->getController()) {
+        if (!m_device) {
             return;
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
@@ -298,7 +297,7 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
             local.setY(m_videoWidget->height());
         }
         event->setLocalPos(local);
-        m_device->getController()->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        emit m_device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else {
         m_dragPosition = QPoint(0, 0);
     }
@@ -307,11 +306,11 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
     if (m_videoWidget->geometry().contains(event->pos())) {
-        if (!m_device || !m_device->getController()) {
+        if (!m_device) {
             return;
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
-        m_device->getController()->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        emit m_device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     } else if (!m_dragPosition.isNull()){
         if (event->buttons() & Qt::LeftButton) {
             move(event->globalPos() - m_dragPosition);
@@ -323,7 +322,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
     if (m_videoWidget->geometry().contains(event->pos())) {
-        if (!m_device || !m_device->getController()) {
+        if (!m_device) {
             return;
         }
         QPointF pos = m_videoWidget->mapFrom(this, event->pos());
@@ -334,7 +333,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         */
         QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(),
                                event->buttons(), event->modifiers(), event->orientation());
-        m_device->getController()->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
+        emit m_device->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
 
@@ -343,32 +342,32 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
     if (Qt::Key_Escape == event->key()
             && !event->isAutoRepeat()
             && isFullScreen()) {
-        switchFullScreen();
+        onSwitchFullScreen();
     }
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier)) {
-        m_device->getController()->requestDeviceClipboard();
+        emit m_device->requestDeviceClipboard();
     }
     if (event->key() == Qt::Key_V && (event->modifiers() & Qt::ControlModifier)) {
         if (event->modifiers() & Qt::ShiftModifier) {
-            m_device->getController()->setDeviceClipboard();
+            emit m_device->setDeviceClipboard();
         } else {
-            m_device->getController()->clipboardPaste();
+            emit m_device->clipboardPaste();
         }
         return;
     }
 
-    m_device->getController()->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+    emit m_device->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+    emit m_device->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
 }
 
 void VideoForm::paintEvent(QPaintEvent *paint)
@@ -431,7 +430,7 @@ void VideoForm::dragLeaveEvent(QDragLeaveEvent *event)
 
 void VideoForm::dropEvent(QDropEvent *event)
 {
-    if (!m_device || !m_device->getFileHandler()) {
+    if (!m_device) {
         return;
     }
     const QMimeData* qm = event->mimeData();
@@ -444,8 +443,8 @@ void VideoForm::dropEvent(QDropEvent *event)
     }
 
     if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
-        m_device->getFileHandler()->installApkRequest(m_device->getSerial(), file);
+        emit m_device->installApkRequest(m_device->getSerial(), file);
         return;
     }
-    m_device->getFileHandler()->pushFileRequest(m_device->getSerial(), file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
+    emit m_device->pushFileRequest(m_device->getSerial(), file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }

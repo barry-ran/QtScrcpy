@@ -24,7 +24,7 @@ FileHandler::~FileHandler()
 
 }
 
-void FileHandler::pushFileRequest(const QString &serial, const QString &file, const QString& devicePath)
+void FileHandler::onPushFileRequest(const QString &serial, const QString &file, const QString& devicePath)
 {
     if (m_adb.isRuning()) {
         emit fileHandlerResult(FAR_IS_RUNNING, false);
@@ -35,7 +35,7 @@ void FileHandler::pushFileRequest(const QString &serial, const QString &file, co
     m_adb.push(serial, file, devicePath);
 }
 
-void FileHandler::installApkRequest(const QString &serial, const QString &apkFile)
+void FileHandler::onInstallApkRequest(const QString &serial, const QString &apkFile)
 {
     if (m_adb.isRuning()) {
         emit fileHandlerResult(FAR_IS_RUNNING, true);

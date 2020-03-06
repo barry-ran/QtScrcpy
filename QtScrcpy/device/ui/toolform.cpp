@@ -97,87 +97,91 @@ void ToolForm::hideEvent(QHideEvent *event)
 
 void ToolForm::on_fullScreenBtn_clicked()
 {
-    if (!m_device || !m_device->getVideoForm()) {
+    if (!m_device) {
         return;
     }
-    m_device->getVideoForm()->switchFullScreen();
+
+    emit m_device->switchFullScreen();
 }
 
 void ToolForm::on_returnBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->postGoBack();
+    emit m_device->postGoBack();
 }
 
 void ToolForm::on_homeBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->postGoHome();
+    emit m_device->postGoHome();
 }
 
 void ToolForm::on_menuBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->postGoMenu();
+   emit m_device->postGoMenu();
 }
 
 void ToolForm::on_appSwitchBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->postAppSwitch();
+    emit m_device->postAppSwitch();
 }
 
 void ToolForm::on_powerBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->postPower();
+    emit m_device->postPower();
 }
 
 void ToolForm::on_screenShotBtn_clicked()
 {
-    emit screenshot();
+    if (!m_device) {
+        return;
+    }
+    emit m_device->screenshot();
 }
 
 void ToolForm::on_volumeUpBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->postVolumeUp();
+    emit m_device->postVolumeUp();
 }
 
 void ToolForm::on_volumeDownBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->postVolumeDown();
+    emit m_device->postVolumeDown();
 }
 
 void ToolForm::on_closeScreenBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-     m_device->getController()->setScreenPowerMode(ControlMsg::SPM_OFF);
+    emit m_device->setScreenPowerMode(ControlMsg::SPM_OFF);
 }
 
 void ToolForm::on_expandNotifyBtn_clicked()
 {
-    if (!m_device || !m_device->getController()) {
+    if (!m_device) {
         return;
     }
-    m_device->getController()->expandNotificationPanel();
+    emit m_device->expandNotificationPanel();
 }
 
 void ToolForm::on_touchBtn_clicked()
@@ -187,19 +191,7 @@ void ToolForm::on_touchBtn_clicked()
     }
 
     m_showTouch = !m_showTouch;
-
-    AdbProcess* adb = new AdbProcess();
-    if (!adb) {
-        return;
-    }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
-        if (AdbProcess::AER_SUCCESS_START != processResult) {
-            sender()->deleteLater();
-        }
-    });
-    adb->setShowTouchesEnabled(m_device->getSerial(), m_showTouch);
-
-    qInfo() << "show touch " << (m_showTouch ? "enable" : "disable");
+    emit m_device->showTouch(m_showTouch);
 }
 
 void ToolForm::on_groupControlBtn_clicked()
@@ -207,6 +199,6 @@ void ToolForm::on_groupControlBtn_clicked()
     if (!m_device) {
         return;
     }
-    m_device->setMainControl(!m_device->mainControl());
+    emit m_device->setMainControl(m_device, !m_device->mainControl());
     updateGroupControl();
 }

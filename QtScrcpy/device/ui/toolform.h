@@ -29,34 +29,19 @@ protected:
     void showEvent(QShowEvent *event);
     void hideEvent(QHideEvent *event);
 
-signals:
-    void screenshot();
-
 private slots:
     void on_fullScreenBtn_clicked();
-
     void on_returnBtn_clicked();
-
     void on_homeBtn_clicked();
-
     void on_menuBtn_clicked();
-
     void on_appSwitchBtn_clicked();
-
     void on_powerBtn_clicked();
-
     void on_screenShotBtn_clicked();
-
     void on_volumeUpBtn_clicked();
-
     void on_volumeDownBtn_clicked();
-
     void on_closeScreenBtn_clicked();
-
     void on_expandNotifyBtn_clicked();
-
     void on_touchBtn_clicked();
-
     void on_groupControlBtn_clicked();
 
 private:
