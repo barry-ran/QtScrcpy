@@ -25,13 +25,9 @@ public:
     void updateShowSize(const QSize &newSize);
     void updateRender(const AVFrame *frame);
     void setDevice(Device *device);
-    Device* getDevice();
-    void setMainControl(bool mainControl);
-    bool mainControl();
 
 signals:
     void screenshot();
-    void mainControlChange(VideoForm* videoFrom, bool mainControl);
 
 public slots:
     void onGrabCursor(bool grab);
@@ -74,7 +70,6 @@ private:
     float m_widthHeightRatio = 0.5f;
     bool m_skin = true;
     QPoint m_fullScreenBeforePos;
-    bool m_mainControl = false;
 
     //outside member
     QPointer<Device> m_device;

@@ -52,10 +52,10 @@ void ToolForm::initStyle()
 
 void ToolForm::updateGroupControl()
 {
-    if (!m_device || !m_device->getVideoForm()) {
+    if (!m_device) {
         return;
     }
-    if (m_device->getVideoForm()->mainControl()) {
+    if (m_device->mainControl()) {
         ui->groupControlBtn->setStyleSheet("color: red");
     } else {
         ui->groupControlBtn->setStyleSheet("color: #DCDCDC");
@@ -204,9 +204,9 @@ void ToolForm::on_touchBtn_clicked()
 
 void ToolForm::on_groupControlBtn_clicked()
 {
-    if (!m_device || !m_device->getVideoForm()) {
+    if (!m_device) {
         return;
     }
-    m_device->getVideoForm()->setMainControl(!m_device->getVideoForm()->mainControl());
+    m_device->setMainControl(!m_device->mainControl());
     updateGroupControl();
 }

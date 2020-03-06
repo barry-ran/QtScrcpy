@@ -40,9 +40,12 @@ public:
     const QString &getSerial();
 
     void updateScript(QString script);
+    void setMainControl(bool mainControl);
+    bool mainControl();
 
 signals:
     void deviceDisconnect(QString serial);
+    void mainControlChange(Device* device, bool mainControl);
 
 public slots:
     void onScreenshot();
@@ -67,6 +70,8 @@ private:
 
     QTime m_startTimeCount;
     DeviceParams m_params;
+
+    bool m_mainControl = false;
 };
 
 #endif // DEVICE_H

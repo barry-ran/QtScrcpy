@@ -239,6 +239,20 @@ void Device::startServer()
     });
 }
 
+void Device::setMainControl(bool mainControl)
+{
+    if (m_mainControl == mainControl) {
+        return;
+    }
+    m_mainControl = mainControl;
+    emit mainControlChange(this, m_mainControl);
+}
+
+bool Device::mainControl()
+{
+    return m_mainControl;
+}
+
 bool Device::saveFrame(const AVFrame* frame)
 {
     if (!frame) {
