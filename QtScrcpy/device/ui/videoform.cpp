@@ -255,25 +255,6 @@ void VideoForm::staysOnTop(bool top)
     }
 }
 
-Device *VideoForm::getDevice()
-{
-    return m_device;
-}
-
-void VideoForm::setMainControl(bool mainControl)
-{
-    if (m_mainControl == mainControl) {
-        return;
-    }
-    m_mainControl = mainControl;
-    emit mainControlChange(this, m_mainControl);
-}
-
-bool VideoForm::mainControl()
-{
-    return m_mainControl;
-}
-
 void VideoForm::setDevice(Device *device)
 {
     m_device = device;
