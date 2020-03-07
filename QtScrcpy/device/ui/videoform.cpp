@@ -81,17 +81,9 @@ void VideoForm::onGrabCursor(bool grab)
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
     MouseTap::getInstance()->enableMouseEventTap(rc, grab);
 #elif defined(Q_OS_OSX)
-    // get nswindow from qt widget
-    NSView *nsview = (NSView *)m_videoWidget->window()->winId();
-    if (!nsview) {
-        return;
-    }
-    NSWindow *nswindow = [nsview window];
-
-    NSRect windowRect = [nswindow contentRectForFrameRect:[nswindow frame]];
-    QRect rc(windowRect.origin.x, windowRect.origin.y,
-             windowRect.size.width, windowRect.size.height);
-
+    QRect rc = m_videoWidget->geometry();
+    rc.setTopLeft(m_videoWidget->mapToGlobal(rc.topLeft()));
+    rc.setBottomRight(m_videoWidget->mapToGlobal(rc.bottomRight()));
     rc.setX(rc.x() + 100);
     rc.setY(rc.y() + 30);
     rc.setWidth(rc.width() - 180);
