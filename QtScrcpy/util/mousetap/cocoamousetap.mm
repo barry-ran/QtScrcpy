@@ -45,33 +45,29 @@ static CGEventRef Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type
         return event;
     }
 
-    NSRect windowRect = NSMakeRect(tapdata->rc.left(), tapdata->rc.top(),
+    NSRect limitWindowRect = NSMakeRect(tapdata->rc.left(), tapdata->rc.top(),
                                    tapdata->rc.width(), tapdata->rc.height());
-    NSRect newWindowRect = NSMakeRect(windowRect.origin.x, windowRect.origin.y,
-                            windowRect.size.width - 10, windowRect.size.height - 10);
-    CGPoint eventLocation = CGEventGetUnflippedLocation(event);
-    //qDebug() << newWindowRect.origin.x << newWindowRect.origin.y << newWindowRect.size.width << newWindowRect.size.height;
-
-    if (!NSMouseInRect(NSPointFromCGPoint(eventLocation), newWindowRect, NO)) {
-
-        /* This is in CGs global screenspace coordinate system, which has a
-         * flipped Y.
-         */
-        CGPoint newLocation = CGEventGetLocation(event);
-
-        if (eventLocation.x < NSMinX(windowRect)) {
-            newLocation.x = NSMinX(windowRect);
-        } else if (eventLocation.x >= NSMaxX(windowRect)) {
-            newLocation.x = NSMaxX(windowRect) - 1.0;
+    // check rect samll than limit rect
+    NSRect checkWindowRect = NSMakeRect(limitWindowRect.origin.x + 10, limitWindowRect.origin.y + 10,
+                            limitWindowRect.size.width - 10, limitWindowRect.size.height - 10);
+    /* This is in CGs global screenspace coordinate system, which has a
+     * flipped Y.
+     */
+    CGPoint eventLocation = CGEventGetLocation(event);
+    if (!NSMouseInRect(NSPointFromCGPoint(eventLocation), checkWindowRect, NO)) {
+        if (eventLocation.x <= NSMinX(limitWindowRect)) {
+            eventLocation.x = NSMinX(limitWindowRect) + 1.0;
+        } else if (eventLocation.x >= NSMaxX(limitWindowRect)) {
+            eventLocation.x = NSMaxX(limitWindowRect) - 1.0;
         }
 
-        if (eventLocation.y <= NSMinY(windowRect)) {
-            newLocation.y -= (NSMinY(windowRect) - eventLocation.y + 1);
-        } else if (eventLocation.y > NSMaxY(windowRect)) {
-            newLocation.y += (eventLocation.y - NSMaxY(windowRect));
+        if (eventLocation.y <= NSMinY(limitWindowRect)) {
+            eventLocation.y = NSMinY(limitWindowRect) + 1.0;
+        } else if (eventLocation.y >= NSMaxY(limitWindowRect)) {
+            eventLocation.y = NSMaxY(limitWindowRect) - 1.0;
         }
 
-        CGWarpMouseCursorPosition(newLocation);
+        CGWarpMouseCursorPosition(eventLocation);
         CGAssociateMouseAndMouseCursorPosition(YES);
 
         if ((CGEventMaskBit(type) & movementEventsMask) == 0) {
@@ -80,7 +76,7 @@ static CGEventRef Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type
              * movement events, since they mean that our warp cursor above
              * behaves strangely.
              */
-            CGEventSetLocation(event, newLocation);
+            CGEventSetLocation(event, eventLocation);
         }
     }
 
