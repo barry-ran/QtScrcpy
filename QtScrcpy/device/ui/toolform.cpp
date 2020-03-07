@@ -7,9 +7,6 @@
 #include "ui_toolform.h"
 #include "iconhelper.h"
 #include "device.h"
-#include "videoform.h"
-#include "controller.h"
-#include "adbprocess.h"
 
 ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
     : MagneticWidget(adsorbWidget, adsorbPos)
