@@ -17,7 +17,6 @@
 #include "toolform.h"
 #include "device.h"
 #include "controller.h"
-#include "filehandler.h"
 #include "config.h"
 extern "C"
 {
@@ -73,8 +72,32 @@ void VideoForm::initUI()
 
 void VideoForm::onGrabCursor(bool grab)
 {
-#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
-    MouseTap::getInstance()->enableMouseEventTap(m_videoWidget, grab);
+#if defined(Q_OS_WIN32)
+    QRect rc;
+    rc = QRect(m_videoWidget->parentWidget()->mapToGlobal(m_videoWidget->pos())
+             , m_videoWidget->size());
+    // high dpi support
+    rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
+    rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
+    MouseTap::getInstance()->enableMouseEventTap(rc, grab);
+#elif defined(Q_OS_OSX)
+    // get nswindow from qt widget
+    NSView *nsview = (NSView *)m_videoWidget->window()->winId();
+    if (!nsview) {
+        return;
+    }
+    NSWindow *nswindow = [nsview window];
+
+    NSRect windowRect = [nswindow contentRectForFrameRect:[nswindow frame]];
+    QRect rc(windowRect.origin.x, windowRect.origin.y,
+             windowRect.size.width, windowRect.size.height);
+
+    rc.setX(rc.x() + 100);
+    rc.setY(rc.y() + 30);
+    rc.setWidth(rc.width() - 180);
+    rc.setHeight(rc.height() - 60);
+
+    MouseTap::getInstance()->enableMouseEventTap(rc, grab);
 #else
     Q_UNUSED(grab)
 #endif
