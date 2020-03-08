@@ -11,7 +11,6 @@
 
 #include "videoform.h"
 #include "qyuvopenglwidget.h"
-#include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "iconhelper.h"
 #include "toolform.h"
@@ -70,29 +69,27 @@ void VideoForm::initUI()
     ui->keepRadioWidget->setMouseTracking(true);
 }
 
-void VideoForm::onGrabCursor(bool grab)
+QRect VideoForm::getGrabCursorRect()
 {
-#if defined(Q_OS_WIN32)
     QRect rc;
-    rc = QRect(m_videoWidget->parentWidget()->mapToGlobal(m_videoWidget->pos())
+#if defined(Q_OS_WIN32)
+    rc = QRect(m_videoWidget->mapToGlobal(m_videoWidget->pos())
              , m_videoWidget->size());
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
-    MouseTap::getInstance()->enableMouseEventTap(rc, grab);
 #elif defined(Q_OS_OSX)
-    QRect rc = m_videoWidget->geometry();
+    rc = m_videoWidget->geometry();
     rc.setTopLeft(m_videoWidget->mapToGlobal(rc.topLeft()));
     rc.setBottomRight(m_videoWidget->mapToGlobal(rc.bottomRight()));
     rc.setX(rc.x() + 100);
     rc.setY(rc.y() + 30);
     rc.setWidth(rc.width() - 180);
     rc.setHeight(rc.height() - 60);
-
-    MouseTap::getInstance()->enableMouseEventTap(rc, grab);
 #else
     Q_UNUSED(grab)
 #endif
+    return rc;
 }
 
 void VideoForm::updateRender(const AVFrame *frame)

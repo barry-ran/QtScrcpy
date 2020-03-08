@@ -13,6 +13,7 @@
 #include "controller.h"
 #include "config.h"
 #include "avframeconvert.h"
+#include "mousetap/mousetap.h"
 extern "C"
 {
 #include "libavutil/imgutils.h"
@@ -130,9 +131,10 @@ void Device::initSignals()
     connect(this, &Device::screenshot, this, &Device::onScreenshot);
     connect(this, &Device::showTouch, this, &Device::onShowTouch);
     connect(this, &Device::setMainControl, this, &Device::onSetMainControl);
+    connect(this, &Device::grabCursor, this, &Device::onGrabCursor);
 
-    if (m_controller && m_videoForm) {
-        connect(m_controller, &Controller::grabCursor, m_videoForm, &VideoForm::onGrabCursor);
+    if (m_controller) {
+        connect(m_controller, &Controller::grabCursor, this, &Device::grabCursor);
     }
     if (m_controller) {
         connect(this, &Device::postGoBack, m_controller, &Controller::onPostGoBack);
@@ -285,6 +287,15 @@ void Device::onSetMainControl(Device* device, bool mainControl)
         return;
     }
     m_mainControl = mainControl;
+}
+
+void Device::onGrabCursor(bool grab)
+{
+    if (!m_videoForm) {
+        return;
+    }
+    QRect rc = m_videoForm->getGrabCursorRect();
+    MouseTap::getInstance()->enableMouseEventTap(rc, grab);
 }
 
 bool Device::mainControl()

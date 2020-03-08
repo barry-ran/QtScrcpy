@@ -48,6 +48,7 @@ public:
 signals:
     void deviceDisconnect(QString serial);
 
+    // tool bar
     void switchFullScreen();
     void postGoBack();
     void postGoHome();
@@ -58,27 +59,30 @@ signals:
     void postVolumeDown();
     void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
     void expandNotificationPanel();
-    void screenshot();
-    void showTouch(bool show);
-    void setMainControl(Device* device, bool mainControl);
-
-    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
-    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
-    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
-
     void postTurnOn();
     void postTextInput(QString& text);
     void requestDeviceClipboard();
     void setDeviceClipboard();
     void clipboardPaste();
-
     void pushFileRequest(const QString& serial, const QString& file, const QString& devicePath = "");
     void installApkRequest(const QString& serial, const QString& apkFile);
+
+    // key map
+    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
+    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
+    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+
+    // self connect signal and slots
+    void screenshot();
+    void showTouch(bool show);
+    void setMainControl(Device* device, bool mainControl);
+    void grabCursor(bool grab);
 
 public slots:
     void onScreenshot();
     void onShowTouch(bool show);
     void onSetMainControl(Device* device, bool mainControl);
+    void onGrabCursor(bool grab);
 
 private:
     void initSignals();
