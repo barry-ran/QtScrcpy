@@ -176,6 +176,7 @@ Note: it is not necessary to keep you Android device connected via USB after you
     - `Ctrl`+`Shift`+`v` copies the computer clipboard to the device clipboard;
     - `Ctrl`+`v` _pastes_ the computer clipboard as a sequence of text events (but
     breaks non-ASCII characters).
+- Group control
 
 ## TODO
 [TODO](docs/TODO.md)
