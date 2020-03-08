@@ -92,6 +92,11 @@ QRect VideoForm::getGrabCursorRect()
     return rc;
 }
 
+const QSize &VideoForm::frameSize()
+{
+    return m_frameSize;
+}
+
 void VideoForm::updateRender(const AVFrame *frame)
 {
     if (m_videoWidget->isHidden()) {

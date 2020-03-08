@@ -46,6 +46,7 @@ public:
     VideoForm *getVideoForm();
     Server *getServer();
     const QString &getSerial();
+    const QSize frameSize();
 
     void updateScript(QString script);
     Device::GroupControlState controlState();
