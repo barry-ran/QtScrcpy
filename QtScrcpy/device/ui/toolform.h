@@ -45,7 +45,7 @@ private slots:
     void on_touchBtn_clicked();
     void on_groupControlBtn_clicked();
 
-    void onControlStateChange(Device* device, Device::GroupControlState state);
+    void onControlStateChange(Device* device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
 private:
     void initStyle();

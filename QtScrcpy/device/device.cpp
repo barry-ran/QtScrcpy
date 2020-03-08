@@ -286,8 +286,9 @@ void Device::onSetControlState(Device* device, Device::GroupControlState state)
     if (m_controlState == state) {
         return;
     }
+    GroupControlState oldState = m_controlState;
     m_controlState = state;
-    emit controlStateChange(this, m_controlState);
+    emit controlStateChange(this, oldState, m_controlState);
 }
 
 void Device::onGrabCursor(bool grab)

@@ -84,7 +84,7 @@ signals:
     void grabCursor(bool grab);
 
     // for notify
-    void controlStateChange(Device* device, Device::GroupControlState state);
+    void controlStateChange(Device* device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
 public slots:
     void onScreenshot();
