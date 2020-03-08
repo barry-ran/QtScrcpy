@@ -25,6 +25,7 @@ public:
     void updateRender(const AVFrame *frame);
     void setDevice(Device *device);
     QRect getGrabCursorRect();
+    const QSize &frameSize();
 
 public slots:
     void onSwitchFullScreen();

@@ -91,6 +91,15 @@ const QString &Device::getSerial()
     return m_params.serial;
 }
 
+const QSize Device::frameSize()
+{
+    QSize size;
+    if (!m_videoForm) {
+        return size;
+    }
+    return m_videoForm->frameSize();
+}
+
 void Device::updateScript(QString script)
 {
     if(m_controller){

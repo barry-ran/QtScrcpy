@@ -127,9 +127,6 @@ void DeviceManage::setGroupControlSignals(Device *host, Device *client, bool ins
         connect(host, &Device::clipboardPaste, client, &Device::clipboardPaste);
         connect(host, &Device::pushFileRequest, client, &Device::pushFileRequest);
         connect(host, &Device::installApkRequest, client, &Device::installApkRequest);
-        connect(host, &Device::mouseEvent, client, &Device::mouseEvent);
-        connect(host, &Device::wheelEvent, client, &Device::wheelEvent);
-        connect(host, &Device::keyEvent, client, &Device::keyEvent);
         connect(host, &Device::screenshot, client, &Device::screenshot);
         connect(host, &Device::showTouch, client, &Device::showTouch);
         // dont connect requestDeviceClipboard
@@ -150,9 +147,6 @@ void DeviceManage::setGroupControlSignals(Device *host, Device *client, bool ins
         disconnect(host, &Device::clipboardPaste, client, &Device::clipboardPaste);
         disconnect(host, &Device::pushFileRequest, client, &Device::pushFileRequest);
         disconnect(host, &Device::installApkRequest, client, &Device::installApkRequest);
-        disconnect(host, &Device::mouseEvent, client, &Device::mouseEvent);
-        disconnect(host, &Device::wheelEvent, client, &Device::wheelEvent);
-        disconnect(host, &Device::keyEvent, client, &Device::keyEvent);
         disconnect(host, &Device::screenshot, client, &Device::screenshot);
         disconnect(host, &Device::showTouch, client, &Device::showTouch);
     }
@@ -201,16 +195,72 @@ void DeviceManage::onControlStateChange(Device *device, Device::GroupControlStat
     // free to host
     if (oldState == Device::GroupControlState::GCS_FREE
             && newState == Device::GroupControlState::GCS_HOST) {
-        // install control signals
+        // install direct control signals
         setGroupControlHost(device, true);
+        // install convert control signals(frameSize need convert)
+        connect(device, &Device::mouseEvent, this, &DeviceManage::onMouseEvent, Qt::UniqueConnection);
+        connect(device, &Device::wheelEvent, this, &DeviceManage::onWheelEvent, Qt::UniqueConnection);
+        connect(device, &Device::keyEvent, this, &DeviceManage::onKeyEvent, Qt::UniqueConnection);
         return;
     }
     // host to free
     if (oldState == Device::GroupControlState::GCS_HOST
             && newState == Device::GroupControlState::GCS_FREE) {
-        // uninstall control signals
+        // uninstall direct control signals
         setGroupControlHost(device, false);
+        // uninstall convert control signals(frameSize need convert)
+        disconnect(device, &Device::mouseEvent, this, &DeviceManage::onMouseEvent);
+        disconnect(device, &Device::wheelEvent, this, &DeviceManage::onWheelEvent);
+        disconnect(device, &Device::keyEvent, this, &DeviceManage::onKeyEvent);
         return;
+    }
+}
+
+void DeviceManage::onMouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
+{
+    QMapIterator<QString, QPointer<Device>> i(m_devices);
+    while (i.hasNext()) {
+        i.next();
+        if (!i.value()) {
+            continue;
+        }
+        if (i.value() == sender()) {
+            continue;
+        }
+        // neend convert frameSize to its frameSize
+        emit i.value()->mouseEvent(from, i.value()->frameSize(), showSize);
+    }
+}
+
+void DeviceManage::onWheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
+{
+    QMapIterator<QString, QPointer<Device>> i(m_devices);
+    while (i.hasNext()) {
+        i.next();
+        if (!i.value()) {
+            continue;
+        }
+        if (i.value() == sender()) {
+            continue;
+        }
+        // neend convert frameSize to its frameSize
+        emit i.value()->wheelEvent(from, i.value()->frameSize(), showSize);
+    }
+}
+
+void DeviceManage::onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
+{
+    QMapIterator<QString, QPointer<Device>> i(m_devices);
+    while (i.hasNext()) {
+        i.next();
+        if (!i.value()) {
+            continue;
+        }
+        if (i.value() == sender()) {
+            continue;
+        }
+        // neend convert frameSize to its frameSize
+        emit i.value()->keyEvent(from, i.value()->frameSize(), showSize);
     }
 }
 
