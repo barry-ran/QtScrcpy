@@ -5,6 +5,7 @@
 #include <QPointer>
 
 #include "magneticwidget.h"
+#include "device.h"
 
 namespace Ui {
 class ToolForm;
@@ -43,6 +44,8 @@ private slots:
     void on_expandNotifyBtn_clicked();
     void on_touchBtn_clicked();
     void on_groupControlBtn_clicked();
+
+    void onControlStateChange(Device* device, Device::GroupControlState state);
 
 private:
     void initStyle();
