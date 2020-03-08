@@ -20,8 +20,13 @@ public:
     bool disconnectDevice(const QString &serial);
     void disconnectAllDevice();
 
+protected:
+    void setGroupControlSignals(Device *host, Device *client, bool install);
+    void setGroupControlHost(Device *host, bool install);
+
 protected slots:
     void onDeviceDisconnect(QString serial);
+    void onControlStateChange(Device* device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
 private:
     quint16 getFreePort();

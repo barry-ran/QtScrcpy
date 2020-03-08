@@ -215,9 +215,10 @@ void ToolForm::on_groupControlBtn_clicked()
     }
 }
 
-void ToolForm::onControlStateChange(Device *device, Device::GroupControlState state)
+void ToolForm::onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState)
 {
     Q_UNUSED(device)
-    Q_UNUSED(state)
+    Q_UNUSED(oldState)
+    Q_UNUSED(newState)
     updateGroupControl();
 }
