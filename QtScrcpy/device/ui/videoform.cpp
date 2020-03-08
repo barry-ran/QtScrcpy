@@ -87,7 +87,7 @@ QRect VideoForm::getGrabCursorRect()
     rc.setWidth(rc.width() - 180);
     rc.setHeight(rc.height() - 60);
 #else
-    Q_UNUSED(grab)
+
 #endif
     return rc;
 }
