@@ -35,6 +35,11 @@ public:
         QString gameScript = "";            // 游戏映射脚本
         bool renderExpiredFrames = false;   // 是否渲染延迟视频帧
     };
+    enum GroupControlState {
+        GCS_FREE = 0,
+        GCS_HOST,
+        GCS_CLIENT,
+    };
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
 
@@ -43,7 +48,7 @@ public:
     const QString &getSerial();
 
     void updateScript(QString script);
-    bool mainControl();
+    Device::GroupControlState controlState();
 
 signals:
     void deviceDisconnect(QString serial);
@@ -75,13 +80,16 @@ signals:
     // self connect signal and slots
     void screenshot();
     void showTouch(bool show);
-    void setMainControl(Device* device, bool mainControl);
+    void setControlState(Device* device, Device::GroupControlState state);
     void grabCursor(bool grab);
+
+    // for notify
+    void controlStateChange(Device* device, Device::GroupControlState state);
 
 public slots:
     void onScreenshot();
     void onShowTouch(bool show);
-    void onSetMainControl(Device* device, bool mainControl);
+    void onSetControlState(Device* device, Device::GroupControlState state);
     void onGrabCursor(bool grab);
 
 private:
@@ -105,7 +113,7 @@ private:
     QTime m_startTimeCount;
     DeviceParams m_params;
 
-    bool m_mainControl = false;
+    GroupControlState m_controlState = GCS_FREE;
 };
 
 #endif // DEVICE_H

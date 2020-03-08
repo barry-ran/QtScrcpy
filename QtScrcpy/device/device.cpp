@@ -130,7 +130,7 @@ void Device::initSignals()
 {
     connect(this, &Device::screenshot, this, &Device::onScreenshot);
     connect(this, &Device::showTouch, this, &Device::onShowTouch);
-    connect(this, &Device::setMainControl, this, &Device::onSetMainControl);
+    connect(this, &Device::setControlState, this, &Device::onSetControlState);
     connect(this, &Device::grabCursor, this, &Device::onGrabCursor);
 
     if (m_controller) {
@@ -185,7 +185,7 @@ void Device::initSignals()
                 tips = tr("%1 failed").arg(tipsType);
             }
             qInfo() << tips;
-            if (!m_mainControl) {
+            if (m_controlState == GCS_CLIENT) {
                 return;
             }
             QMessageBox::information(m_videoForm, "QtScrcpy", tips, QMessageBox::Ok);
@@ -280,13 +280,14 @@ void Device::startServer()
     });
 }
 
-void Device::onSetMainControl(Device* device, bool mainControl)
+void Device::onSetControlState(Device* device, Device::GroupControlState state)
 {
     Q_UNUSED(device)
-    if (m_mainControl == mainControl) {
+    if (m_controlState == state) {
         return;
     }
-    m_mainControl = mainControl;
+    m_controlState = state;
+    emit controlStateChange(this, m_controlState);
 }
 
 void Device::onGrabCursor(bool grab)
@@ -294,13 +295,16 @@ void Device::onGrabCursor(bool grab)
     if (!m_videoForm) {
         return;
     }
+    if (m_controlState == GCS_CLIENT) {
+        return;
+    }
     QRect rc = m_videoForm->getGrabCursorRect();
     MouseTap::getInstance()->enableMouseEventTap(rc, grab);
 }
 
-bool Device::mainControl()
+Device::GroupControlState Device::controlState()
 {
-    return m_mainControl;
+    return m_controlState;
 }
 
 bool Device::saveFrame(const AVFrame* frame)

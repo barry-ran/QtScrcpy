@@ -184,8 +184,8 @@ void VideoForm::updateShowSize(const QSize &newSize)
             showSize.setHeight(showSize.width() / m_widthHeightRatio);
         }
 
-        if (isFullScreen()) {
-            onSwitchFullScreen();
+        if (isFullScreen() && m_device) {
+            emit m_device->switchFullScreen();
         }
         if (m_skin) {
             QMargins m = getMargins(vertical);
@@ -351,13 +351,13 @@ void VideoForm::wheelEvent(QWheelEvent *event)
 
 void VideoForm::keyPressEvent(QKeyEvent *event)
 {
+    if (!m_device) {
+        return;
+    }
     if (Qt::Key_Escape == event->key()
             && !event->isAutoRepeat()
             && isFullScreen()) {
-        onSwitchFullScreen();
-    }
-    if (!m_device) {
-        return;
+        emit m_device->switchFullScreen();
     }
     if (event->key() == Qt::Key_C && (event->modifiers() & Qt::ControlModifier)) {
         emit m_device->requestDeviceClipboard();

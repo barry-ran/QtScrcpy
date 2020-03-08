@@ -26,7 +26,11 @@ ToolForm::~ToolForm()
 
 void ToolForm::setDevice(Device *device)
 {
+    if (!device) {
+        return;
+    }
     m_device = device;
+    connect(m_device, &Device::controlStateChange, this, &ToolForm::onControlStateChange);
 }
 
 void ToolForm::initStyle()
@@ -52,10 +56,16 @@ void ToolForm::updateGroupControl()
     if (!m_device) {
         return;
     }
-    if (m_device->mainControl()) {
-        ui->groupControlBtn->setStyleSheet("color: red");
-    } else {
+    switch (m_device->controlState()) {
+    case Device::GroupControlState::GCS_FREE:
         ui->groupControlBtn->setStyleSheet("color: #DCDCDC");
+        break;
+    case Device::GroupControlState::GCS_HOST:
+        ui->groupControlBtn->setStyleSheet("color: red");
+        break;
+    case Device::GroupControlState::GCS_CLIENT:
+        ui->groupControlBtn->setStyleSheet("color: green");
+        break;
     }
 }
 
@@ -196,6 +206,18 @@ void ToolForm::on_groupControlBtn_clicked()
     if (!m_device) {
         return;
     }
-    emit m_device->setMainControl(m_device, !m_device->mainControl());
+    Device::GroupControlState state = m_device->controlState();
+    if (state == Device::GroupControlState::GCS_FREE) {
+        emit m_device->setControlState(m_device, Device::GroupControlState::GCS_HOST);
+    }
+    if (state == Device::GroupControlState::GCS_HOST) {
+        emit m_device->setControlState(m_device, Device::GroupControlState::GCS_FREE);
+    }
+}
+
+void ToolForm::onControlStateChange(Device *device, Device::GroupControlState state)
+{
+    Q_UNUSED(device)
+    Q_UNUSED(state)
     updateGroupControl();
 }
