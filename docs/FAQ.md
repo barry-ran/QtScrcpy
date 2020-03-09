@@ -23,3 +23,6 @@
 ## 错误信息：Could not open video stream
 导致这个错误的原因有很多，最简单的解决方法是在分辨率设置中，选择一个较低的分辨率
 
+## 错误信息：QOpenGLShaderProgram::attributeLocation(vertexIn): shader program is not linked
+config.ini里修改下解码方式，改成1或者2试试
+
