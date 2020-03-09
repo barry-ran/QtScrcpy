@@ -37,7 +37,6 @@ Device::Device(DeviceParams params, QObject *parent)
         m_controller = new Controller(params.gameScript, this);
         m_videoForm = new VideoForm(Config::getInstance().getSkin());
         m_videoForm->setDevice(this);
-        m_videoForm->show();
     }
 
     m_stream = new Stream(this);
@@ -222,8 +221,13 @@ void Device::initSignals()
 
                     QRect rc = Config::getInstance().getRect(getSerial());
                     if (rc.isValid()) {
-                        m_videoForm->setGeometry(rc);
+                        m_videoForm->move(rc.topLeft());
+                        m_videoForm->resize(rc.size());
+                        // TODO: setGeometry magneticwidget bug
+                        //m_videoForm->setGeometry(rc);
                     }
+                    // videoForm delay show
+                    m_videoForm->show();
                 }
 
                 // init recorder
