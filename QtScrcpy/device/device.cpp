@@ -368,10 +368,10 @@ bool Device::saveFrame(const AVFrame* frame)
     }
     QDateTime dateTime = QDateTime::currentDateTime();
     QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
-    fileName = Config::getInstance().getTitle() + fileName + ".jpg";
+    fileName = Config::getInstance().getTitle() + fileName + ".png";
     QDir dir(fileDir);
     absFilePath = dir.absoluteFilePath(fileName);
-    ret = rgbImage.save(absFilePath);
+    ret = rgbImage.save(absFilePath, "PNG", 100);
     if (!ret) {
         return false;
     }
