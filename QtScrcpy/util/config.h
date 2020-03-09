@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QPointer>
+#include <QRect>
 
 class QSettings;
 class Config : public QObject
@@ -29,6 +30,8 @@ public:
     void setMaxSizeIndex(int maxSizeIndex);
     int getRecordFormatIndex();
     void setRecordFormatIndex(int recordFormatIndex);
+    void setRect(const QString &serial, const QRect &rc);
+    QRect getRect(const QString &serial);
 
 private:
     explicit Config(QObject *parent = nullptr);

@@ -430,6 +430,15 @@ void VideoForm::resizeEvent(QResizeEvent *event)
     }
 }
 
+void VideoForm::closeEvent(QCloseEvent *event)
+{
+    Q_UNUSED(event)
+    if (!m_device) {
+        return;
+    }
+    Config::getInstance().setRect(m_device->getSerial(), geometry());
+}
+
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)
 {
     event->acceptProposedAction();

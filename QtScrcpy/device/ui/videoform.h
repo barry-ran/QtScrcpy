@@ -49,6 +49,7 @@ protected:
     void paintEvent(QPaintEvent *);
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
+    void closeEvent(QCloseEvent *event);
 
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
