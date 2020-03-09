@@ -71,6 +71,7 @@ Device::~Device()
         delete m_vb;
     }
     if (m_videoForm) {
+        m_videoForm->close();
         delete m_videoForm;
     }
     emit deviceDisconnect(m_params.serial);
@@ -218,6 +219,11 @@ void Device::initSignals()
                 if (m_videoForm) {
                     m_videoForm->setWindowTitle(deviceName);
                     m_videoForm->updateShowSize(size);
+
+                    QRect rc = Config::getInstance().getRect(getSerial());
+                    if (rc.isValid()) {
+                        m_videoForm->setGeometry(rc);
+                    }
                 }
 
                 // init recorder
