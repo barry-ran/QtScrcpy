@@ -46,15 +46,18 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
+      # 编译
       - name: Build MacOS
         run: |
           export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/build_for_mac.sh release
+      # 发布
       - name: Publish
         if: startsWith(github.event.ref, 'refs/tags/')
         run: |
           export ENV_QT_CLANG=$(pwd)/${{env.Qt5_Dir}}
           ci/mac/publish_for_mac.sh ../build
+          ci/mac/package_for_mac.sh
       # tag 打包
       - name: Package
         if: startsWith(github.event.ref, 'refs/tags/')
@@ -65,7 +68,7 @@ jobs:
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$name = 'QtScrcpy-mac-x64-' + ${tag}
           # 打包zip
-          Compress-Archive -Path ci\build\QtScrcpy.app ci\build\${name}.zip
+          Compress-Archive -Path ci\build\QtScrcpy.dmg ci\build\${name}.zip
       # 查询Release
       - name: Query Release
         if: startsWith(github.event.ref, 'refs/tags/')
@@ -73,12 +76,20 @@ jobs:
         env:
           githubFullName: ${{ github.event.repository.full_name }}
           ref: ${{ github.event.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
+
+          $token = ${env:github_token}
+          $authInfo = ("{0}" -f $token)
+          $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
+          $authInfo = [System.Convert]::ToBase64String($authInfo)
+          $headers = @{Authorization=("barry-ran {0}" -f $authInfo)}
+
           $response={}
           try {
-            $response = Invoke-RestMethod -Uri $url -Method Get
+            $response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
           } catch {
             Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__ 
             Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
@@ -102,12 +113,14 @@ jobs:
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
+
           # github token防止api rate limite，否则一个小时只能60个api请求
           $token = ${env:github_token}
           $authInfo = ("{0}" -f $token)
           $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
           $authInfo = [System.Convert]::ToBase64String($authInfo)
           $headers = @{Authorization=("barry-ran {0}" -f $authInfo)}
+
           $response = Invoke-RestMethod -Uri $url -ContentType 'text/json' -Headers $headers -Method Get
           [string]$latestUpUrl = $response.upload_url
           Write-Host 'latestUpUrl:'$latestUpUrl

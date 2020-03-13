@@ -103,12 +103,20 @@ jobs:
         env:
           githubFullName: ${{ github.event.repository.full_name }}
           ref: ${{ github.event.ref }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
         run: |
           [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
           [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
+
+          $token = ${env:github_token}
+          $authInfo = ("{0}" -f $token)
+          $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
+          $authInfo = [System.Convert]::ToBase64String($authInfo)
+          $headers = @{Authorization=("barry-ran {0}" -f $authInfo)}
+
           $response={}
           try {
-            $response = Invoke-RestMethod -Uri $url -Method Get
+            $response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
           } catch {
             Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__ 
             Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
