@@ -77,8 +77,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
         with:
           files: ci/build/${{ env.packageName }}.zip
-          name: ${{ env.packageName }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
