@@ -155,11 +155,12 @@ void Device::initSignals()
         connect(this, &Device::postVolumeDown, m_controller, &Controller::onPostVolumeDown);
         connect(this, &Device::setScreenPowerMode, m_controller, &Controller::onSetScreenPowerMode);
         connect(this, &Device::expandNotificationPanel, m_controller, &Controller::onExpandNotificationPanel);
+        connect(this, &Device::collapseNotificationPanel, m_controller, &Controller::onCollapseNotificationPanel);
         connect(this, &Device::mouseEvent, m_controller, &Controller::onMouseEvent);
         connect(this, &Device::wheelEvent, m_controller, &Controller::onWheelEvent);
         connect(this, &Device::keyEvent, m_controller, &Controller::onKeyEvent);
 
-        connect(this, &Device::postTurnOn, m_controller, &Controller::onPostTurnOn);
+        connect(this, &Device::postBackOrScreenOn, m_controller, &Controller::onPostBackOrScreenOn);
         connect(this, &Device::requestDeviceClipboard, m_controller, &Controller::onRequestDeviceClipboard);
         connect(this, &Device::setDeviceClipboard, m_controller, &Controller::onSetDeviceClipboard);
         connect(this, &Device::clipboardPaste, m_controller, &Controller::onClipboardPaste);
