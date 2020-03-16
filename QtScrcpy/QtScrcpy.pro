@@ -58,7 +58,7 @@ INCLUDEPATH += \
 
 # 统一版本号入口,只修改这一个地方即可
 VERSION_MAJOR = 1
-VERSION_MINOR = 2
+VERSION_MINOR = 3
 VERSION_PATCH = 1
 
 # qmake变量的方式定义版本号
