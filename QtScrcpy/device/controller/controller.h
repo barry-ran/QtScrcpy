@@ -40,7 +40,7 @@ public slots:
     void onKeyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
 
     // turn the screen on if it was off, press BACK otherwise
-    void onPostTurnOn();
+    void onPostBackOrScreenOn();
     void onRequestDeviceClipboard();
     void onSetDeviceClipboard();
     void onClipboardPaste();

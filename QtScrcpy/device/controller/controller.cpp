@@ -62,7 +62,7 @@ void Controller::updateScript(QString gameScript)
     connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
 
-void Controller::onPostTurnOn()
+void Controller::onPostBackOrScreenOn()
 {
     ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
     if (!controlMsg) {

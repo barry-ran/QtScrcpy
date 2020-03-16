@@ -26,6 +26,8 @@ public:
     void setDevice(Device *device);
     QRect getGrabCursorRect();
     const QSize &frameSize();
+    void resizeSquare();
+    void removeBlackRect();
 
 public slots:
     void onSwitchFullScreen();
@@ -37,11 +39,14 @@ private:
     
     void showToolForm(bool show = true);
     void moveCenter();
+    void installShortcut();
+    QRect getScreenRect();
 
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
