@@ -17,7 +17,7 @@ class VideoForm : public QWidget
 {
     Q_OBJECT
 public:
-    explicit VideoForm(bool skin = true, QWidget *parent = 0);
+    explicit VideoForm(bool framelessWindow = false, bool skin = true, QWidget *parent = 0);
     ~VideoForm();
 
     void staysOnTop(bool top = true);

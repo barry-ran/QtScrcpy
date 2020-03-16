@@ -62,6 +62,8 @@ private slots:
 
     void on_formatBox_activated(int index);
 
+    void on_framelessCheck_stateChanged(int arg1);
+
 private:
     bool checkAdbRun();
     void initUI();

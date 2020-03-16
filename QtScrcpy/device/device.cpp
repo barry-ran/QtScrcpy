@@ -35,7 +35,7 @@ Device::Device(DeviceParams params, QObject *parent)
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(params.gameScript, this);
-        m_videoForm = new VideoForm(Config::getInstance().getSkin());
+        m_videoForm = new VideoForm(Config::getInstance().getFramelessWindow(), Config::getInstance().getSkin());
         m_videoForm->setDevice(this);
     }
 

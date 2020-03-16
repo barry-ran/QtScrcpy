@@ -25,7 +25,7 @@ extern "C"
 #include "libavutil/frame.h"
 }
 
-VideoForm::VideoForm(bool skin, QWidget *parent)
+VideoForm::VideoForm(bool framelessWindow, bool skin, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::videoForm)
     , m_skin(skin)
@@ -37,6 +37,9 @@ VideoForm::VideoForm(bool skin, QWidget *parent)
     bool vertical = size().height() > size().width();
     if (m_skin) {
         updateStyleSheet(vertical);
+    }
+    if (framelessWindow) {
+        setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     }
 }
 
