@@ -17,9 +17,11 @@ public:
     FileHandler(QObject *parent = nullptr);
     virtual ~FileHandler();
 
-    void pushFileRequest(const QString& serial, const QString& file, const QString& devicePath = "");
-    void installApkRequest(const QString& serial, const QString& apkFile);
     const QString &getDevicePath();
+
+public slots:
+    void onPushFileRequest(const QString& serial, const QString& file, const QString& devicePath = "");
+    void onInstallApkRequest(const QString& serial, const QString& apkFile);
 
 signals:
     void fileHandlerResult(FILE_HANDLER_RESULT processResult, bool isApk = false);

@@ -160,6 +160,7 @@ Note: it is not necessary to keep you Android device connected via USB after you
 - Display Android device screens in real time
 - Real-time mouse and keyboard control of Android devices
 - Screen recording
+- Screenshot to png
 - Wireless connection
 - Supports up to 16 device connections (the number can be higher if your PC performance allows. You need to compile it by yourself)
 - Full-screen display
@@ -176,6 +177,33 @@ Note: it is not necessary to keep you Android device connected via USB after you
     - `Ctrl`+`Shift`+`v` copies the computer clipboard to the device clipboard;
     - `Ctrl`+`v` _pastes_ the computer clipboard as a sequence of text events (but
     breaks non-ASCII characters).
+- Group control
+
+## Shortcuts
+
+ | Action                                 |   Shortcut (Windows)          |   Shortcut (macOS)
+ | -------------------------------------- |:----------------------------- |:-----------------------------
+ | Switch fullscreen mode                 | `Ctrl`+`f`                    | `Cmd`+`f`
+ | Resize window to 1:1 (pixel-perfect)   | `Ctrl`+`g`                    | `Cmd`+`g`
+ | Resize window to remove black borders  | `Ctrl`+`x` \| _Double-click¹_ | `Cmd`+`x`  \| _Double-click¹_
+ | Click on `HOME`                        | `Ctrl`+`h` \| _Middle-click_  | `Ctrl`+`h` \| _Middle-click_
+ | Click on `BACK`                        | `Ctrl`+`b` \| _Right-click²_  | `Cmd`+`b`  \| _Right-click²_
+ | Click on `APP_SWITCH`                  | `Ctrl`+`s`                    | `Cmd`+`s`
+ | Click on `MENU`                        | `Ctrl`+`m`                    | `Ctrl`+`m`
+ | Click on `VOLUME_UP`                   | `Ctrl`+`↑` _(up)_             | `Cmd`+`↑` _(up)_
+ | Click on `VOLUME_DOWN`                 | `Ctrl`+`↓` _(down)_           | `Cmd`+`↓` _(down)_
+ | Click on `POWER`                       | `Ctrl`+`p`                    | `Cmd`+`p`
+ | Power on                               | _Right-click²_                | _Right-click²_
+ | Turn device screen off (keep mirroring)| `Ctrl`+`o`                    | `Cmd`+`o`
+ | Expand notification panel              | `Ctrl`+`n`                    | `Cmd`+`n`
+ | Collapse notification panel            | `Ctrl`+`Shift`+`n`            | `Cmd`+`Shift`+`n`
+ | Copy device clipboard to computer      | `Ctrl`+`c`                    | `Cmd`+`c`
+ | Paste computer clipboard to device     | `Ctrl`+`v`                    | `Cmd`+`v`
+ | Copy computer clipboard to device      | `Ctrl`+`Shift`+`v`            | `Cmd`+`Shift`+`v`
+
+_¹Double-click on black borders to remove them._  
+
+_²Right-click turns the screen on if it was off, presses BACK otherwise._
 
 ## TODO
 [TODO](docs/TODO.md)
@@ -198,7 +226,7 @@ There are several reasons listed as below according to importance (high to low).
 All the dependencies are provided and it is easy to compile.
 
 ### PC client
-1. Set up the Qt development environment on the target platform (Qt >= 5.9.7, vs >= 2015 (mingw not supported))
+1. Set up the Qt development environment on the target platform (Qt >= 5.12.0, vs >= 2017 (mingw not supported))
 2. Clone the project
 3. Open the project root directory all.pro with QtCreator
 4. Compile and run

@@ -15,7 +15,7 @@ public:
 
     void initMouseEventTap() override;
     void quitMouseEventTap() override;
-    void enableMouseEventTap(QWidget* widget, bool enabled) override;
+    void enableMouseEventTap(QRect rc, bool enabled) override;
 
 protected:
     void run() override;

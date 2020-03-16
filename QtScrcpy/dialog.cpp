@@ -98,6 +98,7 @@ void Dialog::initUI()
     ui->formatBox->setCurrentIndex(Config::getInstance().getRecordFormatIndex());
 
     ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
+    ui->framelessCheck->setChecked(Config::getInstance().getFramelessWindow());
 
 #ifdef Q_OS_OSX
     // mac need more width
@@ -383,4 +384,10 @@ void Dialog::on_maxSizeBox_activated(int index)
 void Dialog::on_formatBox_activated(int index)
 {
     Config::getInstance().setRecordFormatIndex(index);
+}
+
+void Dialog::on_framelessCheck_stateChanged(int arg1)
+{
+    Q_UNUSED(arg1)
+    Config::getInstance().setFramelessWindow(ui->framelessCheck->isChecked());
 }
