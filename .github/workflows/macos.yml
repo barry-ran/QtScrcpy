@@ -85,7 +85,7 @@ jobs:
           $authInfo = ("{0}" -f $token)
           $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
           $authInfo = [System.Convert]::ToBase64String($authInfo)
-          $headers = @{Authorization=("${{env.GITHUB_ACTOR}} {0}" -f $authInfo)}
+          $headers = @{Authorization=("${env:GITHUB_ACTOR} {0}" -f $authInfo)}
 
           $response={}
           try {
@@ -119,9 +119,10 @@ jobs:
           $authInfo = ("{0}" -f $token)
           $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
           $authInfo = [System.Convert]::ToBase64String($authInfo)
-          $headers = @{Authorization=("${{env.GITHUB_ACTOR}} {0}" -f $authInfo)}
-          Write-Host 'headers:'$headers
+          $headers = @{Authorization=("${env:GITHUB_ACTOR} {0}" -f $authInfo)}
+          
           $response = Invoke-RestMethod -Uri $url -ContentType 'text/json' -Headers $headers -Method Get
+          Write-Host 'headers:'$headers
           Write-Host 'response:'$response
           [string]$latestUpUrl = $response.upload_url
           Write-Host 'latestUpUrl:'$latestUpUrl
