@@ -73,7 +73,7 @@ jobs:
           # 记录环境变量packageName给后续step
           echo "::set-env name=packageName::$name"
           # 打印环境变量packageName
-          Write-Host 'packageName:'${{ env:packageName }}
+          Write-Host 'packageName:'${{ env.packageName }}
       - name: Release
         id: release
         uses: softprops/action-gh-release@v1
