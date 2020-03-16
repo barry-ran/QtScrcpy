@@ -4,6 +4,11 @@
 #include <QPointer>
 #include <QTime>
 
+#include "controlmsg.h"
+
+class QMouseEvent;
+class QWheelEvent;
+class QKeyEvent;
 class Recorder;
 class Server;
 class VideoBuffer;
@@ -30,20 +35,64 @@ public:
         QString gameScript = "";            // 游戏映射脚本
         bool renderExpiredFrames = false;   // 是否渲染延迟视频帧
     };
+    enum GroupControlState {
+        GCS_FREE = 0,
+        GCS_HOST,
+        GCS_CLIENT,
+    };
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
 
     VideoForm *getVideoForm();
-    Controller *getController();
     Server *getServer();
+    const QString &getSerial();
+    const QSize frameSize();
 
     void updateScript(QString script);
+    Device::GroupControlState controlState();
 
 signals:
     void deviceDisconnect(QString serial);
 
+    // tool bar
+    void switchFullScreen();
+    void postGoBack();
+    void postGoHome();
+    void postGoMenu();
+    void postAppSwitch();
+    void postPower();
+    void postVolumeUp();
+    void postVolumeDown();
+    void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
+    void expandNotificationPanel();
+    void collapseNotificationPanel();
+    void postBackOrScreenOn();
+    void postTextInput(QString& text);
+    void requestDeviceClipboard();
+    void setDeviceClipboard();
+    void clipboardPaste();
+    void pushFileRequest(const QString& serial, const QString& file, const QString& devicePath = "");
+    void installApkRequest(const QString& serial, const QString& apkFile);
+
+    // key map
+    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
+    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
+    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+
+    // self connect signal and slots
+    void screenshot();
+    void showTouch(bool show);
+    void setControlState(Device* device, Device::GroupControlState state);
+    void grabCursor(bool grab);
+
+    // for notify
+    void controlStateChange(Device* device, Device::GroupControlState oldState, Device::GroupControlState newState);
+
 public slots:
     void onScreenshot();
+    void onShowTouch(bool show);
+    void onSetControlState(Device* device, Device::GroupControlState state);
+    void onGrabCursor(bool grab);
 
 private:
     void initSignals();
@@ -65,6 +114,8 @@ private:
 
     QTime m_startTimeCount;
     DeviceParams m_params;
+
+    GroupControlState m_controlState = GCS_FREE;
 };
 
 #endif // DEVICE_H

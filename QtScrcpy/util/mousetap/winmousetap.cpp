@@ -24,17 +24,12 @@ void WinMouseTap::quitMouseEventTap()
 
 }
 
-void WinMouseTap::enableMouseEventTap(QWidget *widget, bool enabled)
+void WinMouseTap::enableMouseEventTap(QRect rc, bool enabled)
 {
-    if (!widget) {
+    if (enabled && rc.isEmpty()) {
         return;
     }
     if(enabled) {
-        QRect rc(widget->parentWidget()->mapToGlobal(widget->pos())
-                 , widget->size());
-        // high dpi support
-        rc.setTopLeft(rc.topLeft() * widget->devicePixelRatio());
-        rc.setBottomRight(rc.bottomRight() * widget->devicePixelRatio());
         RECT mainRect;
         mainRect.left = (LONG)rc.left();
         mainRect.right = (LONG)rc.right();

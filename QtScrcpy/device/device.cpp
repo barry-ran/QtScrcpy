@@ -13,6 +13,7 @@
 #include "controller.h"
 #include "config.h"
 #include "avframeconvert.h"
+#include "mousetap/mousetap.h"
 extern "C"
 {
 #include "libavutil/imgutils.h"
@@ -34,15 +35,8 @@ Device::Device(DeviceParams params, QObject *parent)
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(params.gameScript, this);
-        m_videoForm = new VideoForm(Config::getInstance().getSkin());
-        m_videoForm->setSerial(m_params.serial);
-        if (m_controller) {
-            m_videoForm->setController(m_controller);
-        }
-        if (m_fileHandler) {
-            m_videoForm->setFileHandler(m_fileHandler);
-        }
-        m_videoForm->show();
+        m_videoForm = new VideoForm(Config::getInstance().getFramelessWindow(), Config::getInstance().getSkin());
+        m_videoForm->setDevice(this);
     }
 
     m_stream = new Stream(this);
@@ -76,6 +70,7 @@ Device::~Device()
         delete m_vb;
     }
     if (m_videoForm) {
+        m_videoForm->close();
         delete m_videoForm;
     }
     emit deviceDisconnect(m_params.serial);
@@ -86,14 +81,23 @@ VideoForm *Device::getVideoForm()
     return m_videoForm;
 }
 
-Controller *Device::getController()
-{
-    return m_controller;
-}
-
 Server *Device::getServer()
 {
     return m_server;
+}
+
+const QString &Device::getSerial()
+{
+    return m_params.serial;
+}
+
+const QSize Device::frameSize()
+{
+    QSize size;
+    if (!m_videoForm) {
+        return size;
+    }
+    return m_videoForm->frameSize();
 }
 
 void Device::updateScript(QString script)
@@ -115,35 +119,86 @@ void Device::onScreenshot()
     m_vb->unLock();
 }
 
+void Device::onShowTouch(bool show)
+{
+    AdbProcess* adb = new AdbProcess();
+    if (!adb) {
+        return;
+    }
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+        if (AdbProcess::AER_SUCCESS_START != processResult) {
+            sender()->deleteLater();
+        }
+    });
+    adb->setShowTouchesEnabled(getSerial(), show);
+
+    qInfo() << getSerial() << " show touch " << (show ? "enable" : "disable");
+}
+
 void Device::initSignals()
 {
-    if (m_controller && m_videoForm) {
-        connect(m_controller, &Controller::grabCursor, m_videoForm, &VideoForm::onGrabCursor);
-        connect(m_videoForm, &VideoForm::screenshot, this, &Device::onScreenshot);
+    connect(this, &Device::screenshot, this, &Device::onScreenshot);
+    connect(this, &Device::showTouch, this, &Device::onShowTouch);
+    connect(this, &Device::setControlState, this, &Device::onSetControlState);
+    connect(this, &Device::grabCursor, this, &Device::onGrabCursor);
+
+    if (m_controller) {
+        connect(m_controller, &Controller::grabCursor, this, &Device::grabCursor);
+    }
+    if (m_controller) {
+        connect(this, &Device::postGoBack, m_controller, &Controller::onPostGoBack);
+        connect(this, &Device::postGoHome, m_controller, &Controller::onPostGoHome);
+        connect(this, &Device::postGoMenu, m_controller, &Controller::onPostGoMenu);
+        connect(this, &Device::postAppSwitch, m_controller, &Controller::onPostAppSwitch);
+        connect(this, &Device::postPower, m_controller, &Controller::onPostPower);
+        connect(this, &Device::postVolumeUp, m_controller, &Controller::onPostVolumeUp);
+        connect(this, &Device::postVolumeDown, m_controller, &Controller::onPostVolumeDown);
+        connect(this, &Device::setScreenPowerMode, m_controller, &Controller::onSetScreenPowerMode);
+        connect(this, &Device::expandNotificationPanel, m_controller, &Controller::onExpandNotificationPanel);
+        connect(this, &Device::collapseNotificationPanel, m_controller, &Controller::onCollapseNotificationPanel);
+        connect(this, &Device::mouseEvent, m_controller, &Controller::onMouseEvent);
+        connect(this, &Device::wheelEvent, m_controller, &Controller::onWheelEvent);
+        connect(this, &Device::keyEvent, m_controller, &Controller::onKeyEvent);
+
+        connect(this, &Device::postBackOrScreenOn, m_controller, &Controller::onPostBackOrScreenOn);
+        connect(this, &Device::requestDeviceClipboard, m_controller, &Controller::onRequestDeviceClipboard);
+        connect(this, &Device::setDeviceClipboard, m_controller, &Controller::onSetDeviceClipboard);
+        connect(this, &Device::clipboardPaste, m_controller, &Controller::onClipboardPaste);
+        connect(this, &Device::postTextInput, m_controller, &Controller::onPostTextInput);
     }
     if (m_videoForm) {
         connect(m_videoForm, &VideoForm::destroyed, this, [this](QObject *obj){
             Q_UNUSED(obj)
             deleteLater();
         });
+
+        connect(this, &Device::switchFullScreen, m_videoForm, &VideoForm::onSwitchFullScreen);
     }
     if (m_fileHandler) {
+        connect(this, &Device::pushFileRequest, m_fileHandler, &FileHandler::onPushFileRequest);
+        connect(this, &Device::installApkRequest, m_fileHandler, &FileHandler::onInstallApkRequest);
         connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk){
-            QString tips = "";
+            QString tipsType = "";
             if (isApk) {
-                tips = tr("install apk");
+                tipsType = tr("install apk");
             } else {
-                tips = tr("file transfer");
+                tipsType = tr("file transfer");
             }
+            QString tips;
             if (FileHandler::FAR_IS_RUNNING == processResult && m_videoForm) {
-                QMessageBox::warning(m_videoForm, "QtScrcpy", tr("wait current %1 to complete").arg(tips), QMessageBox::Ok);
+                tips = tr("wait current %1 to complete").arg(tipsType);
             }
             if (FileHandler::FAR_SUCCESS_EXEC == processResult && m_videoForm) {
-                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 complete, save in %2").arg(tips).arg(Config::getInstance().getPushFilePath()), QMessageBox::Ok);
+                tips = tr("%1 complete, save in %2").arg(tipsType).arg(Config::getInstance().getPushFilePath());
             }
             if (FileHandler::FAR_ERROR_EXEC == processResult && m_videoForm) {
-                QMessageBox::information(m_videoForm, "QtScrcpy", tr("%1 failed").arg(tips), QMessageBox::Ok);
+                tips = tr("%1 failed").arg(tipsType);
             }
+            qInfo() << tips;
+            if (m_controlState == GCS_CLIENT) {
+                return;
+            }
+            QMessageBox::information(m_videoForm, "QtScrcpy", tips, QMessageBox::Ok);
         });
     }
 
@@ -164,6 +219,16 @@ void Device::initSignals()
                 if (m_videoForm) {
                     m_videoForm->setWindowTitle(deviceName);
                     m_videoForm->updateShowSize(size);
+
+                    QRect rc = Config::getInstance().getRect(getSerial());
+                    if (rc.isValid()) {
+                        m_videoForm->move(rc.topLeft());
+                        m_videoForm->resize(rc.size());
+                        // TODO: setGeometry magneticwidget bug
+                        //m_videoForm->setGeometry(rc);
+                    }
+                    // videoForm delay show
+                    m_videoForm->show();
                 }
 
                 // init recorder
@@ -182,7 +247,7 @@ void Device::initSignals()
 
                 // 显示界面时才自动息屏（m_params.display）
                 if (m_params.closeScreen && m_params.display && m_controller) {
-                    m_controller->setScreenPowerMode(ControlMsg::SPM_OFF);
+                    emit m_controller->onSetScreenPowerMode(ControlMsg::SPM_OFF);
                 }
             }
         });
@@ -235,6 +300,34 @@ void Device::startServer()
     });
 }
 
+void Device::onSetControlState(Device* device, Device::GroupControlState state)
+{
+    Q_UNUSED(device)
+    if (m_controlState == state) {
+        return;
+    }
+    GroupControlState oldState = m_controlState;
+    m_controlState = state;
+    emit controlStateChange(this, oldState, m_controlState);
+}
+
+void Device::onGrabCursor(bool grab)
+{
+    if (!m_videoForm) {
+        return;
+    }
+    if (m_controlState == GCS_CLIENT) {
+        return;
+    }
+    QRect rc = m_videoForm->getGrabCursorRect();
+    MouseTap::getInstance()->enableMouseEventTap(rc, grab);
+}
+
+Device::GroupControlState Device::controlState()
+{
+    return m_controlState;
+}
+
 bool Device::saveFrame(const AVFrame* frame)
 {
     if (!frame) {
@@ -276,10 +369,10 @@ bool Device::saveFrame(const AVFrame* frame)
     }
     QDateTime dateTime = QDateTime::currentDateTime();
     QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
-    fileName = Config::getInstance().getTitle() + fileName + ".jpg";
+    fileName = Config::getInstance().getTitle() + fileName + ".png";
     QDir dir(fileDir);
     absFilePath = dir.absoluteFilePath(fileName);
-    ret = rgbImage.save(absFilePath);
+    ret = rgbImage.save(absFilePath, "PNG", 100);
     if (!ret) {
         return false;
     }

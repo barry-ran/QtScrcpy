@@ -10,31 +10,27 @@ class videoForm;
 
 struct AVFrame;
 class ToolForm;
-class Controller;
+class Device;
 class FileHandler;
 class QYUVOpenGLWidget;
 class VideoForm : public QWidget
 {
     Q_OBJECT
 public:
-    explicit VideoForm(bool skin = true, QWidget *parent = 0);
+    explicit VideoForm(bool framelessWindow = false, bool skin = true, QWidget *parent = 0);
     ~VideoForm();
 
-    void switchFullScreen();    
     void staysOnTop(bool top = true);
     void updateShowSize(const QSize &newSize);
     void updateRender(const AVFrame *frame);
-    void setController(Controller *controller);
-    Controller* getController();
-    void setFileHandler(FileHandler *fileHandler);
-    void setSerial(const QString &serial);
-    const QString& getSerial();
-
-signals:
-    void screenshot();
+    void setDevice(Device *device);
+    QRect getGrabCursorRect();
+    const QSize &frameSize();
+    void resizeSquare();
+    void removeBlackRect();
 
 public slots:
-    void onGrabCursor(bool grab);
+    void onSwitchFullScreen();
 
 private:    
     void updateStyleSheet(bool vertical);
@@ -43,11 +39,14 @@ private:
     
     void showToolForm(bool show = true);
     void moveCenter();
+    void installShortcut();
+    QRect getScreenRect();
 
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
@@ -55,6 +54,7 @@ protected:
     void paintEvent(QPaintEvent *);
     void showEvent(QShowEvent *event);
     void resizeEvent(QResizeEvent *event);
+    void closeEvent(QCloseEvent *event);
 
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
@@ -76,9 +76,7 @@ private:
     QPoint m_fullScreenBeforePos;
 
     //outside member
-    QString m_serial = "";
-    QPointer<Controller> m_controller;
-    QPointer<FileHandler> m_fileHandler;
+    QPointer<Device> m_device;
 };
 
 #endif // VIDEOFORM_H

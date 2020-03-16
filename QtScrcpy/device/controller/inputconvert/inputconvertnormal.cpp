@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "inputconvertnormal.h"
 
 InputConvertNormal::InputConvertNormal(Controller* controller)
@@ -63,10 +65,10 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameS
     qint32 vScroll = 0;
     switch (from->orientation()) {
     case Qt::Horizontal:
-        hScroll = from->delta();
+        hScroll = from->delta() / abs(from->delta()) * 2;
         break;
     case Qt::Vertical:
-        vScroll = from->delta();
+        vScroll = from->delta() / abs(from->delta()) * 2;
         break;
     }
 

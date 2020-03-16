@@ -7,7 +7,6 @@
 
 ## 中优先级
 - 脚本
-- 群控
 - 软解
 - opengles 3.0 兼容性参考[这里](https://github.com/libretro/glsl-shaders/blob/master/nnedi3/shaders/yuv-to-rgb-2x.glsl)
 

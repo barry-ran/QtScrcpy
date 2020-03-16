@@ -1,6 +1,5 @@
 #import <Cocoa/Cocoa.h>
 #include <QDebug>
-#include <QWidget>
 
 #include "cocoamousetap.h"
 
@@ -20,77 +19,55 @@ typedef struct MouseEventTapData{
     CFMachPortRef tap = Q_NULLPTR;
     CFRunLoopRef runloop = Q_NULLPTR;
     CFRunLoopSourceRef runloopSource = Q_NULLPTR;
-    QWidget* widget = Q_NULLPTR;
+    QRect rc;
 } MouseEventTapData;
 
 static CGEventRef Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)
 {
     Q_UNUSED(proxy);
     MouseEventTapData *tapdata = (MouseEventTapData*)refcon;
-
-    NSView *nsview;
-    NSWindow *nswindow;
-    NSRect windowRect;
-    NSRect newWindowRect;
-    CGPoint eventLocation;
-
     switch (type) {
         case kCGEventTapDisabledByTimeout:
             {
                 CGEventTapEnable(tapdata->tap, true);
-                return NULL;
+                return nullptr;
             }
         case kCGEventTapDisabledByUserInput:
             {
-                return NULL;
+                return nullptr;
             }
         default:
             break;
     }
 
 
-    if (!tapdata->widget) {
+    if (tapdata->rc.isEmpty()) {
         return event;
     }
-    // get nswindow from qt widget
-    nsview = (NSView *)tapdata->widget->window()->winId();
-    if (!nsview) {
-        return event;
-    }
-    nswindow = [nsview window];
 
-    eventLocation = CGEventGetUnflippedLocation(event);
-    windowRect = [nswindow contentRectForFrameRect:[nswindow frame]];
-
-    windowRect.origin.x += 100;
-    windowRect.origin.y += 30;
-    windowRect.size.width -= 180;
-    windowRect.size.height -= 60;
-
-    newWindowRect = NSMakeRect(windowRect.origin.x, windowRect.origin.y,
-                            windowRect.size.width - 10, windowRect.size.height - 10);
-    //qDebug() << newWindowRect.origin.x << newWindowRect.origin.y << newWindowRect.size.width << newWindowRect.size.height;
-
-    if (!NSMouseInRect(NSPointFromCGPoint(eventLocation), newWindowRect, NO)) {
-
-        /* This is in CGs global screenspace coordinate system, which has a
-         * flipped Y.
-         */
-        CGPoint newLocation = CGEventGetLocation(event);
-
-        if (eventLocation.x < NSMinX(windowRect)) {
-            newLocation.x = NSMinX(windowRect);
-        } else if (eventLocation.x >= NSMaxX(windowRect)) {
-            newLocation.x = NSMaxX(windowRect) - 1.0;
+    NSRect limitWindowRect = NSMakeRect(tapdata->rc.left(), tapdata->rc.top(),
+                                   tapdata->rc.width(), tapdata->rc.height());
+    // check rect samll than limit rect
+    NSRect checkWindowRect = NSMakeRect(limitWindowRect.origin.x + 10, limitWindowRect.origin.y + 10,
+                            limitWindowRect.size.width - 10, limitWindowRect.size.height - 10);
+    /* This is in CGs global screenspace coordinate system, which has a
+     * flipped Y.
+     */
+    CGPoint eventLocation = CGEventGetLocation(event);
+    if (!NSMouseInRect(NSPointFromCGPoint(eventLocation), checkWindowRect, NO)) {
+        if (eventLocation.x <= NSMinX(limitWindowRect)) {
+            eventLocation.x = NSMinX(limitWindowRect) + 1.0;
+        } else if (eventLocation.x >= NSMaxX(limitWindowRect)) {
+            eventLocation.x = NSMaxX(limitWindowRect) - 1.0;
         }
 
-        if (eventLocation.y <= NSMinY(windowRect)) {
-            newLocation.y -= (NSMinY(windowRect) - eventLocation.y + 1);
-        } else if (eventLocation.y > NSMaxY(windowRect)) {
-            newLocation.y += (eventLocation.y - NSMaxY(windowRect));
+        if (eventLocation.y <= NSMinY(limitWindowRect)) {
+            eventLocation.y = NSMinY(limitWindowRect) + 1.0;
+        } else if (eventLocation.y >= NSMaxY(limitWindowRect)) {
+            eventLocation.y = NSMaxY(limitWindowRect) - 1.0;
         }
 
-        CGWarpMouseCursorPosition(newLocation);
+        CGWarpMouseCursorPosition(eventLocation);
         CGAssociateMouseAndMouseCursorPosition(YES);
 
         if ((CGEventMaskBit(type) & movementEventsMask) == 0) {
@@ -99,7 +76,7 @@ static CGEventRef Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type
              * movement events, since they mean that our warp cursor above
              * behaves strangely.
              */
-            CGEventSetLocation(event, newLocation);
+            CGEventSetLocation(event, eventLocation);
         }
     }
 
@@ -171,11 +148,11 @@ void CocoaMouseTap::quitMouseEventTap()
     }
 }
 
-void CocoaMouseTap::enableMouseEventTap(QWidget* widget, bool enabled)
+void CocoaMouseTap::enableMouseEventTap(QRect rc, bool enabled)
 {
     if (m_tapData && m_tapData->tap)
     {
-        enabled ? m_tapData->widget = widget : m_tapData->widget = Q_NULLPTR;
+        enabled ? m_tapData->rc = rc : m_tapData->rc = QRect();
         CGEventTapEnable(m_tapData->tap, enabled);
     }
 }

@@ -22,27 +22,29 @@ public:
 
     void updateScript(QString gameScript = "");
 
-    // turn the screen on if it was off, press BACK otherwise
-    void postTurnOn();
-    void postGoHome();
-    void postGoMenu();
-    void postGoBack();
-    void postAppSwitch();
-    void postPower();
-    void postVolumeUp();
-    void postVolumeDown();
-    void expandNotificationPanel();
-    void collapseNotificationPanel();
-    void requestDeviceClipboard();
-    void setDeviceClipboard();
-    void clipboardPaste();
-    void postTextInput(QString& text);
-    void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
+public slots:
+    void onPostGoBack();
+    void onPostGoHome();
+    void onPostGoMenu();
+    void onPostAppSwitch();
+    void onPostPower();
+    void onPostVolumeUp();
+    void onPostVolumeDown();
+    void onExpandNotificationPanel();
+    void onCollapseNotificationPanel();
+    void onSetScreenPowerMode(ControlMsg::ScreenPowerMode mode);
 
     // for input convert
-    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
-    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
-    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+    void onMouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
+    void onWheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
+    void onKeyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+
+    // turn the screen on if it was off, press BACK otherwise
+    void onPostBackOrScreenOn();
+    void onRequestDeviceClipboard();
+    void onSetDeviceClipboard();
+    void onClipboardPaste();
+    void onPostTextInput(QString& text);
 
 signals:
     void grabCursor(bool grab);
