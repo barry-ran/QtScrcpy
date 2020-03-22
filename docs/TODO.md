@@ -7,13 +7,17 @@
 
 ## 中优先级
 - 脚本
-- 软解
+- 某些机器软解不行
 - opengles 3.0 兼容性参考[这里](https://github.com/libretro/glsl-shaders/blob/master/nnedi3/shaders/yuv-to-rgb-2x.glsl)
 
 ## 高优先级
 - linux打包以及版本号
 - 关于
 - 旋转
+- mac版本号模板
+- tag create release
+- ubuntu自动打包
+- 版本号抽离优化
 
 # mark
 ## ffmpeg
