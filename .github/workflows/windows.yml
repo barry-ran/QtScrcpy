@@ -91,5 +91,14 @@ jobs:
       # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
       - uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.publish_dir }}
+          name: ${{ env.publish_dir }}-artifact
           path: ci\build\${{ env.publish_dir }}
+      # 上传release
+      # https://github.com/softprops/action-gh-release
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ci/build/${{ env.publish_dir }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
