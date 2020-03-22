@@ -6,8 +6,9 @@ echo check ENV
 echo ---------------------------------------------------------------
 
 # 从环境变量获取必要参数
-# 例如 /home/barry/Qt5.9.6/5.9.6/gcc_64
-echo ENV_QT_GCC $ENV_QT_GCC
+# 例如 /home/barry/Qt5.9.6/5.9.6
+echo ENV_QT_PATH $ENV_QT_PATH
+qt_gcc_path=$ENV_QT_PATH/gcc_64
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -39,7 +40,7 @@ fi
 echo current build mode: $build_mode
 
 # 环境变量设置
-export PATH=$ENV_QT_GCC/bin:$PATH
+export PATH=$qt_gcc_path/bin:$PATH
 
 echo
 echo

@@ -1,12 +1,11 @@
 name: Windows
+# 触发规则详解 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
 on: 
-  # push代码时触发workflow
   push:
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
       - '.github/workflows/windows.yml'
-  # pull_request时触发workflow
   pull_request:
     paths:
       - 'QtScrcpy/**'
@@ -15,151 +14,94 @@ on:
 jobs:
   build:
     name: Build
-    # 运行平台， windows-latest目前是windows server 2019,选择2016是2016安装的是vs2017
-    # https://github.com/actions/virtual-environments/blob/master/images/win/Windows2019-Readme.md
-    # https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
+    # windows-latest目前是windows server 2019,选择2016是2016安装的是vs2017
+    # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
     runs-on: windows-2016
+
+    # 矩阵配置 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
     strategy:
-      # 矩阵配置
       matrix:
-        qt_ver: [5.12.6]
-        qt_target: [desktop]
-        # mingw用不了
-        # qt_arch: [win64_msvc2017_64, win32_msvc2017, win32_mingw53,win32_mingw73]
-        qt_arch: [win64_msvc2017_64, win32_msvc2017]
-        # 额外设置msvc_arch
+        qt-ver: [5.12.6]
+        qt-arch: [win64_msvc2017_64, win32_msvc2017]
+        # 配置qt-arch的额外设置msvc-arch，qt-arch-install
         include:
-          - qt_arch: win64_msvc2017_64
-            msvc_arch: x64
-            qt_arch_install: msvc2017_64
-          - qt_arch: win32_msvc2017
-            msvc_arch: x86
-            qt_arch_install: msvc2017
+          - qt-arch: win64_msvc2017_64
+            msvc-arch: x64
+            qt-arch-install: msvc2017_64
+          - qt-arch: win32_msvc2017
+            msvc-arch: x86
+            qt-arch-install: msvc2017
+    # job env,所有steps都可以访问
+    # 不同级别env详解 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#env
+    # 使用表达式语法${{}}访问上下文 https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
     env:
-      targetName: QtScrcpy.exe
+      target-name: QtScrcpy
+      vcvarsall-path: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
+      qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
+      plantform-des: win
     # 步骤
     steps:
       - name: Cache Qt
-        id: WindowsCacheQt
+        id: cache-qt
         uses: actions/cache@v1
         with:
-          path: ../../Qt5/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
-          key: ${{ runner.os }}-Qt5.12.6/${{matrix.qt_ver}}/${{matrix.qt_arch}}
-      - name: Setup Qt
-        if: steps.WindowsCacheQt.outputs.cache-hit == 'true'
-        shell: pwsh
-        env:
-          QtPath: ../../Qt5/${{matrix.qt_ver}}/${{matrix.qt_arch_install}}
-        run: |
-          $qt_Path=${env:QtPath}
-          echo "::set-env name=Qt5_Dir::$qt_Path"
-          echo "::add-path::$qt_Path/bin"          
+          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
+          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch }}        
       # 安装Qt
       - name: Install Qt
-        if: steps.WindowsCacheQt.outputs.cache-hit != 'true'
         # 使用外部action。这个action专门用来安装Qt
         uses: jurplel/install-qt-action@v2.0.0
         with:
           # Version of Qt to install
-          version: ${{ matrix.qt_ver }}
+          version: ${{ matrix.qt-ver }}
           # Target platform for build
-          target: ${{ matrix.qt_target }}
+          target: desktop
           # Architecture for Windows/Android
-          arch: ${{ matrix.qt_arch }}
+          arch: ${{ matrix.qt-arch }}
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
       # 拉取代码
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
       # 编译msvc
       - name: Build MSVC
+        # shell介绍 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#using-a-specific-shell
         shell: cmd
         env:
-          ENV_VCVARSALL: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
-          ENV_QT_PATH: 'd:\a\Qt5\5.12.6'
+          ENV_VCVARSALL: ${{ env.vcvarsall-path }}
+          ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
-          call "ci\win\build_for_win.bat" release ${{ matrix.msvc_arch }}
+          call "ci\win\build_for_win.bat" release ${{ matrix.msvc-arch }}
+      # 获取ref最后一个/后的内容
+      - name: Get the version
+        shell: bash
+        id: get-version
+        # ${ GITHUB_REF/refs\/tags\// }是linux shell ${}的变量替换语法
+        run: echo ::set-output name=version::${GITHUB_REF##*/}
       # tag 打包
       - name: Package
-        if: startsWith(github.event.ref, 'refs/tags/')
+        id: package
         env:
-          publish_dir: QtScrcpy-win-${{matrix.msvc_arch}}
-          ref: ${{ github.event.ref }}
-        shell: pwsh
+          ENV_QT_PATH: ${{ env.qt-install-path }}
+          publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.msvc-arch }}-${{ steps.get-version.outputs.version }}
         run: |
-          [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$full_publish_dir = ${env:publish_dir} + '-' + ${tag}
-          cmd.exe /c ci\win\publish_for_win.bat ${{matrix.msvc_arch}} ..\build\$full_publish_dir
+          cmd.exe /c ci\win\publish_for_win.bat ${{ matrix.msvc-arch }} ..\build\${{ env.publish_name }}
           # 打包zip
-          Compress-Archive -Path ci\build\$full_publish_dir ci\build\${full_publish_dir}.zip
-          # 记录环境变量packageName给后续step
-          $name = $full_publish_dir
-          echo "::set-env name=packageName::$name"
-          # 打印环境变量packageName
-          Write-Host 'packageName:'${env:packageName}
-      # 查询Release
-      - name: Query Release
-        if: startsWith(github.event.ref, 'refs/tags/')
-        shell: pwsh
-        env:
-          githubFullName: ${{ github.event.repository.full_name }}
-          ref: ${{ github.event.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
-
-          $token = ${env:github_token}
-          $authInfo = ("{0}" -f $token)
-          $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
-          $authInfo = [System.Convert]::ToBase64String($authInfo)
-          $headers = @{Authorization=("barry-ran {0}" -f $authInfo)}
-
-          $response={}
-          try {
-            $response = Invoke-RestMethod -Uri $url -Headers $headers -Method Get
-          } catch {
-            Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__ 
-            Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
-            # 没查到
-            return 1
-          }
-          [string]$latestUpUrl = $response.upload_url
-          Write-Host 'latestUpUrl:'$latestUpUrl
-          if ($latestUpUrl.Length -eq 0) {
-            # 没查到
-            return 1
-          }
-      # 获取上传url
-      - name: Get Release Url
-        if: startsWith(github.event.ref, 'refs/tags/')
-        shell: pwsh
-        env:
-          githubFullName: ${{ github.event.repository.full_name }}
-          ref: ${{ github.event.ref }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          [string]$tag = ${env:ref}.Substring(${env:ref}.LastIndexOf('/') + 1)
-          [string]$url = 'https://api.github.com/repos/' + ${env:githubFullName} + '/releases/tags/' + ${tag}
-          # github token防止api rate limite，否则一个小时只能60个api请求
-          $token = ${env:github_token}
-          $authInfo = ("{0}" -f $token)
-          $authInfo = [System.Text.Encoding]::UTF8.GetBytes($authInfo)
-          $authInfo = [System.Convert]::ToBase64String($authInfo)
-          $headers = @{Authorization=("barry-ran {0}" -f $authInfo)}
-          $response = Invoke-RestMethod -Uri $url -ContentType 'text/json' -Headers $headers -Method Get
-          [string]$latestUpUrl = $response.upload_url
-          Write-Host 'latestUpUrl:'$latestUpUrl
-          echo "::set-env name=uploadUrl::$latestUpUrl"
-          Write-Host 'env uploadUrl:'${env:uploadUrl}
-      # tag 上传Release
-      - name: Upload Release
-        id: uploadRelease
-        if: startsWith(github.event.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: actions/upload-release-asset@v1.0.1
+          Compress-Archive -Path ci\build\${{ env.publish_name }} ci\build\${{ env.publish_name }}.zip
+          echo "::set-output name=package-name::${{ env.publish_name }}"
+      # 上传artifacts
+      # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
+      - uses: actions/upload-artifact@v1
         with:
-          upload_url: ${{ env.uploadUrl }}
-          asset_path: ci\build\${{ env.packageName }}.zip
-          asset_name: ${{ env.packageName }}.zip
-          asset_content_type: application/zip
+          name: ${{ steps.package.outputs.package-name }}.zip
+          path: ci\build\${{ steps.package.outputs.package-name }}
+      # Upload to release
+      - name: Upload Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ci\build\${{ steps.package.outputs.package-name }}.zip
+          asset_name: ${{ steps.package.outputs.package-name }}.zip
+          tag: ${{ github.ref }}
+          overwrite: true
