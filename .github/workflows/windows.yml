@@ -47,7 +47,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
-          key: ${{ runner.os }}/${{matrix.qt-ver}}/${{matrix.qt-arch}}        
+          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch }}        
       # 安装Qt
       - name: Install Qt
         # 使用外部action。这个action专门用来安装Qt
@@ -73,12 +73,12 @@ jobs:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           call "ci\win\build_for_win.bat" release ${{ matrix.msvc-arch }}
-      # 从tag获取版本号
+      # 获取ref最后一个/后的内容
       - name: Get the version
         shell: bash
         id: get-version
         # ${ GITHUB_REF/refs\/tags\// }是linux shell ${}的变量替换语法
-        run: echo ::set-output name=version::${GITHUB_REF/refs\/tags\//}
+        run: echo ::set-output name=version::${GITHUB_REF##*/}
       # tag 打包
       - name: Package
         env:
@@ -91,5 +91,5 @@ jobs:
       # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
       - uses: actions/upload-artifact@v1
         with:
-        name: ${{ env.publish_dir }}
-        path: ci\build\${{ env.publish_dir }}
+          name: ${{ env.publish_dir }}
+          path: ci\build\${{ env.publish_dir }}
