@@ -58,8 +58,8 @@ jobs:
         run: |
           ci/mac/publish_for_mac.sh ../build
           ci/mac/package_for_mac.sh
-          mv ci/build/QtScrcpy.app ci/build/${{ publish_name }}.app
-          mv ci/build/QtScrcpy.dmg ci/build/${{ publish_name }}.dmg
+          mv ci/build/QtScrcpy.app ci/build/${{ env.publish_name }}.app
+          mv ci/build/QtScrcpy.dmg ci/build/${{ env.publish_name }}.dmg
           echo "::set-env name=artifact-name::${{ env.publish_name }}.app"
       - uses: actions/upload-artifact@v1
         with:
