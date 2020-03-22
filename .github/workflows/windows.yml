@@ -22,7 +22,6 @@ jobs:
     strategy:
       matrix:
         qt-ver: [5.12.6]
-        qt-target: [desktop]
         qt-arch: [win64_msvc2017_64, win32_msvc2017]
         # 配置qt-arch的额外设置msvc-arch，qt-arch-install
         include:
@@ -56,7 +55,7 @@ jobs:
           # Version of Qt to install
           version: ${{ matrix.qt-ver }}
           # Target platform for build
-          target: ${{ matrix.qt-target }}
+          target: desktop
           # Architecture for Windows/Android
           arch: ${{ matrix.qt-arch }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}

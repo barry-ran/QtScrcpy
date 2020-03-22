@@ -18,8 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-16.04,ubuntu-18.04]
-        qt_ver: [5.12.6]
-        qt-target: [desktop]
+        qt-ver: [5.12.6]
         qt-arch-install: [gcc_64]
         gcc-arch: [x64]
     env:
