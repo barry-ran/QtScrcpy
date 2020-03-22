@@ -80,6 +80,7 @@ jobs:
         run: echo ::set-output name=version::${GITHUB_REF##*/}
       # tag 打包
       - name: Package
+        id: package
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
           publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.msvc-arch }}-${{ steps.get-version.outputs.version }}
@@ -87,20 +88,20 @@ jobs:
           cmd.exe /c ci\win\publish_for_win.bat ${{ matrix.msvc-arch }} ..\build\${{ env.publish_name }}
           # 打包zip
           Compress-Archive -Path ci\build\${{ env.publish_name }} ci\build\${{ env.publish_name }}.zip
-          echo "::set-env name=artifact-name::${{ env.publish_name }}"
+          echo "::set-output name=package-name::${{ env.publish_name }}"
       # 上传artifacts
       # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
       - uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.artifact-name }}.zip
-          path: ci\build\${{ env.artifact-name }}
+          name: ${{ steps.package.outputs.package-name }}.zip
+          path: ci\build\${{ steps.package.outputs.package-name }}
       # Upload to release
       - name: Upload Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ci\build\${{ env.publish_name }}.zip
-          asset_name: ${{ env.publish_name }}.zip
+          file: ci\build\${{ steps.package.outputs.package-name }}.zip
+          asset_name: ${{ steps.package.outputs.package-name }}.zip
           tag: ${{ github.ref }}
           overwrite: true

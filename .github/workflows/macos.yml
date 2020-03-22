@@ -51,6 +51,7 @@ jobs:
         run: echo ::set-output name=version::${GITHUB_REF##*/}
       # 打包
       - name: Package
+        id: package
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
           publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.clang-arch }}-${{ steps.get-version.outputs.version }}
@@ -59,18 +60,18 @@ jobs:
           ci/mac/package_for_mac.sh
           mv ci/build/QtScrcpy.app ci/build/${{ env.publish_name }}.app
           mv ci/build/QtScrcpy.dmg ci/build/${{ env.publish_name }}.dmg
-          echo "::set-env name=artifact-name::${{ env.publish_name }}.app"
+          echo "::set-output name=package-name::${{ env.publish_name }}"
       - uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.artifact-name }}.zip
-          path: ci/build/${{ env.artifact-name }}
+          name: ${{ steps.package.outputs.package-name }}.zip
+          path: ci/build/${{ steps.package.outputs.package-name }}.app
       # Upload to release
       - name: Upload Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ci/build/${{ env.publish_name }}.dmg
-          asset_name: ${{ env.publish_name }}.dmg
+          file: ci/build/${{ steps.package.outputs.package-name }}.dmg
+          asset_name: ${{ steps.package.outputs.package-name }}.dmg
           tag: ${{ github.ref }}
           overwrite: true
