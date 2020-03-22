@@ -18,8 +18,8 @@ jobs:
       matrix:
         qt-ver: [5.12.6]
         qt-target: [desktop]
-        qt-arch-install: clang_64
-        clang-arch: x64
+        qt-arch-install: [clang_64]
+        clang-arch: [x64]
     env:
       target-name: QtScrcpy
       qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
