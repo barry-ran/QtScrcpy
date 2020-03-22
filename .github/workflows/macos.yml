@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v1
         with:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
-          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}   
+          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt
         uses: jurplel/install-qt-action@v2.0.0
         with:
@@ -64,14 +64,14 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: ${{ env.artifact-name }}.zip
-          path: ci\build\${{ env.artifact-name }}
+          path: ci/build/${{ env.artifact-name }}
       # Upload to release
       - name: Upload Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v1-release
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ci\build\${{ env.publish_name }}.dmg
+          file: ci/build/${{ env.publish_name }}.dmg
           asset_name: ${{ env.publish_name }}.dmg
           tag: ${{ github.ref }}
           overwrite: true

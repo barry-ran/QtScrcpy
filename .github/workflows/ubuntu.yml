@@ -19,34 +19,31 @@ jobs:
       matrix:
         os: [ubuntu-16.04,ubuntu-18.04]
         qt_ver: [5.12.6]
-        qt_arch: [gcc_64]
+        qt-target: [desktop]
+        qt-arch-install: [gcc_64]
+        gcc-arch: [x64]
+    env:
+      target-name: QtScrcpy
+      qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
+      plantform-des: ubuntu
     steps:
       - name: Cache Qt
-        id: UbuntuCacheQt
+        id: cache-qt
         uses: actions/cache@v1
         with:
-          path: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
-          key: ${{ runner.os }}-Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}    
-      - name: Setup Qt
-        if: steps.UbuntuCacheQt.outputs.cache-hit == 'true'
-        shell: pwsh
-        env:
-          QtPath: ../Qt/${{matrix.qt_ver}}/${{matrix.qt_arch}}
-        run: |
-          $qt_Path=${env:QtPath}
-          echo "::set-env name=Qt5_Dir::$qt_Path"
-          echo "::add-path::$qt_Path/bin"
+          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
+          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt
-        if: steps.UbuntuCacheQt.outputs.cache-hit != 'true'
         uses: jurplel/install-qt-action@v2.0.0
         with:
-          version: ${{ matrix.qt_ver }}
+          version: ${{ matrix.qt-ver }}
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
       - name: Ubuntu install GL library
         run: sudo apt-get install -y libglew-dev libglfw3-dev
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
       - name: Build Ubuntu
-        run: |
-          export ENV_QT_GCC=$(pwd)/${{env.Qt5_Dir}}
-          ci/linux/build_for_ubuntu.sh release
+        env:
+          ENV_QT_PATH: ${{ env.qt-install-path }}
+        run: ci/linux/build_for_ubuntu.sh release
