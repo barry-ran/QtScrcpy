@@ -87,18 +87,20 @@ jobs:
           cmd.exe /c ci\win\publish_for_win.bat ${{ matrix.msvc-arch }} ..\build\${{ env.publish_dir }}
           # 打包zip
           Compress-Archive -Path ci\build\${{ env.publish_dir }} ci\build\${{ env.publish_dir }}.zip
+          echo "::set-env name=artifact-name::${{ env.publish_dir }}"
       # 上传artifacts
       # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
       - uses: actions/upload-artifact@v1
         with:
-          name: ${{ env.publish_dir }}-artifact
-          path: ci\build\${{ env.publish_dir }}
-      # 上传release
-      # https://github.com/softprops/action-gh-release
-      - name: Release
-        uses: softprops/action-gh-release@v1
+          name: ${{ env.artifact-name }}
+          path: ci\build\${{ env.artifact-name }}
+      # Upload to release
+      - name: Upload Release
         if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v1-release
         with:
-          files: ci/build/${{ env.publish_dir }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ci\build\${{ env.publish_dir }}.zip
+          asset_name: ${{ env.publish_dir }}.zip
+          tag: ${{ github.ref }}
+          overwrite: true
