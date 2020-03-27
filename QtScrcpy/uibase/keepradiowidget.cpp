@@ -25,7 +25,7 @@ void KeepRadioWidget::setWidget(QWidget *w)
 
 void KeepRadioWidget::setWidthHeightRadio(float widthHeightRadio)
 {
-    if (abs(m_widthHeightRadio - widthHeightRadio) < 0.000001f) {
+    if (fabs(m_widthHeightRadio - widthHeightRadio) < 0.000001f) {
         return;
     }
     m_widthHeightRadio = widthHeightRadio;
