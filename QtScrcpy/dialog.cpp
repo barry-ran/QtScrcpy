@@ -301,7 +301,6 @@ void Dialog::getIPbyIp()
         return;
     }
 
-
     QStringList adbArgs;
     adbArgs << "shell";
     adbArgs << "ip -o a";
