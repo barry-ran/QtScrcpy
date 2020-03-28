@@ -22,6 +22,7 @@ Dialog::Dialog(QWidget *parent) :
     connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
         QString log = "";
         bool newLine = true;
+        QStringList args = m_adb.arguments();
 
         switch (processResult) {
         case AdbProcess::AER_ERROR_START:
@@ -32,13 +33,15 @@ Dialog::Dialog(QWidget *parent) :
             break;
         case AdbProcess::AER_ERROR_EXEC:
             //log = m_adb.getErrorOut();
+            if (args.contains("ifconfig") && args.contains("wlan0")){
+                getIPbyIp();
+            }
             break;
         case AdbProcess::AER_ERROR_MISSING_BINARY:
             log = "adb not find";
             break;
         case AdbProcess::AER_SUCCESS_EXEC:
             //log = m_adb.getStdOut();
-            QStringList args = m_adb.arguments();
             if (args.contains("devices")) {
                 QStringList devices = m_adb.getDevicesSerialFromStdOut();
                 ui->serialBox->clear();
@@ -54,6 +57,13 @@ Dialog::Dialog(QWidget *parent) :
                 ui->deviceIpEdt->setText(ip);
             } else if (args.contains("ifconfig") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
+                if (ip.isEmpty()) {
+                    log = "ip not find, connect to wifi?";
+                    break;
+                }
+                ui->deviceIpEdt->setText(ip);
+            } else if (args.contains("ip -o a")) {
+                QString ip = m_adb.getDeviceIPByIpFromStdOut();
                 if (ip.isEmpty()) {
                     log = "ip not find, connect to wifi?";
                     break;
@@ -282,6 +292,20 @@ void Dialog::on_getIPBtn_clicked()
     adbArgs << "ifconfig";
     adbArgs << "wlan0";
 #endif
+    m_adb.execute(ui->serialBox->currentText().trimmed(), adbArgs);
+}
+
+void Dialog::getIPbyIp()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+
+
+    QStringList adbArgs;
+    adbArgs << "shell";
+    adbArgs << "ip -o a";
+
     m_adb.execute(ui->serialBox->currentText().trimmed(), adbArgs);
 }
 

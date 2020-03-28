@@ -31,6 +31,7 @@ public:
     void setShowTouchesEnabled(const QString& serial, bool enabled);
     QStringList getDevicesSerialFromStdOut();
     QString getDeviceIPFromStdOut();
+    QString getDeviceIPByIpFromStdOut();
     QString getStdOut();
     QString getErrorOut();
 
