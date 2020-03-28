@@ -22,6 +22,7 @@ public:
 
     void outLog(const QString& log, bool newLine = true);
     bool filterLog(const QString & log);
+    void getIPbyIp();
 
 private slots:
     void on_updateDevice_clicked();
