@@ -5,15 +5,16 @@
 #include <QPointer>
 #include <QSize>
 
+#include "adbprocess.h"
 #include "tcpserver.h"
 #include "videosocket.h"
-#include "adbprocess.h"
 
 class Server : public QObject
 {
     Q_OBJECT
 
-    enum SERVER_START_STEP {
+    enum SERVER_START_STEP
+    {
         SSS_NULL,
         SSS_PUSH,
         SSS_ENABLE_TUNNEL_REVERSE,
@@ -21,16 +22,18 @@ class Server : public QObject
         SSS_EXECUTE_SERVER,
         SSS_RUNNING,
     };
+
 public:
-    struct ServerParams {
-        QString serial = "";            // 设备序列号
-        quint16 localPort = 27183;      // reverse时本地监听端口
-        quint16 maxSize = 720;          // 视频分辨率
-        quint32 bitRate = 8000000;      // 视频比特率
-        quint32 maxFps = 60;            // 视频最大帧率
-        QString crop = "-";             // 视频裁剪
-        bool control = true;            // 安卓端是否接收键鼠控制
-        bool useReverse = true;         // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
+    struct ServerParams
+    {
+        QString serial = "";       // 设备序列号
+        quint16 localPort = 27183; // reverse时本地监听端口
+        quint16 maxSize = 720;     // 视频分辨率
+        quint32 bitRate = 8000000; // 视频比特率
+        quint32 maxFps = 60;       // 视频最大帧率
+        QString crop = "-";        // 视频裁剪
+        bool control = true;       // 安卓端是否接收键鼠控制
+        bool useReverse = true;    // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
     };
 
     explicit Server(QObject *parent = nullptr);
@@ -41,8 +44,8 @@ public:
     bool isReverse();
     Server::ServerParams getParams();
 
-    VideoSocket* getVideoSocket();
-    QTcpSocket* getControlSocket();
+    VideoSocket *getVideoSocket();
+    QTcpSocket *getControlSocket();
 
     void stop();
 
@@ -58,15 +61,15 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
-    const QString& getServerPath();
-    bool pushServer();    
+    const QString &getServerPath();
+    bool pushServer();
     bool enableTunnelReverse();
     bool disableTunnelReverse();
     bool enableTunnelForward();
     bool disableTunnelForward();
     bool execute();
     bool startServerByStep();
-    bool readInfo(VideoSocket* videoSocket, QString& deviceName, QSize& size);
+    bool readInfo(VideoSocket *videoSocket, QString &deviceName, QSize &size);
     void startAcceptTimeoutTimer();
     void stopAcceptTimeoutTimer();
     void startConnectTimeoutTimer();

@@ -22,20 +22,22 @@ class Device : public QObject
 {
     Q_OBJECT
 public:
-    struct DeviceParams {
-        QString recordFileName = "";        // 视频录制文件名
-        QString serial = "";                // 设备序列号
-        quint16 localPort = 27183;          // reverse时本地监听端口
-        quint16 maxSize = 720;              // 视频分辨率
-        quint32 bitRate = 8000000;          // 视频比特率
-        quint32 maxFps = 60;                // 视频最大帧率
-        bool closeScreen = false;           // 启动时自动息屏
-        bool useReverse = true;             // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
-        bool display = true;                // 是否显示画面（或者仅仅后台录制）
-        QString gameScript = "";            // 游戏映射脚本
-        bool renderExpiredFrames = false;   // 是否渲染延迟视频帧
+    struct DeviceParams
+    {
+        QString recordFileName = "";      // 视频录制文件名
+        QString serial = "";              // 设备序列号
+        quint16 localPort = 27183;        // reverse时本地监听端口
+        quint16 maxSize = 720;            // 视频分辨率
+        quint32 bitRate = 8000000;        // 视频比特率
+        quint32 maxFps = 60;              // 视频最大帧率
+        bool closeScreen = false;         // 启动时自动息屏
+        bool useReverse = true;           // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
+        bool display = true;              // 是否显示画面（或者仅仅后台录制）
+        QString gameScript = "";          // 游戏映射脚本
+        bool renderExpiredFrames = false; // 是否渲染延迟视频帧
     };
-    enum GroupControlState {
+    enum GroupControlState
+    {
         GCS_FREE = 0,
         GCS_HOST,
         GCS_CLIENT,
@@ -67,37 +69,37 @@ signals:
     void expandNotificationPanel();
     void collapseNotificationPanel();
     void postBackOrScreenOn();
-    void postTextInput(QString& text);
+    void postTextInput(QString &text);
     void requestDeviceClipboard();
     void setDeviceClipboard();
     void clipboardPaste();
-    void pushFileRequest(const QString& serial, const QString& file, const QString& devicePath = "");
-    void installApkRequest(const QString& serial, const QString& apkFile);
+    void pushFileRequest(const QString &serial, const QString &file, const QString &devicePath = "");
+    void installApkRequest(const QString &serial, const QString &apkFile);
 
     // key map
-    void mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize);
-    void wheelEvent(const QWheelEvent* from, const QSize& frameSize, const QSize& showSize);
-    void keyEvent(const QKeyEvent* from, const QSize& frameSize, const QSize& showSize);
+    void mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize);
+    void wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize);
+    void keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize);
 
     // self connect signal and slots
     void screenshot();
     void showTouch(bool show);
-    void setControlState(Device* device, Device::GroupControlState state);
+    void setControlState(Device *device, Device::GroupControlState state);
     void grabCursor(bool grab);
 
     // for notify
-    void controlStateChange(Device* device, Device::GroupControlState oldState, Device::GroupControlState newState);
+    void controlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
 public slots:
     void onScreenshot();
     void onShowTouch(bool show);
-    void onSetControlState(Device* device, Device::GroupControlState state);
+    void onSetControlState(Device *device, Device::GroupControlState state);
     void onGrabCursor(bool grab);
 
 private:
     void initSignals();
     void startServer();
-    bool saveFrame(const AVFrame* frame);
+    bool saveFrame(const AVFrame *frame);
 
 private:
     // server relevant
@@ -106,8 +108,8 @@ private:
     QPointer<Controller> m_controller;
     QPointer<FileHandler> m_fileHandler;
     QPointer<Stream> m_stream;
-    VideoBuffer* m_vb = Q_NULLPTR;
-    Recorder* m_recorder = Q_NULLPTR;
+    VideoBuffer *m_vb = Q_NULLPTR;
+    Recorder *m_recorder = Q_NULLPTR;
 
     // ui
     QPointer<VideoForm> m_videoForm;

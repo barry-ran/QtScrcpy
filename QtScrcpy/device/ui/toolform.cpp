@@ -1,16 +1,14 @@
-#include <QMouseEvent>
 #include <QDebug>
-#include <QShowEvent>
 #include <QHideEvent>
+#include <QMouseEvent>
+#include <QShowEvent>
 
+#include "device.h"
+#include "iconhelper.h"
 #include "toolform.h"
 #include "ui_toolform.h"
-#include "iconhelper.h"
-#include "device.h"
 
-ToolForm::ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos)
-    : MagneticWidget(adsorbWidget, adsorbPos)
-    , ui(new Ui::ToolForm)
+ToolForm::ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos) : MagneticWidget(adsorbWidget, adsorbPos), ui(new Ui::ToolForm)
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
@@ -40,7 +38,7 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->homeBtn, QChar(0xf1db), 15);
     //IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf104), 15);
     IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf053), 15);
-    IconHelper::Instance()->SetIcon(ui->appSwitchBtn, QChar(0xf24d), 15);    
+    IconHelper::Instance()->SetIcon(ui->appSwitchBtn, QChar(0xf24d), 15);
     IconHelper::Instance()->SetIcon(ui->volumeUpBtn, QChar(0xf028), 15);
     IconHelper::Instance()->SetIcon(ui->volumeDownBtn, QChar(0xf027), 15);
     IconHelper::Instance()->SetIcon(ui->closeScreenBtn, QChar(0xf070), 15);
@@ -132,7 +130,7 @@ void ToolForm::on_menuBtn_clicked()
     if (!m_device) {
         return;
     }
-   emit m_device->postGoMenu();
+    emit m_device->postGoMenu();
 }
 
 void ToolForm::on_appSwitchBtn_clicked()

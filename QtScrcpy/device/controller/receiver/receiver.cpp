@@ -1,18 +1,13 @@
-#include <QTcpSocket>
 #include <QApplication>
 #include <QClipboard>
 #include <QTcpSocket>
 
-#include "receiver.h"
 #include "devicemsg.h"
+#include "receiver.h"
 
-Receiver::Receiver(QObject *parent) : QObject(parent)
-{    
-}
+Receiver::Receiver(QObject *parent) : QObject(parent) {}
 
-Receiver::~Receiver()
-{
-}
+Receiver::~Receiver() {}
 
 void Receiver::setControlSocket(QTcpSocket *controlSocket)
 {
@@ -24,7 +19,7 @@ void Receiver::setControlSocket(QTcpSocket *controlSocket)
 }
 
 void Receiver::onReadyRead()
-{    
+{
     if (!m_controlSocket) {
         return;
     }
@@ -44,8 +39,7 @@ void Receiver::onReadyRead()
 void Receiver::processMsg(DeviceMsg *deviceMsg)
 {
     switch (deviceMsg->type()) {
-    case DeviceMsg::DMT_GET_CLIPBOARD:
-    {
+    case DeviceMsg::DMT_GET_CLIPBOARD: {
         qInfo("Device clipboard copied");
         QClipboard *board = QApplication::clipboard();
         QString text;

@@ -1,25 +1,23 @@
-#include <QFile>
-#include <QTime>
-#include <QKeyEvent>
-#include <QFileDialog>
-#include <QTimer>
 #include <QDebug>
+#include <QFile>
+#include <QFileDialog>
+#include <QKeyEvent>
+#include <QTime>
+#include <QTimer>
 
-#include "dialog.h"
-#include "ui_dialog.h"
-#include "device.h"
-#include "videoform.h"
-#include "keymap.h"
 #include "config.h"
+#include "device.h"
+#include "dialog.h"
+#include "keymap.h"
+#include "ui_dialog.h"
+#include "videoform.h"
 
-Dialog::Dialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::Dialog)
-{    
+Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
+{
     ui->setupUi(this);
     initUI();
 
-    connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+    connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
         QString log = "";
         bool newLine = true;
         QStringList args = m_adb.arguments();
@@ -33,7 +31,7 @@ Dialog::Dialog(QWidget *parent) :
             break;
         case AdbProcess::AER_ERROR_EXEC:
             //log = m_adb.getErrorOut();
-            if (args.contains("ifconfig") && args.contains("wlan0")){
+            if (args.contains("ifconfig") && args.contains("wlan0")) {
                 getIPbyIp();
             }
             break;
@@ -45,7 +43,7 @@ Dialog::Dialog(QWidget *parent) :
             if (args.contains("devices")) {
                 QStringList devices = m_adb.getDevicesSerialFromStdOut();
                 ui->serialBox->clear();
-                for (auto& item : devices) {
+                for (auto &item : devices) {
                     ui->serialBox->addItem(item);
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
@@ -119,7 +117,7 @@ void Dialog::initUI()
     // linux need more width
     setFixedWidth(480);
 #endif
- }
+}
 
 void Dialog::execAdbCmd()
 {
@@ -131,11 +129,10 @@ void Dialog::execAdbCmd()
     m_adb.execute(ui->serialBox->currentText().trimmed(), cmd.split(" ", QString::SkipEmptyParts));
 }
 
-QString Dialog::getGameScript(const QString& fileName)
+QString Dialog::getGameScript(const QString &fileName)
 {
     QFile loadFile(KeyMap::getKeyMapPath() + "/" + fileName);
-    if(!loadFile.open(QIODevice::ReadOnly))
-    {
+    if (!loadFile.open(QIODevice::ReadOnly)) {
         outLog("open file failed:" + fileName, true);
         return "";
     }
@@ -194,7 +191,7 @@ void Dialog::on_startServerBtn_clicked()
 }
 
 void Dialog::on_stopServerBtn_clicked()
-{    
+{
     if (m_deviceManage.disconnectDevice(ui->serialBox->currentText().trimmed())) {
         outLog("stop server");
     }
@@ -241,7 +238,7 @@ void Dialog::outLog(const QString &log, bool newLine)
 {
     // avoid sub thread update ui
     QString backLog = log;
-    QTimer::singleShot(0, this, [this, backLog, newLine](){
+    QTimer::singleShot(0, this, [this, backLog, newLine]() {
         ui->outEdit->append(backLog);
         if (newLine) {
             ui->outEdit->append("<br/>");
@@ -324,10 +321,7 @@ void Dialog::on_wirelessDisConnectBtn_clicked()
 void Dialog::on_selectRecordPathBtn_clicked()
 {
     QFileDialog::Options options = QFileDialog::DontResolveSymlinks | QFileDialog::ShowDirsOnly;
-    QString directory = QFileDialog::getExistingDirectory(this,
-                                                          tr("select path"),
-                                                          "",
-                                                          options);
+    QString directory = QFileDialog::getExistingDirectory(this, tr("select path"), "", options);
     ui->recordPathEdt->setText(directory);
 }
 
@@ -349,7 +343,7 @@ void Dialog::on_stopAdbBtn_clicked()
 }
 
 void Dialog::on_clearOut_clicked()
-{    
+{
     ui->outEdit->clear();
 }
 

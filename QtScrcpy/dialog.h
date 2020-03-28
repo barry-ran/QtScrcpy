@@ -7,8 +7,9 @@
 #include "adbprocess.h"
 #include "devicemanage.h"
 
-namespace Ui {
-class Dialog;
+namespace Ui
+{
+    class Dialog;
 }
 
 class QYUVOpenGLWidget;
@@ -20,8 +21,8 @@ public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
 
-    void outLog(const QString& log, bool newLine = true);
-    bool filterLog(const QString & log);
+    void outLog(const QString &log, bool newLine = true);
+    bool filterLog(const QString &log);
     void getIPbyIp();
 
 private slots:
@@ -69,7 +70,7 @@ private:
     bool checkAdbRun();
     void initUI();
     void execAdbCmd();
-    QString getGameScript(const QString& fileName);
+    QString getGameScript(const QString &fileName);
 
 private:
     Ui::Dialog *ui;

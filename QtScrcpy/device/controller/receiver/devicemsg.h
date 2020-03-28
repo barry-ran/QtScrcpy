@@ -11,7 +11,8 @@ class DeviceMsg : public QObject
 {
     Q_OBJECT
 public:
-    enum DeviceMsgType {
+    enum DeviceMsgType
+    {
         DMT_NULL = -1,
         // 和服务端对应
         DMT_GET_CLIPBOARD = 0,
@@ -20,20 +21,23 @@ public:
     virtual ~DeviceMsg();
 
     DeviceMsg::DeviceMsgType type();
-    void getClipboardMsgData(QString& text);
+    void getClipboardMsgData(QString &text);
 
-    qint32 deserialize(QByteArray& byteArray);
+    qint32 deserialize(QByteArray &byteArray);
 
 private:
-    struct DeviceMsgData {
+    struct DeviceMsgData
+    {
         DeviceMsgType type = DMT_NULL;
-        union {
-            struct {                
-                char* text = Q_NULLPTR;
+        union
+        {
+            struct
+            {
+                char *text = Q_NULLPTR;
             } clipboardMsg;
         };
-        DeviceMsgData(){}
-        ~DeviceMsgData(){}
+        DeviceMsgData() {}
+        ~DeviceMsgData() {}
     };
 
     DeviceMsgData m_data;

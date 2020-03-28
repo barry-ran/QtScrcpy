@@ -1,19 +1,13 @@
 #include "videobuffer.h"
 extern "C"
 {
-#include "libavutil/avutil.h"
 #include "libavformat/avformat.h"
+#include "libavutil/avutil.h"
 }
 
-VideoBuffer::VideoBuffer()
-{
+VideoBuffer::VideoBuffer() {}
 
-}
-
-VideoBuffer::~VideoBuffer()
-{
-
-}
+VideoBuffer::~VideoBuffer() {}
 
 bool VideoBuffer::init(bool renderExpiredFrames)
 {
@@ -68,7 +62,7 @@ AVFrame *VideoBuffer::decodingFrame()
     return m_decodingFrame;
 }
 
-void VideoBuffer::offerDecodedFrame(bool& previousFrameSkipped)
+void VideoBuffer::offerDecodedFrame(bool &previousFrameSkipped)
 {
     m_mutex.lock();
 
@@ -87,7 +81,7 @@ void VideoBuffer::offerDecodedFrame(bool& previousFrameSkipped)
     swap();
     previousFrameSkipped = !m_renderingFrameConsumed;
     m_renderingFrameConsumed = false;
-    m_mutex.unlock();    
+    m_mutex.unlock();
 }
 
 const AVFrame *VideoBuffer::consumeRenderedFrame()

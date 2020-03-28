@@ -1,23 +1,23 @@
 #ifndef ICONHELPER_H
 #define ICONHELPER_H
 
-#include <QObject>
+#include <QApplication>
 #include <QFont>
 #include <QFontDatabase>
-#include <QMutex>
 #include <QLabel>
+#include <QMutex>
+#include <QObject>
 #include <QPushButton>
-#include <QApplication>
 
 class IconHelper : public QObject
 {
 private:
     explicit IconHelper(QObject *parent = 0);
     QFont iconFont;
-    static IconHelper* _instance;
+    static IconHelper *_instance;
 
 public:
-    static IconHelper* Instance()
+    static IconHelper *Instance()
     {
         static QMutex mutex;
         if (!_instance) {
@@ -29,9 +29,8 @@ public:
         return _instance;
     }
 
-    void SetIcon(QLabel* lab, QChar c, int size = 10);
-    void SetIcon(QPushButton* btn, QChar c, int size = 10);
-
+    void SetIcon(QLabel *lab, QChar c, int size = 10);
+    void SetIcon(QPushButton *btn, QChar c, int size = 10);
 };
 
 #endif // ICONHELPER_H
