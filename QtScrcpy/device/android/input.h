@@ -23,7 +23,8 @@
 /**
  * Meta key / modifer state.
  */
-enum AndroidMetastate {
+enum AndroidMetastate
+{
     /** No meta keys are pressed. */
     AMETA_NONE = 0,
 
@@ -82,7 +83,8 @@ enum AndroidMetastate {
 /**
  * Input event types.
  */
-enum AndroidInputEventType {
+enum AndroidInputEventType
+{
     /** Indicates that the input event is a key event. */
     AINPUT_EVENT_TYPE_KEY = 1,
     /** Indicates that the input event is a motion event. */
@@ -92,7 +94,8 @@ enum AndroidInputEventType {
 /**
  * Key event actions.
  */
-enum AndroidKeyeventAction {
+enum AndroidKeyeventAction
+{
     /** The key has been pressed down. */
     AKEY_EVENT_ACTION_DOWN = 0,
 
@@ -111,7 +114,8 @@ enum AndroidKeyeventAction {
 /**
  * Key event flags.
  */
-enum AndroidKeyeventFlags {
+enum AndroidKeyeventFlags
+{
     /** This mask is set if the device woke because of this key event. */
     AKEY_EVENT_FLAG_WOKE_HERE = 0x1,
 
@@ -195,7 +199,8 @@ enum AndroidKeyeventFlags {
 #define AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT 8
 
 /** Motion event actions */
-enum AndroidMotioneventAction {
+enum AndroidMotioneventAction
+{
     /** Bit mask of the parts of the action code that are the action itself. */
     AMOTION_EVENT_ACTION_MASK = 0xff,
 
@@ -205,7 +210,7 @@ enum AndroidMotioneventAction {
      * down by AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT provides the actual pointer
      * index where the data for the pointer going up or down can be found.
      */
-    AMOTION_EVENT_ACTION_POINTER_INDEX_MASK  = 0xff00,
+    AMOTION_EVENT_ACTION_POINTER_INDEX_MASK = 0xff00,
 
     /** A pressed gesture has started, the motion contains the initial starting location. */
     AMOTION_EVENT_ACTION_DOWN = 0,
@@ -281,7 +286,8 @@ enum AndroidMotioneventAction {
 /**
  * Motion event flags.
  */
-enum AndroidMotioneventFlags {
+enum AndroidMotioneventFlags
+{
     /**
      * This flag indicates that the window that received this motion event is partly
      * or wholly obscured by another visible window above it.  This flag is set to true
@@ -298,7 +304,8 @@ enum AndroidMotioneventFlags {
 /**
  * Motion event edge touch flags.
  */
-enum AndroidMotioneventEdgeTouchTlags {
+enum AndroidMotioneventEdgeTouchTlags
+{
     /** No edges intersected. */
     AMOTION_EVENT_EDGE_FLAG_NONE = 0,
 
@@ -319,7 +326,8 @@ enum AndroidMotioneventEdgeTouchTlags {
  * Constants that identify each individual axis of a motion event.
  * @anchor AMOTION_EVENT_AXIS
  */
-enum AndroidMotioneventAxis {
+enum AndroidMotioneventAxis
+{
     /**
      * Axis constant: X axis of a motion event.
      *
@@ -688,7 +696,8 @@ enum AndroidMotioneventAxis {
  * Constants that identify buttons that are associated with motion events.
  * Refer to the documentation on the MotionEvent class for descriptions of each button.
  */
-enum AndroidMotioneventButtons {
+enum AndroidMotioneventButtons
+{
     /** primary */
     AMOTION_EVENT_BUTTON_PRIMARY = 1 << 0,
     /** secondary */
@@ -707,7 +716,8 @@ enum AndroidMotioneventButtons {
  * Constants that identify tool types.
  * Refer to the documentation on the MotionEvent class for descriptions of each tool type.
  */
-enum AndroidMotioneventToolType {
+enum AndroidMotioneventToolType
+{
     /** unknown */
     AMOTION_EVENT_TOOL_TYPE_UNKNOWN = 0,
     /** finger */
@@ -726,7 +736,8 @@ enum AndroidMotioneventToolType {
  * Refer to the documentation on android.view.InputDevice for more details about input sources
  * and their correct interpretation.
  */
-enum AndroidInputSourceClass {
+enum AndroidInputSourceClass
+{
     /** mask */
     AINPUT_SOURCE_CLASS_MASK = 0x000000ff,
 
@@ -747,7 +758,8 @@ enum AndroidInputSourceClass {
 /**
  * Input sources.
  */
-enum AndroidInputSource {
+enum AndroidInputSource
+{
     /** unknown */
     AINPUT_SOURCE_UNKNOWN = 0x00000000,
 
@@ -784,7 +796,8 @@ enum AndroidInputSource {
  *
  * Refer to the documentation on android.view.InputDevice for more details.
  */
-enum AndroidKeyboardType {
+enum AndroidKeyboardType
+{
     /** none */
     AINPUT_KEYBOARD_TYPE_NONE = 0,
     /** non alphabetic */
@@ -802,7 +815,8 @@ enum AndroidKeyboardType {
  *
  * @deprecated These constants are deprecated. Use {@link AMOTION_EVENT_AXIS AMOTION_EVENT_AXIS_*} constants instead.
  */
-enum AndroidMotionRange {
+enum AndroidMotionRange
+{
     /** x */
     AINPUT_MOTION_RANGE_X = AMOTION_EVENT_AXIS_X,
     /** y */

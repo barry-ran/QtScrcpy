@@ -1,20 +1,12 @@
 #include <QDebug>
 
 #include "compat.h"
-#include "videobuffer.h"
 #include "decoder.h"
+#include "videobuffer.h"
 
-Decoder::Decoder(VideoBuffer* vb, QObject *parent)
-    : QObject(parent)
-    , m_vb(vb)
-{
+Decoder::Decoder(VideoBuffer *vb, QObject *parent) : QObject(parent), m_vb(vb) {}
 
-}
-
-Decoder::~Decoder()
-{
-
-}
+Decoder::~Decoder() {}
 
 bool Decoder::open(const AVCodec *codec)
 {
@@ -43,12 +35,12 @@ void Decoder::close()
     avcodec_free_context(&m_codecCtx);
 }
 
-bool Decoder::push(const AVPacket* packet)
+bool Decoder::push(const AVPacket *packet)
 {
     if (!m_codecCtx || !m_vb) {
         return false;
     }
-    AVFrame* decodingFrame = m_vb->decodingFrame();
+    AVFrame *decodingFrame = m_vb->decodingFrame();
 #ifdef QTSCRCPY_LAVF_HAS_NEW_ENCODING_DECODING_API
     int ret = -1;
     if ((ret = avcodec_send_packet(m_codecCtx, packet)) < 0) {
@@ -123,6 +115,6 @@ void Decoder::pushFrame()
     if (previousFrameSkipped) {
         // the previous newFrame will consume this frame
         return;
-    }    
+    }
     emit onNewFrame();
 }

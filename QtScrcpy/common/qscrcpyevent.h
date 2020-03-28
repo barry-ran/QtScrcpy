@@ -5,17 +5,18 @@
 class QScrcpyEvent : public QEvent
 {
 public:
-    enum Type {
+    enum Type
+    {
         VideoSocket = QEvent::User + 1,
         Control,
     };
-    QScrcpyEvent(Type type) : QEvent(QEvent::Type(type)){}
+    QScrcpyEvent(Type type) : QEvent(QEvent::Type(type)) {}
 };
 
 // VideoSocketEvent
 class VideoSocketEvent : public QScrcpyEvent
 {
 public:
-    VideoSocketEvent() : QScrcpyEvent(VideoSocket){}
+    VideoSocketEvent() : QScrcpyEvent(VideoSocket) {}
 };
 #endif // QSCRCPYEVENT_H

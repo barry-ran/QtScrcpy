@@ -1,17 +1,11 @@
-#include <QTimerEvent>
 #include <QDebug>
+#include <QTimerEvent>
 
 #include "fpscounter.h"
 
-FpsCounter::FpsCounter(QObject* parent) : QObject(parent)
-{
+FpsCounter::FpsCounter(QObject *parent) : QObject(parent) {}
 
-}
-
-FpsCounter::~FpsCounter()
-{
-
-}
+FpsCounter::~FpsCounter() {}
 
 void FpsCounter::start()
 {
@@ -20,7 +14,7 @@ void FpsCounter::start()
 }
 
 void FpsCounter::stop()
-{    
+{
     stopCounterTimer();
     resetCounter();
 }

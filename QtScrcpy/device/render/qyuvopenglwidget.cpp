@@ -14,18 +14,30 @@ static const GLfloat coordinate[] = {
     // GL_TRIANGLE_STRIP的绘制方式：
     // 使用前3个坐标绘制一个三角形，使用后三个坐标绘制一个三角形，正好为一个矩形
     // x     y     z
-    -1.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, 0.0f,
-    -1.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 0.0f,
+    -1.0f,
+    -1.0f,
+    0.0f,
+    1.0f,
+    -1.0f,
+    0.0f,
+    -1.0f,
+    1.0f,
+    0.0f,
+    1.0f,
+    1.0f,
+    0.0f,
 
     // 纹理坐标，存储4个xy坐标
     // 坐标范围为[0,1],左下角为 0,0
     // TODO 为什么这个顺序指定四个顶点？顶点坐标和纹理坐标如何映射的？
-    0.0f, 1.0f,
-    1.0f, 1.0f,
-    0.0f, 0.0f,
-    1.0f, 0.0f
+    0.0f,
+    1.0f,
+    1.0f,
+    1.0f,
+    0.0f,
+    0.0f,
+    1.0f,
+    0.0f
 };
 
 // 顶点着色器
@@ -107,7 +119,7 @@ void QYUVOpenGLWidget::setFrameSize(const QSize &frameSize)
     }
 }
 
-const QSize& QYUVOpenGLWidget::frameSize()
+const QSize &QYUVOpenGLWidget::frameSize()
 {
     return m_frameSize;
 }
@@ -133,13 +145,13 @@ void QYUVOpenGLWidget::initializeGL()
     m_vbo.allocate(coordinate, sizeof(coordinate));
     initShader();
     // 设置背景清理色为黑色
-    glClearColor(0.0,0.0,0.0,0.0);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
     // 清理颜色背景
-    glClear(GL_COLOR_BUFFER_BIT);    
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void QYUVOpenGLWidget::paintGL()
-{    
+{
     if (m_needUpdate) {
         deInitTextures();
         initTextures();
@@ -198,7 +210,7 @@ void QYUVOpenGLWidget::initShader()
 }
 
 void QYUVOpenGLWidget::initTextures()
-{    
+{
     // 创建纹理
     glGenTextures(1, &m_texture[0]);
     glBindTexture(GL_TEXTURE_2D, m_texture[0]);
@@ -216,7 +228,7 @@ void QYUVOpenGLWidget::initTextures()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width()/2, m_frameSize.height()/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width() / 2, m_frameSize.height() / 2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
     glGenTextures(1, &m_texture[2]);
     glBindTexture(GL_TEXTURE_2D, m_texture[2]);
@@ -226,7 +238,7 @@ void QYUVOpenGLWidget::initTextures()
     // 设置st方向上纹理超出坐标时的显示策略
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width()/2, m_frameSize.height()/2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_frameSize.width() / 2, m_frameSize.height() / 2, 0, GL_RED, GL_UNSIGNED_BYTE, NULL);
 
     m_textureInited = true;
 }
@@ -246,7 +258,7 @@ void QYUVOpenGLWidget::updateTexture(GLuint texture, quint32 textureType, quint8
     if (!pixels)
         return;
 
-    QSize size = 0 == textureType ? m_frameSize : m_frameSize/2;
+    QSize size = 0 == textureType ? m_frameSize : m_frameSize / 2;
 
     makeCurrent();
     glBindTexture(GL_TEXTURE_2D, texture);

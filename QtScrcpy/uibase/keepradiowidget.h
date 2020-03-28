@@ -1,8 +1,8 @@
 #ifndef KEEPRADIOWIDGET_H
 #define KEEPRADIOWIDGET_H
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 
 class KeepRadioWidget : public QWidget
 {
@@ -11,7 +11,7 @@ public:
     explicit KeepRadioWidget(QWidget *parent = nullptr);
     ~KeepRadioWidget();
 
-    void setWidget(QWidget* w);
+    void setWidget(QWidget *w);
     void setWidthHeightRadio(float widthHeightRadio);
     const QSize goodSize();
 
@@ -23,7 +23,6 @@ private:
     float m_widthHeightRadio = -1.0f;
     QPointer<QWidget> m_subWidget;
     QSize m_goodSize;
-
 };
 
 #endif // KEEPRADIOWIDGET_H

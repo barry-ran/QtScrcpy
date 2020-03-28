@@ -1,11 +1,12 @@
 #ifndef VIDEOFORM_H
 #define VIDEOFORM_H
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 
-namespace Ui {
-class videoForm;
+namespace Ui
+{
+    class videoForm;
 }
 
 struct AVFrame;
@@ -32,11 +33,11 @@ public:
 public slots:
     void onSwitchFullScreen();
 
-private:    
+private:
     void updateStyleSheet(bool vertical);
     QMargins getMargins(bool vertical);
     void initUI();
-    
+
     void showToolForm(bool show = true);
     void moveCenter();
     void installShortcut();
@@ -63,7 +64,7 @@ protected:
 
 private:
     // ui
-    Ui::videoForm *ui;    
+    Ui::videoForm *ui;
     QPointer<ToolForm> m_toolForm;
     QPointer<QWidget> m_loadingWidget;
     QPointer<QYUVOpenGLWidget> m_videoWidget;

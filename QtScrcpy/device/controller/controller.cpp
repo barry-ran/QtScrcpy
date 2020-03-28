@@ -2,12 +2,12 @@
 #include <QClipboard>
 
 #include "controller.h"
-#include "videosocket.h"
 #include "controlmsg.h"
-#include "receiver.h"
 #include "inputconvertgame.h"
+#include "receiver.h"
+#include "videosocket.h"
 
-Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
+Controller::Controller(QString gameScript, QObject *parent) : QObject(parent)
 {
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
@@ -15,12 +15,9 @@ Controller::Controller(QString gameScript, QObject* parent) : QObject(parent)
     updateScript(gameScript);
 }
 
-Controller::~Controller()
-{
+Controller::~Controller() {}
 
-}
-
-void Controller::setControlSocket(QTcpSocket* controlSocket)
+void Controller::setControlSocket(QTcpSocket *controlSocket)
 {
     if (m_controlSocket || !controlSocket) {
         return;
@@ -38,11 +35,8 @@ void Controller::postControlMsg(ControlMsg *controlMsg)
 
 void Controller::test(QRect rc)
 {
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
-    controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE,
-                                      AMOTION_EVENT_ACTION_DOWN,
-                                      AMOTION_EVENT_BUTTON_PRIMARY,
-                                      rc, 1.0f);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
+    controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE, AMOTION_EVENT_ACTION_DOWN, AMOTION_EVENT_BUTTON_PRIMARY, rc, 1.0f);
     postControlMsg(controlMsg);
 }
 
@@ -52,11 +46,11 @@ void Controller::updateScript(QString gameScript)
         delete m_inputConvert;
     }
     if (!gameScript.isEmpty()) {
-        InputConvertGame* convertgame = new InputConvertGame(this);
+        InputConvertGame *convertgame = new InputConvertGame(this);
         convertgame->loadKeyMap(gameScript);
-         m_inputConvert = convertgame;
+        m_inputConvert = convertgame;
     } else {
-         m_inputConvert = new InputConvertNormal(this);
+        m_inputConvert = new InputConvertNormal(this);
     }
     Q_ASSERT(m_inputConvert);
     connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
@@ -64,7 +58,7 @@ void Controller::updateScript(QString gameScript)
 
 void Controller::onPostBackOrScreenOn()
 {
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
     if (!controlMsg) {
         return;
     }
@@ -108,7 +102,7 @@ void Controller::onPostVolumeDown()
 
 void Controller::onExpandNotificationPanel()
 {
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_EXPAND_NOTIFICATION_PANEL);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_EXPAND_NOTIFICATION_PANEL);
     if (!controlMsg) {
         return;
     }
@@ -117,7 +111,7 @@ void Controller::onExpandNotificationPanel()
 
 void Controller::onCollapseNotificationPanel()
 {
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_COLLAPSE_NOTIFICATION_PANEL);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_COLLAPSE_NOTIFICATION_PANEL);
     if (!controlMsg) {
         return;
     }
@@ -126,7 +120,7 @@ void Controller::onCollapseNotificationPanel()
 
 void Controller::onRequestDeviceClipboard()
 {
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_GET_CLIPBOARD);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_GET_CLIPBOARD);
     if (!controlMsg) {
         return;
     }
@@ -137,7 +131,7 @@ void Controller::onSetDeviceClipboard()
 {
     QClipboard *board = QApplication::clipboard();
     QString text = board->text();
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_SET_CLIPBOARD);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_SET_CLIPBOARD);
     if (!controlMsg) {
         return;
     }
@@ -152,9 +146,9 @@ void Controller::onClipboardPaste()
     onPostTextInput(text);
 }
 
-void Controller::onPostTextInput(QString& text)
+void Controller::onPostTextInput(QString &text)
 {
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TEXT);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TEXT);
     if (!controlMsg) {
         return;
     }
@@ -164,7 +158,7 @@ void Controller::onPostTextInput(QString& text)
 
 void Controller::onSetScreenPowerMode(ControlMsg::ScreenPowerMode mode)
 {
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_SET_SCREEN_POWER_MODE);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_SET_SCREEN_POWER_MODE);
     if (!controlMsg) {
         return;
     }
@@ -196,7 +190,7 @@ void Controller::onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const
 bool Controller::event(QEvent *event)
 {
     if (event && static_cast<ControlMsg::Type>(event->type()) == ControlMsg::Control) {
-        ControlMsg* controlMsg = dynamic_cast<ControlMsg*>(event);
+        ControlMsg *controlMsg = dynamic_cast<ControlMsg *>(event);
         if (controlMsg) {
             sendControl(controlMsg->serializeData());
         }
@@ -219,14 +213,14 @@ bool Controller::sendControl(const QByteArray &buffer)
 
 void Controller::postKeyCodeClick(AndroidKeycode keycode)
 {
-    ControlMsg* controlEventDown = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
+    ControlMsg *controlEventDown = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
     if (!controlEventDown) {
         return;
     }
     controlEventDown->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_DOWN, keycode, AMETA_NONE);
     postControlMsg(controlEventDown);
 
-    ControlMsg* controlEventUp = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
+    ControlMsg *controlEventUp = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
     if (!controlEventUp) {
         return;
     }

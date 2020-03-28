@@ -3,9 +3,10 @@
 #include <QRect>
 
 class QWidget;
-class MouseTap {
+class MouseTap
+{
 public:
-    static MouseTap* getInstance();
+    static MouseTap *getInstance();
     virtual void initMouseEventTap() = 0;
     virtual void quitMouseEventTap() = 0;
     // rc base global screenspace coordinate system, which has a flipped Y.
