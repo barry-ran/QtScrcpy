@@ -15,7 +15,6 @@
 - 关于
 - 旋转
 - mac版本号模板
-- tag create release
 - ubuntu自动打包
 - 版本号抽离优化
 
