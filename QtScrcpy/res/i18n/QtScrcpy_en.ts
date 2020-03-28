@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="144"/>
-        <location filename="../../dialog.cpp" line="305"/>
+        <location filename="../../dialog.cpp" line="328"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
@@ -203,7 +203,7 @@
         <translation>refresh devices</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="93"/>
+        <location filename="../../dialog.cpp" line="103"/>
         <source>original</source>
         <translation>original</translation>
     </message>
@@ -211,9 +211,19 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../main.cpp" line="101"/>
         <source>This software is completely open source and free, you can download it at the following address:</source>
-        <translation>This software is completely open source and free, you can download it at the following address:</translation>
+        <translation type="vanished">This software is completely open source and free, you can download it at the following address:</translation>
+    </message>
+    <message>
+        <source>This software is completely open source and free.
+Strictly used for illegal purposes, or at your own risk.
+You can download it at the following address:</source>
+        <translation type="vanished">This software is completely open source and free.\nStrictly used for illegal purposes, or at your own risk.\nYou can download it at the following address:</translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="101"/>
+        <source>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</source>
+        <translation>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</translation>
     </message>
 </context>
 <context>
