@@ -49,7 +49,7 @@ void InputConvertNormal::mouseEvent(const QMouseEvent *from, const QSize &frameS
 
 void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
 {
-    if (!from) {
+    if (!from || 0 == from->delta()) {
         return;
     }
 
