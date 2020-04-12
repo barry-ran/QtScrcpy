@@ -11,7 +11,7 @@
 
 #define CONTROL_MSG_TEXT_MAX_LENGTH 300
 #define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH 4093
-#define POINTER_ID_MOUSE UINT64_C(-1)
+#define POINTER_ID_MOUSE static_cast<quint64>(-1)
 // ControlMsg
 class ControlMsg : public QScrcpyEvent
 {
