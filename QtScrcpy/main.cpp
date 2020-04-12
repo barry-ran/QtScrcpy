@@ -98,10 +98,9 @@ int main(int argc, char *argv[])
     g_mainDlg->setWindowTitle(Config::getInstance().getTitle());
     g_mainDlg->show();
 
-    qInfo(QObject::tr("This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the "
-                      "following address:")
-              .toUtf8());
-    qInfo(QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8());
+    qInfo() << QObject::tr("This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the "
+                           "following address:").toUtf8();
+    qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8();
 
     int ret = a.exec();
 

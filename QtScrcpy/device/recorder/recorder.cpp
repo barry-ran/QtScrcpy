@@ -102,7 +102,7 @@ bool Recorder::open(const AVCodec *inputCodec)
     if (ret < 0) {
         char errorbuf[255] = { 0 };
         av_strerror(ret, errorbuf, 254);
-        qCritical(QString("Failed to open output file: %1 %2").arg(errorbuf).arg(m_fileName).toUtf8().toStdString().c_str());
+        qCritical() << QString("Failed to open output file: %1 %2").arg(errorbuf).arg(m_fileName).toUtf8().toStdString().c_str();
         // ostream will be cleaned up during context cleaning
         avformat_free_context(m_formatCtx);
         m_formatCtx = Q_NULLPTR;
@@ -118,10 +118,10 @@ void Recorder::close()
         if (m_headerWritten) {
             int ret = av_write_trailer(m_formatCtx);
             if (ret < 0) {
-                qCritical(QString("Failed to write trailer to %1").arg(m_fileName).toUtf8().toStdString().c_str());
+                qCritical() << QString("Failed to write trailer to %1").arg(m_fileName).toUtf8().toStdString().c_str();
                 m_failed = true;
             } else {
-                qInfo(QString("success record %1").arg(m_fileName).toStdString().c_str());
+                qInfo() << QString("success record %1").arg(m_fileName).toStdString().c_str();
             }
         } else {
             // the recorded file is empty

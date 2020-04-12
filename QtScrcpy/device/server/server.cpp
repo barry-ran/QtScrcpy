@@ -255,7 +255,7 @@ bool Server::startServerByStep()
                 // try to connect until the server socket is listening on the device.
                 m_serverSocket.setMaxPendingConnections(2);
                 if (!m_serverSocket.listen(QHostAddress::LocalHost, m_params.localPort)) {
-                    qCritical(QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str());
+                    qCritical() << QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str();
                     m_serverStartStep = SSS_NULL;
                     if (m_tunnelForward) {
                         disableTunnelForward();

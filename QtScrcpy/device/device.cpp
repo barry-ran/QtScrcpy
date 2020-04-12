@@ -211,7 +211,7 @@ void Device::initSignals()
         connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size) {
             if (success) {
                 double diff = m_startTimeCount.elapsed() / 1000.0;
-                qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
+                qInfo() << QString("server start finish in %1s").arg(diff).toStdString().c_str();
 
                 // update ui
                 if (m_videoForm) {

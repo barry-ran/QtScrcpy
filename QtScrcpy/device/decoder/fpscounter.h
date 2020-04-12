@@ -24,7 +24,7 @@ private:
     void resetCounter();
 
 private:
-    quint32 m_counterTimer = 0;
+    qint32 m_counterTimer = 0;
     quint32 m_curRendered = 0;
     quint32 m_curSkipped = 0;
 

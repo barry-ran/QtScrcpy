@@ -27,19 +27,18 @@ static void avLogCallback(void *avcl, int level, const char *fmt, va_list vl)
     switch (level) {
     case AV_LOG_PANIC:
     case AV_LOG_FATAL:
-        qFatal(localFmt.toUtf8());
-        break;
+        qFatal("%s", localFmt.toUtf8().data());
     case AV_LOG_ERROR:
-        qCritical(localFmt.toUtf8());
+        qCritical() << localFmt.toUtf8();
         break;
     case AV_LOG_WARNING:
-        qWarning(localFmt.toUtf8());
+        qWarning() << localFmt.toUtf8();
         break;
     case AV_LOG_INFO:
-        qInfo(localFmt.toUtf8());
+        qInfo() << localFmt.toUtf8();
         break;
     case AV_LOG_DEBUG:
-        //qDebug(localFmt.toUtf8());
+        // qDebug() << localFmt.toUtf8();
         break;
     }
 

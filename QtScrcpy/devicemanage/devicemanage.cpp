@@ -212,6 +212,7 @@ void DeviceManage::onControlStateChange(Device *device, Device::GroupControlStat
 
 void DeviceManage::onMouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize)
     QMapIterator<QString, QPointer<Device>> i(m_devices);
     while (i.hasNext()) {
         i.next();
@@ -228,6 +229,7 @@ void DeviceManage::onMouseEvent(const QMouseEvent *from, const QSize &frameSize,
 
 void DeviceManage::onWheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize)
     QMapIterator<QString, QPointer<Device>> i(m_devices);
     while (i.hasNext()) {
         i.next();
@@ -244,6 +246,7 @@ void DeviceManage::onWheelEvent(const QWheelEvent *from, const QSize &frameSize,
 
 void DeviceManage::onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize)
     QMapIterator<QString, QPointer<Device>> i(m_devices);
     while (i.hasNext()) {
         i.next();
