@@ -230,7 +230,7 @@ bool Stream::recvPacket(AVPacket *packet)
 
     quint64 pts = bufferRead64be(header);
     quint32 len = bufferRead32be(&header[8]);
-    Q_ASSERT(pts == NO_PTS || (pts & 0x8000000000000000) == 0);
+    Q_ASSERT(pts == static_cast<quint64>(NO_PTS) || (pts & 0x8000000000000000) == 0);
     Q_ASSERT(len);
 
     if (av_new_packet(packet, len)) {
@@ -244,7 +244,7 @@ bool Stream::recvPacket(AVPacket *packet)
         return false;
     }
 
-    packet->pts = pts != NO_PTS ? (int64_t)pts : AV_NOPTS_VALUE;
+    packet->pts = pts != NO_PTS ? static_cast<int64_t>(pts) : static_cast<int64_t>(AV_NOPTS_VALUE);
 
     return true;
 }

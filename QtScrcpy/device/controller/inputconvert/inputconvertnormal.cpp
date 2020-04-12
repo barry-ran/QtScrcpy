@@ -43,7 +43,8 @@ void InputConvertNormal::mouseEvent(const QMouseEvent *from, const QSize &frameS
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE, action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize), 1.0f);
+    controlMsg->setInjectTouchMsgData(
+        static_cast<quint64>(POINTER_ID_MOUSE), action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize), 1.0f);
     sendControlMsg(controlMsg);
 }
 
@@ -134,7 +135,7 @@ AndroidMotioneventButtons InputConvertNormal::convertMouseButtons(Qt::MouseButto
     if (buttonState & Qt::XButton2) {
         buttons |= AMOTION_EVENT_BUTTON_FORWARD;
     }
-    return (AndroidMotioneventButtons)buttons;
+    return static_cast<AndroidMotioneventButtons>(buttons);
 }
 
 AndroidKeycode InputConvertNormal::convertKeyCode(int key, Qt::KeyboardModifiers modifiers)
@@ -338,5 +339,5 @@ AndroidMetastate InputConvertNormal::convertMetastate(Qt::KeyboardModifiers modi
         // no mapping?
     }
     */
-    return (AndroidMetastate)metastate;
+    return static_cast<AndroidMetastate>(metastate);
 }
