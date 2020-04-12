@@ -1,7 +1,7 @@
 #include <QDebug>
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
-#include <QKeyEvent>
 
 #include "devicemanage.h"
 #include "server.h"
@@ -9,15 +9,9 @@
 
 #define DM_MAX_DEVICES_NUM 16
 
-DeviceManage::DeviceManage(QObject *parent) : QObject(parent)
-{
+DeviceManage::DeviceManage(QObject *parent) : QObject(parent) {}
 
-}
-
-DeviceManage::~DeviceManage()
-{
-
-}
+DeviceManage::~DeviceManage() {}
 
 bool DeviceManage::connectDevice(Device::DeviceParams params)
 {
@@ -195,8 +189,7 @@ void DeviceManage::onControlStateChange(Device *device, Device::GroupControlStat
         return;
     }
     // free to host
-    if (oldState == Device::GroupControlState::GCS_FREE
-            && newState == Device::GroupControlState::GCS_HOST) {
+    if (oldState == Device::GroupControlState::GCS_FREE && newState == Device::GroupControlState::GCS_HOST) {
         // install direct control signals
         setGroupControlHost(device, true);
         // install convert control signals(frameSize need convert)
@@ -206,8 +199,7 @@ void DeviceManage::onControlStateChange(Device *device, Device::GroupControlStat
         return;
     }
     // host to free
-    if (oldState == Device::GroupControlState::GCS_HOST
-            && newState == Device::GroupControlState::GCS_FREE) {
+    if (oldState == Device::GroupControlState::GCS_HOST && newState == Device::GroupControlState::GCS_FREE) {
         // uninstall direct control signals
         setGroupControlHost(device, false);
         // uninstall convert control signals(frameSize need convert)
@@ -220,6 +212,7 @@ void DeviceManage::onControlStateChange(Device *device, Device::GroupControlStat
 
 void DeviceManage::onMouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize)
     QMapIterator<QString, QPointer<Device>> i(m_devices);
     while (i.hasNext()) {
         i.next();
@@ -236,6 +229,7 @@ void DeviceManage::onMouseEvent(const QMouseEvent *from, const QSize &frameSize,
 
 void DeviceManage::onWheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize)
     QMapIterator<QString, QPointer<Device>> i(m_devices);
     while (i.hasNext()) {
         i.next();
@@ -252,6 +246,7 @@ void DeviceManage::onWheelEvent(const QWheelEvent *from, const QSize &frameSize,
 
 void DeviceManage::onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize)
     QMapIterator<QString, QPointer<Device>> i(m_devices);
     while (i.hasNext()) {
         i.next();
@@ -268,16 +263,14 @@ void DeviceManage::onKeyEvent(const QKeyEvent *from, const QSize &frameSize, con
 
 quint16 DeviceManage::getFreePort()
 {
-    quint16 port = m_localPortStart;    
+    quint16 port = m_localPortStart;
     while (port < m_localPortStart + DM_MAX_DEVICES_NUM) {
         bool used = false;
         QMapIterator<QString, QPointer<Device>> i(m_devices);
         while (i.hasNext()) {
             i.next();
             auto device = i.value();
-            if (device && device->getServer()
-                    && device->getServer()->isReverse()
-                    && port == device->getServer()->getParams().localPort) {
+            if (device && device->getServer() && device->getServer()->isReverse() && port == device->getServer()->getParams().localPort) {
                 used = true;
                 break;
             }

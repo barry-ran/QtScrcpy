@@ -1,8 +1,8 @@
 #ifndef STREAM_H
 #define STREAM_H
 
-#include <QThread>
 #include <QPointer>
+#include <QThread>
 
 extern "C"
 {
@@ -24,10 +24,10 @@ public:
     static bool init();
     static void deInit();
 
-    void setDecoder(Decoder* decoder);
-    void setRecoder(Recorder* recorder);
-    void setVideoSocket(VideoSocket* deviceSocket);
-    qint32 recvData(quint8* buf, qint32 bufSize);
+    void setDecoder(Decoder *decoder);
+    void setRecoder(Recorder *recorder);
+    void setVideoSocket(VideoSocket *deviceSocket);
+    qint32 recvData(quint8 *buf, qint32 bufSize);
     bool startDecode();
     void stopDecode();
 
@@ -36,8 +36,8 @@ signals:
 
 protected:
     void run();
-    bool recvPacket(AVPacket* packet);
-    bool pushPacket(AVPacket* packet);
+    bool recvPacket(AVPacket *packet);
+    bool pushPacket(AVPacket *packet);
     bool processConfigPacket(AVPacket *packet);
     bool parse(AVPacket *packet);
     bool processFrame(AVPacket *packet);
@@ -45,10 +45,10 @@ protected:
 private:
     QPointer<VideoSocket> m_videoSocket;
     // for recorder
-    Recorder* m_recorder = Q_NULLPTR;
-    Decoder* m_decoder = Q_NULLPTR;
+    Recorder *m_recorder = Q_NULLPTR;
+    Decoder *m_decoder = Q_NULLPTR;
 
-    AVCodecContext* m_codecCtx = Q_NULLPTR;
+    AVCodecContext *m_codecCtx = Q_NULLPTR;
     AVCodecParserContext *m_parser = Q_NULLPTR;
     // successive packets may need to be concatenated, until a non-config
     // packet is available

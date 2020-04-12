@@ -1,6 +1,6 @@
-#include <QSettings>
 #include <QCoreApplication>
 #include <QFileInfo>
+#include <QSettings>
 
 #include "config.h"
 
@@ -72,7 +72,7 @@ Config &Config::getInstance()
     return config;
 }
 
-const QString& Config::getConfigPath()
+const QString &Config::getConfigPath()
 {
     if (s_configPath.isEmpty()) {
         s_configPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_CONFIG_PATH"));
@@ -261,6 +261,3 @@ QString Config::getTitle()
     m_settings->endGroup();
     return title;
 }
-
-
-

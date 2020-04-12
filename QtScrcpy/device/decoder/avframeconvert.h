@@ -5,8 +5,8 @@
 extern "C"
 {
 #include "libavcodec/avcodec.h"
-#include "libswscale/swscale.h"
 #include "libavutil/frame.h"
+#include "libswscale/swscale.h"
 }
 
 class AVFrameConvert
@@ -17,14 +17,14 @@ public:
 
 public:
     void setSrcFrameInfo(int srcWidth, int srcHeight, AVPixelFormat srcFormat);
-    void getSrcFrameInfo(int& srcWidth, int& srcHeight, AVPixelFormat& srcFormat);
+    void getSrcFrameInfo(int &srcWidth, int &srcHeight, AVPixelFormat &srcFormat);
     void setDstFrameInfo(int dstWidth, int dstHeight, AVPixelFormat dstFormat);
-    void getDstFrameInfo(int& dstWidth, int& dstHeight, AVPixelFormat& dstFormat);
+    void getDstFrameInfo(int &dstWidth, int &dstHeight, AVPixelFormat &dstFormat);
 
     bool init();
     bool isInit();
     void deInit();
-    bool convert(const AVFrame* srcFrame, AVFrame* dstFrame);
+    bool convert(const AVFrame *srcFrame, AVFrame *dstFrame);
 
 private:
     int m_srcWidth = 0;

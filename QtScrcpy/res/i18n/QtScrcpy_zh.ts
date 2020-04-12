@@ -75,7 +75,7 @@
     </message>
     <message>
         <location filename="../../dialog.ui" line="144"/>
-        <location filename="../../dialog.cpp" line="305"/>
+        <location filename="../../dialog.cpp" line="328"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
@@ -203,7 +203,7 @@
         <translation>刷新设备列表</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="93"/>
+        <location filename="../../dialog.cpp" line="103"/>
         <source>original</source>
         <translation>原始</translation>
     </message>
@@ -211,9 +211,19 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../../main.cpp" line="101"/>
         <source>This software is completely open source and free, you can download it at the following address:</source>
-        <translation>本软件完全开源免费，你可以在下面的地址下载：</translation>
+        <translation type="vanished">本软件完全开源免费，你可以在下面的地址下载：</translation>
+    </message>
+    <message>
+        <source>This software is completely open source and free.
+Strictly used for illegal purposes, or at your own risk.
+You can download it at the following address:</source>
+        <translation type="vanished">本软件完全开源免费.\n严禁用于非法用途，否则后果自负.\n你可以在下面地址下载:</translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="101"/>
+        <source>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</source>
+        <translation>本软件完全开源免费，严禁用于非法用途，否则后果自负，你可以在下面地址下载:</translation>
     </message>
 </context>
 <context>

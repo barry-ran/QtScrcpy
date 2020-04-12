@@ -1,34 +1,31 @@
 #include <QDesktopWidget>
-#include <QMouseEvent>
-#include <QTimer>
-#include <QStyle>
-#include <QStyleOption>
-#include <QPainter>
-#include <QtWidgets/QHBoxLayout>
-#include <QMimeData>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QShortcut>
-#include <QWindow>
+#include <QMimeData>
+#include <QMouseEvent>
+#include <QPainter>
 #include <QScreen>
+#include <QShortcut>
+#include <QStyle>
+#include <QStyleOption>
+#include <QTimer>
+#include <QWindow>
+#include <QtWidgets/QHBoxLayout>
 
-#include "videoform.h"
-#include "qyuvopenglwidget.h"
-#include "ui_videoform.h"
-#include "iconhelper.h"
-#include "toolform.h"
-#include "device.h"
-#include "controller.h"
 #include "config.h"
+#include "controller.h"
+#include "device.h"
+#include "iconhelper.h"
+#include "qyuvopenglwidget.h"
+#include "toolform.h"
+#include "ui_videoform.h"
+#include "videoform.h"
 extern "C"
 {
 #include "libavutil/frame.h"
 }
 
-VideoForm::VideoForm(bool framelessWindow, bool skin, QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::videoForm)
-    , m_skin(skin)
+VideoForm::VideoForm(bool framelessWindow, bool skin, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin)
 {
     ui->setupUi(this);
     initUI();
@@ -80,8 +77,7 @@ QRect VideoForm::getGrabCursorRect()
 {
     QRect rc;
 #if defined(Q_OS_WIN32)
-    rc = QRect(m_videoWidget->mapToGlobal(m_videoWidget->pos())
-             , m_videoWidget->size());
+    rc = QRect(m_videoWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
@@ -130,8 +126,7 @@ void VideoForm::updateRender(const AVFrame *frame)
 
     updateShowSize(QSize(frame->width, frame->height));
     m_videoWidget->setFrameSize(QSize(frame->width, frame->height));
-    m_videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2],
-            frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+    m_videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
 }
 
 void VideoForm::showToolForm(bool show)
@@ -157,146 +152,141 @@ void VideoForm::moveCenter()
 
 void VideoForm::installShortcut()
 {
-   QShortcut *shortcut = nullptr;
+    QShortcut *shortcut = nullptr;
 
-   // switchFullScreen
-   shortcut = new QShortcut(QKeySequence("Ctrl+f"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->switchFullScreen();
-   });
+    // switchFullScreen
+    shortcut = new QShortcut(QKeySequence("Ctrl+f"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->switchFullScreen();
+    });
 
-   // resizeSquare
-   shortcut = new QShortcut(QKeySequence("Ctrl+g"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       resizeSquare();
-   });
+    // resizeSquare
+    shortcut = new QShortcut(QKeySequence("Ctrl+g"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() { resizeSquare(); });
 
-   // removeBlackRect
-   shortcut = new QShortcut(QKeySequence("Ctrl+x"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       removeBlackRect();
-   });
+    // removeBlackRect
+    shortcut = new QShortcut(QKeySequence("Ctrl+x"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() { removeBlackRect(); });
 
+    // postGoHome
+    shortcut = new QShortcut(QKeySequence("Ctrl+h"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postGoHome();
+    });
 
-   // postGoHome
-   shortcut = new QShortcut(QKeySequence("Ctrl+h"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->postGoHome();
-   });
+    // postGoBack
+    shortcut = new QShortcut(QKeySequence("Ctrl+b"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postGoBack();
+    });
 
-   // postGoBack
-   shortcut = new QShortcut(QKeySequence("Ctrl+b"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->postGoBack();
-   });
+    // postAppSwitch
+    shortcut = new QShortcut(QKeySequence("Ctrl+s"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postAppSwitch();
+    });
 
-   // postAppSwitch
-   shortcut = new QShortcut(QKeySequence("Ctrl+s"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->postAppSwitch();
-   });
+    // postGoMenu
+    shortcut = new QShortcut(QKeySequence("Ctrl+m"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postGoMenu();
+    });
 
-   // postGoMenu
-   shortcut = new QShortcut(QKeySequence("Ctrl+m"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->postGoMenu();
-   });
+    // postVolumeUp
+    shortcut = new QShortcut(QKeySequence("Ctrl+up"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postVolumeUp();
+    });
 
-   // postVolumeUp
-   shortcut = new QShortcut(QKeySequence("Ctrl+up"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->postVolumeUp();
-   });
+    // postVolumeDown
+    shortcut = new QShortcut(QKeySequence("Ctrl+down"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postVolumeDown();
+    });
 
-   // postVolumeDown
-   shortcut = new QShortcut(QKeySequence("Ctrl+down"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->postVolumeDown();
-   });
+    // postPower
+    shortcut = new QShortcut(QKeySequence("Ctrl+p"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postPower();
+    });
 
-   // postPower
-   shortcut = new QShortcut(QKeySequence("Ctrl+p"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->postPower();
-   });
+    // setScreenPowerMode(ControlMsg::SPM_OFF)
+    shortcut = new QShortcut(QKeySequence("Ctrl+o"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->setScreenPowerMode(ControlMsg::SPM_OFF);
+    });
 
-   // setScreenPowerMode(ControlMsg::SPM_OFF)
-   shortcut = new QShortcut(QKeySequence("Ctrl+o"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->setScreenPowerMode(ControlMsg::SPM_OFF);
-   });
+    // expandNotificationPanel
+    shortcut = new QShortcut(QKeySequence("Ctrl+n"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->expandNotificationPanel();
+    });
 
-   // expandNotificationPanel
-   shortcut = new QShortcut(QKeySequence("Ctrl+n"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->expandNotificationPanel();
-   });
+    // collapseNotificationPanel
+    shortcut = new QShortcut(QKeySequence("Ctrl+Shift+n"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->collapseNotificationPanel();
+    });
 
-   // collapseNotificationPanel
-   shortcut = new QShortcut(QKeySequence("Ctrl+Shift+n"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->collapseNotificationPanel();
-   });
+    // requestDeviceClipboard
+    shortcut = new QShortcut(QKeySequence("Ctrl+c"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->requestDeviceClipboard();
+    });
 
-   // requestDeviceClipboard
-   shortcut = new QShortcut(QKeySequence("Ctrl+c"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->requestDeviceClipboard();
-   });
+    // clipboardPaste
+    shortcut = new QShortcut(QKeySequence("Ctrl+v"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->clipboardPaste();
+    });
 
-   // clipboardPaste
-   shortcut = new QShortcut(QKeySequence("Ctrl+v"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->clipboardPaste();
-   });
-
-   // setDeviceClipboard
-   shortcut = new QShortcut(QKeySequence("Ctrl+Shift+v"), this);
-   connect(shortcut, &QShortcut::activated, this, [this](){
-       if (!m_device) {
-           return;
-       }
-       emit m_device->setDeviceClipboard();
-   });
+    // setDeviceClipboard
+    shortcut = new QShortcut(QKeySequence("Ctrl+Shift+v"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->setDeviceClipboard();
+    });
 }
 
 QRect VideoForm::getScreenRect()
@@ -368,7 +358,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
             showSize.setHeight(qMin(newSize.height(), screenRect.height() - 200));
             showSize.setWidth(showSize.height() * m_widthHeightRatio);
         } else {
-            showSize.setWidth(qMin(newSize.width(), screenRect.width()/2));
+            showSize.setWidth(qMin(newSize.width(), screenRect.width() / 2));
             showSize.setHeight(showSize.width() / m_widthHeightRatio);
         }
 
@@ -517,7 +507,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
         emit m_device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
-    } else if (!m_dragPosition.isNull()){
+    } else if (!m_dragPosition.isNull()) {
         if (event->buttons() & Qt::LeftButton) {
             move(event->globalPos() - m_dragPosition);
             event->accept();
@@ -527,8 +517,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 
 void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if (event->button() == Qt::LeftButton
-            && !m_videoWidget->geometry().contains(event->pos())) {
+    if (event->button() == Qt::LeftButton && !m_videoWidget->geometry().contains(event->pos())) {
         removeBlackRect();
     }
 
@@ -549,8 +538,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
                 Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers,
                 Qt::Orientation orient = Qt::Vertical);
         */
-        QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(),
-                               event->buttons(), event->modifiers(), event->orientation());
+        QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(), event->buttons(), event->modifiers(), event->orientation());
         emit m_device->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
@@ -560,9 +548,7 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
     if (!m_device) {
         return;
     }
-    if (Qt::Key_Escape == event->key()
-            && !event->isAutoRepeat()
-            && isFullScreen()) {
+    if (Qt::Key_Escape == event->key() && !event->isAutoRepeat() && isFullScreen()) {
         emit m_device->switchFullScreen();
     }
 
@@ -649,7 +635,7 @@ void VideoForm::dropEvent(QDropEvent *event)
     if (!m_device) {
         return;
     }
-    const QMimeData* qm = event->mimeData();
+    const QMimeData *qm = event->mimeData();
     QString file = qm->urls()[0].toLocalFile();
     QFileInfo fileInfo(file);
 

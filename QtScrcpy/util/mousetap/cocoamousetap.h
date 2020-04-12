@@ -1,13 +1,15 @@
 #ifndef COCOAMOUSETAP_H
 #define COCOAMOUSETAP_H
-#include <QThread>
 #include <QSemaphore>
+#include <QThread>
 
 #include "mousetap.h"
 
 struct MouseEventTapData;
 class QWidget;
-class CocoaMouseTap : public MouseTap, public QThread
+class CocoaMouseTap
+    : public MouseTap
+    , public QThread
 {
 public:
     CocoaMouseTap(QObject *parent = Q_NULLPTR);

@@ -2,15 +2,9 @@
 
 #include "avframeconvert.h"
 
-AVFrameConvert::AVFrameConvert()
-{
+AVFrameConvert::AVFrameConvert() {}
 
-}
-
-AVFrameConvert::~AVFrameConvert()
-{
-
-}
+AVFrameConvert::~AVFrameConvert() {}
 
 void AVFrameConvert::setSrcFrameInfo(int srcWidth, int srcHeight, AVPixelFormat srcFormat)
 {
@@ -20,11 +14,11 @@ void AVFrameConvert::setSrcFrameInfo(int srcWidth, int srcHeight, AVPixelFormat 
     qDebug() << "Convert::src frame info " << srcWidth << "x" << srcHeight;
 }
 
-void AVFrameConvert::getSrcFrameInfo(int& srcWidth, int& srcHeight, AVPixelFormat& srcFormat)
+void AVFrameConvert::getSrcFrameInfo(int &srcWidth, int &srcHeight, AVPixelFormat &srcFormat)
 {
     srcWidth = m_srcWidth;
     srcHeight = m_srcHeight;
-    srcFormat = m_srcFormat;    
+    srcFormat = m_srcFormat;
 }
 
 void AVFrameConvert::setDstFrameInfo(int dstWidth, int dstHeight, AVPixelFormat dstFormat)
@@ -34,7 +28,7 @@ void AVFrameConvert::setDstFrameInfo(int dstWidth, int dstHeight, AVPixelFormat 
     m_dstFormat = dstFormat;
 }
 
-void AVFrameConvert::getDstFrameInfo(int& dstWidth, int& dstHeight, AVPixelFormat& dstFormat)
+void AVFrameConvert::getDstFrameInfo(int &dstWidth, int &dstHeight, AVPixelFormat &dstFormat)
 {
     dstWidth = m_dstWidth;
     dstHeight = m_dstHeight;
@@ -46,8 +40,7 @@ bool AVFrameConvert::init()
     if (m_convertCtx) {
         return true;
     }
-    m_convertCtx = sws_getContext(m_srcWidth, m_srcHeight, m_srcFormat, m_dstWidth, m_dstHeight, m_dstFormat,
-                                  SWS_BICUBIC, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
+    m_convertCtx = sws_getContext(m_srcWidth, m_srcHeight, m_srcFormat, m_dstWidth, m_dstHeight, m_dstFormat, SWS_BICUBIC, Q_NULLPTR, Q_NULLPTR, Q_NULLPTR);
     if (!m_convertCtx) {
         return false;
     }
@@ -67,15 +60,13 @@ void AVFrameConvert::deInit()
     }
 }
 
-bool AVFrameConvert::convert(const AVFrame* srcFrame, AVFrame* dstFrame)
+bool AVFrameConvert::convert(const AVFrame *srcFrame, AVFrame *dstFrame)
 {
-    if(!m_convertCtx || !srcFrame || !dstFrame) {
+    if (!m_convertCtx || !srcFrame || !dstFrame) {
         return false;
     }
-    qint32 ret = sws_scale(m_convertCtx,
-                           static_cast<const uint8_t* const*>(srcFrame->data),
-                           srcFrame->linesize, 0, m_srcHeight, dstFrame->data,
-                           dstFrame->linesize);
+    qint32 ret
+        = sws_scale(m_convertCtx, static_cast<const uint8_t *const *>(srcFrame->data), srcFrame->linesize, 0, m_srcHeight, dstFrame->data, dstFrame->linesize);
     if (0 == ret) {
         return false;
     }

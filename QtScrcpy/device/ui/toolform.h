@@ -1,14 +1,15 @@
 #ifndef TOOLFORM_H
 #define TOOLFORM_H
 
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 
-#include "magneticwidget.h"
 #include "device.h"
+#include "magneticwidget.h"
 
-namespace Ui {
-class ToolForm;
+namespace Ui
+{
+    class ToolForm;
 }
 
 class Device;
@@ -17,7 +18,7 @@ class ToolForm : public MagneticWidget
     Q_OBJECT
 
 public:
-    explicit ToolForm(QWidget* adsorbWidget, AdsorbPositions adsorbPos);
+    explicit ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos);
     ~ToolForm();
 
     void setDevice(Device *device);
@@ -45,7 +46,7 @@ private slots:
     void on_touchBtn_clicked();
     void on_groupControlBtn_clicked();
 
-    void onControlStateChange(Device* device, Device::GroupControlState oldState, Device::GroupControlState newState);
+    void onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
 private:
     void initStyle();

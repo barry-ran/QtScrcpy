@@ -2,18 +2,11 @@
 
 #include "inputconvertnormal.h"
 
-InputConvertNormal::InputConvertNormal(Controller* controller)
-    : InputConvertBase(controller)
-{
+InputConvertNormal::InputConvertNormal(Controller *controller) : InputConvertBase(controller) {}
 
-}
+InputConvertNormal::~InputConvertNormal() {}
 
-InputConvertNormal::~InputConvertNormal()
-{
-
-}
-
-void InputConvertNormal::mouseEvent(const QMouseEvent* from, const QSize& frameSize, const QSize& showSize)
+void InputConvertNormal::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     if (!from) {
         return;
@@ -43,20 +36,21 @@ void InputConvertNormal::mouseEvent(const QMouseEvent* from, const QSize& frameS
     QPointF pos = from->localPos();
     // convert pos
     pos.setX(pos.x() * frameSize.width() / showSize.width());
-    pos.setY(pos.y() * frameSize.height() / showSize.height());    
+    pos.setY(pos.y() * frameSize.height() / showSize.height());
 
     // set data
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_TOUCH);
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectTouchMsgData(POINTER_ID_MOUSE, action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize), 1.0f);
+    controlMsg->setInjectTouchMsgData(
+        static_cast<quint64>(POINTER_ID_MOUSE), action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize), 1.0f);
     sendControlMsg(controlMsg);
 }
 
-void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameSize, const QSize& showSize)
+void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
 {
-    if (!from) {
+    if (!from || 0 == from->delta()) {
         return;
     }
 
@@ -79,7 +73,7 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameS
     pos.setY(pos.y() * frameSize.height() / showSize.height());
 
     // set data
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_SCROLL);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_SCROLL);
     if (!controlMsg) {
         return;
     }
@@ -87,7 +81,7 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize& frameS
     sendControlMsg(controlMsg);
 }
 
-void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize& frameSize, const QSize& showSize)
+void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     Q_UNUSED(frameSize)
     Q_UNUSED(showSize)
@@ -115,7 +109,7 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize& frameSize,
     }
 
     // set data
-    ControlMsg* controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
     if (!controlMsg) {
         return;
     }
@@ -141,7 +135,7 @@ AndroidMotioneventButtons InputConvertNormal::convertMouseButtons(Qt::MouseButto
     if (buttonState & Qt::XButton2) {
         buttons |= AMOTION_EVENT_BUTTON_FORWARD;
     }
-    return (AndroidMotioneventButtons)buttons;
+    return static_cast<AndroidMotioneventButtons>(buttons);
 }
 
 AndroidKeycode InputConvertNormal::convertKeyCode(int key, Qt::KeyboardModifiers modifiers)
@@ -345,5 +339,5 @@ AndroidMetastate InputConvertNormal::convertMetastate(Qt::KeyboardModifiers modi
         // no mapping?
     }
     */
-    return (AndroidMetastate)metastate;
+    return static_cast<AndroidMetastate>(metastate);
 }

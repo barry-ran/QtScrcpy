@@ -1,76 +1,82 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
-#include <QObject>
-#include <QPointF>
-#include <QVector>
-#include <QRectF>
-#include <QPair>
+#include <QJsonObject>
 #include <QMetaEnum>
 #include <QMultiHash>
-#include <QJsonObject>
+#include <QObject>
+#include <QPair>
+#include <QPointF>
+#include <QRectF>
+#include <QVector>
 
 class KeyMap : public QObject
-{    
+{
     Q_OBJECT
 public:
-    enum KeyMapType {
+    enum KeyMapType
+    {
         KMT_INVALID = -1,
         KMT_CLICK = 0,
         KMT_CLICK_TWICE,
         KMT_STEER_WHEEL,
         KMT_DRAG,
         KMT_MOUSE_MOVE
-    };    
+    };
     Q_ENUM(KeyMapType)
 
-    enum ActionType {
+    enum ActionType
+    {
         AT_INVALID = -1,
         AT_KEY = 0,
         AT_MOUSE = 1,
     };
     Q_ENUM(ActionType)
 
-    struct KeyNode {
+    struct KeyNode
+    {
         ActionType type = AT_INVALID;
         int key = Qt::Key_unknown;
-        QPointF pos = QPointF(0, 0); // normal key
+        QPointF pos = QPointF(0, 0);       // normal key
         QPointF extendPos = QPointF(0, 0); // for drag
-        double extendOffset = 0.0;  // for steerWheel
+        double extendOffset = 0.0;         // for steerWheel
 
-        KeyNode(ActionType type = AT_INVALID,
-                int key = Qt::Key_unknown,
-                QPointF pos = QPointF(0, 0),
-                QPointF extendPos = QPointF(0, 0),
-                double extendOffset = 0.0)
-            : type(type)
-            , key(key)
-            , pos(pos)
-            , extendPos(extendPos)
-            , extendOffset(extendOffset)
+        KeyNode(
+            ActionType type = AT_INVALID,
+            int key = Qt::Key_unknown,
+            QPointF pos = QPointF(0, 0),
+            QPointF extendPos = QPointF(0, 0),
+            double extendOffset = 0.0)
+            : type(type), key(key), pos(pos), extendPos(extendPos), extendOffset(extendOffset)
         {
-
         }
     };
 
-    struct KeyMapNode {
+    struct KeyMapNode
+    {
         KeyMapType type = KMT_INVALID;
-        union DATA {
-            struct {
+        union DATA
+        {
+            struct
+            {
                 KeyNode keyNode;
                 bool switchMap = false;
             } click;
-            struct {
+            struct
+            {
                 KeyNode keyNode;
             } clickTwice;
-            struct {
-                QPointF centerPos = {0.0, 0.0};
+            struct
+            {
+                QPointF centerPos = { 0.0, 0.0 };
                 KeyNode left, right, up, down;
             } steerWheel;
-            struct {
+            struct
+            {
                 KeyNode keyNode;
             } drag;
-            struct {
-                QPointF startPos = {0.0, 0.0};
+            struct
+            {
+                QPointF startPos = { 0.0, 0.0 };
                 int speedRatio = 1;
             } mouseMove;
             DATA() {}
@@ -84,49 +90,49 @@ public:
     virtual ~KeyMap();
 
     void loadKeyMap(const QString &json);
-    const KeyMap::KeyMapNode& getKeyMapNode(int key);
-    const KeyMap::KeyMapNode& getKeyMapNodeKey(int key);
-    const KeyMap::KeyMapNode& getKeyMapNodeMouse(int key);
+    const KeyMap::KeyMapNode &getKeyMapNode(int key);
+    const KeyMap::KeyMapNode &getKeyMapNodeKey(int key);
+    const KeyMap::KeyMapNode &getKeyMapNodeMouse(int key);
     bool isSwitchOnKeyboard();
     int getSwitchKey();
 
     bool isValidMouseMoveMap();
     bool isValidSteerWheelMap();
-    const KeyMap::KeyMapNode& getMouseMoveMap();
+    const KeyMap::KeyMapNode &getMouseMoveMap();
 
-    static const QString& getKeyMapPath();
+    static const QString &getKeyMapPath();
 
 private:
     // set up the reverse map from key/event event to keyMapNode
     void makeReverseMap();
 
     // safe check for base
-    bool checkItemString(const QJsonObject& node, const QString& name);
-    bool checkItemDouble(const QJsonObject& node, const QString& name);
-    bool checkItemBool(const QJsonObject& node, const QString& name);
-    bool checkItemObject(const QJsonObject& node, const QString& name);
-    bool checkItemPos(const QJsonObject& node, const QString& name);
+    bool checkItemString(const QJsonObject &node, const QString &name);
+    bool checkItemDouble(const QJsonObject &node, const QString &name);
+    bool checkItemBool(const QJsonObject &node, const QString &name);
+    bool checkItemObject(const QJsonObject &node, const QString &name);
+    bool checkItemPos(const QJsonObject &node, const QString &name);
 
     // safe check for KeyMapNode
-    bool checkForClick(const QJsonObject& node);
-    bool checkForClickTwice(const QJsonObject& node);
-    bool checkForSteerWhell(const QJsonObject& node);
-    bool checkForDrag(const QJsonObject& node);
+    bool checkForClick(const QJsonObject &node);
+    bool checkForClickTwice(const QJsonObject &node);
+    bool checkForSteerWhell(const QJsonObject &node);
+    bool checkForDrag(const QJsonObject &node);
 
     // get keymap from json object
-    QString getItemString(const QJsonObject& node, const QString& name);
-    double getItemDouble(const QJsonObject& node, const QString& name);
-    bool getItemBool(const QJsonObject& node, const QString& name);
-    QJsonObject getItemObject(const QJsonObject& node, const QString& name);
-    QPointF getItemPos(const QJsonObject& node, const QString& name);
-    QPair<ActionType, int> getItemKey(const QJsonObject& node, const QString& name);
-    KeyMapType getItemKeyMapType(const QJsonObject& node, const QString& name);
+    QString getItemString(const QJsonObject &node, const QString &name);
+    double getItemDouble(const QJsonObject &node, const QString &name);
+    bool getItemBool(const QJsonObject &node, const QString &name);
+    QJsonObject getItemObject(const QJsonObject &node, const QString &name);
+    QPointF getItemPos(const QJsonObject &node, const QString &name);
+    QPair<ActionType, int> getItemKey(const QJsonObject &node, const QString &name);
+    KeyMapType getItemKeyMapType(const QJsonObject &node, const QString &name);
 
 private:
     static QString s_keyMapPath;
 
     QVector<KeyMapNode> m_keyMapNodes;
-    KeyNode m_switchKey = {AT_KEY, Qt::Key_QuoteLeft};
+    KeyNode m_switchKey = { AT_KEY, Qt::Key_QuoteLeft };
 
     // just for return
     KeyMapNode m_invalidNode;
@@ -142,8 +148,8 @@ private:
     QMetaEnum m_metaEnumMouseButtons = QMetaEnum::fromType<Qt::MouseButtons>();
     QMetaEnum m_metaEnumKeyMapType = QMetaEnum::fromType<KeyMap::KeyMapType>();
     // reverse map of key/mouse event
-    QMultiHash<int, KeyMapNode*> m_rmapKey;
-    QMultiHash<int, KeyMapNode*> m_rmapMouse;
+    QMultiHash<int, KeyMapNode *> m_rmapKey;
+    QMultiHash<int, KeyMapNode *> m_rmapMouse;
 };
 
 #endif // KEYMAP_H

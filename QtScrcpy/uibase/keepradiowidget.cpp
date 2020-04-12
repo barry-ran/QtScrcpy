@@ -3,16 +3,9 @@
 
 #include "keepradiowidget.h"
 
-KeepRadioWidget::KeepRadioWidget(QWidget *parent) :
-    QWidget(parent)
-{
+KeepRadioWidget::KeepRadioWidget(QWidget *parent) : QWidget(parent) {}
 
-}
-
-KeepRadioWidget::~KeepRadioWidget()
-{
-
-}
+KeepRadioWidget::~KeepRadioWidget() {}
 
 void KeepRadioWidget::setWidget(QWidget *w)
 {
@@ -25,7 +18,7 @@ void KeepRadioWidget::setWidget(QWidget *w)
 
 void KeepRadioWidget::setWidthHeightRadio(float widthHeightRadio)
 {
-    if (abs(m_widthHeightRadio - widthHeightRadio) < 0.000001f) {
+    if (fabs(m_widthHeightRadio - widthHeightRadio) < 0.000001f) {
         return;
     }
     m_widthHeightRadio = widthHeightRadio;
