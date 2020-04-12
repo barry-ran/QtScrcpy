@@ -13,7 +13,7 @@ InputConvertGame::~InputConvertGame() {}
 void InputConvertGame::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
     // 处理开关按键
-    if (m_keyMap.isSwitchOnKeyboard() == false && m_keyMap.getSwitchKey() == from->button()) {
+    if (m_keyMap.isSwitchOnKeyboard() == false && m_keyMap.getSwitchKey() == static_cast<int>(from->button())) {
         if (from->type() != QEvent::MouseButtonPress) {
             return;
         }

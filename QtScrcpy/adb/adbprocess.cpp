@@ -53,20 +53,20 @@ void AdbProcess::initSignals()
         } else {
             emit adbProcessResult(AER_ERROR_START);
             QString err = QString("qprocess start error:%1 %2").arg(program()).arg(arguments().join(" "));
-            qCritical(err.toStdString().c_str());
+            qCritical() << err.toStdString().c_str();
         }
     });
 
     connect(this, &QProcess::readyReadStandardError, this, [this]() {
         QString tmp = QString::fromUtf8(readAllStandardError()).trimmed();
         m_errorOutput += tmp;
-        qWarning(QString("AdbProcess::error:%1").arg(tmp).toStdString().data());
+        qWarning() << QString("AdbProcess::error:%1").arg(tmp).toStdString().data();
     });
 
     connect(this, &QProcess::readyReadStandardOutput, this, [this]() {
         QString tmp = QString::fromUtf8(readAllStandardOutput()).trimmed();
         m_standardOutput += tmp;
-        qInfo(QString("AdbProcess::out:%1").arg(tmp).toStdString().data());
+        qInfo() << QString("AdbProcess::out:%1").arg(tmp).toStdString().data();
     });
 
     connect(this, &QProcess::started, this, [this]() { emit adbProcessResult(AER_SUCCESS_START); });

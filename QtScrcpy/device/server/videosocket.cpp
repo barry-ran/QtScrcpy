@@ -45,7 +45,7 @@ qint32 VideoSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
 
 bool VideoSocket::event(QEvent *event)
 {
-    if (event->type() == QScrcpyEvent::VideoSocket) {
+    if (static_cast<QScrcpyEvent::Type>(event->type()) == QScrcpyEvent::VideoSocket) {
         onReadyRead();
         return true;
     }
