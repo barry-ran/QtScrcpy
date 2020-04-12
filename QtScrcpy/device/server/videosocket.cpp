@@ -1,6 +1,6 @@
 #include <QCoreApplication>
-#include <QThread>
 #include <QDebug>
+#include <QThread>
 
 #include "qscrcpyevent.h"
 #include "videosocket.h"
@@ -31,7 +31,7 @@ qint32 VideoSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
     m_dataSize = 0;
 
     // post event
-    VideoSocketEvent* getDataEvent = new VideoSocketEvent();
+    VideoSocketEvent *getDataEvent = new VideoSocketEvent();
     QCoreApplication::postEvent(this, getDataEvent);
 
     // wait
@@ -45,7 +45,7 @@ qint32 VideoSocket::subThreadRecvData(quint8 *buf, qint32 bufSize)
 
 bool VideoSocket::event(QEvent *event)
 {
-    if (event->type() == QScrcpyEvent::VideoSocket) {
+    if (static_cast<QScrcpyEvent::Type>(event->type()) == QScrcpyEvent::VideoSocket) {
         onReadyRead();
         return true;
     }
@@ -58,7 +58,7 @@ void VideoSocket::onReadyRead()
     if (m_buffer && m_bufferSize <= bytesAvailable()) {
         // recv data
         qint64 readSize = qMin(bytesAvailable(), (qint64)m_bufferSize);
-        m_dataSize = read((char*)m_buffer, readSize);
+        m_dataSize = read((char *)m_buffer, readSize);
 
         m_buffer = Q_NULLPTR;
         m_bufferSize = 0;

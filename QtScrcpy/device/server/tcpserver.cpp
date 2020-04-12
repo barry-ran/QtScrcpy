@@ -1,15 +1,9 @@
 #include "tcpserver.h"
 #include "videosocket.h"
 
-TcpServer::TcpServer(QObject *parent) : QTcpServer(parent)
-{
+TcpServer::TcpServer(QObject *parent) : QTcpServer(parent) {}
 
-}
-
-TcpServer::~TcpServer()
-{
-
-}
+TcpServer::~TcpServer() {}
 
 void TcpServer::incomingConnection(qintptr handle)
 {

@@ -1,17 +1,13 @@
 #include <QDebug>
 
-#include "devicemsg.h"
 #include "bufferutil.h"
+#include "devicemsg.h"
 
-DeviceMsg::DeviceMsg(QObject *parent) : QObject(parent)
-{
-
-}
+DeviceMsg::DeviceMsg(QObject *parent) : QObject(parent) {}
 
 DeviceMsg::~DeviceMsg()
 {
-    if (DMT_GET_CLIPBOARD == m_data.type
-            && Q_NULLPTR != m_data.clipboardMsg.text) {
+    if (DMT_GET_CLIPBOARD == m_data.type && Q_NULLPTR != m_data.clipboardMsg.text) {
         delete m_data.clipboardMsg.text;
         m_data.clipboardMsg.text = Q_NULLPTR;
     }
@@ -22,12 +18,12 @@ DeviceMsg::DeviceMsgType DeviceMsg::type()
     return m_data.type;
 }
 
-void DeviceMsg::getClipboardMsgData(QString& text)
+void DeviceMsg::getClipboardMsgData(QString &text)
 {
     text = QString::fromUtf8(m_data.clipboardMsg.text);
 }
 
-qint32 DeviceMsg::deserialize(QByteArray& byteArray)
+qint32 DeviceMsg::deserialize(QByteArray &byteArray)
 {
     QBuffer buf(&byteArray);
     buf.open(QBuffer::ReadOnly);
@@ -61,7 +57,7 @@ qint32 DeviceMsg::deserialize(QByteArray& byteArray)
         break;
     }
     default:
-        qWarning("Unsupported device msg type: %d", (int) m_data.type);
+        qWarning("Unsupported device msg type: %d", (int)m_data.type);
         ret = -1; // error, we cannot recover
     }
 

@@ -1,35 +1,23 @@
-#include <Windows.h>
-#include <QWidget>
 #include <QDebug>
+#include <QWidget>
+#include <Windows.h>
 
 #include "winmousetap.h"
 
-WinMouseTap::WinMouseTap()
-{
+WinMouseTap::WinMouseTap() {}
 
-}
+WinMouseTap::~WinMouseTap() {}
 
-WinMouseTap::~WinMouseTap()
-{
+void WinMouseTap::initMouseEventTap() {}
 
-}
-
-void WinMouseTap::initMouseEventTap()
-{
-
-}
-
-void WinMouseTap::quitMouseEventTap()
-{
-
-}
+void WinMouseTap::quitMouseEventTap() {}
 
 void WinMouseTap::enableMouseEventTap(QRect rc, bool enabled)
 {
     if (enabled && rc.isEmpty()) {
         return;
     }
-    if(enabled) {
+    if (enabled) {
         RECT mainRect;
         mainRect.left = (LONG)rc.left();
         mainRect.right = (LONG)rc.right();

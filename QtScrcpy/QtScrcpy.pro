@@ -59,7 +59,7 @@ INCLUDEPATH += \
 # 统一版本号入口,只修改这一个地方即可
 VERSION_MAJOR = 1
 VERSION_MINOR = 3
-VERSION_PATCH = 0
+VERSION_PATCH = 1
 
 # qmake变量的方式定义版本号
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
@@ -121,6 +121,7 @@ win32 {
     # windows rc file
     RC_FILE = $$PWD/res/QtScrcpy.rc
 }
+
 # ***********************************************************
 # Mac平台下配置
 # ***********************************************************
@@ -158,12 +159,12 @@ macos {
 
     # mac application icon
     ICON = $$PWD/res/QtScrcpy.icns
-    QMAKE_INFO_PLIST = $$PWD/res/Info_mac.plist
+    QMAKE_INFO_PLIST = $$PWD/res/Info_Mac.plist
 
     # 定义目标命令（修改版本号字段）
     plistupdate.commands = /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $$VERSION\" \
     -c \"Set :CFBundleVersion $$VERSION\" \
-    $$QMAKE_INFO_PLIST
+    $$DESTDIR/$${TARGET}.app/Contents/Info.plist
 
     # 增加额外目标
     QMAKE_EXTRA_TARGETS += plistupdate

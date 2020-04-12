@@ -6,7 +6,7 @@ class FpsCounter : public QObject
 {
     Q_OBJECT
 public:
-    FpsCounter(QObject* parent = Q_NULLPTR);
+    FpsCounter(QObject *parent = Q_NULLPTR);
     virtual ~FpsCounter();
 
     void start();
@@ -23,8 +23,8 @@ private:
     void stopCounterTimer();
     void resetCounter();
 
-private:    
-    quint32 m_counterTimer = 0;
+private:
+    qint32 m_counterTimer = 0;
     quint32 m_curRendered = 0;
     quint32 m_curSkipped = 0;
 

@@ -1,17 +1,17 @@
 #include <QApplication>
 #include <QDebug>
-#include <QTcpSocket>
-#include <QTcpServer>
-#include <QTranslator>
 #include <QFile>
 #include <QSurfaceFormat>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QTranslator>
 
-#include "dialog.h"
-#include "stream.h"
-#include "mousetap/mousetap.h"
 #include "config.h"
+#include "dialog.h"
+#include "mousetap/mousetap.h"
+#include "stream.h"
 
-static Dialog* g_mainDlg = Q_NULLPTR;
+static Dialog *g_mainDlg = Q_NULLPTR;
 
 static QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     int opengl = Config::getInstance().getDesktopOpenGL();
     if (0 == opengl) {
         QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
-    } else if (1 == opengl){
+    } else if (1 == opengl) {
         QApplication::setAttribute(Qt::AA_UseOpenGLES);
     } else if (2 == opengl) {
         QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
@@ -98,8 +98,13 @@ int main(int argc, char *argv[])
     g_mainDlg->setWindowTitle(Config::getInstance().getTitle());
     g_mainDlg->show();
 
-    qInfo(QObject::tr("This software is completely open source and free, you can download it at the following address:").toUtf8());
-    qInfo(QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8());
+    qInfo(
+        "%s",
+        QObject::tr("This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the "
+                    "following address:")
+            .toUtf8()
+            .data());
+    qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8();
 
     int ret = a.exec();
 
@@ -111,7 +116,8 @@ int main(int argc, char *argv[])
     return ret;
 }
 
-void installTranslator() {
+void installTranslator()
+{
     static QTranslator translator;
     QLocale locale;
     QLocale::Language language = locale.language();

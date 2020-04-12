@@ -1,12 +1,12 @@
-#include <QDebug>
-#include <QTimer>
-#include <QThread>
-#include <QTimerEvent>
 #include <QCoreApplication>
+#include <QDebug>
 #include <QFileInfo>
+#include <QThread>
+#include <QTimer>
+#include <QTimerEvent>
 
-#include "server.h"
 #include "config.h"
+#include "server.h"
 
 #define DEVICE_NAME_FIELD_LENGTH 64
 #define SOCKET_NAME "scrcpy"
@@ -18,10 +18,10 @@ Server::Server(QObject *parent) : QObject(parent)
     connect(&m_workProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
     connect(&m_serverProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
 
-    connect(&m_serverSocket, &QTcpServer::newConnection, this, [this](){
-        QTcpSocket* tmp = m_serverSocket.nextPendingConnection();
-        if (dynamic_cast<VideoSocket*>(tmp)) {
-            m_videoSocket = dynamic_cast<VideoSocket*>(tmp);
+    connect(&m_serverSocket, &QTcpServer::newConnection, this, [this]() {
+        QTcpSocket *tmp = m_serverSocket.nextPendingConnection();
+        if (dynamic_cast<VideoSocket *>(tmp)) {
+            m_videoSocket = dynamic_cast<VideoSocket *>(tmp);
             if (!m_videoSocket->isValid() || !readInfo(m_videoSocket, m_deviceName, m_deviceSize)) {
                 stop();
                 emit connectToResult(false);
@@ -45,12 +45,9 @@ Server::Server(QObject *parent) : QObject(parent)
     });
 }
 
-Server:: ~Server()
-{
+Server::~Server() {}
 
-}
-
-const QString& Server::getServerPath()
+const QString &Server::getServerPath()
 {
     if (m_serverPath.isEmpty()) {
         m_serverPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_SERVER_PATH"));
@@ -63,7 +60,7 @@ const QString& Server::getServerPath()
 }
 
 bool Server::pushServer()
-{    
+{
     if (m_workProcess.isRuning()) {
         m_workProcess.kill();
     }
@@ -82,11 +79,11 @@ bool Server::enableTunnelReverse()
 
 bool Server::disableTunnelReverse()
 {
-    AdbProcess* adb = new AdbProcess();
+    AdbProcess *adb = new AdbProcess();
     if (!adb) {
         return false;
     }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
         if (AdbProcess::AER_SUCCESS_START != processResult) {
             sender()->deleteLater();
         }
@@ -105,11 +102,11 @@ bool Server::enableTunnelForward()
 }
 bool Server::disableTunnelForward()
 {
-    AdbProcess* adb = new AdbProcess();
+    AdbProcess *adb = new AdbProcess();
     if (!adb) {
         return false;
     }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
         if (AdbProcess::AER_SUCCESS_START != processResult) {
             sender()->deleteLater();
         }
@@ -150,7 +147,7 @@ bool Server::execute()
 }
 
 bool Server::start(Server::ServerParams params)
-{    
+{
     m_params = params;
     m_serverStartStep = SSS_PUSH;
     return startServerByStep();
@@ -161,7 +158,7 @@ bool Server::connectTo()
     if (SSS_RUNNING != m_serverStartStep) {
         qWarning("server not run");
         return false;
-    }    
+    }
 
     if (!m_tunnelForward && !m_videoSocket) {
         startAcceptTimeoutTimer();
@@ -192,8 +189,8 @@ void Server::timerEvent(QTimerEvent *event)
     }
 }
 
-VideoSocket* Server::getVideoSocket()
-{    
+VideoSocket *Server::getVideoSocket()
+{
     return m_videoSocket;
 }
 
@@ -228,8 +225,8 @@ void Server::stop()
         }
         m_tunnelForward = false;
         m_tunnelEnabled = false;
-    }    
-    m_serverSocket.close();    
+    }
+    m_serverSocket.close();
 }
 
 bool Server::startServerByStep()
@@ -258,7 +255,7 @@ bool Server::startServerByStep()
                 // try to connect until the server socket is listening on the device.
                 m_serverSocket.setMaxPendingConnections(2);
                 if (!m_serverSocket.listen(QHostAddress::LocalHost, m_params.localPort)) {
-                    qCritical(QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str());
+                    qCritical() << QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str();
                     m_serverStartStep = SSS_NULL;
                     if (m_tunnelForward) {
                         disableTunnelForward();
@@ -283,14 +280,14 @@ bool Server::startServerByStep()
     return stepSuccess;
 }
 
-bool Server::readInfo(VideoSocket* videoSocket, QString &deviceName, QSize &size)
+bool Server::readInfo(VideoSocket *videoSocket, QString &deviceName, QSize &size)
 {
     unsigned char buf[DEVICE_NAME_FIELD_LENGTH + 4];
     if (videoSocket->bytesAvailable() <= (DEVICE_NAME_FIELD_LENGTH + 4)) {
         videoSocket->waitForReadyRead(300);
     }
 
-    qint64 len = videoSocket->read((char*)buf, sizeof(buf));
+    qint64 len = videoSocket->read((char *)buf, sizeof(buf));
     if (len < DEVICE_NAME_FIELD_LENGTH + 4) {
         qInfo("Could not retrieve device information");
         return false;
@@ -298,7 +295,7 @@ bool Server::readInfo(VideoSocket* videoSocket, QString &deviceName, QSize &size
     buf[DEVICE_NAME_FIELD_LENGTH - 1] = '\0'; // in case the client sends garbage
     // strcpy is safe here, since name contains at least DEVICE_NAME_FIELD_LENGTH bytes
     // and strlen(buf) < DEVICE_NAME_FIELD_LENGTH
-    deviceName = (char*)buf;
+    deviceName = (char *)buf;
     size.setWidth((buf[DEVICE_NAME_FIELD_LENGTH] << 8) | buf[DEVICE_NAME_FIELD_LENGTH + 1]);
     size.setHeight((buf[DEVICE_NAME_FIELD_LENGTH + 2] << 8) | buf[DEVICE_NAME_FIELD_LENGTH + 3]);
     return true;
@@ -342,7 +339,7 @@ void Server::onConnectTimer()
     QSize deviceSize;
     bool success = false;
 
-    VideoSocket* videoSocket = new VideoSocket();
+    VideoSocket *videoSocket = new VideoSocket();
     QTcpSocket *controlSocket = new QTcpSocket();
 
     videoSocket->connectToHost(QHostAddress::LocalHost, m_params.localPort);
@@ -427,7 +424,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                         m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
                     }
                     startServerByStep();
-                } else if (AdbProcess::AER_SUCCESS_START != processResult){
+                } else if (AdbProcess::AER_SUCCESS_START != processResult) {
                     qCritical("adb push failed");
                     m_serverStartStep = SSS_NULL;
                     emit serverStartResult(false);
@@ -437,7 +434,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
-                } else if (AdbProcess::AER_SUCCESS_START != processResult){
+                } else if (AdbProcess::AER_SUCCESS_START != processResult) {
                     // 有一些设备reverse会报错more than o'ne device，adb的bug
                     // https://github.com/Genymobile/scrcpy/issues/5
                     qCritical("adb reverse failed");
@@ -450,7 +447,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
-                } else if (AdbProcess::AER_SUCCESS_START != processResult){
+                } else if (AdbProcess::AER_SUCCESS_START != processResult) {
                     qCritical("adb forward failed");
                     m_serverStartStep = SSS_NULL;
                     emit serverStartResult(false);
@@ -467,7 +464,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 m_serverStartStep = SSS_RUNNING;
                 m_tunnelEnabled = true;
                 emit serverStartResult(true);
-            } else if (AdbProcess::AER_ERROR_START == processResult){
+            } else if (AdbProcess::AER_ERROR_START == processResult) {
                 if (!m_tunnelForward) {
                     m_serverSocket.close();
                     disableTunnelReverse();

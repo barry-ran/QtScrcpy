@@ -1,27 +1,25 @@
-#include <QTimer>
-#include <QMessageBox>
 #include <QDir>
+#include <QMessageBox>
+#include <QTimer>
 
+#include "avframeconvert.h"
+#include "config.h"
+#include "controller.h"
+#include "decoder.h"
 #include "device.h"
+#include "filehandler.h"
+#include "mousetap/mousetap.h"
 #include "recorder.h"
 #include "server.h"
-#include "videobuffer.h"
-#include "decoder.h"
-#include "filehandler.h"
 #include "stream.h"
+#include "videobuffer.h"
 #include "videoform.h"
-#include "controller.h"
-#include "config.h"
-#include "avframeconvert.h"
-#include "mousetap/mousetap.h"
 extern "C"
 {
 #include "libavutil/imgutils.h"
 }
 
-Device::Device(DeviceParams params, QObject *parent)
-    : QObject(parent)
-    , m_params(params)
+Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params(params)
 {
     if (!params.display && m_params.recordFileName.trimmed().isEmpty()) {
         qCritical("not display must be recorded");
@@ -102,7 +100,7 @@ const QSize Device::frameSize()
 
 void Device::updateScript(QString script)
 {
-    if(m_controller){
+    if (m_controller) {
         m_controller->updateScript(script);
     }
 }
@@ -121,11 +119,11 @@ void Device::onScreenshot()
 
 void Device::onShowTouch(bool show)
 {
-    AdbProcess* adb = new AdbProcess();
+    AdbProcess *adb = new AdbProcess();
     if (!adb) {
         return;
     }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
         if (AdbProcess::AER_SUCCESS_START != processResult) {
             sender()->deleteLater();
         }
@@ -167,7 +165,7 @@ void Device::initSignals()
         connect(this, &Device::postTextInput, m_controller, &Controller::onPostTextInput);
     }
     if (m_videoForm) {
-        connect(m_videoForm, &VideoForm::destroyed, this, [this](QObject *obj){
+        connect(m_videoForm, &VideoForm::destroyed, this, [this](QObject *obj) {
             Q_UNUSED(obj)
             deleteLater();
         });
@@ -177,7 +175,7 @@ void Device::initSignals()
     if (m_fileHandler) {
         connect(this, &Device::pushFileRequest, m_fileHandler, &FileHandler::onPushFileRequest);
         connect(this, &Device::installApkRequest, m_fileHandler, &FileHandler::onInstallApkRequest);
-        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk){
+        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
             QString tipsType = "";
             if (isApk) {
                 tipsType = tr("install apk");
@@ -203,17 +201,17 @@ void Device::initSignals()
     }
 
     if (m_server) {
-        connect(m_server, &Server::serverStartResult, this, [this](bool success){
+        connect(m_server, &Server::serverStartResult, this, [this](bool success) {
             if (success) {
                 m_server->connectTo();
             } else {
                 deleteLater();
             }
         });
-        connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size){
+        connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size) {
             if (success) {
                 double diff = m_startTimeCount.elapsed() / 1000.0;
-                qInfo(QString("server start finish in %1s").arg(diff).toStdString().c_str());
+                qInfo() << QString("server start finish in %1s").arg(diff).toStdString().c_str();
 
                 // update ui
                 if (m_videoForm) {
@@ -251,14 +249,14 @@ void Device::initSignals()
                 }
             }
         });
-        connect(m_server, &Server::onServerStop, this, [this](){
+        connect(m_server, &Server::onServerStop, this, [this]() {
             deleteLater();
             qDebug() << "server process stop";
         });
     }
 
     if (m_stream) {
-        connect(m_stream, &Stream::onStreamStop, this, [this](){
+        connect(m_stream, &Stream::onStreamStop, this, [this]() {
             deleteLater();
             qDebug() << "stream thread stop";
         });
@@ -266,21 +264,26 @@ void Device::initSignals()
 
     if (m_decoder && m_vb) {
         // must be Qt::QueuedConnection, ui update must be main thread
-        connect(m_decoder, &Decoder::onNewFrame, this, [this](){
-            m_vb->lock();
-            const AVFrame *frame = m_vb->consumeRenderedFrame();
-            if (m_videoForm) {
-                m_videoForm->updateRender(frame);
-            }
-            m_vb->unLock();
-        },Qt::QueuedConnection);
+        connect(
+            m_decoder,
+            &Decoder::onNewFrame,
+            this,
+            [this]() {
+                m_vb->lock();
+                const AVFrame *frame = m_vb->consumeRenderedFrame();
+                if (m_videoForm) {
+                    m_videoForm->updateRender(frame);
+                }
+                m_vb->unLock();
+            },
+            Qt::QueuedConnection);
     }
 }
 
 void Device::startServer()
 {
     // fix: macos cant recv finished signel, timer is ok
-    QTimer::singleShot(0, this, [this](){
+    QTimer::singleShot(0, this, [this]() {
         m_startTimeCount.start();
         // max size support 480p 720p 1080p 设备原生分辨率
         // support wireless connect, example:
@@ -300,7 +303,7 @@ void Device::startServer()
     });
 }
 
-void Device::onSetControlState(Device* device, Device::GroupControlState state)
+void Device::onSetControlState(Device *device, Device::GroupControlState state)
 {
     Q_UNUSED(device)
     if (m_controlState == state) {
@@ -328,7 +331,7 @@ Device::GroupControlState Device::controlState()
     return m_controlState;
 }
 
-bool Device::saveFrame(const AVFrame* frame)
+bool Device::saveFrame(const AVFrame *frame)
 {
     if (!frame) {
         return false;
@@ -336,7 +339,7 @@ bool Device::saveFrame(const AVFrame* frame)
 
     // create buffer
     QImage rgbImage(frame->width, frame->height, QImage::Format_RGB32);
-    AVFrame* rgbFrame = av_frame_alloc();
+    AVFrame *rgbFrame = av_frame_alloc();
     if (!rgbFrame) {
         return false;
     }

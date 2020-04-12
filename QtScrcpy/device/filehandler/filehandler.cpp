@@ -1,9 +1,8 @@
 #include "filehandler.h"
 
-FileHandler::FileHandler(QObject *parent)
-    : QObject (parent)
+FileHandler::FileHandler(QObject *parent) : QObject(parent)
 {
-    connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult){
+    connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
         switch (processResult) {
         case AdbProcess::AER_ERROR_START:
         case AdbProcess::AER_ERROR_EXEC:
@@ -19,12 +18,9 @@ FileHandler::FileHandler(QObject *parent)
     });
 }
 
-FileHandler::~FileHandler()
-{
+FileHandler::~FileHandler() {}
 
-}
-
-void FileHandler::onPushFileRequest(const QString &serial, const QString &file, const QString& devicePath)
+void FileHandler::onPushFileRequest(const QString &serial, const QString &file, const QString &devicePath)
 {
     if (m_adb.isRuning()) {
         emit fileHandlerResult(FAR_IS_RUNNING, false);
