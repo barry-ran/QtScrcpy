@@ -56,10 +56,15 @@ INCLUDEPATH += \
         $$PWD/devicemanage \
         $$PWD/fontawesome
 
-# 统一版本号入口,只修改这一个地方即可
-VERSION_MAJOR = 1
-VERSION_MINOR = 3
-VERSION_PATCH = 1
+# 版本号会在打包脚本中定义，并通过qmake传递进来
+# 如果外部没有定义，则内部定义（debug模式）
+!defined(VERSION_MAJOR, var) {
+    VERSION_MAJOR = 0
+    VERSION_MINOR = 0
+    VERSION_PATCH = 0
+}
+
+message("version:" $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH})
 
 # qmake变量的方式定义版本号
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH}
