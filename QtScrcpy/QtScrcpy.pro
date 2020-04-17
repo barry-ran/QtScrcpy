@@ -56,14 +56,17 @@ INCLUDEPATH += \
         $$PWD/devicemanage \
         $$PWD/fontawesome
 
-# 版本号会在打包脚本中定义，并通过qmake传递进来
-# 如果外部没有定义，则内部定义（debug模式）
-!defined(VERSION_MAJOR, var) {
-    VERSION_MAJOR = 0
-    VERSION_MINOR = 0
-    VERSION_PATCH = 0
-}
+# 如果变量没有定义
+# !defined(TEST_VAR, var) {
+#     message("test")
+# }
 
+# 从文件读取版本号
+CAT_VERSION = $$cat($$PWD/version)
+# 拆分出版本号
+VERSION_MAJOR = $$section(CAT_VERSION, ., 0, 0)
+VERSION_MINOR = $$section(CAT_VERSION, ., 1, 1)
+VERSION_PATCH = $$section(CAT_VERSION, ., 2, 2)
 message("version:" $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_PATCH})
 
 # qmake变量的方式定义版本号
