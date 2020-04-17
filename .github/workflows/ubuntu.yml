@@ -45,4 +45,6 @@ jobs:
       - name: Build Ubuntu
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
-        run: ci/linux/build_for_ubuntu.sh release
+        run: |
+          python ci\generate-version.py
+          ci/linux/build_for_ubuntu.sh release
