@@ -28,8 +28,9 @@ msvc{
 }
 
 # warning as error
+#4566 https://github.com/Chuyu-Team/VC-LTL/issues/27
 *g++*: QMAKE_CXXFLAGS += -Werror
-*msvc*: QMAKE_CXXFLAGS += /WX
+*msvc*: QMAKE_CXXFLAGS += /WX /wd4566
 
 # 源码
 SOURCES += \

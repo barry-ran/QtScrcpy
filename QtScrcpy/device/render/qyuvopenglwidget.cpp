@@ -29,7 +29,6 @@ static const GLfloat coordinate[] = {
 
     // 纹理坐标，存储4个xy坐标
     // 坐标范围为[0,1],左下角为 0,0
-    // TODO 为什么这个顺序指定四个顶点？顶点坐标和纹理坐标如何映射的？
     0.0f,
     1.0f,
     1.0f,
@@ -249,7 +248,7 @@ void QYUVOpenGLWidget::deInitTextures()
         glDeleteTextures(3, m_texture);
     }
 
-    memset(m_texture, 0, 3);
+    memset(m_texture, 0, sizeof(m_texture));
     m_textureInited = false;
 }
 
