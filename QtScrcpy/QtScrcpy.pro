@@ -26,6 +26,11 @@ msvc{
     QMAKE_CFLAGS += -source-charset:utf-8
     QMAKE_CXXFLAGS += -source-charset:utf-8
 }
+
+# warning as error
+*g++*: QMAKE_CXXFLAGS += -Werror
+*msvc*: QMAKE_CXXFLAGS += /WX
+
 # 源码
 SOURCES += \
         main.cpp \
