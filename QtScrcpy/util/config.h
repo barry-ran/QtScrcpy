@@ -20,6 +20,7 @@ public:
     int getRenderExpiredFrames();
     QString getPushFilePath();
     QString getServerPath();
+    QString getAdbPath();
 
     // user data
     QString getRecordPath();
