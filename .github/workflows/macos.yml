@@ -42,7 +42,9 @@ jobs:
       - name: Build MacOS
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
-        run: ci/mac/build_for_mac.sh release
+        run: |
+          python ci/generate-version.py
+          ci/mac/build_for_mac.sh release
       # 获取ref最后一个/后的内容
       - name: Get the version
         shell: bash

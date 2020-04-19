@@ -9,7 +9,7 @@
 
 #define BUFSIZE 0x10000
 #define HEADER_SIZE 12
-#define NO_PTS UINT64_C(-1)
+#define NO_PTS UINT64_MAX
 
 typedef qint32 (*ReadPacketFunc)(void *, quint8 *, qint32);
 
@@ -28,6 +28,7 @@ static void avLogCallback(void *avcl, int level, const char *fmt, va_list vl)
     case AV_LOG_PANIC:
     case AV_LOG_FATAL:
         qFatal("%s", localFmt.toUtf8().data());
+        break;
     case AV_LOG_ERROR:
         qCritical() << localFmt.toUtf8();
         break;
@@ -70,14 +71,14 @@ void Stream::setDecoder(Decoder *decoder)
 
 static quint32 bufferRead32be(quint8 *buf)
 {
-    return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+    return static_cast<quint32>((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
 }
 
 static quint64 bufferRead64be(quint8 *buf)
 {
     quint32 msb = bufferRead32be(buf);
     quint32 lsb = bufferRead32be(&buf[4]);
-    return ((quint64)msb << 32) | lsb;
+    return (static_cast<quint64>(msb) << 32) | lsb;
 }
 
 void Stream::setVideoSocket(VideoSocket *videoSocket)
@@ -230,16 +231,16 @@ bool Stream::recvPacket(AVPacket *packet)
 
     quint64 pts = bufferRead64be(header);
     quint32 len = bufferRead32be(&header[8]);
-    Q_ASSERT(pts == static_cast<quint64>(NO_PTS) || (pts & 0x8000000000000000) == 0);
+    Q_ASSERT(pts == NO_PTS || (pts & 0x8000000000000000) == 0);
     Q_ASSERT(len);
 
-    if (av_new_packet(packet, len)) {
+    if (av_new_packet(packet, static_cast<int>(len))) {
         qCritical("Could not allocate packet");
         return false;
     }
 
-    r = recvData(packet->data, len);
-    if (r < 0 || ((uint32_t)r) < len) {
+    r = recvData(packet->data, static_cast<qint32>(len));
+    if (r < 0 || static_cast<quint32>(r) < len) {
         av_packet_unref(packet);
         return false;
     }
@@ -272,7 +273,7 @@ bool Stream::pushPacket(AVPacket *packet)
             m_hasPending = true;
         }
 
-        memcpy(m_pending.data + offset, packet->data, packet->size);
+        memcpy(m_pending.data + offset, packet->data, static_cast<unsigned int>(packet->size));
 
         if (!isConfig) {
             // prepare the concat packet to send to the decoder

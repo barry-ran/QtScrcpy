@@ -107,7 +107,7 @@ QByteArray ControlMsg::serializeData()
         BufferUtil::write32(buffer, m_data.injectKeycode.metastate);
         break;
     case CMT_INJECT_TEXT:
-        BufferUtil::write16(buffer, strlen(m_data.injectText.text));
+        BufferUtil::write16(buffer, static_cast<quint32>(strlen(m_data.injectText.text)));
         buffer.write(m_data.injectText.text, strlen(m_data.injectText.text));
         break;
     case CMT_INJECT_TOUCH: {
@@ -124,7 +124,7 @@ QByteArray ControlMsg::serializeData()
         BufferUtil::write32(buffer, m_data.injectScroll.vScroll);
         break;
     case CMT_SET_CLIPBOARD:
-        BufferUtil::write16(buffer, strlen(m_data.setClipboard.text));
+        BufferUtil::write16(buffer, static_cast<quint32>(strlen(m_data.setClipboard.text)));
         buffer.write(m_data.setClipboard.text, strlen(m_data.setClipboard.text));
         break;
     case CMT_SET_SCREEN_POWER_MODE:
