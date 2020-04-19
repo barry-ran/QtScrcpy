@@ -5,6 +5,7 @@
 #include <QProcess>
 
 #include "adbprocess.h"
+#include "config.h"
 
 QString AdbProcess::s_adbPath = "";
 
@@ -26,8 +27,13 @@ const QString &AdbProcess::getAdbPath()
         s_adbPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_ADB_PATH"));
         QFileInfo fileInfo(s_adbPath);
         if (s_adbPath.isEmpty() || !fileInfo.isFile()) {
+            s_adbPath = Config::getInstance().getAdbPath();
+        }
+        fileInfo = s_adbPath;
+        if (s_adbPath.isEmpty() || !fileInfo.isFile()) {
             s_adbPath = QCoreApplication::applicationDirPath() + "/adb";
         }
+        qInfo("adb path: %s", QDir(s_adbPath).absolutePath().toUtf8().data());
     }
     return s_adbPath;
 }
