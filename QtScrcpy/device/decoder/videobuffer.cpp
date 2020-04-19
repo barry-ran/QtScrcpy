@@ -115,6 +115,11 @@ void VideoBuffer::interrupt()
     }
 }
 
+FpsCounter *VideoBuffer::getFPSCounter()
+{
+    return &m_fpsCounter;
+}
+
 void VideoBuffer::swap()
 {
     AVFrame *tmp = m_decodingFrame;

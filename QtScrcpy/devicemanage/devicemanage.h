@@ -16,6 +16,7 @@ public:
     bool connectDevice(Device::DeviceParams params);
     void updateScript(QString script);
     bool staysOnTop(const QString &serial);
+    void showFPS(const QString &serial, bool show);
 
     bool disconnectDevice(const QString &serial);
     void disconnectAllDevice();
