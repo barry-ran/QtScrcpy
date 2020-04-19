@@ -31,6 +31,9 @@
 #define COMMON_RENDER_EXPIRED_FRAMES_KEY "RenderExpiredFrames"
 #define COMMON_RENDER_EXPIRED_FRAMES_DEF 0
 
+#define COMMON_ADB_PATH_KEY "AdbPath"
+#define COMMON_ADB_PATH_DEF ""
+
 // user data
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
@@ -251,6 +254,15 @@ QString Config::getServerPath()
     serverPath = m_settings->value(COMMON_SERVER_PATH_KEY, COMMON_SERVER_PATH_DEF).toString();
     m_settings->endGroup();
     return serverPath;
+}
+
+QString Config::getAdbPath()
+{
+    QString adbPath;
+    m_settings->beginGroup(GROUP_COMMON);
+    adbPath = m_settings->value(COMMON_ADB_PATH_KEY, COMMON_ADB_PATH_DEF).toString();
+    m_settings->endGroup();
+    return adbPath;
 }
 
 QString Config::getTitle()

@@ -1,9 +1,7 @@
 #include "winres.h"
 
-// 图标
 IDI_ICON1       ICON      "QtScrcpy.ico"
-
-// 版本信息
+// 涓轰簡FileDescription鐨勪腑鏂囦笉涔辩爜锛屼腑鏂囩郴缁熶笂鏈枃浠堕渶瑕乬bk缂栫爜锛岃嫳鏂囩郴缁熶笂鏈枃浠堕渶瑕乽tf8缂栫爜
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH
  PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH
@@ -22,7 +20,7 @@ BEGIN
         BLOCK "080404b0"
         BEGIN
             VALUE "CompanyName", "RanKun"
-            VALUE "FileDescription", "安卓实时同屏软件"
+            VALUE "FileDescription", "瀹夊崜瀹炴椂鍚屽睆杞欢"
             VALUE "FileVersion", VERSION_RC_STR
             VALUE "LegalCopyright", "Copyright (C) RanKun 2018-2038. All rights reserved."
             VALUE "ProductName", "QtScrcpy"
