@@ -188,6 +188,7 @@ void Dialog::on_startServerBtn_clicked()
     if (ui->alwaysTopCheck->isChecked()) {
         m_deviceManage.staysOnTop(params.serial);
     }
+    m_deviceManage.showFPS(params.serial, ui->fpsCheck->isChecked());
 }
 
 void Dialog::on_stopServerBtn_clicked()

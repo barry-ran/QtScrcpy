@@ -208,10 +208,23 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="recordScreenCheck">
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="closeScreenCheck">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="text">
-            <string>record screen</string>
+            <string>screen-off</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QCheckBox" name="framelessCheck">
+           <property name="text">
+            <string>frameless</string>
            </property>
           </widget>
          </item>
@@ -231,8 +244,8 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QCheckBox" name="closeScreenCheck">
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="notDisplayCheck">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -240,7 +253,10 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>screen-off</string>
+            <string>background record</string>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -260,26 +276,17 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QCheckBox" name="notDisplayCheck">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+         <item row="0" column="0">
+          <widget class="QCheckBox" name="recordScreenCheck">
            <property name="text">
-            <string>background record</string>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
+            <string>record screen</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="3">
-          <widget class="QCheckBox" name="framelessCheck">
+         <item row="0" column="4">
+          <widget class="QCheckBox" name="fpsCheck">
            <property name="text">
-            <string>frameless</string>
+            <string>show fps</string>
            </property>
           </widget>
          </item>

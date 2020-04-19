@@ -76,6 +76,21 @@ bool DeviceManage::staysOnTop(const QString &serial)
     return true;
 }
 
+void DeviceManage::showFPS(const QString &serial, bool show)
+{
+    if (!serial.isEmpty() && m_devices.contains(serial)) {
+        auto it = m_devices.find(serial);
+        if (!it->data()) {
+            return;
+        }
+        if (!it->data()->getVideoForm()) {
+            return;
+        }
+        it->data()->getVideoForm()->showFPS(show);
+    }
+    return;
+}
+
 bool DeviceManage::disconnectDevice(const QString &serial)
 {
     bool ret = false;
