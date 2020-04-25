@@ -14,6 +14,7 @@ class ToolForm;
 class Device;
 class FileHandler;
 class QYUVOpenGLWidget;
+class QLabel;
 class VideoForm : public QWidget
 {
     Q_OBJECT
@@ -29,9 +30,11 @@ public:
     const QSize &frameSize();
     void resizeSquare();
     void removeBlackRect();
+    void showFPS(bool show);
 
 public slots:
     void onSwitchFullScreen();
+    void updateFPS(quint32 fps);
 
 private:
     void updateStyleSheet(bool vertical);
@@ -68,6 +71,7 @@ private:
     QPointer<ToolForm> m_toolForm;
     QPointer<QWidget> m_loadingWidget;
     QPointer<QYUVOpenGLWidget> m_videoWidget;
+    QPointer<QLabel> m_fpsLabel;
 
     //inside member
     QSize m_frameSize;

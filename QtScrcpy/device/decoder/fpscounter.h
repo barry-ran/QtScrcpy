@@ -15,6 +15,9 @@ public:
     void addRenderedFrame();
     void addSkippedFrame();
 
+signals:
+    void updateFPS(quint32 fps);
+
 protected:
     virtual void timerEvent(QTimerEvent *event);
 

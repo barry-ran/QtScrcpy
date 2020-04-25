@@ -277,6 +277,7 @@ void Device::initSignals()
                 m_vb->unLock();
             },
             Qt::QueuedConnection);
+        connect(m_vb->getFPSCounter(), &::FpsCounter::updateFPS, m_videoForm, &VideoForm::updateFPS);
     }
 }
 
