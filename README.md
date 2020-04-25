@@ -52,6 +52,11 @@ Here is the instruction of adding new customized mapping files.
 - Press the ~ key again to switch back to normal mode
 - (For PUBG and similar games) If you want to drive cars with WASD, you need to check the `single rocker mode` in the game setting.
 
+## Group control
+You can control all your phones at the same time.
+
+![](docs/image/group-control.gif)
+
 ## Thanks
 
 QtScrcpy is based on [Genymobile's](https://github.com/Genymobile) [scrcpy](https://github.com/Genymobile/scrcpy) project. Thanks
