@@ -66,7 +66,7 @@ video render|sdl|opengl
 cross-platform|self implemented|provided by Qt
 language|C|C++
 style|sync|async
-control|single touch|single/multi touch
+keymap|no custom keymap|support custom keymap
 build|meson+gradle|Qt Creator
 
 - It's very easy to customize your GUI with Qt
