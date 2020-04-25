@@ -37,6 +37,8 @@ public:
     // wake up and avoid any blocking call
     void interrupt();
 
+    FpsCounter *getFPSCounter();
+
 private:
     void swap();
 

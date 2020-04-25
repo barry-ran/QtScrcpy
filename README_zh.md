@@ -51,6 +51,11 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 - 再次按~键切换为正常控制模式
 - 要想wasd控制开车记得在载具设置中设置为单摇杆模式
 
+## 群控
+你可以同时控制所有的手机
+
+![gc](docs/image/group-control.gif)
+
 ## 感谢
 
 基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢。QtScrcpy和原版scrcpy区别如下：
@@ -63,7 +68,7 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 跨平台基础设施|自己封装|Qt提供
 编程语言|C|C++
 编程方式|同步|异步
-控制方式|单点触控|单点/多点触控
+按键映射|不支持自定义|支持自定义按键映射
 编译方式|meson+gradle|Qt Creator
 
 - 使用Qt可以非常容易的定制自己的界面

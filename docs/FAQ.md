@@ -26,6 +26,11 @@ QtScrcpy.exe>属性>兼容性>更改高DPI设置>覆盖高DPI缩放行为>由以
 
 ![image](image/USB调试(安全设置).jpg)
 
+## 可以控制，但无法看到画面
+控制台错误信息可能会包含 QOpenGLShaderProgram::attributeLocation(vertexIn): shader program is not linked
+
+一般是由于显卡不支持当前的视频渲染方式，config.ini里修改下解码方式，改成1或者2试试
+
 ## 手机通过数据线连接电脑，刷新设备列表以后，没有任何设备出现
 随便下载一个手机助手，尝试连接成功以后，再用QtScrcpy刷新设备列表连接
 
@@ -34,7 +39,4 @@ QtScrcpy.exe>属性>兼容性>更改高DPI设置>覆盖高DPI缩放行为>由以
 
 ## 错误信息：Could not open video stream
 导致这个错误的原因有很多，最简单的解决方法是在分辨率设置中，选择一个较低的分辨率
-
-## 错误信息：QOpenGLShaderProgram::attributeLocation(vertexIn): shader program is not linked
-config.ini里修改下解码方式，改成1或者2试试
 
