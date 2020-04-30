@@ -279,6 +279,7 @@ AndroidKeycode InputConvertNormal::convertKeyCode(int key, Qt::KeyboardModifiers
         keyCode = AKEYCODE_0;
         break;
     case Qt::Key_1:
+    case Qt::Key_Exclam:// !
         keyCode = AKEYCODE_1;
         break;
     case Qt::Key_2:
@@ -288,15 +289,19 @@ AndroidKeycode InputConvertNormal::convertKeyCode(int key, Qt::KeyboardModifiers
         keyCode = AKEYCODE_3;
         break;
     case Qt::Key_4:
+    case Qt::Key_Dollar://$
         keyCode = AKEYCODE_4;
         break;
     case Qt::Key_5:
+    case Qt::Key_Percent:// %
         keyCode = AKEYCODE_5;
         break;
     case Qt::Key_6:
+    case Qt::Key_AsciiCircum: //^
         keyCode = AKEYCODE_6;
         break;
     case Qt::Key_7:
+    case Qt::Key_Ampersand: //&
         keyCode = AKEYCODE_7;
         break;
     case Qt::Key_8:
@@ -307,6 +312,67 @@ AndroidKeycode InputConvertNormal::convertKeyCode(int key, Qt::KeyboardModifiers
         break;
     case Qt::Key_Space:
         keyCode = AKEYCODE_SPACE;
+        break;
+    case Qt::Key_Comma://,
+    case Qt::Key_Less://<
+        keyCode = AKEYCODE_COMMA;
+        break;
+    case Qt::Key_Period://.
+    case Qt::Key_Greater://>
+        keyCode = AKEYCODE_PERIOD;
+        break;
+    case Qt::Key_Minus://-
+    case Qt::Key_Underscore: //_
+        keyCode = AKEYCODE_MINUS;
+        break;
+    case Qt::Key_Equal://=
+        keyCode = AKEYCODE_EQUALS;
+        break;
+    case Qt::Key_BracketLeft://[
+    case Qt::Key_BraceLeft: //{
+        keyCode = AKEYCODE_LEFT_BRACKET;
+        break;
+    case Qt::Key_BracketRight://]
+    case Qt::Key_BraceRight: //}
+        keyCode = AKEYCODE_RIGHT_BRACKET;
+        break;
+    case Qt::Key_Backslash:// \ ????
+    case Qt::Key_Bar: //|
+        keyCode = AKEYCODE_BACKSLASH;
+        break;
+    case Qt::Key_Semicolon://;
+    case Qt::Key_Colon: //:
+        keyCode = AKEYCODE_SEMICOLON;
+        break;
+    case Qt::Key_Apostrophe://'
+    case Qt::Key_QuoteDbl: //"
+        keyCode = AKEYCODE_APOSTROPHE;
+        break;
+    case Qt::Key_Slash:// /
+    case Qt::Key_Question://?
+        keyCode = AKEYCODE_SLASH;
+        break;
+    case Qt::Key_At://@
+        keyCode = AKEYCODE_AT;
+        break;
+    case Qt::Key_Plus://+
+        keyCode = AKEYCODE_PLUS;
+        break;
+    case Qt::Key_QuoteLeft://`
+    case Qt::Key_AsciiTilde://~
+        keyCode = AKEYCODE_GRAVE;
+        break;
+    case Qt::Key_NumberSign: //#
+        keyCode = AKEYCODE_POUND;
+        break;
+    case Qt::Key_ParenLeft: //(
+        keyCode = AKEYCODE_NUMPAD_LEFT_PAREN;
+        break;
+    case Qt::Key_ParenRight: //)
+        keyCode = AKEYCODE_NUMPAD_RIGHT_PAREN;
+        break;
+    case Qt::Key_Asterisk: //*
+        keyCode = AKEYCODE_STAR;
         break;
     }
     return keyCode;
