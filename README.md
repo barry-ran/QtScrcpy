@@ -110,17 +110,17 @@ For Windows, for simplicity, prebuilt archives with all the dependencies (includ
 
  - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it by yourself](##Build)
 
 ### Mac OS
 For Mac OS, for simplicity, prebuilt archives with all the dependencies (including adb) are available:
 
 - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it by yourself](##Build)
 
 ### Linux
-you can [build it by yourself](#Build)(just ubuntu test)
+you can [build it by yourself](##Build)(just ubuntu test)
 
 
 ## Run
@@ -237,7 +237,7 @@ There are several reasons listed as below according to importance (high to low).
 4. I found scrcpy and decided to re-make it with the new technology stack (C++ + Qt + Opengl + ffmpeg)
 
 
-## How to build
+## Build
 All the dependencies are provided and it is easy to compile.
 
 ### PC client
