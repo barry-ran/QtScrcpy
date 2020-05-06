@@ -50,7 +50,7 @@ jobs:
       # 安装Qt
       - name: Install Qt
         # 使用外部action。这个action专门用来安装Qt
-        uses: jurplel/install-qt-action@v2.0.0
+        uses: jurplel/install-qt-action@v2.6.2
         with:
           # Version of Qt to install
           version: ${{ matrix.qt-ver }}
