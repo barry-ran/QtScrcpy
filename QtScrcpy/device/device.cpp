@@ -215,18 +215,21 @@ void Device::initSignals()
 
                 // update ui
                 if (m_videoForm) {
+                    // must be show before updateShowSize
+                    m_videoForm->show();
+
                     m_videoForm->setWindowTitle(deviceName);
                     m_videoForm->updateShowSize(size);
 
+                    bool deviceVer = size.height() > size.width();
                     QRect rc = Config::getInstance().getRect(getSerial());
-                    if (rc.isValid()) {
-                        m_videoForm->move(rc.topLeft());
+                    bool rcVer = rc.height() > rc.width();
+                    // same width/height rate
+                    if (rc.isValid() && (deviceVer == rcVer)) {
+                        // mark: resize is for fix setGeometry magneticwidget bug
                         m_videoForm->resize(rc.size());
-                        // TODO: setGeometry magneticwidget bug
-                        //m_videoForm->setGeometry(rc);
+                        m_videoForm->setGeometry(rc);
                     }
-                    // videoForm delay show
-                    m_videoForm->show();
                 }
 
                 // init recorder

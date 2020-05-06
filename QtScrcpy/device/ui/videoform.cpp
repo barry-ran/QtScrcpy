@@ -88,14 +88,14 @@ QRect VideoForm::getGrabCursorRect()
 {
     QRect rc;
 #if defined(Q_OS_WIN32)
-    rc = QRect(m_videoWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
+    rc = QRect(ui->keepRadioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
 #elif defined(Q_OS_OSX)
     rc = m_videoWidget->geometry();
-    rc.setTopLeft(m_videoWidget->mapToGlobal(rc.topLeft()));
-    rc.setBottomRight(m_videoWidget->mapToGlobal(rc.bottomRight()));
+    rc.setTopLeft(ui->keepRadioWidget->mapToGlobal(rc.topLeft()));
+    rc.setBottomRight(ui->keepRadioWidget->mapToGlobal(rc.bottomRight()));
     rc.setX(rc.x() + 100);
     rc.setY(rc.y() + 30);
     rc.setWidth(rc.width() - 180);
