@@ -110,17 +110,17 @@ For Windows, for simplicity, prebuilt archives with all the dependencies (includ
 
  - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it by yourself](##Build)
 
 ### Mac OS
 For Mac OS, for simplicity, prebuilt archives with all the dependencies (including adb) are available:
 
 - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it by yourself](##Build)
 
 ### Linux
-you can [build it by yourself](#Build)(just ubuntu test)
+you can [build it by yourself](##Build)(just ubuntu test)
 
 
 ## Run
@@ -223,6 +223,12 @@ _²Right-click turns the screen on if it was off, presses BACK otherwise._
 ## DEVELOP
 [DEVELOP](docs/DEVELOP.md)
 
+Everyone is welcome to maintain this project and contribute your own code, but please follow these requirements:
+1. pr please mention the dev branch, not the master branch
+2. Please rebase dev before mentioning pr
+3. pr please submit on the principle of a small number of times (a small function point is recommended to mention a pr)
+4. Please keep the code style consistent with the existing style
+
 ## Why develop QtScrcpy?
 There are several reasons listed as below according to importance (high to low).
 1. In the process of learning Qt, I need a real project to try
@@ -231,7 +237,7 @@ There are several reasons listed as below according to importance (high to low).
 4. I found scrcpy and decided to re-make it with the new technology stack (C++ + Qt + Opengl + ffmpeg)
 
 
-## How to build
+## Build
 All the dependencies are provided and it is easy to compile.
 
 ### PC client
