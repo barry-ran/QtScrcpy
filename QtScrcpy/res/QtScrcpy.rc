@@ -1,7 +1,8 @@
 #include "winres.h"
 
 IDI_ICON1       ICON      "QtScrcpy.ico"
-
+// GB2312编码的话，在中文系统上打包FileDescription可以显示中文
+// 在github action（英文系统）打包后FileDescription是乱码，utf8编码也不行。。
 VS_VERSION_INFO VERSIONINFO
  FILEVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH
  PRODUCTVERSION VERSION_MAJOR,VERSION_MINOR,VERSION_PATCH
@@ -20,7 +21,7 @@ BEGIN
         BLOCK "080404b0"
         BEGIN
             VALUE "CompanyName", "RanKun"
-            VALUE "FileDescription", "��׿ʵʱͬ������"
+            VALUE "FileDescription", "Android real-time display control software"
             VALUE "FileVersion", VERSION_RC_STR
             VALUE "LegalCopyright", "Copyright (C) RanKun 2018-2038. All rights reserved."
             VALUE "ProductName", "QtScrcpy"
