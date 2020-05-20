@@ -92,6 +92,10 @@ QRect VideoForm::getGrabCursorRect()
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
+    rc.setX(rc.x() + 10);
+    rc.setY(rc.y() + 10);
+    rc.setWidth(rc.width() - 20);
+    rc.setHeight(rc.height() - 20);
 #elif defined(Q_OS_OSX)
     rc = m_videoWidget->geometry();
     rc.setTopLeft(ui->keepRadioWidget->mapToGlobal(rc.topLeft()));
