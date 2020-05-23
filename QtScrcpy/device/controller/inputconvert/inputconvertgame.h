@@ -66,6 +66,8 @@ private:
     int m_multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
     KeyMap m_keyMap;
 
+    bool m_processMouseMove = true;
+
     // steer wheel
     struct
     {
@@ -86,6 +88,7 @@ private:
         QPointF lastPos = { 0.0, 0.0 };
         bool touching = false;
         int timer = 0;
+        bool smallEyes = false;
     } m_ctrlMouseMove;
 };
 

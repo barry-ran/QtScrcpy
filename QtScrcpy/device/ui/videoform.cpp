@@ -454,7 +454,7 @@ void VideoForm::onSwitchFullScreen()
 
 void VideoForm::updateFPS(quint32 fps)
 {
-    qDebug() << "FPS:" << fps;
+    //qDebug() << "FPS:" << fps;
     if (!m_fpsLabel) {
         return;
     }
@@ -555,6 +555,14 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 
     if (event->button() == Qt::RightButton && m_device) {
         emit m_device->postBackOrScreenOn();
+    }
+
+    if (m_videoWidget->geometry().contains(event->pos())) {
+        if (!m_device) {
+            return;
+        }
+        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
+        emit m_device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
 

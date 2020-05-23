@@ -1,6 +1,7 @@
 ﻿#include <QDebug>
 #include <QCursor>
 #include <QGuiApplication>
+#include <QTimer>
 
 #include "inputconvertgame.h"
 
@@ -73,6 +74,27 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
     if (m_gameMap) {
         updateSize(frameSize, showSize);
         if (!from || from->isAutoRepeat()) {
+            return;
+        }
+
+        // small eyes
+        if (from->key() == m_keyMap.getMouseMoveMap().data.mouseMove.smallEyes.key) {
+            m_ctrlMouseMove.smallEyes = (QEvent::KeyPress == from->type());
+
+            if (QEvent::KeyPress == from->type()) {
+                m_processMouseMove = false;
+                int delay = 30;
+                QTimer::singleShot(delay, this, [this]() { mouseMoveStopTouch(); });
+                QTimer::singleShot(delay * 2, this, [this]() {
+                    mouseMoveStartTouch(nullptr);
+                    m_processMouseMove = true;
+                });
+
+                stopMouseMoveTimer();
+            } else {
+                mouseMoveStopTouch();
+                mouseMoveStartTouch(nullptr);
+            }
             return;
         }
 
@@ -304,7 +326,6 @@ bool InputConvertGame::processMouseClick(const QMouseEvent *from)
         return false;
     }
 
-    qDebug() << "mouse event " << from->type();
     if (QEvent::MouseButtonPress == from->type() || QEvent::MouseButtonDblClick == from->type()) {
         int id = attachTouchID(from->button());
         sendTouchDownEvent(id, node.data.click.keyNode.pos);
@@ -330,7 +351,7 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
         return true;
     }
 
-    if (!m_ctrlMouseMove.lastPos.isNull()) {
+    if (!m_ctrlMouseMove.lastPos.isNull() && m_processMouseMove) {
         QPointF distance = from->localPos() - m_ctrlMouseMove.lastPos;
         distance /= m_keyMap.getMouseMoveMap().data.mouseMove.speedRatio;
 
@@ -340,10 +361,20 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
         m_ctrlMouseMove.lastConverPos.setX(m_ctrlMouseMove.lastConverPos.x() + distance.x() / m_showSize.width());
         m_ctrlMouseMove.lastConverPos.setY(m_ctrlMouseMove.lastConverPos.y() + distance.y() / m_showSize.height());
 
-        if (m_ctrlMouseMove.lastConverPos.x() < 0.1 || m_ctrlMouseMove.lastConverPos.x() > 0.8 || m_ctrlMouseMove.lastConverPos.y() < 0.1
-            || m_ctrlMouseMove.lastConverPos.y() > 0.8) {
-            mouseMoveStopTouch();
-            mouseMoveStartTouch(from);
+        if (m_ctrlMouseMove.lastConverPos.x() < 0.1 || m_ctrlMouseMove.lastConverPos.x() > 0.98 || m_ctrlMouseMove.lastConverPos.y() < 0.1
+            || m_ctrlMouseMove.lastConverPos.y() > 0.98) {
+            if (m_ctrlMouseMove.smallEyes) {
+                m_processMouseMove = false;
+                int delay = 30;
+                QTimer::singleShot(delay, this, [this]() { mouseMoveStopTouch(); });
+                QTimer::singleShot(delay * 2, this, [this]() {
+                    mouseMoveStartTouch(nullptr);
+                    m_processMouseMove = true;
+                });
+            } else {
+                mouseMoveStopTouch();
+                mouseMoveStartTouch(from);
+            }
         }
 
         sendTouchMoveEvent(getTouchID(Qt::ExtraButton24), m_ctrlMouseMove.lastConverPos);
@@ -390,7 +421,8 @@ void InputConvertGame::mouseMoveStartTouch(const QMouseEvent *from)
 {
     Q_UNUSED(from)
     if (!m_ctrlMouseMove.touching) {
-        QPointF mouseMoveStartPos = m_keyMap.getMouseMoveMap().data.mouseMove.startPos;
+        QPointF mouseMoveStartPos
+            = m_ctrlMouseMove.smallEyes ? m_keyMap.getMouseMoveMap().data.mouseMove.smallEyes.pos : m_keyMap.getMouseMoveMap().data.mouseMove.startPos;
         int id = attachTouchID(Qt::ExtraButton24);
         sendTouchDownEvent(id, mouseMoveStartPos);
         m_ctrlMouseMove.lastConverPos = mouseMoveStartPos;

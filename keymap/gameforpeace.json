@@ -5,7 +5,17 @@
 			"x": 0.57,
 			"y": 0.26
 		},
-		"speedRatio": 8
+		"smallEyes": {
+			"comment": "小眼睛",
+			"type": "KMT_CLICK",
+			"key": "Key_Alt",
+			"pos": {
+				"x": 0.8,
+				"y": 0.31
+			},
+			"switchMap": false
+		},
+		"speedRatio": 10
 	},
 	"keyMapNodes": [
 		{
@@ -99,16 +109,6 @@
 			"pos": {
 				"x": 0.795,
 				"y": 0.93
-			},
-			"switchMap": false
-		},
-		{
-			"comment": "小眼睛",
-			"type": "KMT_CLICK",
-			"key": "Key_Alt",
-			"pos": {
-				"x": 0.8,
-				"y": 0.31
 			},
 			"switchMap": false
 		},
