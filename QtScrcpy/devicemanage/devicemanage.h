@@ -40,6 +40,7 @@ private:
 private:
     QMap<QString, QPointer<Device>> m_devices;
     quint16 m_localPortStart = 27183;
+    QString m_script;
 };
 
 #endif // DEVICEMANAGE_H
