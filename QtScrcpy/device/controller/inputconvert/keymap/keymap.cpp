@@ -81,6 +81,39 @@ void KeyMap::loadKeyMap(const QString &json)
         if (checkItemDouble(startPos, "y")) {
             keyMapNode.data.mouseMove.startPos.setY(getItemDouble(startPos, "y"));
         }
+
+        // small eyes
+        if (checkItemObject(mouseMoveMap, "smallEyes")) {
+            QJsonObject smallEyes = mouseMoveMap.value("smallEyes").toObject();
+            if (!smallEyes.contains("type") || !smallEyes.value("type").isString()) {
+                errorString = QString("json error: smallEyes no find node type");
+                goto parseError;
+            }
+
+            // type just support KMT_CLICK
+            KeyMap::KeyMapType type = getItemKeyMapType(smallEyes, "type");
+            if (KeyMap::KMT_CLICK != type) {
+                errorString = QString("json error: smallEyes just support KMT_CLICK");
+                goto parseError;
+            }
+
+            // safe check
+            if (!checkForClick(smallEyes)) {
+                errorString = QString("json error: smallEyes node format error");
+                goto parseError;
+            }
+
+            QPair<ActionType, int> key = getItemKey(smallEyes, "key");
+            if (key.first == AT_INVALID) {
+                errorString = QString("json error: keyMapNodes node invalid key: %1").arg(smallEyes.value("key").toString());
+                goto parseError;
+            }
+
+            keyMapNode.data.mouseMove.smallEyes.type = key.first;
+            keyMapNode.data.mouseMove.smallEyes.key = key.second;
+            keyMapNode.data.mouseMove.smallEyes.pos = getItemPos(smallEyes, "pos");
+        }
+
         m_idxMouseMove = m_keyMapNodes.size();
         m_keyMapNodes.push_back(keyMapNode);
     }

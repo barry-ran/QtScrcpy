@@ -78,6 +78,7 @@ public:
             {
                 QPointF startPos = { 0.0, 0.0 };
                 int speedRatio = 1;
+                KeyNode smallEyes;
             } mouseMove;
             DATA() {}
             ~DATA() {}
