@@ -495,6 +495,14 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
         }
         event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
         emit m_device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+
+        // debug keymap pos
+        if (event->button() == Qt::LeftButton) {
+            qreal x = event->localPos().x() / m_videoWidget->size().width();
+            qreal y = event->localPos().y() / m_videoWidget->size().height();
+            QString posTip = QString(R"("pos": {"x": %1, "y": %2})").arg(x).arg(y);
+            qInfo(posTip.toStdString().c_str());
+        }
     } else {
         if (event->button() == Qt::LeftButton) {
             m_dragPosition = event->globalPos() - frameGeometry().topLeft();
