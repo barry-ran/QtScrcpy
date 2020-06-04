@@ -16,3 +16,11 @@ mac {
     LIBS += -framework Appkit
     QMAKE_CFLAGS += -mmacosx-version-min=10.6
 }
+
+linux {
+    HEADERS += $$PWD/xmousetap.h
+    SOURCES += $$PWD/xmousetap.cpp
+    LIBS    += -lxcb
+    QT      += x11extras
+}
+
