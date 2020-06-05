@@ -53,6 +53,16 @@
 			}
 		},
 		{
+			"comment": "自动跑",
+			"type": "KMT_CLICK",
+			"key": "Key_Equal",
+			"pos": {
+				"x": 0.84,
+				"y": 0.26
+			},
+			"switchMap": false
+		},
+		{
 			"comment": "跳",
 			"type": "KMT_CLICK",
 			"key": "Key_Space",
