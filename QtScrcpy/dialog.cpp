@@ -91,6 +91,10 @@ void Dialog::initUI()
     ui->bitRateBox->addItem("6000000");
     ui->bitRateBox->addItem("8000000");
     ui->bitRateBox->addItem("10000000");
+    ui->bitRateBox->addItem("20000000");
+    ui->bitRateBox->addItem("50000000");
+    ui->bitRateBox->addItem("100000000");
+    ui->bitRateBox->addItem("200000000");
     ui->bitRateBox->setCurrentIndex(Config::getInstance().getBitRateIndex());
 
     ui->maxSizeBox->addItem("640");
