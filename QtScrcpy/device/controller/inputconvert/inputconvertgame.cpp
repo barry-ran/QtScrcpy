@@ -470,6 +470,8 @@ bool InputConvertGame::switchGameMap()
         QGuiApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 #endif
     } else {
+        stopMouseMoveTimer();
+        mouseMoveStopTouch();
         QGuiApplication::restoreOverrideCursor();
     }
     return m_gameMap;
