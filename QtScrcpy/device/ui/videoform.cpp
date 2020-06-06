@@ -100,10 +100,10 @@ QRect VideoForm::getGrabCursorRect()
     rc = m_videoWidget->geometry();
     rc.setTopLeft(ui->keepRadioWidget->mapToGlobal(rc.topLeft()));
     rc.setBottomRight(ui->keepRadioWidget->mapToGlobal(rc.bottomRight()));
-    rc.setX(rc.x() + 100);
-    rc.setY(rc.y() + 30);
-    rc.setWidth(rc.width() - 180);
-    rc.setHeight(rc.height() - 60);
+    rc.setX(rc.x() + 10);
+    rc.setY(rc.y() + 10);
+    rc.setWidth(rc.width() - 20);
+    rc.setHeight(rc.height() - 20);
 #else
 
 #endif
@@ -501,7 +501,7 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
             qreal x = event->localPos().x() / m_videoWidget->size().width();
             qreal y = event->localPos().y() / m_videoWidget->size().height();
             QString posTip = QString(R"("pos": {"x": %1, "y": %2})").arg(x).arg(y);
-            qInfo(posTip.toStdString().c_str());
+            qInfo() << posTip.toStdString().c_str();
         }
     } else {
         if (event->button() == Qt::LeftButton) {
