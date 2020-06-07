@@ -223,6 +223,16 @@
 			"switchMap": false
 		},
 		{
+			"comment": "手枪",
+			"type": "KMT_CLICK",
+			"key": "Key_7",
+			"pos": {
+				"x": 0.61,
+				"y": 0.82
+			},
+			"switchMap": false
+		},
+		{
 			"comment": "车加速",
 			"type": "KMT_CLICK",
 			"key": "Key_Shift",
