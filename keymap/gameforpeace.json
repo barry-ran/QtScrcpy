@@ -233,6 +233,46 @@
 			"switchMap": false
 		},
 		{
+			"comment": "投掷物菜单",
+			"type": "KMT_CLICK",
+			"key": "Key_F1",
+			"pos": {
+				"x": 0.69,
+				"y": 0.88
+			},
+			"switchMap": true
+		},
+		{
+			"comment": "药物菜单",
+			"type": "KMT_CLICK",
+			"key": "Key_F2",
+			"pos": {
+				"x": 0.31,
+				"y": 0.88
+			},
+			"switchMap": true
+		},
+		{
+			"comment": "消息菜单",
+			"type": "KMT_CLICK",
+			"key": "Key_F3",
+			"pos": {
+				"x": 0.98,
+				"y": 0.34
+			},
+			"switchMap": true
+		},
+		{
+			"comment": "表情菜单",
+			"type": "KMT_CLICK",
+			"key": "Key_F4",
+			"pos": {
+				"x": 0.81,
+				"y": 0.03
+			},
+			"switchMap": true
+		},
+		{
 			"comment": "开关门",
 			"type": "KMT_CLICK",
 			"key": "Key_X",
