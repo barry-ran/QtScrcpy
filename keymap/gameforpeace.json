@@ -93,6 +93,16 @@
 			"switchMap": true
 		},
 		{
+			"comment": "视角",
+			"type": "KMT_CLICK",
+			"key": "Key_V",
+			"pos": {
+				"x": 0.23,
+				"y": 0.95
+			},
+			"switchMap": false
+		},
+		{
 			"comment": "趴",
 			"type": "KMT_CLICK",
 			"key": "Key_Z",
