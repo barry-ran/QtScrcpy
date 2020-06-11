@@ -85,12 +85,16 @@ Dialog::~Dialog()
 void Dialog::initUI()
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint);
+    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
     ui->bitRateBox->addItem("2000000");
     ui->bitRateBox->addItem("6000000");
     ui->bitRateBox->addItem("8000000");
     ui->bitRateBox->addItem("10000000");
+    ui->bitRateBox->addItem("20000000");
+    ui->bitRateBox->addItem("50000000");
+    ui->bitRateBox->addItem("100000000");
+    ui->bitRateBox->addItem("200000000");
     ui->bitRateBox->setCurrentIndex(Config::getInstance().getBitRateIndex());
 
     ui->maxSizeBox->addItem("640");

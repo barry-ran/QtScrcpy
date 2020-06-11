@@ -53,6 +53,16 @@
 			}
 		},
 		{
+			"comment": "自动跑",
+			"type": "KMT_CLICK",
+			"key": "Key_Equal",
+			"pos": {
+				"x": 0.84,
+				"y": 0.26
+			},
+			"switchMap": false
+		},
+		{
 			"comment": "跳",
 			"type": "KMT_CLICK",
 			"key": "Key_Space",
@@ -81,6 +91,16 @@
 				"y": 0.9
 			},
 			"switchMap": true
+		},
+		{
+			"comment": "视角",
+			"type": "KMT_CLICK",
+			"key": "Key_V",
+			"pos": {
+				"x": 0.23,
+				"y": 0.95
+			},
+			"switchMap": false
 		},
 		{
 			"comment": "趴",
