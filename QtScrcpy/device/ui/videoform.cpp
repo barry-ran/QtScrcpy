@@ -92,6 +92,7 @@ QRect VideoForm::getGrabCursorRect()
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
+  
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
@@ -100,12 +101,21 @@ QRect VideoForm::getGrabCursorRect()
     rc = m_videoWidget->geometry();
     rc.setTopLeft(ui->keepRadioWidget->mapToGlobal(rc.topLeft()));
     rc.setBottomRight(ui->keepRadioWidget->mapToGlobal(rc.bottomRight()));
+
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
     rc.setHeight(rc.height() - 20);
-#else
-
+#elif defined(Q_OS_LINUX)
+    rc = QRect(ui->keepRadioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
+    // high dpi support -- taken from the WIN32 section and untested
+    rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
+    rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
+    
+    rc.setX(rc.x() + 10);
+    rc.setY(rc.y() + 10);
+    rc.setWidth(rc.width() - 20);
+    rc.setHeight(rc.height() - 20);
 #endif
     return rc;
 }
