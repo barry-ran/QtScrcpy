@@ -245,27 +245,6 @@ bool Server::startServerByStep()
             stepSuccess = enableTunnelForward();
             break;
         case SSS_EXECUTE_SERVER:
-            // if "adb reverse" does not work (e.g. over "adb connect"), it fallbacks to
-            // "adb forward", so the app socket is the client
-            if (!m_tunnelForward) {
-                // At the application level, the device part is "the server" because it
-                // serves video stream and control. However, at the network level, the
-                // client listens and the server connects to the client. That way, the
-                // client can listen before starting the server app, so there is no need to
-                // try to connect until the server socket is listening on the device.
-                m_serverSocket.setMaxPendingConnections(2);
-                if (!m_serverSocket.listen(QHostAddress::LocalHost, m_params.localPort)) {
-                    qCritical() << QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str();
-                    m_serverStartStep = SSS_NULL;
-                    if (m_tunnelForward) {
-                        disableTunnelForward();
-                    } else {
-                        disableTunnelReverse();
-                    }
-                    emit serverStartResult(false);
-                    return false;
-                }
-            }
             // server will connect to our server socket
             stepSuccess = execute();
             break;
@@ -432,6 +411,20 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 break;
             case SSS_ENABLE_TUNNEL_REVERSE:
                 if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                    // At the application level, the device part is "the server" because it
+                    // serves video stream and control. However, at the network level, the
+                    // client listens and the server connects to the client. That way, the
+                    // client can listen before starting the server app, so there is no need to
+                    // try to connect until the server socket is listening on the device.
+                    m_serverSocket.setMaxPendingConnections(2);
+                    if (!m_serverSocket.listen(QHostAddress::LocalHost, m_params.localPort)) {
+                        qCritical() << QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str();
+                        m_serverStartStep = SSS_NULL;
+                        disableTunnelReverse();
+                        emit serverStartResult(false);
+                        break;
+                    }
+
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult) {
