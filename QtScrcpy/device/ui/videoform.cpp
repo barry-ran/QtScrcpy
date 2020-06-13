@@ -92,7 +92,7 @@ QRect VideoForm::getGrabCursorRect()
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
-  
+
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
@@ -111,7 +111,7 @@ QRect VideoForm::getGrabCursorRect()
     // high dpi support -- taken from the WIN32 section and untested
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
-    
+
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
@@ -329,14 +329,16 @@ QRect VideoForm::getScreenRect()
     if (!win) {
         return screenRect;
     }
+
     QWindow *winHandle = win->windowHandle();
-    if (!winHandle) {
-        return screenRect;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (winHandle) {
+        screen = winHandle->screen();
     }
-    QScreen *screen = winHandle->screen();
     if (!screen) {
         return screenRect;
     }
+
     screenRect = screen->availableGeometry();
     return screenRect;
 }
