@@ -257,7 +257,7 @@ All the dependencies are provided and it is easy to compile.
 ## Licence
 Since it is based on scrcpy, respect its Licence
 
-    Copyright (C) 2018 Genymobile
+    Copyright (C) 2020 Barry
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
