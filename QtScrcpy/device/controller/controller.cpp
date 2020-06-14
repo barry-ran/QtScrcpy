@@ -135,7 +135,7 @@ void Controller::onSetDeviceClipboard()
     if (!controlMsg) {
         return;
     }
-    controlMsg->setSetClipboardMsgData(text);
+    controlMsg->setSetClipboardMsgData(text, true);
     postControlMsg(controlMsg);
 }
 

@@ -21,6 +21,7 @@ public:
     QString getPushFilePath();
     QString getServerPath();
     QString getAdbPath();
+    QString getLogLevel();
 
     // user data
     QString getRecordPath();

@@ -109,6 +109,13 @@ void Dialog::initUI()
     ui->formatBox->addItem("mkv");
     ui->formatBox->setCurrentIndex(Config::getInstance().getRecordFormatIndex());
 
+    ui->lockOrientationBox->addItem(tr("no lock"));
+    ui->lockOrientationBox->addItem("0");
+    ui->lockOrientationBox->addItem("90");
+    ui->lockOrientationBox->addItem("180");
+    ui->lockOrientationBox->addItem("270");
+    ui->lockOrientationBox->setCurrentIndex(0);
+
     ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
     ui->framelessCheck->setChecked(Config::getInstance().getFramelessWindow());
 
@@ -186,6 +193,8 @@ void Dialog::on_startServerBtn_clicked()
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
     params.renderExpiredFrames = Config::getInstance().getRenderExpiredFrames();
+    params.lockVideoOrientation = ui->lockOrientationBox->currentIndex() - 1;
+    params.stayAwake = ui->stayAwakeCheck->isChecked();
 
     m_deviceManage.connectDevice(params);
 

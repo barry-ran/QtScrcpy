@@ -1,21 +1,22 @@
-最后同步scrcpy 31bd95022bc525be42ca273d59a3211d964d278b
+最后同步scrcpy 3c0fc8f54f42bf6e7eca35b352a7d343749b65c4
 
 # TODO
 ## 低优先级
-- [单独线程统计帧率](https://github.com/Genymobile/scrcpy/commit/e2a272bf99ecf48fcb050177113f903b3fb323c4)
 - text转换 https://github.com/Genymobile/scrcpy/commit/c916af0984f72a60301d13fa8ef9a85112f54202?tdsourcetag=s_pctim_aiomsg
+- 关闭number lock时的数字小键盘处理 https://github.com/Genymobile/scrcpy/commit/cd69eb4a4fecf8167208399def4ef536b59c9d22
+- mipmapping https://github.com/Genymobile/scrcpy/commit/bea7658807d276aeab7d18d856a366c83ee05827
 
 ## 中优先级
 - 脚本
 - 某些机器软解不行
 - opengles 3.0 兼容性参考[这里](https://github.com/libretro/glsl-shaders/blob/master/nnedi3/shaders/yuv-to-rgb-2x.glsl)
+- 通过host:track-devices实现自动连接 https://www.jianshu.com/p/2cb86c6de76c
+- 旋转 https://github.com/Genymobile/scrcpy/commit/d48b375a1dbc8bed92e3424b5967e59c2d8f6ca1
 
 ## 高优先级
 - linux打包以及版本号
 - 关于
-- 旋转
-- ubuntu自动打包
-- 版本号抽离优化
+- 音频转发 https://github.com/rom1v/sndcpy
 
 # mark
 ## ffmpeg

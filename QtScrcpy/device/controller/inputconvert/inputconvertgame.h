@@ -54,6 +54,7 @@ protected:
 
     bool switchGameMap();
     bool checkCursorPos(const QMouseEvent *from);
+    void hideMouseCursor(bool hide);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -62,7 +63,7 @@ private:
     QSize m_frameSize;
     QSize m_showSize;
     bool m_gameMap = false;
-    bool m_needSwitchGameAgain = false;
+    bool m_needBackMouseMove = false;
     int m_multiTouchID[MULTI_TOUCH_MAX_NUM] = { 0 };
     KeyMap m_keyMap;
 

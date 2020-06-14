@@ -9,8 +9,8 @@
 #include "keycodes.h"
 #include "qscrcpyevent.h"
 
-#define CONTROL_MSG_TEXT_MAX_LENGTH 300
-#define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH 4093
+#define CONTROL_MSG_INJECT_TEXT_MAX_LENGTH 300
+#define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH 4092
 #define POINTER_ID_MOUSE static_cast<quint64>(-1)
 // ControlMsg
 class ControlMsg : public QScrcpyEvent
@@ -48,7 +48,7 @@ public:
     // position action动作对应的位置
     void setInjectTouchMsgData(quint64 id, AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position, float pressure);
     void setInjectScrollMsgData(QRect position, qint32 hScroll, qint32 vScroll);
-    void setSetClipboardMsgData(QString &text);
+    void setSetClipboardMsgData(QString &text, bool paste);
     void setSetScreenPowerModeData(ControlMsg::ScreenPowerMode mode);
 
     QByteArray serializeData();
@@ -90,6 +90,7 @@ private:
             struct
             {
                 char *text = Q_NULLPTR;
+                bool paste = true;
             } setClipboard;
             struct
             {
