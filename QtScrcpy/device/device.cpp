@@ -173,8 +173,10 @@ void Device::initSignals()
         connect(this, &Device::switchFullScreen, m_videoForm, &VideoForm::onSwitchFullScreen);
     }
     if (m_fileHandler) {
-        connect(this, &Device::pushFileRequest, m_fileHandler, &FileHandler::onPushFileRequest);
-        connect(this, &Device::installApkRequest, m_fileHandler, &FileHandler::onInstallApkRequest);
+        connect(this, &Device::pushFileRequest, this, [this](const QString &file, const QString &devicePath) {
+            m_fileHandler->onPushFileRequest(getSerial(), file, devicePath);
+        });
+        connect(this, &Device::installApkRequest, this, [this](const QString &apkFile) { m_fileHandler->onInstallApkRequest(getSerial(), apkFile); });
         connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
             QString tipsType = "";
             if (isApk) {

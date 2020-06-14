@@ -712,8 +712,8 @@ void VideoForm::dropEvent(QDropEvent *event)
     }
 
     if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
-        emit m_device->installApkRequest(m_device->getSerial(), file);
+        emit m_device->installApkRequest(file);
         return;
     }
-    emit m_device->pushFileRequest(m_device->getSerial(), file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
+    emit m_device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }

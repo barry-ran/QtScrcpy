@@ -75,8 +75,8 @@ signals:
     void requestDeviceClipboard();
     void setDeviceClipboard();
     void clipboardPaste();
-    void pushFileRequest(const QString &serial, const QString &file, const QString &devicePath = "");
-    void installApkRequest(const QString &serial, const QString &apkFile);
+    void pushFileRequest(const QString &file, const QString &devicePath = "");
+    void installApkRequest(const QString &apkFile);
 
     // key map
     void mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize);
