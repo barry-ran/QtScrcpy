@@ -1,10 +1,8 @@
 package com.genymobile.scrcpy;
 
-import com.genymobile.scrcpy.wrappers.InputManager;
-
+import android.os.Build;
 import android.os.SystemClock;
 import android.view.InputDevice;
-import android.view.InputEvent;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -47,11 +45,10 @@ public class Controller {
         }
     }
 
-    @SuppressWarnings("checkstyle:MagicNumber")
     public void control() throws IOException {
         // on start, power on the device
         if (!device.isScreenOn()) {
-            injectKeycode(KeyEvent.KEYCODE_POWER);
+            device.injectKeycode(KeyEvent.KEYCODE_POWER);
 
             // dirty hack
             // After POWER is injected, the device is powered on asynchronously.
@@ -76,19 +73,29 @@ public class Controller {
         ControlMessage msg = connection.receiveControlMessage();
         switch (msg.getType()) {
             case ControlMessage.TYPE_INJECT_KEYCODE:
-                injectKeycode(msg.getAction(), msg.getKeycode(), msg.getMetaState());
+                if (device.supportsInputEvents()) {
+                    injectKeycode(msg.getAction(), msg.getKeycode(), msg.getMetaState());
+                }
                 break;
             case ControlMessage.TYPE_INJECT_TEXT:
-                injectText(msg.getText());
+                if (device.supportsInputEvents()) {
+                    injectText(msg.getText());
+                }
                 break;
             case ControlMessage.TYPE_INJECT_TOUCH_EVENT:
-                injectTouch(msg.getAction(), msg.getPointerId(), msg.getPosition(), msg.getPressure(), msg.getButtons());
+                if (device.supportsInputEvents()) {
+                    injectTouch(msg.getAction(), msg.getPointerId(), msg.getPosition(), msg.getPressure(), msg.getButtons());
+                }
                 break;
             case ControlMessage.TYPE_INJECT_SCROLL_EVENT:
-                injectScroll(msg.getPosition(), msg.getHScroll(), msg.getVScroll());
+                if (device.supportsInputEvents()) {
+                    injectScroll(msg.getPosition(), msg.getHScroll(), msg.getVScroll());
+                }
                 break;
             case ControlMessage.TYPE_BACK_OR_SCREEN_ON:
-                pressBackOrTurnScreenOn();
+                if (device.supportsInputEvents()) {
+                    pressBackOrTurnScreenOn();
+                }
                 break;
             case ControlMessage.TYPE_EXPAND_NOTIFICATION_PANEL:
                 device.expandNotificationPanel();
@@ -98,13 +105,22 @@ public class Controller {
                 break;
             case ControlMessage.TYPE_GET_CLIPBOARD:
                 String clipboardText = device.getClipboardText();
-                sender.pushClipboardText(clipboardText);
+                if (clipboardText != null) {
+                    sender.pushClipboardText(clipboardText);
+                }
                 break;
             case ControlMessage.TYPE_SET_CLIPBOARD:
-                device.setClipboardText(msg.getText());
+                boolean paste = (msg.getFlags() & ControlMessage.FLAGS_PASTE) != 0;
+                setClipboard(msg.getText(), paste);
                 break;
             case ControlMessage.TYPE_SET_SCREEN_POWER_MODE:
-                device.setScreenPowerMode(msg.getAction());
+                if (device.supportsInputEvents()) {
+                    int mode = msg.getAction();
+                    boolean setPowerModeOk = device.setScreenPowerMode(mode);
+                    if (setPowerModeOk) {
+                        Ln.i("Device screen turned " + (mode == Device.POWER_MODE_OFF ? "off" : "on"));
+                    }
+                }
                 break;
             case ControlMessage.TYPE_ROTATE_DEVICE:
                 device.rotateDevice();
@@ -115,7 +131,7 @@ public class Controller {
     }
 
     private boolean injectKeycode(int action, int keycode, int metaState) {
-        return injectKeyEvent(action, keycode, 0, metaState);
+        return device.injectKeyEvent(action, keycode, 0, metaState);
     }
 
     private boolean injectChar(char c) {
@@ -126,7 +142,7 @@ public class Controller {
             return false;
         }
         for (KeyEvent event : events) {
-            if (!injectEvent(event)) {
+            if (!device.injectEvent(event)) {
                 return false;
             }
         }
@@ -182,7 +198,7 @@ public class Controller {
         MotionEvent event = MotionEvent
                 .obtain(lastTouchDown, now, action, pointerCount, pointerProperties, pointerCoords, 0, buttons, 1f, 1f, DEVICE_ID_VIRTUAL, 0,
                         InputDevice.SOURCE_TOUCHSCREEN, 0);
-        return injectEvent(event);
+        return device.injectEvent(event);
     }
 
     private boolean injectScroll(Position position, int hScroll, int vScroll) {
@@ -204,27 +220,26 @@ public class Controller {
 
         MotionEvent event = MotionEvent
                 .obtain(lastTouchDown, now, MotionEvent.ACTION_SCROLL, 1, pointerProperties, pointerCoords, 0, 0, 1f, 1f, DEVICE_ID_VIRTUAL, 0,
-                        InputDevice.SOURCE_MOUSE, 0);
-        return injectEvent(event);
-    }
-
-    private boolean injectKeyEvent(int action, int keyCode, int repeat, int metaState) {
-        long now = SystemClock.uptimeMillis();
-        KeyEvent event = new KeyEvent(now, now, action, keyCode, repeat, metaState, KeyCharacterMap.VIRTUAL_KEYBOARD, 0, 0,
-                InputDevice.SOURCE_KEYBOARD);
-        return injectEvent(event);
-    }
-
-    private boolean injectKeycode(int keyCode) {
-        return injectKeyEvent(KeyEvent.ACTION_DOWN, keyCode, 0, 0) && injectKeyEvent(KeyEvent.ACTION_UP, keyCode, 0, 0);
-    }
-
-    private boolean injectEvent(InputEvent event) {
-        return device.injectInputEvent(event, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
+                        InputDevice.SOURCE_TOUCHSCREEN, 0);
+        return device.injectEvent(event);
     }
 
     private boolean pressBackOrTurnScreenOn() {
         int keycode = device.isScreenOn() ? KeyEvent.KEYCODE_BACK : KeyEvent.KEYCODE_POWER;
-        return injectKeycode(keycode);
+        return device.injectKeycode(keycode);
+    }
+
+    private boolean setClipboard(String text, boolean paste) {
+        boolean ok = device.setClipboardText(text);
+        if (ok) {
+            Ln.i("Device clipboard set");
+        }
+
+        // On Android >= 7, also press the PASTE key if requested
+        if (paste && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && device.supportsInputEvents()) {
+            device.injectKeycode(KeyEvent.KEYCODE_PASTE);
+        }
+
+        return ok;
     }
 }

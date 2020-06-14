@@ -29,9 +29,9 @@ void ControlMsg::setInjectKeycodeMsgData(AndroidKeyeventAction action, AndroidKe
 void ControlMsg::setInjectTextMsgData(QString &text)
 {
     // write length (2 byte) + string (non nul-terminated)
-    if (CONTROL_MSG_TEXT_MAX_LENGTH < text.length()) {
+    if (CONTROL_MSG_INJECT_TEXT_MAX_LENGTH < text.length()) {
         // injecting a text takes time, so limit the text length
-        text = text.left(CONTROL_MSG_TEXT_MAX_LENGTH);
+        text = text.left(CONTROL_MSG_INJECT_TEXT_MAX_LENGTH);
     }
     QByteArray tmp = text.toUtf8();
     m_data.injectText.text = new char[tmp.length() + 1];
@@ -55,7 +55,7 @@ void ControlMsg::setInjectScrollMsgData(QRect position, qint32 hScroll, qint32 v
     m_data.injectScroll.vScroll = vScroll;
 }
 
-void ControlMsg::setSetClipboardMsgData(QString &text)
+void ControlMsg::setSetClipboardMsgData(QString &text, bool paste)
 {
     if (text.isEmpty()) {
         return;
@@ -68,6 +68,7 @@ void ControlMsg::setSetClipboardMsgData(QString &text)
     m_data.setClipboard.text = new char[tmp.length() + 1];
     memcpy(m_data.setClipboard.text, tmp.data(), tmp.length());
     m_data.setClipboard.text[tmp.length()] = '\0';
+    m_data.setClipboard.paste = paste;
 }
 
 void ControlMsg::setSetScreenPowerModeData(ControlMsg::ScreenPowerMode mode)
@@ -124,6 +125,7 @@ QByteArray ControlMsg::serializeData()
         BufferUtil::write32(buffer, m_data.injectScroll.vScroll);
         break;
     case CMT_SET_CLIPBOARD:
+        buffer.putChar(!!m_data.setClipboard.paste);
         BufferUtil::write16(buffer, static_cast<quint32>(strlen(m_data.setClipboard.text)));
         buffer.write(m_data.setClipboard.text, strlen(m_data.setClipboard.text));
         break;

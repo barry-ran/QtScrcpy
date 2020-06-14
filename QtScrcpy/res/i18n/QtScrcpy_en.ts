@@ -49,17 +49,17 @@
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="../../dialog.ui" line="429"/>
+        <location filename="../../dialog.ui" line="477"/>
         <source>Wireless</source>
         <translation>Wireless</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="513"/>
+        <location filename="../../dialog.ui" line="561"/>
         <source>wireless connect</source>
         <translation>wireless connect</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="529"/>
+        <location filename="../../dialog.ui" line="577"/>
         <source>wireless disconnect</source>
         <translation>wireless disconnect</translation>
     </message>
@@ -69,13 +69,13 @@
         <translation>Start Config</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="127"/>
+        <location filename="../../dialog.ui" line="168"/>
         <source>record save path:</source>
         <translation>record save path:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="144"/>
-        <location filename="../../dialog.cpp" line="325"/>
+        <location filename="../../dialog.ui" line="185"/>
+        <location filename="../../dialog.cpp" line="338"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
@@ -85,47 +85,57 @@
         <translation>record format:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="282"/>
+        <location filename="../../dialog.ui" line="323"/>
         <source>record screen</source>
         <translation>record screen</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="227"/>
+        <location filename="../../dialog.ui" line="268"/>
         <source>frameless</source>
         <translation>frameless</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="289"/>
+        <location filename="../../dialog.ui" line="127"/>
+        <source>lock orientation:</source>
+        <translation>lock orientation:</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="330"/>
         <source>show fps</source>
         <translation>show fps</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="386"/>
+        <location filename="../../dialog.ui" line="337"/>
+        <source>stay awake</source>
+        <translation>stay awake</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="434"/>
         <source>stop all server</source>
         <translation>stop all server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="563"/>
+        <location filename="../../dialog.ui" line="611"/>
         <source>adb command:</source>
         <translation>adb command:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="599"/>
+        <location filename="../../dialog.ui" line="647"/>
         <source>terminate</source>
         <translation>terminate</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="586"/>
+        <location filename="../../dialog.ui" line="634"/>
         <source>execute</source>
         <translation>execute</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="612"/>
+        <location filename="../../dialog.ui" line="660"/>
         <source>clear</source>
         <translation>clear</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="272"/>
+        <location filename="../../dialog.ui" line="313"/>
         <source>reverse connection</source>
         <translation>reverse connection</translation>
     </message>
@@ -134,17 +144,17 @@
         <translation type="vanished">auto enable</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="256"/>
+        <location filename="../../dialog.ui" line="297"/>
         <source>background record</source>
         <translation>background record</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="220"/>
+        <location filename="../../dialog.ui" line="261"/>
         <source>screen-off</source>
         <translation>screen-off</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="189"/>
+        <location filename="../../dialog.ui" line="230"/>
         <source>apply</source>
         <translation>apply</translation>
     </message>
@@ -154,37 +164,37 @@
         <translation>max size:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="240"/>
+        <location filename="../../dialog.ui" line="281"/>
         <source>always on top</source>
         <translation>always on top</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="182"/>
+        <location filename="../../dialog.ui" line="223"/>
         <source>refresh script</source>
         <translation>refresh script</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="403"/>
+        <location filename="../../dialog.ui" line="451"/>
         <source>get device IP</source>
         <translation>get device IP</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="302"/>
+        <location filename="../../dialog.ui" line="350"/>
         <source>USB line</source>
         <translation>USB line</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="358"/>
+        <location filename="../../dialog.ui" line="406"/>
         <source>stop server</source>
         <translation>stop server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="348"/>
+        <location filename="../../dialog.ui" line="396"/>
         <source>start server</source>
         <translation>start server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="338"/>
+        <location filename="../../dialog.ui" line="386"/>
         <source>device serial:</source>
         <translation>device serial:</translation>
     </message>
@@ -198,19 +208,24 @@
         <translation>bit rate:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="413"/>
+        <location filename="../../dialog.ui" line="461"/>
         <source>start adbd</source>
         <translation>start adbd</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="393"/>
+        <location filename="../../dialog.ui" line="441"/>
         <source>refresh devices</source>
         <translation>refresh devices</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="101"/>
+        <location filename="../../dialog.cpp" line="105"/>
         <source>original</source>
         <translation>original</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="112"/>
+        <source>no lock</source>
+        <translation>no lock</translation>
     </message>
 </context>
 <context>
@@ -226,7 +241,7 @@ You can download it at the following address:</source>
         <translation type="vanished">This software is completely open source and free.\nStrictly used for illegal purposes, or at your own risk.\nYou can download it at the following address:</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="103"/>
+        <location filename="../../main.cpp" line="108"/>
         <source>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</source>
         <translation>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</translation>
     </message>
@@ -322,7 +337,7 @@ You can download it at the following address:</source>
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="671"/>
+        <location filename="../../device/ui/videoform.cpp" line="710"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>

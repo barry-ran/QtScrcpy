@@ -303,6 +303,8 @@ void Device::startServer()
         params.crop = "-";
         params.control = true;
         params.useReverse = m_params.useReverse;
+        params.lockVideoOrientation = m_params.lockVideoOrientation;
+        params.stayAwake = m_params.stayAwake;
         m_server->start(params);
     });
 }

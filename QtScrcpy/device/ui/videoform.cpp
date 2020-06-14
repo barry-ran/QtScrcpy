@@ -400,6 +400,11 @@ void VideoForm::updateShowSize(const QSize &newSize)
         if (isFullScreen() && m_device) {
             emit m_device->switchFullScreen();
         }
+
+        if (isMaximized()) {
+            showNormal();
+        }
+
         if (m_skin) {
             QMargins m = getMargins(vertical);
             showSize.setWidth(showSize.width() + m.left() + m.right());
@@ -570,7 +575,9 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && !m_videoWidget->geometry().contains(event->pos())) {
-        removeBlackRect();
+        if (!isMaximized()) {
+            removeBlackRect();
+        }
     }
 
     if (event->button() == Qt::RightButton && m_device) {

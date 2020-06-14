@@ -124,12 +124,29 @@ bool Server::execute()
     args << "shell";
     args << QString("CLASSPATH=%1").arg(Config::getInstance().getServerPath());
     args << "app_process";
-    args << "/"; // unused;
+
+#ifdef SERVER_DEBUGGER
+#define SERVER_DEBUGGER_PORT "5005"
+
+    args <<
+#ifdef SERVER_DEBUGGER_METHOD_NEW
+        /* Android 9 and above */
+        "-XjdwpProvider:internal -XjdwpOptions:transport=dt_socket,suspend=y,server=y,address="
+#else
+        /* Android 8 and below */
+        "-agentlib:jdwp=transport=dt_socket,suspend=y,server=y,address="
+#endif
+        SERVER_DEBUGGER_PORT,
+#endif
+
+        args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
     args << Config::getInstance().getServerVersion();
+    args << Config::getInstance().getLogLevel();
     args << QString::number(m_params.maxSize);
     args << QString::number(m_params.bitRate);
     args << QString::number(m_params.maxFps);
+    args << QString::number(m_params.lockVideoOrientation);
     args << (m_tunnelForward ? "true" : "false");
     if (m_params.crop.isEmpty()) {
         args << "-";
@@ -138,6 +155,24 @@ bool Server::execute()
     }
     args << "true"; // always send frame meta (packet boundaries + timestamp)
     args << (m_params.control ? "true" : "false");
+    args << "0";                                     // display id
+    args << "false";                                 // show touch
+    args << (m_params.stayAwake ? "true" : "false"); // stay awake
+    // code option
+    // https://github.com/Genymobile/scrcpy/commit/080a4ee3654a9b7e96c8ffe37474b5c21c02852a
+    // <https://d.android.com/reference/android/media/MediaFormat>
+    args << "-";
+
+#ifdef SERVER_DEBUGGER
+    qInfo("Server debugger waiting for a client on device port " SERVER_DEBUGGER_PORT "...");
+    // From the computer, run
+    //     adb forward tcp:5005 tcp:5005
+    // Then, from Android Studio: Run > Debug > Edit configurations...
+    // On the left, click on '+', "Remote", with:
+    //     Host: localhost
+    //     Port: 5005
+    // Then click on "Debug"
+#endif
 
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server app_process / com.genymobile.scrcpy.Server 0 8000000 false
     // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
