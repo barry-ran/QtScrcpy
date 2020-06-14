@@ -92,6 +92,7 @@ QRect VideoForm::getGrabCursorRect()
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
+
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
@@ -100,12 +101,21 @@ QRect VideoForm::getGrabCursorRect()
     rc = m_videoWidget->geometry();
     rc.setTopLeft(ui->keepRadioWidget->mapToGlobal(rc.topLeft()));
     rc.setBottomRight(ui->keepRadioWidget->mapToGlobal(rc.bottomRight()));
+
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
     rc.setHeight(rc.height() - 20);
-#else
+#elif defined(Q_OS_LINUX)
+    rc = QRect(ui->keepRadioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
+    // high dpi support -- taken from the WIN32 section and untested
+    rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
+    rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
 
+    rc.setX(rc.x() + 10);
+    rc.setY(rc.y() + 10);
+    rc.setWidth(rc.width() - 20);
+    rc.setHeight(rc.height() - 20);
 #endif
     return rc;
 }
@@ -319,14 +329,16 @@ QRect VideoForm::getScreenRect()
     if (!win) {
         return screenRect;
     }
+
     QWindow *winHandle = win->windowHandle();
-    if (!winHandle) {
-        return screenRect;
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (winHandle) {
+        screen = winHandle->screen();
     }
-    QScreen *screen = winHandle->screen();
     if (!screen) {
         return screenRect;
     }
+
     screenRect = screen->availableGeometry();
     return screenRect;
 }
@@ -388,6 +400,11 @@ void VideoForm::updateShowSize(const QSize &newSize)
         if (isFullScreen() && m_device) {
             emit m_device->switchFullScreen();
         }
+
+        if (isMaximized()) {
+            showNormal();
+        }
+
         if (m_skin) {
             QMargins m = getMargins(vertical);
             showSize.setWidth(showSize.width() + m.left() + m.right());
@@ -558,7 +575,9 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && !m_videoWidget->geometry().contains(event->pos())) {
-        removeBlackRect();
+        if (!isMaximized()) {
+            removeBlackRect();
+        }
     }
 
     if (event->button() == Qt::RightButton && m_device) {
@@ -693,8 +712,8 @@ void VideoForm::dropEvent(QDropEvent *event)
     }
 
     if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
-        emit m_device->installApkRequest(m_device->getSerial(), file);
+        emit m_device->installApkRequest(file);
         return;
     }
-    emit m_device->pushFileRequest(m_device->getSerial(), file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
+    emit m_device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }

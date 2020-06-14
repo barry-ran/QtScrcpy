@@ -8,15 +8,16 @@ import java.nio.charset.StandardCharsets;
 
 public class ControlMessageReader {
 
-    private static final int INJECT_KEYCODE_PAYLOAD_LENGTH = 9;
-    private static final int INJECT_MOUSE_EVENT_PAYLOAD_LENGTH = 17;
-    private static final int INJECT_TOUCH_EVENT_PAYLOAD_LENGTH = 21;
-    private static final int INJECT_SCROLL_EVENT_PAYLOAD_LENGTH = 20;
-    private static final int SET_SCREEN_POWER_MODE_PAYLOAD_LENGTH = 1;
+    static final int INJECT_KEYCODE_PAYLOAD_LENGTH = 9;
+    static final int INJECT_TOUCH_EVENT_PAYLOAD_LENGTH = 27;
+    static final int INJECT_SCROLL_EVENT_PAYLOAD_LENGTH = 20;
+    static final int SET_SCREEN_POWER_MODE_PAYLOAD_LENGTH = 1;
+    static final int SET_CLIPBOARD_FIXED_PAYLOAD_LENGTH = 1;
 
-    public static final int TEXT_MAX_LENGTH = 300;
-    public static final int CLIPBOARD_TEXT_MAX_LENGTH = 4093;
-    private static final int RAW_BUFFER_SIZE = 1024;
+    public static final int CLIPBOARD_TEXT_MAX_LENGTH = 4092; // 4096 - 1 (type) - 1 (parse flag) - 2 (length)
+    public static final int INJECT_TEXT_MAX_LENGTH = 300;
+
+    private static final int RAW_BUFFER_SIZE = 4096;
 
     private final byte[] rawBuffer = new byte[RAW_BUFFER_SIZE];
     private final ByteBuffer buffer = ByteBuffer.wrap(rawBuffer);
@@ -122,7 +123,6 @@ public class ControlMessageReader {
         return ControlMessage.createInjectText(text);
     }
 
-    @SuppressWarnings("checkstyle:MagicNumber")
     private ControlMessage parseInjectTouchEvent() {
         if (buffer.remaining() < INJECT_TOUCH_EVENT_PAYLOAD_LENGTH) {
             return null;
@@ -149,11 +149,15 @@ public class ControlMessageReader {
     }
 
     private ControlMessage parseSetClipboard() {
+        if (buffer.remaining() < SET_CLIPBOARD_FIXED_PAYLOAD_LENGTH) {
+            return null;
+        }
+        boolean parse = buffer.get() != 0;
         String text = parseString();
         if (text == null) {
             return null;
         }
-        return ControlMessage.createSetClipboard(text);
+        return ControlMessage.createSetClipboard(text, parse);
     }
 
     private ControlMessage parseSetScreenPowerMode() {
@@ -172,12 +176,10 @@ public class ControlMessageReader {
         return new Position(x, y, screenWidth, screenHeight);
     }
 
-    @SuppressWarnings("checkstyle:MagicNumber")
     private static int toUnsigned(short value) {
         return value & 0xffff;
     }
 
-    @SuppressWarnings("checkstyle:MagicNumber")
     private static int toUnsigned(byte value) {
         return value & 0xff;
     }

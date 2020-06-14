@@ -124,12 +124,29 @@ bool Server::execute()
     args << "shell";
     args << QString("CLASSPATH=%1").arg(Config::getInstance().getServerPath());
     args << "app_process";
-    args << "/"; // unused;
+
+#ifdef SERVER_DEBUGGER
+#define SERVER_DEBUGGER_PORT "5005"
+
+    args <<
+#ifdef SERVER_DEBUGGER_METHOD_NEW
+        /* Android 9 and above */
+        "-XjdwpProvider:internal -XjdwpOptions:transport=dt_socket,suspend=y,server=y,address="
+#else
+        /* Android 8 and below */
+        "-agentlib:jdwp=transport=dt_socket,suspend=y,server=y,address="
+#endif
+        SERVER_DEBUGGER_PORT,
+#endif
+
+        args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
     args << Config::getInstance().getServerVersion();
+    args << Config::getInstance().getLogLevel();
     args << QString::number(m_params.maxSize);
     args << QString::number(m_params.bitRate);
     args << QString::number(m_params.maxFps);
+    args << QString::number(m_params.lockVideoOrientation);
     args << (m_tunnelForward ? "true" : "false");
     if (m_params.crop.isEmpty()) {
         args << "-";
@@ -138,6 +155,24 @@ bool Server::execute()
     }
     args << "true"; // always send frame meta (packet boundaries + timestamp)
     args << (m_params.control ? "true" : "false");
+    args << "0";                                     // display id
+    args << "false";                                 // show touch
+    args << (m_params.stayAwake ? "true" : "false"); // stay awake
+    // code option
+    // https://github.com/Genymobile/scrcpy/commit/080a4ee3654a9b7e96c8ffe37474b5c21c02852a
+    // <https://d.android.com/reference/android/media/MediaFormat>
+    args << "-";
+
+#ifdef SERVER_DEBUGGER
+    qInfo("Server debugger waiting for a client on device port " SERVER_DEBUGGER_PORT "...");
+    // From the computer, run
+    //     adb forward tcp:5005 tcp:5005
+    // Then, from Android Studio: Run > Debug > Edit configurations...
+    // On the left, click on '+', "Remote", with:
+    //     Host: localhost
+    //     Port: 5005
+    // Then click on "Debug"
+#endif
 
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server app_process / com.genymobile.scrcpy.Server 0 8000000 false
     // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
@@ -245,27 +280,6 @@ bool Server::startServerByStep()
             stepSuccess = enableTunnelForward();
             break;
         case SSS_EXECUTE_SERVER:
-            // if "adb reverse" does not work (e.g. over "adb connect"), it fallbacks to
-            // "adb forward", so the app socket is the client
-            if (!m_tunnelForward) {
-                // At the application level, the device part is "the server" because it
-                // serves video stream and control. However, at the network level, the
-                // client listens and the server connects to the client. That way, the
-                // client can listen before starting the server app, so there is no need to
-                // try to connect until the server socket is listening on the device.
-                m_serverSocket.setMaxPendingConnections(2);
-                if (!m_serverSocket.listen(QHostAddress::LocalHost, m_params.localPort)) {
-                    qCritical() << QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str();
-                    m_serverStartStep = SSS_NULL;
-                    if (m_tunnelForward) {
-                        disableTunnelForward();
-                    } else {
-                        disableTunnelReverse();
-                    }
-                    emit serverStartResult(false);
-                    return false;
-                }
-            }
             // server will connect to our server socket
             stepSuccess = execute();
             break;
@@ -432,6 +446,20 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 break;
             case SSS_ENABLE_TUNNEL_REVERSE:
                 if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                    // At the application level, the device part is "the server" because it
+                    // serves video stream and control. However, at the network level, the
+                    // client listens and the server connects to the client. That way, the
+                    // client can listen before starting the server app, so there is no need to
+                    // try to connect until the server socket is listening on the device.
+                    m_serverSocket.setMaxPendingConnections(2);
+                    if (!m_serverSocket.listen(QHostAddress::LocalHost, m_params.localPort)) {
+                        qCritical() << QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str();
+                        m_serverStartStep = SSS_NULL;
+                        disableTunnelReverse();
+                        emit serverStartResult(false);
+                        break;
+                    }
+
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
                 } else if (AdbProcess::AER_SUCCESS_START != processResult) {

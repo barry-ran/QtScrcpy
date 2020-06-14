@@ -32,6 +32,11 @@ msvc{
 *g++*: QMAKE_CXXFLAGS += -Werror
 *msvc*: QMAKE_CXXFLAGS += /WX /wd4566
 
+# run a server debugger and wait for a client to be attached
+# DEFINES += SERVER_DEBUGGER
+# select the debugger method ('old' for Android < 9, 'new' for Android >= 9)
+# DEFINES += SERVER_DEBUGGER_METHOD_NEW
+
 # 源码
 SOURCES += \
         main.cpp \
