@@ -19,12 +19,12 @@ void InputConvertGame::mouseEvent(const QMouseEvent *from, const QSize &frameSiz
             return;
         }
         if (!switchGameMap()) {
-            m_needSwitchGameAgain = false;
+            m_needBackMouseMove = false;
         }
         return;
     }
 
-    if (m_gameMap) {
+    if (!m_needBackMouseMove && m_gameMap) {
         updateSize(frameSize, showSize);
         // mouse move
         if (m_keyMap.isValidMouseMoveMap()) {
@@ -57,14 +57,14 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
             return;
         }
         if (!switchGameMap()) {
-            m_needSwitchGameAgain = false;
+            m_needBackMouseMove = false;
         }
         return;
     }
 
     const KeyMap::KeyMapNode &node = m_keyMap.getKeyMapNodeKey(from->key());
-    // 处理特殊按键：可以在按键映射和普通映射间切换的按键
-    if (m_needSwitchGameAgain && KeyMap::KMT_CLICK == node.type && node.data.click.switchMap) {
+    // 处理特殊按键：可以释放出鼠标的按键
+    if (m_needBackMouseMove && KeyMap::KMT_CLICK == node.type && node.data.click.switchMap) {
         updateSize(frameSize, showSize);
         // Qt::Key_Tab Qt::Key_M for PUBG mobile
         processKeyClick(node.data.click.keyNode.pos, false, node.data.click.switchMap, from);
@@ -281,8 +281,8 @@ void InputConvertGame::processSteerWheel(const KeyMap::KeyMapNode &node, const Q
 void InputConvertGame::processKeyClick(const QPointF &clickPos, bool clickTwice, bool switchMap, const QKeyEvent *from)
 {
     if (switchMap && QEvent::KeyRelease == from->type()) {
-        m_needSwitchGameAgain = !m_needSwitchGameAgain;
-        switchGameMap();
+        m_needBackMouseMove = !m_needBackMouseMove;
+        hideMouseCursor(!m_needBackMouseMove);
     }
 
     if (QEvent::KeyPress == from->type()) {
@@ -463,18 +463,27 @@ bool InputConvertGame::switchGameMap()
 
     // grab cursor and set cursor only mouse move map
     emit grabCursor(m_gameMap);
-    if (m_gameMap) {
+    hideMouseCursor(m_gameMap);
+
+    if (!m_gameMap) {
+        stopMouseMoveTimer();
+        mouseMoveStopTouch();
+    }
+
+    return m_gameMap;
+}
+
+void InputConvertGame::hideMouseCursor(bool hide)
+{
+    if (hide) {
 #ifdef QT_NO_DEBUG
         QGuiApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
 #else
         QGuiApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
 #endif
     } else {
-        stopMouseMoveTimer();
-        mouseMoveStopTouch();
         QGuiApplication::restoreOverrideCursor();
     }
-    return m_gameMap;
 }
 
 void InputConvertGame::timerEvent(QTimerEvent *event)
