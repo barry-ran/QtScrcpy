@@ -34,6 +34,9 @@
 #define COMMON_ADB_PATH_KEY "AdbPath"
 #define COMMON_ADB_PATH_DEF ""
 
+#define COMMON_LOG_LEVEL_KEY "LogLevel"
+#define COMMON_LOG_LEVEL_DEF "info"
+
 // user data
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
@@ -74,7 +77,7 @@ Config &Config::getInstance()
     static Config config;
     return config;
 }
-
+#include <QDebug>
 const QString &Config::getConfigPath()
 {
     if (s_configPath.isEmpty()) {
@@ -263,6 +266,15 @@ QString Config::getAdbPath()
     adbPath = m_settings->value(COMMON_ADB_PATH_KEY, COMMON_ADB_PATH_DEF).toString();
     m_settings->endGroup();
     return adbPath;
+}
+
+QString Config::getLogLevel()
+{
+    QString logLevel;
+    m_settings->beginGroup(GROUP_COMMON);
+    logLevel = m_settings->value(COMMON_LOG_LEVEL_KEY, COMMON_LOG_LEVEL_DEF).toString();
+    m_settings->endGroup();
+    return logLevel;
 }
 
 QString Config::getTitle()

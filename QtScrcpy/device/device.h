@@ -35,6 +35,8 @@ public:
         bool display = true;              // 是否显示画面（或者仅仅后台录制）
         QString gameScript = "";          // 游戏映射脚本
         bool renderExpiredFrames = false; // 是否渲染延迟视频帧
+        int lockVideoOrientation = -1;    // 是否锁定视频方向
+        int stayAwake = false;            // 是否保持唤醒
     };
     enum GroupControlState
     {
