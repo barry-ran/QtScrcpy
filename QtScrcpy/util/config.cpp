@@ -14,7 +14,7 @@
 #define COMMON_PUSHFILE_DEF "/sdcard/"
 
 #define COMMON_SERVER_VERSION_KEY "ServerVersion"
-#define COMMON_SERVER_VERSION_DEF "1.12.1"
+#define COMMON_SERVER_VERSION_DEF "1.14"
 
 #define COMMON_SERVER_PATH_KEY "ServerPath"
 #define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
@@ -77,7 +77,7 @@ Config &Config::getInstance()
     static Config config;
     return config;
 }
-#include <QDebug>
+
 const QString &Config::getConfigPath()
 {
     if (s_configPath.isEmpty()) {
