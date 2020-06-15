@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     g_msgType = covertLogLevel(Config::getInstance().getLogLevel());
 
     // set on QApplication before
+    // bug: config path is error on mac
     int opengl = Config::getInstance().getDesktopOpenGL();
     if (0 == opengl) {
         QApplication::setAttribute(Qt::AA_UseSoftwareOpenGL);
