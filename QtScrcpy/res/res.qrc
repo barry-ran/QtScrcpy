@@ -2,7 +2,7 @@
     <qresource prefix="/">
         <file>font/fontawesome-webfont.ttf</file>
         <file>image/videoform/phone-h.png</file>
-        <file>image/videoform/phone-v.png</file>        
+        <file>image/videoform/phone-v.png</file>
         <file>qss/psblack.css</file>
         <file>qss/psblack/add_bottom.png</file>
         <file>qss/psblack/add_left.png</file>
@@ -24,5 +24,9 @@
         <file>qss/psblack/radiobutton_unchecked_disable.png</file>
         <file>i18n/QtScrcpy_en.qm</file>
         <file>i18n/QtScrcpy_zh.qm</file>
+        <file>qml/MainWindow.qml</file>
+        <file>image/mainwindow/bg.png</file>
+        <file>image/mainwindow/bg@2x.png</file>
+        <file>image/mainwindow/bg@3x.png</file>
     </qresource>
 </RCC>

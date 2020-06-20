@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
+#include <QQmlApplicationEngine>
 #include <QSurfaceFormat>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -71,18 +72,19 @@ int main(int argc, char *argv[])
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Stream::init();
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    QQmlApplicationEngine engine("qrc:/qml/MainWindow.qml");
 
     // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
     // mac下拿到的是CFBundleVersion的值
-    qDebug() << a.applicationVersion();
-    qDebug() << a.applicationName();
+    qDebug() << app.applicationVersion();
+    qDebug() << app.applicationName();
 
     //update version
     QStringList versionList = QCoreApplication::applicationVersion().split(".");
     if (versionList.size() >= 3) {
         QString version = versionList[0] + "." + versionList[1] + "." + versionList[2];
-        a.setApplicationVersion(version);
+        app.setApplicationVersion(version);
     }
 
     installTranslator();
@@ -100,9 +102,11 @@ int main(int argc, char *argv[])
         file.close();
     }
 
+    /*
     g_mainDlg = new Dialog;
     g_mainDlg->setWindowTitle(Config::getInstance().getTitle());
     g_mainDlg->show();
+    */
 
     qInfo(
         "%s",
@@ -112,7 +116,7 @@ int main(int argc, char *argv[])
             .data());
     qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion()).toUtf8();
 
-    int ret = a.exec();
+    int ret = app.exec();
 
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->quitMouseEventTap();
