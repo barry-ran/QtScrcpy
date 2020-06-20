@@ -55,8 +55,8 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize &frameS
     }
 
     // delta
-    qint32 hScroll = from->angleDelta().x() / abs(from->angleDelta().x()) * 2;
-    qint32 vScroll = from->angleDelta().y() / abs(from->angleDelta().y()) * 2;
+    qint32 hScroll = from->angleDelta().x() == 0 ? 0 : from->angleDelta().x() / abs(from->angleDelta().x()) * 2;
+    qint32 vScroll = from->angleDelta().y() == 0 ? 0 : from->angleDelta().y() / abs(from->angleDelta().y()) * 2;
 
     // pos
     QPointF pos = from->position();
