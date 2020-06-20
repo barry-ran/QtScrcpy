@@ -699,17 +699,21 @@ void VideoForm::dropEvent(QDropEvent *event)
         return;
     }
     const QMimeData *qm = event->mimeData();
-    QString file = qm->urls()[0].toLocalFile();
-    QFileInfo fileInfo(file);
+    QList<QUrl> urls = qm->urls();
 
-    if (!fileInfo.exists()) {
-        QMessageBox::warning(this, "QtScrcpy", tr("file does not exist"), QMessageBox::Ok);
-        return;
-    }
+    for (const QUrl& url : urls) {
+        QString file = url.toLocalFile();
+        QFileInfo fileInfo(file);
 
-    if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
-        emit m_device->installApkRequest(file);
-        return;
+        if (!fileInfo.exists()) {
+            QMessageBox::warning(this, "QtScrcpy", tr("file does not exist"), QMessageBox::Ok);
+            continue;
+        }
+
+        if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
+            emit m_device->installApkRequest(file);
+            continue;
+        }
+        emit m_device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
     }
-    emit m_device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }
