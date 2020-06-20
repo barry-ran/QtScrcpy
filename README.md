@@ -241,7 +241,7 @@ There are several reasons listed as below according to importance (high to low).
 All the dependencies are provided and it is easy to compile.
 
 ### PC client
-1. Set up the Qt development environment on the target platform (Qt >= 5.12.0, vs >= 2017 (mingw not supported))
+1. Set up the Qt development environment on the target platform (Qt == 5.15.0, vs == 2017 (mingw not supported))
 2. Clone the project
 3. Open the project root directory all.pro with QtCreator
 4. Compile and run

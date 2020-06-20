@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-16.04,ubuntu-18.04]
-        qt-ver: [5.12.6]
+        qt-ver: [5.15.0]
         qt-arch-install: [gcc_64]
         gcc-arch: [x64]
     env:
@@ -33,7 +33,7 @@ jobs:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
           key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2.6.2
+        uses: jurplel/install-qt-action@v2.7.1
         with:
           version: ${{ matrix.qt-ver }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
