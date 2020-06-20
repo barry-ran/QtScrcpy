@@ -24,13 +24,11 @@ public slots:
     void onPushFileRequest(const QString &serial, const QString &file, const QString &devicePath = "");
     void onInstallApkRequest(const QString &serial, const QString &apkFile);
 
+protected:
+    void onAdbProcessResult(AdbProcess* adb, bool isApk, AdbProcess::ADB_EXEC_RESULT processResult);
+
 signals:
     void fileHandlerResult(FILE_HANDLER_RESULT processResult, bool isApk = false);
-
-private:
-    AdbProcess m_adb;
-    bool m_isApk = false;
-    QString m_devicePath = "";
 };
 
 #endif // FILEHANDLER_H
