@@ -1,6 +1,7 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include <QElapsedTimer>
 #include <QPointer>
 #include <QTime>
 
@@ -116,7 +117,7 @@ private:
     // ui
     QPointer<VideoForm> m_videoForm;
 
-    QTime m_startTimeCount;
+    QElapsedTimer m_startTimeCount;
     DeviceParams m_params;
 
     GroupControlState m_controlState = GCS_FREE;
