@@ -66,8 +66,8 @@ void VideoForm::initUI()
 
     m_videoWidget = new QYUVOpenGLWidget();
     m_videoWidget->hide();
-    ui->keepRadioWidget->setWidget(m_videoWidget);
-    ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+    ui->keepRatioWidget->setWidget(m_videoWidget);
+    ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
 
     m_fpsLabel = new QLabel(m_videoWidget);
     QFont ft;
@@ -81,14 +81,14 @@ void VideoForm::initUI()
 
     setMouseTracking(true);
     m_videoWidget->setMouseTracking(true);
-    ui->keepRadioWidget->setMouseTracking(true);
+    ui->keepRatioWidget->setMouseTracking(true);
 }
 
 QRect VideoForm::getGrabCursorRect()
 {
     QRect rc;
 #if defined(Q_OS_WIN32)
-    rc = QRect(ui->keepRadioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
+    rc = QRect(ui->keepRatioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
@@ -99,15 +99,15 @@ QRect VideoForm::getGrabCursorRect()
     rc.setHeight(rc.height() - 20);
 #elif defined(Q_OS_OSX)
     rc = m_videoWidget->geometry();
-    rc.setTopLeft(ui->keepRadioWidget->mapToGlobal(rc.topLeft()));
-    rc.setBottomRight(ui->keepRadioWidget->mapToGlobal(rc.bottomRight()));
+    rc.setTopLeft(ui->keepRatioWidget->mapToGlobal(rc.topLeft()));
+    rc.setBottomRight(ui->keepRatioWidget->mapToGlobal(rc.bottomRight()));
 
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
     rc.setHeight(rc.height() - 20);
 #elif defined(Q_OS_LINUX)
-    rc = QRect(ui->keepRadioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
+    rc = QRect(ui->keepRatioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
     // high dpi support -- taken from the WIN32 section and untested
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
@@ -137,7 +137,7 @@ void VideoForm::resizeSquare()
 
 void VideoForm::removeBlackRect()
 {
-    resize(ui->keepRadioWidget->goodSize());
+    resize(ui->keepRatioWidget->goodSize());
 }
 
 void VideoForm::showFPS(bool show)
@@ -380,7 +380,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
         m_frameSize = newSize;
 
         m_widthHeightRatio = 1.0f * newSize.width() / newSize.height();
-        ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+        ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
 
         bool vertical = m_widthHeightRatio < 1.0f ? true : false;
         QSize showSize = newSize;
@@ -426,7 +426,7 @@ void VideoForm::onSwitchFullScreen()
     if (isFullScreen()) {
         // 横屏全屏铺满全屏，恢复时，恢复保持宽高比
         if (m_widthHeightRatio > 1.0f) {
-            ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+            ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
         }
 
         showNormal();
@@ -447,7 +447,7 @@ void VideoForm::onSwitchFullScreen()
     } else {
         // 横屏全屏铺满全屏，不保持宽高比
         if (m_widthHeightRatio > 1.0f) {
-            ui->keepRadioWidget->setWidthHeightRadio(-1.0f);
+            ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
         }
 
         m_fullScreenBeforePos = pos();
@@ -646,12 +646,12 @@ void VideoForm::showEvent(QShowEvent *event)
 void VideoForm::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
-    QSize goodSize = ui->keepRadioWidget->goodSize();
+    QSize goodSize = ui->keepRatioWidget->goodSize();
     if (goodSize.isEmpty()) {
         return;
     }
     QSize curSize = size();
-    // 限制VideoForm尺寸不能小于keepRadioWidget good size
+    // 限制VideoForm尺寸不能小于keepRatioWidget good size
     if (m_widthHeightRatio > 1.0f) {
         // hor
         if (curSize.height() <= goodSize.height()) {
