@@ -39,15 +39,15 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="KeepRadioWidget" name="keepRadioWidget" native="true"/>
+    <widget class="KeepRatioWidget" name="keepRatioWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KeepRadioWidget</class>
+   <class>KeepRatioWidget</class>
    <extends>QWidget</extends>
-   <header location="global">keepradiowidget.h</header>
+   <header location="global">keepratiowidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
