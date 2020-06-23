@@ -1,13 +1,13 @@
 #include <QResizeEvent>
 #include <cmath>
 
-#include "keepradiowidget.h"
+#include "keepratiowidget.h"
 
-KeepRadioWidget::KeepRadioWidget(QWidget *parent) : QWidget(parent) {}
+KeepRatioWidget::KeepRatioWidget(QWidget *parent) : QWidget(parent) {}
 
-KeepRadioWidget::~KeepRadioWidget() {}
+KeepRatioWidget::~KeepRatioWidget() {}
 
-void KeepRadioWidget::setWidget(QWidget *w)
+void KeepRatioWidget::setWidget(QWidget *w)
 {
     if (!w) {
         return;
@@ -16,30 +16,30 @@ void KeepRadioWidget::setWidget(QWidget *w)
     m_subWidget = w;
 }
 
-void KeepRadioWidget::setWidthHeightRadio(float widthHeightRadio)
+void KeepRatioWidget::setWidthHeightRatio(float widthHeightRatio)
 {
-    if (fabs(m_widthHeightRadio - widthHeightRadio) < 0.000001f) {
+    if (fabs(m_widthHeightRatio - widthHeightRatio) < 0.000001f) {
         return;
     }
-    m_widthHeightRadio = widthHeightRadio;
+    m_widthHeightRatio = widthHeightRatio;
     adjustSubWidget();
 }
 
-const QSize KeepRadioWidget::goodSize()
+const QSize KeepRatioWidget::goodSize()
 {
-    if (!m_subWidget || m_widthHeightRadio < 0.0f) {
+    if (!m_subWidget || m_widthHeightRatio < 0.0f) {
         return QSize();
     }
     return m_subWidget->size();
 }
 
-void KeepRadioWidget::resizeEvent(QResizeEvent *event)
+void KeepRatioWidget::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
     adjustSubWidget();
 }
 
-void KeepRadioWidget::adjustSubWidget()
+void KeepRatioWidget::adjustSubWidget()
 {
     if (!m_subWidget) {
         return;
@@ -49,15 +49,15 @@ void KeepRadioWidget::adjustSubWidget()
     QPoint pos(0, 0);
     int width = 0;
     int height = 0;
-    if (m_widthHeightRadio > 1.0f) {
+    if (m_widthHeightRatio > 1.0f) {
         // base width
         width = curSize.width();
-        height = curSize.width() / m_widthHeightRadio;
+        height = curSize.width() / m_widthHeightRatio;
         pos.setY((curSize.height() - height) / 2);
-    } else if (m_widthHeightRadio > 0.0f) {
+    } else if (m_widthHeightRatio > 0.0f) {
         // base height
         height = curSize.height();
-        width = curSize.height() * m_widthHeightRadio;
+        width = curSize.height() * m_widthHeightRatio;
         pos.setX((curSize.width() - width) / 2);
     } else {
         // full widget
