@@ -1,9 +1,9 @@
 FORMS +=
 
 HEADERS += \
-    $$PWD/keepradiowidget.h \
+    $$PWD/keepratiowidget.h \
     $$PWD/magneticwidget.h
 
 SOURCES += \
-    $$PWD/keepradiowidget.cpp \
+    $$PWD/keepratiowidget.cpp \
     $$PWD/magneticwidget.cpp

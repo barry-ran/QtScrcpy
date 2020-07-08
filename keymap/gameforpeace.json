@@ -227,7 +227,7 @@
 			"type": "KMT_CLICK",
 			"key": "Key_7",
 			"pos": {
-				"x": 0.61,
+				"x": 0.63,
 				"y": 0.82
 			},
 			"switchMap": false
@@ -237,7 +237,7 @@
 			"type": "KMT_CLICK",
 			"key": "Key_Shift",
 			"pos": {
-				"x": 0.82,
+				"x": 0.8,
 				"y": 0.8
 			},
 			"switchMap": false

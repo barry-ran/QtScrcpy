@@ -33,10 +33,10 @@ It focuses on:
 
 ![linux](screenshot/ubuntu.png)
 
-## Customized key mapping (Windows&MacOS only)
-You can write your own script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/按键映射说明.md) are the rules.
+## Customized key mapping
+You can write your own script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/KeyMapDes.md) are the rules.
 
-A script for "PUBG mobile" and TikTok mapping is provided by default. Once enabled, you can play the game with your keyboard and mouse as the PC version. or you can use up/down/left/right direction keys to simulate up/down/left/right sliding. You can also write your own mapping files for other games according to [writing rules](docs/按键映射说明.md). The default key mapping is as follows:
+A script for "PUBG mobile" and TikTok mapping is provided by default. Once enabled, you can play the game with your keyboard and mouse as the PC version. or you can use up/down/left/right direction keys to simulate up/down/left/right sliding. You can also write your own mapping files for other games according to [writing rules](docs/KeyMapDes.md). The default key mapping is as follows:
 
 ![game](screenshot/game.jpg)
 
@@ -241,7 +241,7 @@ There are several reasons listed as below according to importance (high to low).
 All the dependencies are provided and it is easy to compile.
 
 ### PC client
-1. Set up the Qt development environment on the target platform (Qt >= 5.12.0, vs >= 2017 (mingw not supported))
+1. Set up the Qt development environment on the target platform (Qt == 5.15.0, vs == 2017 (mingw not supported))
 2. Clone the project
 3. Open the project root directory all.pro with QtCreator
 4. Compile and run

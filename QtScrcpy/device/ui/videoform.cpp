@@ -66,8 +66,8 @@ void VideoForm::initUI()
 
     m_videoWidget = new QYUVOpenGLWidget();
     m_videoWidget->hide();
-    ui->keepRadioWidget->setWidget(m_videoWidget);
-    ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+    ui->keepRatioWidget->setWidget(m_videoWidget);
+    ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
 
     m_fpsLabel = new QLabel(m_videoWidget);
     QFont ft;
@@ -81,14 +81,14 @@ void VideoForm::initUI()
 
     setMouseTracking(true);
     m_videoWidget->setMouseTracking(true);
-    ui->keepRadioWidget->setMouseTracking(true);
+    ui->keepRatioWidget->setMouseTracking(true);
 }
 
 QRect VideoForm::getGrabCursorRect()
 {
     QRect rc;
 #if defined(Q_OS_WIN32)
-    rc = QRect(ui->keepRadioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
+    rc = QRect(ui->keepRatioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
     // high dpi support
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
@@ -99,15 +99,15 @@ QRect VideoForm::getGrabCursorRect()
     rc.setHeight(rc.height() - 20);
 #elif defined(Q_OS_OSX)
     rc = m_videoWidget->geometry();
-    rc.setTopLeft(ui->keepRadioWidget->mapToGlobal(rc.topLeft()));
-    rc.setBottomRight(ui->keepRadioWidget->mapToGlobal(rc.bottomRight()));
+    rc.setTopLeft(ui->keepRatioWidget->mapToGlobal(rc.topLeft()));
+    rc.setBottomRight(ui->keepRatioWidget->mapToGlobal(rc.bottomRight()));
 
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
     rc.setHeight(rc.height() - 20);
 #elif defined(Q_OS_LINUX)
-    rc = QRect(ui->keepRadioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
+    rc = QRect(ui->keepRatioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
     // high dpi support -- taken from the WIN32 section and untested
     rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
     rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
@@ -137,7 +137,7 @@ void VideoForm::resizeSquare()
 
 void VideoForm::removeBlackRect()
 {
-    resize(ui->keepRadioWidget->goodSize());
+    resize(ui->keepRatioWidget->goodSize());
 }
 
 void VideoForm::showFPS(bool show)
@@ -380,7 +380,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
         m_frameSize = newSize;
 
         m_widthHeightRatio = 1.0f * newSize.width() / newSize.height();
-        ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+        ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
 
         bool vertical = m_widthHeightRatio < 1.0f ? true : false;
         QSize showSize = newSize;
@@ -426,7 +426,7 @@ void VideoForm::onSwitchFullScreen()
     if (isFullScreen()) {
         // 横屏全屏铺满全屏，恢复时，恢复保持宽高比
         if (m_widthHeightRatio > 1.0f) {
-            ui->keepRadioWidget->setWidthHeightRadio(m_widthHeightRatio);
+            ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
         }
 
         showNormal();
@@ -447,7 +447,7 @@ void VideoForm::onSwitchFullScreen()
     } else {
         // 横屏全屏铺满全屏，不保持宽高比
         if (m_widthHeightRatio > 1.0f) {
-            ui->keepRadioWidget->setWidthHeightRadio(-1.0f);
+            ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
         }
 
         m_fullScreenBeforePos = pos();
@@ -595,17 +595,13 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
-    if (m_videoWidget->geometry().contains(event->pos())) {
+    if (m_videoWidget->geometry().contains(event->position().toPoint())) {
         if (!m_device) {
             return;
         }
-        QPointF pos = m_videoWidget->mapFrom(this, event->pos());
-        /*
-        QWheelEvent(const QPointF &pos, const QPointF& globalPos, int delta,
-                Qt::MouseButtons buttons, Qt::KeyboardModifiers modifiers,
-                Qt::Orientation orient = Qt::Vertical);
-        */
-        QWheelEvent wheelEvent(pos, event->globalPosF(), event->delta(), event->buttons(), event->modifiers(), event->orientation());
+        QPointF pos = m_videoWidget->mapFrom(this, event->position().toPoint());
+        QWheelEvent wheelEvent(
+            pos, event->globalPosition(), event->pixelDelta(), event->angleDelta(), event->buttons(), event->modifiers(), event->phase(), event->inverted());
         emit m_device->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
@@ -650,12 +646,12 @@ void VideoForm::showEvent(QShowEvent *event)
 void VideoForm::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event)
-    QSize goodSize = ui->keepRadioWidget->goodSize();
+    QSize goodSize = ui->keepRatioWidget->goodSize();
     if (goodSize.isEmpty()) {
         return;
     }
     QSize curSize = size();
-    // 限制VideoForm尺寸不能小于keepRadioWidget good size
+    // 限制VideoForm尺寸不能小于keepRatioWidget good size
     if (m_widthHeightRatio > 1.0f) {
         // hor
         if (curSize.height() <= goodSize.height()) {
@@ -703,17 +699,21 @@ void VideoForm::dropEvent(QDropEvent *event)
         return;
     }
     const QMimeData *qm = event->mimeData();
-    QString file = qm->urls()[0].toLocalFile();
-    QFileInfo fileInfo(file);
+    QList<QUrl> urls = qm->urls();
 
-    if (!fileInfo.exists()) {
-        QMessageBox::warning(this, "QtScrcpy", tr("file does not exist"), QMessageBox::Ok);
-        return;
-    }
+    for (const QUrl& url : urls) {
+        QString file = url.toLocalFile();
+        QFileInfo fileInfo(file);
 
-    if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
-        emit m_device->installApkRequest(file);
-        return;
+        if (!fileInfo.exists()) {
+            QMessageBox::warning(this, "QtScrcpy", tr("file does not exist"), QMessageBox::Ok);
+            continue;
+        }
+
+        if (fileInfo.isFile() && fileInfo.suffix() == "apk") {
+            emit m_device->installApkRequest(file);
+            continue;
+        }
+        emit m_device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
     }
-    emit m_device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
 }
