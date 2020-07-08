@@ -361,8 +361,8 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
         m_ctrlMouseMove.lastConverPos.setX(m_ctrlMouseMove.lastConverPos.x() + distance.x() / m_showSize.width());
         m_ctrlMouseMove.lastConverPos.setY(m_ctrlMouseMove.lastConverPos.y() + distance.y() / m_showSize.height());
 
-        if (m_ctrlMouseMove.lastConverPos.x() < 0.1 || m_ctrlMouseMove.lastConverPos.x() > 0.98 || m_ctrlMouseMove.lastConverPos.y() < 0.1
-            || m_ctrlMouseMove.lastConverPos.y() > 0.98) {
+        if (m_ctrlMouseMove.lastConverPos.x() < 0.1 || m_ctrlMouseMove.lastConverPos.x() > 0.8 || m_ctrlMouseMove.lastConverPos.y() < 0.1
+            || m_ctrlMouseMove.lastConverPos.y() > 0.8) {
             if (m_ctrlMouseMove.smallEyes) {
                 m_processMouseMove = false;
                 int delay = 30;
