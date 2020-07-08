@@ -198,7 +198,7 @@ void Device::initSignals()
             if (m_controlState == GCS_CLIENT) {
                 return;
             }
-            QMessageBox::information(m_videoForm, "QtScrcpy", tips, QMessageBox::Ok);
+            //QMessageBox::information(m_videoForm, "QtScrcpy", tips, QMessageBox::Ok);
         });
     }
 

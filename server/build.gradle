@@ -1,34 +1,13 @@
 apply plugin: 'com.android.application'
 
-buildscript {
-
-    repositories {
-        google()
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.1'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        jcenter()
-    }
-}
-
 android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.genymobile.scrcpy"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 5
-        versionName "1.12.1"
+        versionCode 16
+        versionName "1.14"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

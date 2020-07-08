@@ -14,29 +14,30 @@ on:
 jobs:
   build:
     name: Build
-    # windows-latest目前是windows server 2019,选择2016是2016安装的是vs2017
+    # windows-latest目前是windows server 2019
+    # windows server 2019安装的是vs2019，windows server 2016安装的是vs2017
     # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-    runs-on: windows-2016
+    runs-on: windows-2019
 
     # 矩阵配置 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
     strategy:
       matrix:
-        qt-ver: [5.12.6]
-        qt-arch: [win64_msvc2017_64, win32_msvc2017]
+        qt-ver: [5.15.0]
+        qt-arch: [win64_msvc2019_64, win32_msvc2019]
         # 配置qt-arch的额外设置msvc-arch，qt-arch-install
         include:
-          - qt-arch: win64_msvc2017_64
+          - qt-arch: win64_msvc2019_64
             msvc-arch: x64
-            qt-arch-install: msvc2017_64
-          - qt-arch: win32_msvc2017
+            qt-arch-install: msvc2019_64
+          - qt-arch: win32_msvc2019
             msvc-arch: x86
-            qt-arch-install: msvc2017
+            qt-arch-install: msvc2019
     # job env,所有steps都可以访问
     # 不同级别env详解 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#env
     # 使用表达式语法${{}}访问上下文 https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
     env:
       target-name: QtScrcpy
-      vcvarsall-path: 'C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
+      vcvarsall-path: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
       qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
       plantform-des: win
     # 步骤
@@ -50,7 +51,7 @@ jobs:
       # 安装Qt
       - name: Install Qt
         # 使用外部action。这个action专门用来安装Qt
-        uses: jurplel/install-qt-action@v2.6.2
+        uses: jurplel/install-qt-action@v2.7.1
         with:
           # Version of Qt to install
           version: ${{ matrix.qt-ver }}

@@ -37,6 +37,9 @@
 #define COMMON_LOG_LEVEL_KEY "LogLevel"
 #define COMMON_LOG_LEVEL_DEF "info"
 
+#define COMMON_CODEC_OPTIONS_KEY "CodecOptions"
+#define COMMON_CODEC_OPTIONS_DEF "-"
+
 // user data
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
@@ -275,6 +278,15 @@ QString Config::getLogLevel()
     logLevel = m_settings->value(COMMON_LOG_LEVEL_KEY, COMMON_LOG_LEVEL_DEF).toString();
     m_settings->endGroup();
     return logLevel;
+}
+
+QString Config::getCodecOptions()
+{
+    QString codecOptions;
+    m_settings->beginGroup(GROUP_COMMON);
+    codecOptions = m_settings->value(COMMON_CODEC_OPTIONS_KEY, COMMON_CODEC_OPTIONS_DEF).toString();
+    m_settings->endGroup();
+    return codecOptions;
 }
 
 QString Config::getTitle()
