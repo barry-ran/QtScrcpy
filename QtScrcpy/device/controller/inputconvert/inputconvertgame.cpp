@@ -442,7 +442,7 @@ void InputConvertGame::mouseMoveStopTouch()
 void InputConvertGame::startMouseMoveTimer()
 {
     stopMouseMoveTimer();
-    m_ctrlMouseMove.timer = startTimer(1000);
+    m_ctrlMouseMove.timer = startTimer(500);
 }
 
 void InputConvertGame::stopMouseMoveTimer()
