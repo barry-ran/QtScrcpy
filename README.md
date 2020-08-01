@@ -8,6 +8,8 @@
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
 ![release](https://img.shields.io/github/v/release/barry-ran/QtScrcpy.svg)
 
+<a href="https://tracking.gitads.io/?repo=QtScrcpy"><img src="https://images.gitads.io/QtScrcpy" alt="GitAds"/></a>
+
 [中文介绍](README_zh.md)
 
 QtScrcpy connects to Android devices via USB (or via TCP/IP) for display and control. It does NOT require the root privileges.
