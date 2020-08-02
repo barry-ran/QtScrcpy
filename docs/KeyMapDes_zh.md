@@ -35,6 +35,7 @@
 - type 按键映射的类型，每个keyMapNodes中的元素都需要指明，可以是如下类型：
     - KMT_CLICK 普通点击，按键按下模拟为手指按下，按键抬起模拟为手指抬起
     - KMT_CLICK_TWICE 两次点击，按键按下模拟为手指按下再抬起，按键抬起模拟为手指按下再抬起
+    - KMT_CLICK_MULTI 多次点击，根据clickNodes数组中的delay和pos实现一个按键多次点击
     - KMT_DRAG 拖拽，按键按下模拟为手指按下并拖动一段距离，按键抬起模拟为手指抬起
     - KMT_STEER_WHEEL 方向盘映射，专用于FPS游戏中移动人物脚步的方向盘的映射，需要4个按键来配合。
 
@@ -47,6 +48,10 @@
 
 - KMT_CLICK_TWICE
     - key 要映射的按键码
+    - pos 模拟触摸的位置
+
+- KMT_CLICK_MULTI
+    - delay 延迟delay毫秒以后再模拟触摸
     - pos 模拟触摸的位置
 
 - KMT_DRAG

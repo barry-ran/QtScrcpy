@@ -1,0 +1,39 @@
+{
+	"switchKey": "Key_QuoteLeft",
+	"keyMapNodes": [
+		{
+			"comment": "测试一键多点",
+			"type": "KMT_CLICK_MULTI",
+			"key": "Key_Space",
+			"clickNodes": [
+				{
+					"delay": 500,
+					"pos": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"delay": 500,
+					"pos": {
+						"x": 0.8,
+						"y": 0.8
+					}
+				}
+			]
+		},
+		{
+			"comment": "测试拖拽",
+			"type": "KMT_DRAG",
+			"key": "Key_Up",
+			"startPos": {
+				"x": 0.5,
+				"y": 0.7
+			},
+			"endPos": {
+				"x": 0.5,
+				"y": 0.3
+			}
+		}
+	]
+}
