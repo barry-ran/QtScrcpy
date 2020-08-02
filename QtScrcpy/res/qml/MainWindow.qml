@@ -10,20 +10,21 @@ Window {
     color: "transparent"
 
     // bg
-    Image {
+    BorderImage {
         id: background
-        //anchors { top: parent.top; bottom: parent.bottom }
         anchors.fill: parent
         source: "qrc:/image/mainwindow/bg.png"
-        fillMode: Image.PreserveAspectCrop
+        border { left: 30; top: 30; right: 30; bottom: 30 }
+        horizontalTileMode: BorderImage.Stretch
+        verticalTileMode: BorderImage.Stretch
     }
 
     Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: 30
-        color: "red"
+        height: 60
+        color: "transparent"
 
         DragHandler {
             grabPermissions: TapHandler.CanTakeOverFromAnything
