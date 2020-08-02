@@ -21,6 +21,7 @@ public:
     void test(QRect rc);
 
     void updateScript(QString gameScript = "");
+    bool isCurrentCustomKeymap();
 
 public slots:
     void onPostGoBack();

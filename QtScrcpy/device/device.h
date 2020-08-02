@@ -56,6 +56,8 @@ public:
     void updateScript(QString script);
     Device::GroupControlState controlState();
 
+    bool isCurrentCustomKeymap();
+
 signals:
     void deviceDisconnect(QString serial);
 
