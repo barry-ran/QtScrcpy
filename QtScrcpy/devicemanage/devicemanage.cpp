@@ -7,7 +7,7 @@
 #include "server.h"
 #include "videoform.h"
 
-#define DM_MAX_DEVICES_NUM 16
+#define DM_MAX_DEVICES_NUM 1000
 
 DeviceManage::DeviceManage(QObject *parent) : QObject(parent) {}
 
