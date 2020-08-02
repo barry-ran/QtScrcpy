@@ -56,6 +56,15 @@ void Controller::updateScript(QString gameScript)
     connect(m_inputConvert, &InputConvertBase::grabCursor, this, &Controller::grabCursor);
 }
 
+bool Controller::isCurrentCustomKeymap()
+{
+    if (!m_inputConvert) {
+        return false;
+    }
+
+    return m_inputConvert->isCurrentCustomKeymap();
+}
+
 void Controller::onPostBackOrScreenOn()
 {
     ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);

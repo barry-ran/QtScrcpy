@@ -501,7 +501,7 @@ void VideoForm::setDevice(Device *device)
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::MiddleButton) {
-        if (m_device) {
+        if (m_device && !m_device->isCurrentCustomKeymap()) {
             emit m_device->postGoHome();
         }
     }
@@ -580,7 +580,7 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
         }
     }
 
-    if (event->button() == Qt::RightButton && m_device) {
+    if (event->button() == Qt::RightButton && m_device && !m_device->isCurrentCustomKeymap()) {
         emit m_device->postBackOrScreenOn();
     }
 
@@ -701,7 +701,7 @@ void VideoForm::dropEvent(QDropEvent *event)
     const QMimeData *qm = event->mimeData();
     QList<QUrl> urls = qm->urls();
 
-    for (const QUrl& url : urls) {
+    for (const QUrl &url : urls) {
         QString file = url.toLocalFile();
         QFileInfo fileInfo(file);
 

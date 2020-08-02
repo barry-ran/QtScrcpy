@@ -124,6 +124,11 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
     }
 }
 
+bool InputConvertGame::isCurrentCustomKeymap()
+{
+    return m_gameMap;
+}
+
 void InputConvertGame::loadKeyMap(const QString &json)
 {
     m_keyMap.loadKeyMap(json);
