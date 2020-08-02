@@ -9,6 +9,8 @@
 #include <QRectF>
 #include <QVector>
 
+#define MAX_DELAY_CLICK_NODES 50
+
 class KeyMap : public QObject
 {
     Q_OBJECT
@@ -18,6 +20,7 @@ public:
         KMT_INVALID = -1,
         KMT_CLICK = 0,
         KMT_CLICK_TWICE,
+        KMT_CLICK_MULTI,
         KMT_STEER_WHEEL,
         KMT_DRAG,
         KMT_MOUSE_MOVE
@@ -32,13 +35,21 @@ public:
     };
     Q_ENUM(ActionType)
 
+    struct DelayClickNode
+    {
+        int delay = 0;
+        QPointF pos = QPointF(0, 0);
+    };
+
     struct KeyNode
     {
         ActionType type = AT_INVALID;
         int key = Qt::Key_unknown;
-        QPointF pos = QPointF(0, 0);       // normal key
-        QPointF extendPos = QPointF(0, 0); // for drag
-        double extendOffset = 0.0;         // for steerWheel
+        QPointF pos = QPointF(0, 0);                           // normal key
+        QPointF extendPos = QPointF(0, 0);                     // for drag
+        double extendOffset = 0.0;                             // for steerWheel
+        DelayClickNode delayClickNodes[MAX_DELAY_CLICK_NODES]; // for multi clicks
+        int delayClickNodesCount = 0;
 
         KeyNode(
             ActionType type = AT_INVALID,
@@ -67,6 +78,10 @@ public:
             } clickTwice;
             struct
             {
+                KeyNode keyNode;
+            } clickMulti;
+            struct
+            {
                 QPointF centerPos = { 0.0, 0.0 };
                 KeyNode left, right, up, down;
             } steerWheel;
@@ -83,6 +98,7 @@ public:
             DATA() {}
             ~DATA() {}
         } data;
+
         KeyMapNode() {}
         ~KeyMapNode() {}
     };
@@ -116,6 +132,8 @@ private:
 
     // safe check for KeyMapNode
     bool checkForClick(const QJsonObject &node);
+    bool checkForClickMulti(const QJsonObject &node);
+    bool checkForDelayClickNode(const QJsonObject &node);
     bool checkForClickTwice(const QJsonObject &node);
     bool checkForSteerWhell(const QJsonObject &node);
     bool checkForDrag(const QJsonObject &node);

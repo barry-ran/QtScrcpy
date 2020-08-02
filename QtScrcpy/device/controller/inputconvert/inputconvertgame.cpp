@@ -78,7 +78,7 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
         }
 
         // small eyes
-        if (from->key() == m_keyMap.getMouseMoveMap().data.mouseMove.smallEyes.key) {
+        if (m_keyMap.isValidMouseMoveMap() && from->key() == m_keyMap.getMouseMoveMap().data.mouseMove.smallEyes.key) {
             m_ctrlMouseMove.smallEyes = (QEvent::KeyPress == from->type());
 
             if (QEvent::KeyPress == from->type()) {
@@ -110,6 +110,9 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
         case KeyMap::KMT_CLICK_TWICE:
             processKeyClick(node.data.clickTwice.keyNode.pos, true, false, from);
             return;
+        case KeyMap::KMT_CLICK_MULTI:
+            processKeyClickMulti(node.data.clickMulti.keyNode.delayClickNodes, node.data.clickMulti.keyNode.delayClickNodesCount, from);
+            return;
         case KeyMap::KMT_DRAG:
             processKeyDrag(node.data.drag.keyNode.pos, node.data.drag.keyNode.extendPos, from);
             return;
@@ -119,6 +122,11 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
     } else {
         InputConvertNormal::keyEvent(from, frameSize, showSize);
     }
+}
+
+bool InputConvertGame::isCurrentCustomKeymap()
+{
+    return m_gameMap;
 }
 
 void InputConvertGame::loadKeyMap(const QString &json)
@@ -164,8 +172,15 @@ void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAct
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectTouchMsgData(
-        static_cast<quint64>(id), action, static_cast<AndroidMotioneventButtons>(0), QRect(calcFrameAbsolutePos(pos).toPoint(), m_frameSize), 1.0f);
+
+    QPoint absolutePos = calcFrameAbsolutePos(pos).toPoint();
+    static QPoint lastAbsolutePos = absolutePos;
+    if (AMOTION_EVENT_ACTION_MOVE == action && lastAbsolutePos == absolutePos) {
+        return;
+    }
+    lastAbsolutePos = absolutePos;
+
+    controlMsg->setInjectTouchMsgData(static_cast<quint64>(id), action, static_cast<AndroidMotioneventButtons>(0), QRect(absolutePos, m_frameSize), 1.0f);
     sendControlMsg(controlMsg);
 }
 
@@ -302,6 +317,34 @@ void InputConvertGame::processKeyClick(const QPointF &clickPos, bool clickTwice,
     }
 }
 
+void InputConvertGame::processKeyClickMulti(const KeyMap::DelayClickNode *nodes, const int count, const QKeyEvent *from)
+{
+    if (QEvent::KeyPress != from->type()) {
+        return;
+    }
+
+    int key = from->key();
+    int delay = 0;
+    QPointF clickPos;
+
+    for (int i = 0; i < count; i++) {
+        delay += nodes[i].delay;
+        clickPos = nodes[i].pos;
+        QTimer::singleShot(delay, this, [this, key, clickPos]() {
+            int id = attachTouchID(key);
+            sendTouchDownEvent(id, clickPos);
+        });
+
+        // Don't up it too fast
+        delay += 20;
+        QTimer::singleShot(delay, this, [this, key, clickPos]() {
+            int id = getTouchID(key);
+            sendTouchUpEvent(id, clickPos);
+            detachTouchID(key);
+        });
+    }
+}
+
 void InputConvertGame::processKeyDrag(const QPointF &startPos, QPointF endPos, const QKeyEvent *from)
 {
     if (QEvent::KeyPress == from->type()) {
@@ -361,8 +404,8 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
         m_ctrlMouseMove.lastConverPos.setX(m_ctrlMouseMove.lastConverPos.x() + distance.x() / m_showSize.width());
         m_ctrlMouseMove.lastConverPos.setY(m_ctrlMouseMove.lastConverPos.y() + distance.y() / m_showSize.height());
 
-        if (m_ctrlMouseMove.lastConverPos.x() < 0.1 || m_ctrlMouseMove.lastConverPos.x() > 0.8 || m_ctrlMouseMove.lastConverPos.y() < 0.1
-            || m_ctrlMouseMove.lastConverPos.y() > 0.8) {
+        if (m_ctrlMouseMove.lastConverPos.x() < 0.05 || m_ctrlMouseMove.lastConverPos.x() > 0.95 || m_ctrlMouseMove.lastConverPos.y() < 0.05
+            || m_ctrlMouseMove.lastConverPos.y() > 0.95) {
             if (m_ctrlMouseMove.smallEyes) {
                 m_processMouseMove = false;
                 int delay = 30;
@@ -442,7 +485,7 @@ void InputConvertGame::mouseMoveStopTouch()
 void InputConvertGame::startMouseMoveTimer()
 {
     stopMouseMoveTimer();
-    m_ctrlMouseMove.timer = startTimer(1000);
+    m_ctrlMouseMove.timer = startTimer(500);
 }
 
 void InputConvertGame::stopMouseMoveTimer()
@@ -456,6 +499,7 @@ void InputConvertGame::stopMouseMoveTimer()
 bool InputConvertGame::switchGameMap()
 {
     m_gameMap = !m_gameMap;
+    qInfo() << tr("current keymap mode: %1").arg(m_gameMap ? tr("custom") : tr("normal"));
 
     if (!m_keyMap.isValidMouseMoveMap()) {
         return m_gameMap;
