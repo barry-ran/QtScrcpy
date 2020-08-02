@@ -78,7 +78,7 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
         }
 
         // small eyes
-        if (from->key() == m_keyMap.getMouseMoveMap().data.mouseMove.smallEyes.key) {
+        if (m_keyMap.isValidMouseMoveMap() && from->key() == m_keyMap.getMouseMoveMap().data.mouseMove.smallEyes.key) {
             m_ctrlMouseMove.smallEyes = (QEvent::KeyPress == from->type());
 
             if (QEvent::KeyPress == from->type()) {
@@ -109,6 +109,9 @@ void InputConvertGame::keyEvent(const QKeyEvent *from, const QSize &frameSize, c
             return;
         case KeyMap::KMT_CLICK_TWICE:
             processKeyClick(node.data.clickTwice.keyNode.pos, true, false, from);
+            return;
+        case KeyMap::KMT_CLICK_MULTI:
+            processKeyClickMulti(node.data.clickMulti.keyNode.delayClickNodes, node.data.clickMulti.keyNode.delayClickNodesCount, from);
             return;
         case KeyMap::KMT_DRAG:
             processKeyDrag(node.data.drag.keyNode.pos, node.data.drag.keyNode.extendPos, from);
@@ -306,6 +309,34 @@ void InputConvertGame::processKeyClick(const QPointF &clickPos, bool clickTwice,
         }
         sendTouchUpEvent(getTouchID(from->key()), clickPos);
         detachTouchID(from->key());
+    }
+}
+
+void InputConvertGame::processKeyClickMulti(const KeyMap::DelayClickNode *nodes, const int count, const QKeyEvent *from)
+{
+    if (QEvent::KeyPress != from->type()) {
+        return;
+    }
+
+    int key = from->key();
+    int delay = 0;
+    QPointF clickPos;
+
+    for (int i = 0; i < count; i++) {
+        delay += nodes[i].delay;
+        clickPos = nodes[i].pos;
+        QTimer::singleShot(delay, this, [this, key, clickPos]() {
+            int id = attachTouchID(key);
+            sendTouchDownEvent(id, clickPos);
+        });
+
+        // Don't up it too fast
+        delay += 20;
+        QTimer::singleShot(delay, this, [this, key, clickPos]() {
+            int id = getTouchID(key);
+            sendTouchUpEvent(id, clickPos);
+            detachTouchID(key);
+        });
     }
 }
 

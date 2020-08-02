@@ -40,6 +40,9 @@ protected:
     // click
     void processKeyClick(const QPointF &clickPos, bool clickTwice, bool switchMap, const QKeyEvent *from);
 
+    // click mutil
+    void processKeyClickMulti(const KeyMap::DelayClickNode *nodes, const int count, const QKeyEvent *from);
+
     // drag
     void processKeyDrag(const QPointF &startPos, QPointF endPos, const QKeyEvent *from);
 
