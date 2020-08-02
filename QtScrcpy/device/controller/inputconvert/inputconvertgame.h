@@ -17,6 +17,7 @@ public:
     virtual void mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize);
     virtual void wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize);
     virtual void keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize);
+    virtual bool isCurrentCustomKeymap();
 
     void loadKeyMap(const QString &json);
 
@@ -39,6 +40,9 @@ protected:
 
     // click
     void processKeyClick(const QPointF &clickPos, bool clickTwice, bool switchMap, const QKeyEvent *from);
+
+    // click mutil
+    void processKeyClickMulti(const KeyMap::DelayClickNode *nodes, const int count, const QKeyEvent *from);
 
     // drag
     void processKeyDrag(const QPointF &startPos, QPointF endPos, const QKeyEvent *from);

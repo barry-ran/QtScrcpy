@@ -339,6 +339,14 @@ Device::GroupControlState Device::controlState()
     return m_controlState;
 }
 
+bool Device::isCurrentCustomKeymap()
+{
+    if (!m_controller) {
+        return false;
+    }
+    return m_controller->isCurrentCustomKeymap();
+}
+
 bool Device::saveFrame(const AVFrame *frame)
 {
     if (!frame) {

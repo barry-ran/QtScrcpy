@@ -175,6 +175,41 @@ void KeyMap::loadKeyMap(const QString &json)
                 keyMapNode.data.click.switchMap = getItemBool(node, "switchMap");
                 m_keyMapNodes.push_back(keyMapNode);
             } break;
+            case KeyMap::KMT_CLICK_MULTI: {
+                // safe check
+                if (!checkForClickMulti(node)) {
+                    qWarning() << "json error: keyMapNodes node format error";
+                    break;
+                }
+                QPair<ActionType, int> key = getItemKey(node, "key");
+                if (key.first == AT_INVALID) {
+                    qWarning() << "json error: keyMapNodes node invalid key: " << node.value("key").toString();
+                    break;
+                }
+                KeyMapNode keyMapNode;
+                keyMapNode.type = type;
+                keyMapNode.data.clickMulti.keyNode.type = key.first;
+                keyMapNode.data.clickMulti.keyNode.key = key.second;
+
+                QJsonArray clickNodes = node.value("clickNodes").toArray();
+                QJsonObject clickNode;
+                keyMapNode.data.clickMulti.keyNode.delayClickNodesCount = 0;
+
+                for (int i = 0; i < clickNodes.size(); i++) {
+                    if (i >= MAX_DELAY_CLICK_NODES) {
+                        qInfo() << "clickNodes too much, up to " << MAX_DELAY_CLICK_NODES;
+                        break;
+                    }
+                    clickNode = clickNodes.at(i).toObject();
+                    DelayClickNode delayClickNode;
+                    delayClickNode.delay = getItemDouble(clickNode, "delay");
+                    delayClickNode.pos = getItemPos(clickNode, "pos");
+                    keyMapNode.data.clickMulti.keyNode.delayClickNodes[i] = delayClickNode;
+                    keyMapNode.data.clickMulti.keyNode.delayClickNodesCount++;
+                }
+
+                m_keyMapNodes.push_back(keyMapNode);
+            } break;
             case KeyMap::KMT_STEER_WHEEL: {
                 // safe check
                 if (!checkForSteerWhell(node)) {
@@ -242,7 +277,7 @@ void KeyMap::loadKeyMap(const QString &json)
     }
     // this must be called after m_keyMapNodes is stable
     makeReverseMap();
-    qInfo() << "Script updated.";
+    qInfo() << tr("Script updated, current keymap mode:normal, Press ~ key to switch keymap mode");
 
 parseError:
     if (!errorString.isEmpty()) {
@@ -309,6 +344,10 @@ void KeyMap::makeReverseMap()
         case KMT_CLICK_TWICE: {
             QMultiHash<int, KeyMapNode *> &m = node.data.clickTwice.keyNode.type == AT_KEY ? m_rmapKey : m_rmapMouse;
             m.insert(node.data.clickTwice.keyNode.key, &node);
+        } break;
+        case KMT_CLICK_MULTI: {
+            QMultiHash<int, KeyMapNode *> &m = node.data.clickMulti.keyNode.type == AT_KEY ? m_rmapKey : m_rmapMouse;
+            m.insert(node.data.clickMulti.keyNode.key, &node);
         } break;
         case KMT_STEER_WHEEL: {
             QMultiHash<int, KeyMapNode *> &ml = node.data.steerWheel.left.type == AT_KEY ? m_rmapKey : m_rmapMouse;
@@ -408,6 +447,45 @@ bool KeyMap::checkItemPos(const QJsonObject &node, const QString &name)
 bool KeyMap::checkForClick(const QJsonObject &node)
 {
     return checkForClickTwice(node) && checkItemBool(node, "switchMap");
+}
+
+bool KeyMap::checkForClickMulti(const QJsonObject &node)
+{
+    bool ret = true;
+
+    if (!node.contains("clickNodes") || !node.value("clickNodes").isArray()) {
+        qWarning("json error: no find clickNodes");
+        return false;
+    }
+
+    QJsonArray clickNodes = node.value("clickNodes").toArray();
+    QJsonObject clickNode;
+    int size = clickNodes.size();
+    if (0 == size) {
+        qWarning("json error: clickNodes is empty");
+        return false;
+    }
+
+    for (int i = 0; i < size; i++) {
+        if (!clickNodes.at(i).isObject()) {
+            qWarning("json error: clickNodes node must be json object");
+            ret = false;
+            break;
+        }
+
+        clickNode = clickNodes.at(i).toObject();
+        if (!checkForDelayClickNode(clickNode)) {
+            ret = false;
+            break;
+        }
+    }
+
+    return ret;
+}
+
+bool KeyMap::checkForDelayClickNode(const QJsonObject &node)
+{
+    return checkItemPos(node, "pos") && checkItemDouble(node, "delay");
 }
 
 bool KeyMap::checkForClickTwice(const QJsonObject &node)

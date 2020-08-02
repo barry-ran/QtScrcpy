@@ -35,6 +35,7 @@ There are several types of key mapping as follows:
 -type The type of key mapping, each element in keyMapNodes needs to be specified, and can be of the following types:
     -KMT_CLICK Ordinary click, key press simulates finger press, key lift simulates finger lift
     -KMT_CLICK_TWICE Double click, key press simulates finger press and then lift, key lift simulates finger press and then lift
+    - KMT_CLICK_MULTI Click multiple times. According to the delay and pos in the clickNodes array, press one key to simulate touching multiple positions
     -KMT_DRAG drag and drop, the key press is simulated as a finger press and drag a distance, the key lift is simulated as a finger lift
     -KMT_STEER_WHEEL steering wheel mapping, which is dedicated to the mapping of the steering wheel for moving characters in FPS games, requires 4 buttons to cooperate.
 
@@ -47,7 +48,11 @@ Description of the unique attributes of different key mapping types:
 
 -KMT_CLICK_TWICE
     -key The key code to be mapped
-    -pos simulates the location of the touch
+    -pos Simulates the location of the touch
+
+-KMT_CLICK_MULTI
+    -delay Delay `delay` ms before simulating touch
+    -pos Simulates the location of the touch
 
 -KMT_DRAG
     -key The key code to be mapped
