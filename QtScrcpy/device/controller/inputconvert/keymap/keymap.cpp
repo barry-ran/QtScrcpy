@@ -197,7 +197,7 @@ void KeyMap::loadKeyMap(const QString &json)
 
                 for (int i = 0; i < clickNodes.size(); i++) {
                     if (i >= MAX_DELAY_CLICK_NODES) {
-                        qInfo("clickNodes too much, up to %1", MAX_DELAY_CLICK_NODES);
+                        qInfo() << "clickNodes too much, up to " << MAX_DELAY_CLICK_NODES;
                         break;
                     }
                     clickNode = clickNodes.at(i).toObject();
