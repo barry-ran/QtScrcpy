@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Stream::init();
     QApplication app(argc, argv);
-    QQmlApplicationEngine engine("qrc:/qml/MainWindow.qml");
+    QQmlApplicationEngine engine("qrc:/MainWindow.qml");
 
     // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
     // mac下拿到的是CFBundleVersion的值

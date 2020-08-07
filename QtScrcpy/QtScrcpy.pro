@@ -215,5 +215,9 @@ linux {
 # message("test")
 
 RESOURCES += \
+    qml.qrc \
     res/res.qrc
+
+DISTFILES += \
+    MainWindow.qml
 
