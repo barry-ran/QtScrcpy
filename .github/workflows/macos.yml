@@ -16,7 +16,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        qt-ver: [5.15.0]
+        qt-ver: [5.15.1]
         qt-arch-install: [clang_64]
         clang-arch: [x64]
     env:
