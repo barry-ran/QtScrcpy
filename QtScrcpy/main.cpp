@@ -23,6 +23,7 @@ QtMsgType covertLogLevel(const QString &logLevel);
 int main(int argc, char *argv[])
 {
     // set env
+#ifdef QTSCRCPY_DEV_ENV
 #ifdef Q_OS_WIN32
     qputenv("QTSCRCPY_ADB_PATH", "../../../../third_party/adb/win/adb.exe");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../../third_party/scrcpy-server");
@@ -39,6 +40,7 @@ int main(int argc, char *argv[])
     qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server");
     qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
+#endif
 #endif
 
     g_msgType = covertLogLevel(Config::getInstance().getLogLevel());
