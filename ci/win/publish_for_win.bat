@@ -9,10 +9,10 @@ echo ---------------------------------------------------------------
 :: 从环境变量获取必要参数
 :: example: D:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat
 set vcvarsall="%ENV_VCVARSALL%"
-:: 设置了VCINSTALLDIR，windeployqt会自动copy vcruntime dll
-set VCINSTALLDIR="%ENV_VCINSTALL%"
 :: 例如 d:\a\QtScrcpy\Qt\5.12.7
 set qt_msvc_path="%ENV_QT_PATH%"
+:: 设置了VCINSTALLDIR，windeployqt会自动copy vcruntime dll
+:: set VCINSTALLDIR="%ENV_VCINSTALL%"
 
 echo ENV_VCVARSALL %ENV_VCVARSALL%
 echo ENV_QT_PATH %ENV_QT_PATH%
@@ -57,11 +57,11 @@ if /i %cpu_mode% == x86 (
 set PATH=%qt_msvc_path%;%PATH%
 
 :: 注册vc环境(注册以后，windeployqt会把vc_redist复制过来（vcruntime安装包）)
-:: if /i %cpu_mode% == x86 (
-::     call %vcvarsall% %cpu_mode%
-:: ) else (
-::     call %vcvarsall% %cpu_mode%
-:: )
+if /i %cpu_mode% == x86 (
+    call %vcvarsall% %cpu_mode%
+) else (
+    call %vcvarsall% %cpu_mode%
+)
 
 if exist %publish_path% (
     rmdir /s/q %publish_path%
@@ -92,11 +92,20 @@ del %publish_path%\imageformats\qtiff.dll
 del %publish_path%\imageformats\qwbmp.dll
 del %publish_path%\imageformats\qwebp.dll
 
+:: 删除vc_redist，自己copy vcruntime dll
 if /i %cpu_mode% == x86 (
     del %publish_path%\vc_redist.x86.exe
 ) else (
     del %publish_path%\vc_redist.x64.exe
 )
+
+:: copy vcruntime dll
+cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\VCRUNTIME140.dll" %publish_path%\VCRUNTIME140.dll
+cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-runtime-l1-1-0.dll" %publish_path%\api-ms-win-crt-runtime-l1-1-0.dll
+cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-heap-l1-1-0.dll" %publish_path%\api-ms-win-crt-heap-l1-1-0.dll
+cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-math-l1-1-0.dll" %publish_path%\api-ms-win-crt-math-l1-1-0.dll
+cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-stdio-l1-1-0.dll" %publish_path%\api-ms-win-crt-stdio-l1-1-0.dll
+cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-locale-l1-1-0.dll" %publish_path%\api-ms-win-crt-locale-l1-1-0.dll
 
 echo=
 echo=
