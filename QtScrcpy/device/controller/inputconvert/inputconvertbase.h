@@ -24,7 +24,7 @@ public:
     virtual bool isCurrentCustomKeymap()
     {
         return false;
-    };
+    }
 
 signals:
     void grabCursor(bool grab);
