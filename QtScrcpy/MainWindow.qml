@@ -2,21 +2,30 @@ import QtQuick 2.12
 import QtQuick.Window 2.12
 
 Window {
-    id: window
+    id: root
     visible: true
-    flags: Qt.Window |Qt.FramelessWindowHint
+    flags: Qt.Window | Qt.FramelessWindowHint | Qt.WindowMaximizeButtonHint
     width: 800
     height: 600
     color: "transparent"
 
-    // bg
-    BorderImage {
-        id: background
+    property real backgroundRadius: 4
+    property bool backgroundHasBorder: true
+    property color backgroundColor: "#2E2F30"
+    property color backgroundBorderColor: "#555656"
+
+    Rectangle {
+        id: backgroundView
         anchors.fill: parent
-        source: "qrc:/image/mainwindow/bg.png"
-        border { left: 30; top: 30; right: 30; bottom: 30 }
-        horizontalTileMode: BorderImage.Stretch
-        verticalTileMode: BorderImage.Stretch
+        color: root.backgroundColor
+        radius: root.backgroundRadius
+        clip: true
+        antialiasing: true
+
+        border {
+            color: root.backgroundHasBorder ? root.backgroundBorderColor : "transparent"
+            width: root.backgroundHasBorder ? 1 : 0
+        }
     }
 
     Rectangle {
@@ -28,23 +37,7 @@ Window {
 
         DragHandler {
             grabPermissions: TapHandler.CanTakeOverFromAnything
-            onActiveChanged: if (active) { window.startSystemMove(); }
+            onActiveChanged: if (active) { root.startSystemMove(); }
         }
-    }
-
-    DragHandler {
-        id: resizeHandler
-        grabPermissions: TapHandler.TakeOverForbidden
-        target: null
-        onActiveChanged:
-            if (active) {
-                const p = resizeHandler.centroid.position;
-                let e = 0;
-                if (p.x / width < 0.10) { e |= Qt.LeftEdge }
-                if (p.x / width > 0.90) { e |= Qt.RightEdge }
-                if (p.y / height > 0.90) { e |= Qt.BottomEdge }
-                console.log("RESIZING", e);
-                window.startSystemResize(e);
-            }
     }
 }

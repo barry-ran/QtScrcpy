@@ -11,6 +11,7 @@
 #include "dialog.h"
 #include "mousetap/mousetap.h"
 #include "stream.h"
+#include "windowframelesshelper.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
 
@@ -74,6 +75,10 @@ int main(int argc, char *argv[])
     Stream::init();
     QApplication app(argc, argv);
     QQmlApplicationEngine engine("qrc:/MainWindow.qml");
+
+#ifdef Q_OS_WIN32
+    WindowFramelessHelper::Instance()->Init();
+#endif
 
     // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
     // mac下拿到的是CFBundleVersion的值
