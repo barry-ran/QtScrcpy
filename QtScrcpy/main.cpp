@@ -12,6 +12,7 @@
 #include "mousetap/mousetap.h"
 #include "stream.h"
 #include "windowframelesshelper.h"
+#include "windowframelesshelpermac.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
 
@@ -74,6 +75,9 @@ int main(int argc, char *argv[])
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     Stream::init();
     QApplication app(argc, argv);
+
+    qmlRegisterType<WindowFramelessHelperMac>("barry.uibase", 1, 0, "WindowFramelessHelperMac");
+
     QQmlApplicationEngine engine("qrc:/MainWindow.qml");
 
 #ifdef Q_OS_WIN32
