@@ -11,7 +11,6 @@
 #include "dialog.h"
 #include "mousetap/mousetap.h"
 #include "stream.h"
-#include "windownativeeventfilter.h"
 #include "windowframelesshelper.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
@@ -79,10 +78,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<WindowFramelessHelper>("barry.uibase", 1, 0, "WindowFramelessHelper");
 
     QQmlApplicationEngine engine("qrc:/MainWindow.qml");
-
-#ifdef Q_OS_WIN32
-    WindowNativeEventFilter::Instance()->Init();
-#endif
 
     // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
     // mac下拿到的是CFBundleVersion的值

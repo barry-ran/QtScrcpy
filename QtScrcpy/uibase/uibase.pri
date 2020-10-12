@@ -10,5 +10,16 @@ HEADERS += \
 SOURCES += \
     $$PWD/keepratiowidget.cpp \
     $$PWD/magneticwidget.cpp \
-    $$PWD/windowframelesshelper.mm \
     $$PWD/windownativeeventfilter.cpp
+
+win32 {
+    SOURCES += $$PWD/windowframelesshelper.cpp
+}
+
+mac {
+    SOURCES += $$PWD/windowframelesshelper.mm
+}
+
+linux {
+    SOURCES += $$PWD/windowframelesshelper.cpp
+}
