@@ -1,19 +1,19 @@
-#include "windowframelesshelpermac.h"
+#include "windowframelesshelper.h"
 
 #include <Cocoa/Cocoa.h>
 #include <QOperatingSystemVersion>
 
-WindowFramelessHelperMac::WindowFramelessHelperMac(QObject *parent) : QObject(parent)
+WindowFramelessHelper::WindowFramelessHelper(QObject *parent) : QObject(parent)
 {
 
 }
 
-QQuickWindow *WindowFramelessHelperMac::target() const
+QQuickWindow *WindowFramelessHelper::target() const
 {
     return m_target;
 }
 
-void WindowFramelessHelperMac::setTarget(QQuickWindow *target)
+void WindowFramelessHelper::setTarget(QQuickWindow *target)
 {
     if (target == m_target) {
         return;

@@ -4,11 +4,11 @@ HEADERS += \
     $$PWD/keepratiowidget.h \
     $$PWD/magneticwidget.h \
     $$PWD/windowframelesshelper.h \
-    $$PWD/windowframelesshelpermac.h
+    $$PWD/windownativeeventfilter.h
 
 
 SOURCES += \
     $$PWD/keepratiowidget.cpp \
     $$PWD/magneticwidget.cpp \
-    $$PWD/windowframelesshelper.cpp \
-    $$PWD/windowframelesshelpermac.mm
+    $$PWD/windowframelesshelper.mm \
+    $$PWD/windownativeeventfilter.cpp

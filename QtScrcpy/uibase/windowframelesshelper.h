@@ -1,32 +1,24 @@
-#pragma once
-#include <QWindow>
+#ifndef WindowFramelessHelper_H
+#define WindowFramelessHelper_H
 
-#if defined(Q_OS_WIN)
-#include <QAbstractNativeEventFilter>
-#include <QMargins>
+#include <QQuickWindow>
 
-class WindowFramelessHelper : public QAbstractNativeEventFilter
+class WindowFramelessHelper : public QObject
 {
-protected:
-    WindowFramelessHelper();
-    ~WindowFramelessHelper() override;
+    Q_OBJECT
+    Q_PROPERTY(QQuickWindow * target READ target WRITE setTarget NOTIFY targetChanged)
 
 public:
-    static WindowFramelessHelper *Instance();
+    explicit WindowFramelessHelper(QObject *parent = nullptr);
 
-    void Init();
-    bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+    QQuickWindow *target() const;
+    void setTarget(QQuickWindow *target);
 
-private:
-    bool processNcHitTest(void *message, long *result);
-    bool processNcLButtonDown(void *message, long *result);
-    bool processSetCursor(void *message, long *result);
-
-    QWindow *getWindow(WId wndId);
+signals:
+    void targetChanged();
 
 private:
-    bool m_inited = false;
-    QMargins m_windowMargin = QMargins(0, 0, 0, 0);
+    QQuickWindow* m_target = nullptr;
 };
 
-#endif // Q_OS_WIN
+#endif // WindowFramelessHelper_H

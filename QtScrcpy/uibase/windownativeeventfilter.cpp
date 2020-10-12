@@ -1,4 +1,4 @@
-#include "windowframelesshelper.h"
+#include "windownativeeventfilter.h"
 
 #if defined(Q_OS_WIN)
 #include <QCursor>
@@ -7,20 +7,20 @@
 #include <windows.h>
 #include <windowsx.h>
 
-WindowFramelessHelper::WindowFramelessHelper() {}
+WindowNativeEventFilter::WindowNativeEventFilter() {}
 
-WindowFramelessHelper::~WindowFramelessHelper()
+WindowNativeEventFilter::~WindowNativeEventFilter()
 {
     // do nothing, because this object is static instance
 }
 
-WindowFramelessHelper *WindowFramelessHelper::Instance()
+WindowNativeEventFilter *WindowNativeEventFilter::Instance()
 {
-    static WindowFramelessHelper g_windowNativeEventFilter;
+    static WindowNativeEventFilter g_windowNativeEventFilter;
     return &g_windowNativeEventFilter;
 }
 
-void WindowFramelessHelper::Init()
+void WindowNativeEventFilter::Init()
 {
     if (!m_inited) {
         m_inited = true;
@@ -28,7 +28,7 @@ void WindowFramelessHelper::Init()
     }
 }
 
-bool WindowFramelessHelper::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool WindowNativeEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
 {
     Q_UNUSED(eventType);
 
@@ -60,7 +60,7 @@ bool WindowFramelessHelper::nativeEventFilter(const QByteArray &eventType, void 
     return false;
 }
 
-bool WindowFramelessHelper::processNcHitTest(void *message, long *result)
+bool WindowNativeEventFilter::processNcHitTest(void *message, long *result)
 {
     MSG *param = static_cast<MSG *>(message);
     if (!param) {
@@ -126,7 +126,7 @@ bool WindowFramelessHelper::processNcHitTest(void *message, long *result)
     return true;
 }
 
-bool WindowFramelessHelper::processNcLButtonDown(void *message, long *result)
+bool WindowNativeEventFilter::processNcLButtonDown(void *message, long *result)
 {
     Q_UNUSED(result);
 
@@ -173,7 +173,7 @@ bool WindowFramelessHelper::processNcLButtonDown(void *message, long *result)
     return false;
 }
 
-bool WindowFramelessHelper::processSetCursor(void *message, long *result)
+bool WindowNativeEventFilter::processSetCursor(void *message, long *result)
 {
     Q_UNUSED(result);
 
@@ -240,7 +240,7 @@ bool WindowFramelessHelper::processSetCursor(void *message, long *result)
     return true;
 }
 
-QWindow *WindowFramelessHelper::getWindow(WId wndId)
+QWindow *WindowNativeEventFilter::getWindow(WId wndId)
 {
     QWindowList windows = QGuiApplication::topLevelWindows();
     for (int i = 0; i < windows.size(); ++i) {

@@ -15,7 +15,7 @@ Window {
     property color backgroundColor: "#2E2F30"
     property color backgroundBorderColor: "#555656"
 
-    WindowFramelessHelperMac {
+    WindowFramelessHelper {
         target: root;
     }
 
