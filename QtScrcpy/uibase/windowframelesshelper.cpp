@@ -24,3 +24,7 @@ void WindowFramelessHelper::setTarget(QQuickWindow *target)
 
     emit targetChanged();
 }
+
+void WindowFramelessHelper::updateStyle() {
+
+}

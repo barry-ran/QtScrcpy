@@ -14,6 +14,9 @@ public:
     QQuickWindow *target() const;
     void setTarget(QQuickWindow *target);
 
+protected:
+    void updateStyle();
+
 signals:
     void targetChanged();
 
