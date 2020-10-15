@@ -6,7 +6,7 @@
 #include <QDebug>
 #include "windowframelessmanager.h"
 
-windownativeeventfiltermac::windownativeeventfiltermac()
+WindowNativeEventFilterMac::WindowNativeEventFilterMac()
 {
 
 }

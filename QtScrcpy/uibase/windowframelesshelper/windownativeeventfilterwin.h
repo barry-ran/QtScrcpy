@@ -1,18 +1,16 @@
 #pragma once
-#include <QWindow>
-
-#if defined(Q_OS_WIN)
 #include <QAbstractNativeEventFilter>
 #include <QMargins>
+#include <QWindow>
 
-class WindowNativeEventFilter : public QAbstractNativeEventFilter
+class WindowNativeEventFilterWin : public QAbstractNativeEventFilter
 {
 protected:
-    WindowNativeEventFilter();
-    ~WindowNativeEventFilter() override;
+    WindowNativeEventFilterWin();
+    ~WindowNativeEventFilterWin() override;
 
 public:
-    static WindowNativeEventFilter *Instance();
+    static WindowNativeEventFilterWin *Instance();
 
     void Init();
     bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
@@ -28,5 +26,3 @@ private:
     bool m_inited = false;
     QMargins m_windowMargin = QMargins(0, 0, 0, 0);
 };
-
-#endif // Q_OS_WIN

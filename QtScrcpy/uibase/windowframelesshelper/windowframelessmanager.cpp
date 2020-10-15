@@ -1,18 +1,21 @@
 #include "windowframelessmanager.h"
-#include "windowframelesshelper.h"
 #include "nativewindowutils.h"
+#include "windowframelesshelper.h"
 
-static QVector<WindowFramelessHelper*> s_windowFramelessHelpers;
+#ifdef Q_OS_WIN32
+#include "windownativeeventfilterwin.h"
+#endif
+
+static QVector<WindowFramelessHelper *> s_windowFramelessHelpers;
 
 WindowFramelessManager::WindowFramelessManager()
 {
-
+#ifdef Q_OS_WIN32
+    WindowNativeEventFilterWin::Instance()->Init();
+#endif
 }
 
-WindowFramelessManager::~WindowFramelessManager()
-{
-
-}
+WindowFramelessManager::~WindowFramelessManager() {}
 
 WindowFramelessManager *WindowFramelessManager::Instance()
 {
@@ -20,7 +23,7 @@ WindowFramelessManager *WindowFramelessManager::Instance()
     return &windowNativeEventFilter;
 }
 
-void WindowFramelessManager::addWindow(WindowFramelessHelper* win)
+void WindowFramelessManager::addWindow(WindowFramelessHelper *win)
 {
     if (nullptr == win) {
         return;
@@ -28,7 +31,7 @@ void WindowFramelessManager::addWindow(WindowFramelessHelper* win)
     s_windowFramelessHelpers.push_back(win);
 }
 
-void WindowFramelessManager::removeWindow(WindowFramelessHelper* win)
+void WindowFramelessManager::removeWindow(WindowFramelessHelper *win)
 {
     if (nullptr == win) {
         return;
@@ -36,7 +39,7 @@ void WindowFramelessManager::removeWindow(WindowFramelessHelper* win)
     s_windowFramelessHelpers.removeOne(win);
 }
 
-WindowFramelessHelper* WindowFramelessManager::getWindowByHandle(quint64 handle)
+WindowFramelessHelper *WindowFramelessManager::getWindowByHandle(quint64 handle)
 {
     quint64 targetHandle = 0;
     for (auto i = s_windowFramelessHelpers.begin(); i != s_windowFramelessHelpers.end(); i++) {

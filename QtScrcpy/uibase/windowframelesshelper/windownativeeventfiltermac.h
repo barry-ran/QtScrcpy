@@ -1,7 +1,7 @@
 #pragma once
 
-class windownativeeventfiltermac
+class WindowNativeEventFilterMac
 {
 public:
-    windownativeeventfiltermac();
+    WindowNativeEventFilterMac();
 };

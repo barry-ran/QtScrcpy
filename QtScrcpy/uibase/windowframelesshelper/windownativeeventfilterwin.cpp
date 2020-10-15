@@ -1,26 +1,27 @@
-#include "windownativeeventfilter.h"
+#include "windownativeeventfilterwin.h"
+#include "windowframelesshelper.h"
+#include "windowframelessmanager.h"
 
-#if defined(Q_OS_WIN)
 #include <QCursor>
 #include <QDebug>
 #include <QGuiApplication>
 #include <windows.h>
 #include <windowsx.h>
 
-WindowNativeEventFilter::WindowNativeEventFilter() {}
+WindowNativeEventFilterWin::WindowNativeEventFilterWin() {}
 
-WindowNativeEventFilter::~WindowNativeEventFilter()
+WindowNativeEventFilterWin::~WindowNativeEventFilterWin()
 {
     // do nothing, because this object is static instance
 }
 
-WindowNativeEventFilter *WindowNativeEventFilter::Instance()
+WindowNativeEventFilterWin *WindowNativeEventFilterWin::Instance()
 {
-    static WindowNativeEventFilter g_windowNativeEventFilter;
-    return &g_windowNativeEventFilter;
+    static WindowNativeEventFilterWin g_WindowNativeEventFilterWin;
+    return &g_WindowNativeEventFilterWin;
 }
 
-void WindowNativeEventFilter::Init()
+void WindowNativeEventFilterWin::Init()
 {
     if (!m_inited) {
         m_inited = true;
@@ -28,7 +29,7 @@ void WindowNativeEventFilter::Init()
     }
 }
 
-bool WindowNativeEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool WindowNativeEventFilterWin::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
 {
     Q_UNUSED(eventType);
 
@@ -60,14 +61,19 @@ bool WindowNativeEventFilter::nativeEventFilter(const QByteArray &eventType, voi
     return false;
 }
 
-bool WindowNativeEventFilter::processNcHitTest(void *message, long *result)
+bool WindowNativeEventFilterWin::processNcHitTest(void *message, long *result)
 {
     MSG *param = static_cast<MSG *>(message);
     if (!param) {
         return false;
     }
 
-    QWindow *window = getWindow((WId)param->hwnd);
+    WindowFramelessHelper *win = WindowFramelessManager::Instance()->getWindowByHandle((quint64)param->hwnd);
+    if (!win) {
+        return false;
+    }
+
+    QWindow *window = win->target();
     if (!window) {
         return false;
     }
@@ -96,7 +102,6 @@ bool WindowNativeEventFilter::processNcHitTest(void *message, long *result)
         return false;
     }
 
-    qDebug() << "processNcHitTest:" << ptCursor << window->geometry() << "d:" << nX;
     int borderWidth = 5;
     if ((nX > m_windowMargin.left()) && (nX < m_windowMargin.left() + borderWidth) && (nY > m_windowMargin.top())
         && (nY < m_windowMargin.top() + borderWidth)) {
@@ -126,7 +131,7 @@ bool WindowNativeEventFilter::processNcHitTest(void *message, long *result)
     return true;
 }
 
-bool WindowNativeEventFilter::processNcLButtonDown(void *message, long *result)
+bool WindowNativeEventFilterWin::processNcLButtonDown(void *message, long *result)
 {
     Q_UNUSED(result);
 
@@ -135,7 +140,12 @@ bool WindowNativeEventFilter::processNcLButtonDown(void *message, long *result)
         return false;
     }
 
-    QWindow *window = getWindow((WId)param->hwnd);
+    WindowFramelessHelper *win = WindowFramelessManager::Instance()->getWindowByHandle((quint64)param->hwnd);
+    if (!win) {
+        return false;
+    }
+
+    QWindow *window = win->target();
     if (!window) {
         return false;
     }
@@ -173,7 +183,7 @@ bool WindowNativeEventFilter::processNcLButtonDown(void *message, long *result)
     return false;
 }
 
-bool WindowNativeEventFilter::processSetCursor(void *message, long *result)
+bool WindowNativeEventFilterWin::processSetCursor(void *message, long *result)
 {
     Q_UNUSED(result);
 
@@ -182,7 +192,12 @@ bool WindowNativeEventFilter::processSetCursor(void *message, long *result)
         return false;
     }
 
-    QWindow *window = getWindow((WId)param->hwnd);
+    WindowFramelessHelper *win = WindowFramelessManager::Instance()->getWindowByHandle((quint64)param->hwnd);
+    if (!win) {
+        return false;
+    }
+
+    QWindow *window = win->target();
     if (!window) {
         return false;
     }
@@ -240,7 +255,7 @@ bool WindowNativeEventFilter::processSetCursor(void *message, long *result)
     return true;
 }
 
-QWindow *WindowNativeEventFilter::getWindow(WId wndId)
+QWindow *WindowNativeEventFilterWin::getWindow(WId wndId)
 {
     QWindowList windows = QGuiApplication::topLevelWindows();
     for (int i = 0; i < windows.size(); ++i) {
@@ -250,5 +265,3 @@ QWindow *WindowNativeEventFilter::getWindow(WId wndId)
     }
     return nullptr;
 }
-
-#endif //(Q_OS_WIN)

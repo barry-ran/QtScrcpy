@@ -4,9 +4,6 @@
 WindowFramelessHelper::WindowFramelessHelper(QObject *parent) : QObject(parent)
 {
     WindowFramelessManager::Instance()->addWindow(this);
-#ifdef Q_OS_WIN32
-    WindowNativeEventFilter::Instance()->Init();
-#endif
 }
 
 WindowFramelessHelper::~WindowFramelessHelper()
