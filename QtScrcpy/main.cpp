@@ -11,7 +11,7 @@
 #include "dialog.h"
 #include "mousetap/mousetap.h"
 #include "stream.h"
-#include "windowframelesshelper.h"
+#include "windowframelesshelper/windowframelesshelper.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
 

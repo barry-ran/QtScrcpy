@@ -1,5 +1,4 @@
-#ifndef WindowFramelessHelper_H
-#define WindowFramelessHelper_H
+#pragma once
 
 #include <QQuickWindow>
 
@@ -10,12 +9,10 @@ class WindowFramelessHelper : public QObject
 
 public:
     explicit WindowFramelessHelper(QObject *parent = nullptr);
+    virtual ~WindowFramelessHelper();
 
     QQuickWindow *target() const;
     void setTarget(QQuickWindow *target);
-
-protected:
-    void updateStyle();
 
 signals:
     void targetChanged();
@@ -23,5 +20,3 @@ signals:
 private:
     QQuickWindow* m_target = nullptr;
 };
-
-#endif // WindowFramelessHelper_H

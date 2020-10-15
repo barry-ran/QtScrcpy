@@ -2,24 +2,22 @@ FORMS +=
 
 HEADERS += \
     $$PWD/keepratiowidget.h \
-    $$PWD/magneticwidget.h \
-    $$PWD/windowframelesshelper.h \
-    $$PWD/windownativeeventfilter.h
-
+    $$PWD/magneticwidget.h
 
 SOURCES += \
     $$PWD/keepratiowidget.cpp \
-    $$PWD/magneticwidget.cpp \
-    $$PWD/windownativeeventfilter.cpp
+    $$PWD/magneticwidget.cpp
 
 win32 {
-    SOURCES += $$PWD/windowframelesshelper.cpp
+    SOURCES +=
 }
 
 mac {
-    SOURCES += $$PWD/windowframelesshelper.mm
+    SOURCES +=
 }
 
 linux {
-    SOURCES += $$PWD/windowframelesshelper.cpp
+    SOURCES +=
 }
+
+include ($$PWD/windowframelesshelper/windowframelesshelper.pri)
