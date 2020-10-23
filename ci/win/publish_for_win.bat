@@ -11,7 +11,7 @@ echo ---------------------------------------------------------------
 set vcvarsall="%ENV_VCVARSALL%"
 :: 例如 d:\a\QtScrcpy\Qt\5.12.7
 set qt_msvc_path="%ENV_QT_PATH%"
-:: 设置了VCINSTALLDIR，windeployqt会自动copy vcruntime dll
+:: 设置了VCINSTALLDIR，windeployqt会自动copy vc_redist.x**.exe(vcruntime dll安装包)
 :: set VCINSTALLDIR="%ENV_VCINSTALL%"
 
 echo ENV_VCVARSALL %ENV_VCVARSALL%
@@ -100,12 +100,17 @@ if /i %cpu_mode% == x86 (
 )
 
 :: copy vcruntime dll
-cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\VCRUNTIME140.dll" %publish_path%\VCRUNTIME140.dll
-cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-runtime-l1-1-0.dll" %publish_path%\api-ms-win-crt-runtime-l1-1-0.dll
-cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-heap-l1-1-0.dll" %publish_path%\api-ms-win-crt-heap-l1-1-0.dll
-cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-math-l1-1-0.dll" %publish_path%\api-ms-win-crt-math-l1-1-0.dll
-cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-stdio-l1-1-0.dll" %publish_path%\api-ms-win-crt-stdio-l1-1-0.dll
-cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-locale-l1-1-0.dll" %publish_path%\api-ms-win-crt-locale-l1-1-0.dll
+:: 只有在64位下需要这个
+if /i %cpu_mode% == x64 (
+    cp "C:\Windows\System32\vcruntime140_1.dll" %publish_path%\vcruntime140_1.dll
+)
+
+::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\VCRUNTIME140.dll" %publish_path%\VCRUNTIME140.dll
+::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-runtime-l1-1-0.dll" %publish_path%\api-ms-win-crt-runtime-l1-1-0.dll
+::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-heap-l1-1-0.dll" %publish_path%\api-ms-win-crt-heap-l1-1-0.dll
+::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-math-l1-1-0.dll" %publish_path%\api-ms-win-crt-math-l1-1-0.dll
+::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-stdio-l1-1-0.dll" %publish_path%\api-ms-win-crt-stdio-l1-1-0.dll
+::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\api-ms-win-crt-locale-l1-1-0.dll" %publish_path%\api-ms-win-crt-locale-l1-1-0.dll
 
 echo=
 echo=
