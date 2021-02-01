@@ -25,7 +25,9 @@ Taking the upper left corner of the screen as the origin, the position of the pi
 -mouseMoveMap: mouse movement mapping, the movement of the mouse will be mapped to startPos as the starting point, and the direction of the mouse movement as the direction of the finger drag operation (after the mouse movement map is turned on, the mouse will be hidden, limiting the range of mouse movement).
 Generally used to adjust the character field of vision in FPS mobile games.
     -startPos finger drag starting point
-    -speedRatio mouse movement is mapped to the ratio of finger dragging, you can control the mouse sensitivity, the value should be greater than 0.00, the greater the value, the lower the sensitivity
+    -speedRatio mouse sensitivity of the finger dragging. The value must be at least 0.00225. The greater the value, the lower the sensitivity. The Y-axis translates with a ratio of 2.25. If this does not fit your phone screen, please use the following two settings to set individual sensitivity values.
+    -speedRatioX sensitivity of the mouse X-axis. This value must be at least 0.001.
+    -speedRatioY sensitivity of the mouse Y-axis. This value must be at least 0.001.
     -smallEyes The button that triggers the small eyes. After pressing this button, the mouse movement will be mapped to the finger drag operation with the smallEyes.pos as the starting point and the mouse movement direction as the movement direction
 
 -keyMapNodes general key map, json array, all general key maps are placed in this array, map the keys of the keyboard to ordinary finger clicks.
