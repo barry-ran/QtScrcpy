@@ -5,6 +5,8 @@
 			"x": 0.57,
 			"y": 0.26
 		},
+		"speedRatioX": 3.25,
+		"speedRatioY": 1.25,
 		"smallEyes": {
 			"comment": "小眼睛",
 			"type": "KMT_CLICK",

@@ -7,7 +7,8 @@
 			"x": 0.700,
 			"y": 0.410
 		},
-		"speedRatio": 2
+		"speedRatioX": 3.25,
+		"speedRatioY": 1.25
 	},
 	"keyMapNodes": [{
 			"comment": "退出",
