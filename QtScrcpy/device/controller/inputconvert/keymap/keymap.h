@@ -91,8 +91,8 @@ public:
             } drag;
             struct
             {
-                QPointF startPos = { 0.0, 0.0 };
-                int speedRatio = 1;
+                QPointF startPos   = { 0.0, 0.0 };
+                QPointF speedRatio = { 1.0, 1.0 };
                 KeyNode smallEyes;
             } mouseMove;
             DATA() {}

@@ -1,0 +1,119 @@
+{
+	"old-switchKey": "Key_QuoteLeft",
+	"switchKey": "RightButton",
+	"mouseMoveMap": {
+		"startPos": {
+			"x": 0.5,
+			"y": 0.5
+		},
+		"speedRatioX": 3.25,
+		"speedRatioY": 1.25
+	},
+	"keyMapNodes": [{
+			"comment": "Steering Wheel",
+			"type": "KMT_STEER_WHEEL",
+			"centerPos": {
+				"x": 0.194792,
+				"y": 0.716484
+			},
+			"leftOffset": 0.15,
+			"rightOffset": 0.15,
+			"upOffset": 0.15,
+			"downOffset": 0.15,
+			"leftKey": "Key_A",
+			"rightKey": "Key_D",
+			"upKey": "Key_W",
+			"downKey": "Key_S"
+		},
+		{
+			"comment": "Activate item under crosshair",
+			"type": "KMT_CLICK",
+			"key": "LeftButton",
+			"pos": {
+				"x": 0.51875,
+				"y": 0.496703
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Activate first special skill",
+			"type": "KMT_CLICK",
+			"key": "Key_E",
+			"pos": {
+				"x": 0.909375,
+				"y": 0.542857
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Activate Chat",
+			"type": "KMT_CLICK",
+			"key": "Key_C",
+			"pos": {
+				"x": 0.905208,
+				"y": 0.254945
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Chat option 1",
+			"type": "KMT_CLICK",
+			"key": "Key_1",
+			"pos": {
+				"x": 0.875,
+				"y": 0.523077
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Chat option 2",
+			"type": "KMT_CLICK",
+			"key": "Key_2",
+			"pos": {
+				"x": 0.875,
+				"y": 0.606593
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Chat option 3",
+			"type": "KMT_CLICK",
+			"key": "Key_3",
+			"pos": {
+				"x": 0.875,
+				"y": 0.685714
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Chat option 4",
+			"type": "KMT_CLICK",
+			"key": "Key_4",
+			"pos": {
+				"x": 0.875,
+				"y": 0.756044
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Chat option 5",
+			"type": "KMT_CLICK",
+			"key": "Key_5",
+			"pos": {
+				"x": 0.875,
+				"y": 0.832967
+			},
+			"switchMap": false
+		},
+		{
+			"comment": "Chat option 6",
+			"type": "KMT_CLICK",
+			"key": "Key_6",
+			"pos": {
+				"x": 0.875,
+				"y": 0.911273
+			},
+			"switchMap": false
+		}
+	]
+}
