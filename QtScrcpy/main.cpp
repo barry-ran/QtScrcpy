@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     MouseTap::getInstance()->initMouseEventTap();
 #endif
 
-    //加载样式表
+    // load style sheet
     QFile file(":/qss/psblack.css");
     if (file.open(QFile::ReadOnly)) {
         QString qss = QLatin1String(file.readAll());

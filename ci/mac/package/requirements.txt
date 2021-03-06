@@ -1,1 +1,1 @@
-dmgbuild==1.3.3
+dmgbuild==1.4.2
