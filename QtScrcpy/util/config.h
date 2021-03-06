@@ -23,6 +23,7 @@ public:
     QString getAdbPath();
     QString getLogLevel();
     QString getCodecOptions();
+    QString getCodecName();
 
     // user data
     QString getRecordPath();

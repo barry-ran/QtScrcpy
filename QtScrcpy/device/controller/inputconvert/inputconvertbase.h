@@ -32,7 +32,6 @@ signals:
 protected:
     void sendControlMsg(ControlMsg *msg);
 
-private:
     QPointer<Controller> m_controller;
 };
 

@@ -109,6 +109,16 @@ void Controller::onPostVolumeDown()
     postKeyCodeClick(AKEYCODE_VOLUME_DOWN);
 }
 
+void Controller::onCopy()
+{
+    postKeyCodeClick(AKEYCODE_COPY);
+}
+
+void Controller::onCut()
+{
+    postKeyCodeClick(AKEYCODE_CUT);
+}
+
 void Controller::onExpandNotificationPanel()
 {
     ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_EXPAND_NOTIFICATION_PANEL);
@@ -136,7 +146,7 @@ void Controller::onRequestDeviceClipboard()
     postControlMsg(controlMsg);
 }
 
-void Controller::onSetDeviceClipboard()
+void Controller::onSetDeviceClipboard(bool pause)
 {
     QClipboard *board = QApplication::clipboard();
     QString text = board->text();
@@ -144,7 +154,7 @@ void Controller::onSetDeviceClipboard()
     if (!controlMsg) {
         return;
     }
-    controlMsg->setSetClipboardMsgData(text, true);
+    controlMsg->setSetClipboardMsgData(text, pause);
     postControlMsg(controlMsg);
 }
 
@@ -226,13 +236,13 @@ void Controller::postKeyCodeClick(AndroidKeycode keycode)
     if (!controlEventDown) {
         return;
     }
-    controlEventDown->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_DOWN, keycode, AMETA_NONE);
+    controlEventDown->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_DOWN, keycode, 0, AMETA_NONE);
     postControlMsg(controlEventDown);
 
     ControlMsg *controlEventUp = new ControlMsg(ControlMsg::CMT_INJECT_KEYCODE);
     if (!controlEventUp) {
         return;
     }
-    controlEventUp->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_UP, keycode, AMETA_NONE);
+    controlEventUp->setInjectKeycodeMsgData(AKEY_EVENT_ACTION_UP, keycode, 0, AMETA_NONE);
     postControlMsg(controlEventUp);
 }

@@ -31,6 +31,8 @@ public slots:
     void onPostPower();
     void onPostVolumeUp();
     void onPostVolumeDown();
+    void onCopy();
+    void onCut();
     void onExpandNotificationPanel();
     void onCollapseNotificationPanel();
     void onSetScreenPowerMode(ControlMsg::ScreenPowerMode mode);
@@ -43,7 +45,7 @@ public slots:
     // turn the screen on if it was off, press BACK otherwise
     void onPostBackOrScreenOn();
     void onRequestDeviceClipboard();
-    void onSetDeviceClipboard();
+    void onSetDeviceClipboard(bool pause = true);
     void onClipboardPaste();
     void onPostTextInput(QString &text);
 

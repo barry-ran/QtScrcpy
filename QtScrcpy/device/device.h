@@ -70,13 +70,15 @@ signals:
     void postPower();
     void postVolumeUp();
     void postVolumeDown();
+    void postCopy();
+    void postCut();
     void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
     void expandNotificationPanel();
     void collapseNotificationPanel();
     void postBackOrScreenOn();
     void postTextInput(QString &text);
     void requestDeviceClipboard();
-    void setDeviceClipboard();
+    void setDeviceClipboard(bool pause = true);
     void clipboardPaste();
     void pushFileRequest(const QString &file, const QString &devicePath = "");
     void installApkRequest(const QString &apkFile);
