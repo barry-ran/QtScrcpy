@@ -64,11 +64,38 @@ void KeyMap::loadKeyMap(const QString &json)
         KeyMapNode keyMapNode;
         keyMapNode.type = KMT_MOUSE_MOVE;
 
-        if (!checkItemDouble(mouseMoveMap, "speedRatio")) {
-            errorString = QString("json error: mouseMoveMap on find speedRatio");
+        bool have_speedRatio = false;
+
+        // General speedRatio (for backwards compatibility)
+        if (checkItemDouble(mouseMoveMap, "speedRatio")) {
+            float ratio = static_cast<float>(getItemDouble(mouseMoveMap, "speedRatio"));
+            keyMapNode.data.mouseMove.speedRatio.setX(ratio);
+            keyMapNode.data.mouseMove.speedRatio.setY(ratio / 2.25f); // Phone screens are often FHD+
+            have_speedRatio = true;
+        }
+
+        // Individual X Ratio
+        if (checkItemDouble(mouseMoveMap, "speedRatioX")) {
+            keyMapNode.data.mouseMove.speedRatio.setX(static_cast<float>(getItemDouble(mouseMoveMap, "speedRatioX")));
+            have_speedRatio = true;
+        }
+
+        // Individual Y Ratio
+        if (checkItemDouble(mouseMoveMap, "speedRatioY")) {
+            keyMapNode.data.mouseMove.speedRatio.setY(static_cast<float>(getItemDouble(mouseMoveMap, "speedRatioY")));
+            have_speedRatio = true;
+        }
+
+        if (!have_speedRatio) {
+            errorString = QString("json error: speedRatio setting is missing in mouseMoveMap!");
             goto parseError;
         }
-        keyMapNode.data.mouseMove.speedRatio = static_cast<int>(getItemDouble(mouseMoveMap, "speedRatio"));
+
+        // Sanity check: No ratio must be lower than 0.001
+        if ( ( keyMapNode.data.mouseMove.speedRatio.x() < 0.001f ) || ( keyMapNode.data.mouseMove.speedRatio.x() < 0.001f ) ) {
+            errorString = QString("json error: Minimum speedRatio is 0.001");
+            goto parseError;
+        }
 
         if (!checkItemObject(mouseMoveMap, "startPos")) {
             errorString = QString("json error: mouseMoveMap on find startPos");

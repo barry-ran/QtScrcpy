@@ -395,8 +395,9 @@ bool InputConvertGame::processMouseMove(const QMouseEvent *from)
     }
 
     if (!m_ctrlMouseMove.lastPos.isNull() && m_processMouseMove) {
-        QPointF distance = from->localPos() - m_ctrlMouseMove.lastPos;
-        distance /= m_keyMap.getMouseMoveMap().data.mouseMove.speedRatio;
+        QPointF distance_raw{from->localPos() - m_ctrlMouseMove.lastPos};
+        QPointF speedRatio  {m_keyMap.getMouseMoveMap().data.mouseMove.speedRatio};
+        QPointF distance    {distance_raw.x() / speedRatio.x(), distance_raw.y() / speedRatio.y()};
 
         mouseMoveStartTouch(from);
         startMouseMoveTimer();
