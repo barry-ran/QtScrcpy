@@ -103,6 +103,7 @@ if /i %cpu_mode% == x86 (
 :: 只有在64位下需要这个
 if /i %cpu_mode% == x64 (
     cp "C:\Windows\System32\vcruntime140_1.dll" %publish_path%\vcruntime140_1.dll
+    cp "C:\Windows\System32\msvcp140_1.dll" %publish_path%\msvcp140_1.dll
 )
 
 ::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\VCRUNTIME140.dll" %publish_path%\VCRUNTIME140.dll

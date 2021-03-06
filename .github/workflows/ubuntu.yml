@@ -33,7 +33,7 @@ jobs:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
           key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2.7.1
+        uses: jurplel/install-qt-action@v2.13.0
         with:
           version: ${{ matrix.qt-ver }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
