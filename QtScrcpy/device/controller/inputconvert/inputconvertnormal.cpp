@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "inputconvertnormal.h"
+#include "controller.h"
 
 InputConvertNormal::InputConvertNormal(Controller *controller) : InputConvertBase(controller) {}
 
@@ -44,7 +45,10 @@ void InputConvertNormal::mouseEvent(const QMouseEvent *from, const QSize &frameS
         return;
     }
     controlMsg->setInjectTouchMsgData(
-        static_cast<quint64>(POINTER_ID_MOUSE), action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize), 1.0f);
+        static_cast<quint64>(POINTER_ID_MOUSE), action,
+                convertMouseButtons(from->buttons()),
+                QRect(pos.toPoint(), frameSize),
+                AMOTION_EVENT_ACTION_DOWN == action? 1.0f : 0.0f);
     sendControlMsg(controlMsg);
 }
 
@@ -81,6 +85,19 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize &frameSize,
         return;
     }
 
+    bool ctrl = from->modifiers() & Qt::ControlModifier;
+    bool shift = from->modifiers() & Qt::ShiftModifier;
+    bool down = from->type() == QEvent::KeyPress;
+    bool repeat = from->isAutoRepeat();
+
+    if (ctrl && !shift && from->key() == Qt::Key_V && down && !repeat) {
+        // Synchronize the computer clipboard to the device clipboard before
+        // sending Ctrl+v, to allow seamless copy-paste.
+        if (m_controller) {
+            m_controller->onSetDeviceClipboard(false);
+        }
+    }
+
     // action
     AndroidKeyeventAction action;
     switch (from->type()) {
@@ -105,7 +122,7 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize &frameSize,
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectKeycodeMsgData(action, keyCode, convertMetastate(from->modifiers()));
+    controlMsg->setInjectKeycodeMsgData(action, keyCode, 0, convertMetastate(from->modifiers()));
     sendControlMsg(controlMsg);
 }
 

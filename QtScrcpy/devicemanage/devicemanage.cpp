@@ -139,8 +139,6 @@ void DeviceManage::setGroupControlSignals(Device *host, Device *client, bool ins
         connect(host, &Device::installApkRequest, client, &Device::installApkRequest);
         connect(host, &Device::screenshot, client, &Device::screenshot);
         connect(host, &Device::showTouch, client, &Device::showTouch);
-        // dont connect requestDeviceClipboard
-        //connect(host, &Device::requestDeviceClipboard, client, &Device::requestDeviceClipboard);
     } else {
         disconnect(host, &Device::postGoBack, client, &Device::postGoBack);
         disconnect(host, &Device::postGoHome, client, &Device::postGoHome);

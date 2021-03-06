@@ -201,7 +201,7 @@ void VideoForm::installShortcut()
     connect(shortcut, &QShortcut::activated, this, [this]() { resizeSquare(); });
 
     // removeBlackRect
-    shortcut = new QShortcut(QKeySequence("Ctrl+x"), this);
+    shortcut = new QShortcut(QKeySequence("Ctrl+w"), this);
     connect(shortcut, &QShortcut::activated, this, [this]() { removeBlackRect(); });
 
     // postGoHome
@@ -294,13 +294,22 @@ void VideoForm::installShortcut()
         emit m_device->collapseNotificationPanel();
     });
 
-    // requestDeviceClipboard
+    // copy
     shortcut = new QShortcut(QKeySequence("Ctrl+c"), this);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
         }
-        emit m_device->requestDeviceClipboard();
+        emit m_device->postCopy();
+    });
+
+    // cut
+    shortcut = new QShortcut(QKeySequence("Ctrl+x"), this);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postCut();
     });
 
     // clipboardPaste
@@ -309,7 +318,7 @@ void VideoForm::installShortcut()
         if (!m_device) {
             return;
         }
-        emit m_device->clipboardPaste();
+        emit m_device->setDeviceClipboard();
     });
 
     // setDeviceClipboard
@@ -318,7 +327,7 @@ void VideoForm::installShortcut()
         if (!m_device) {
             return;
         }
-        emit m_device->setDeviceClipboard();
+        emit m_device->clipboardPaste();
     });
 }
 
