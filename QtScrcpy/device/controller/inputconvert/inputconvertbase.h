@@ -33,6 +33,9 @@ protected:
     void sendControlMsg(ControlMsg *msg);
 
     QPointer<Controller> m_controller;
+    // Qt reports repeated events as a boolean, but Android expects the actual
+    // number of repetitions. This variable keeps track of the count.
+    unsigned m_repeat = 0;
 };
 
 #endif // INPUTCONVERTBASE_H

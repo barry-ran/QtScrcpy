@@ -1,4 +1,5 @@
 #include <cmath>
+#include <QDebug>
 
 #include "inputconvertnormal.h"
 #include "controller.h"
@@ -85,18 +86,7 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize &frameSize,
         return;
     }
 
-    bool ctrl = from->modifiers() & Qt::ControlModifier;
-    bool shift = from->modifiers() & Qt::ShiftModifier;
-    bool down = from->type() == QEvent::KeyPress;
     bool repeat = from->isAutoRepeat();
-
-    if (ctrl && !shift && from->key() == Qt::Key_V && down && !repeat) {
-        // Synchronize the computer clipboard to the device clipboard before
-        // sending Ctrl+v, to allow seamless copy-paste.
-        if (m_controller) {
-            m_controller->onSetDeviceClipboard(false);
-        }
-    }
 
     // action
     AndroidKeyeventAction action;
@@ -122,7 +112,14 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize &frameSize,
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectKeycodeMsgData(action, keyCode, 0, convertMetastate(from->modifiers()));
+
+    if (repeat) {
+        m_repeat++;
+    } else {
+        m_repeat = 0;
+    }
+
+    controlMsg->setInjectKeycodeMsgData(action, keyCode, m_repeat, convertMetastate(from->modifiers()));
     sendControlMsg(controlMsg);
 }
 
