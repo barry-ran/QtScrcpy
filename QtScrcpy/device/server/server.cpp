@@ -162,6 +162,7 @@ bool Server::execute()
     // https://github.com/Genymobile/scrcpy/commit/080a4ee3654a9b7e96c8ffe37474b5c21c02852a
     // <https://d.android.com/reference/android/media/MediaFormat>
     args << Config::getInstance().getCodecOptions();
+    args << Config::getInstance().getCodecName();
 
 #ifdef SERVER_DEBUGGER
     qInfo("Server debugger waiting for a client on device port " SERVER_DEBUGGER_PORT "...");

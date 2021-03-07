@@ -9,9 +9,15 @@
 #include "keycodes.h"
 #include "qscrcpyevent.h"
 
+#define CONTROL_MSG_MAX_SIZE (1 << 18) // 256k
+
 #define CONTROL_MSG_INJECT_TEXT_MAX_LENGTH 300
-#define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH 4092
+// type: 1 byte; paste flag: 1 byte; length: 4 bytes
+#define CONTROL_MSG_CLIPBOARD_TEXT_MAX_LENGTH \
+    (CONTROL_MSG_MAX_SIZE - 6)
+
 #define POINTER_ID_MOUSE static_cast<quint64>(-1)
+
 // ControlMsg
 class ControlMsg : public QScrcpyEvent
 {
@@ -41,7 +47,7 @@ public:
     ControlMsg(ControlMsgType controlMsgType);
     virtual ~ControlMsg();
 
-    void setInjectKeycodeMsgData(AndroidKeyeventAction action, AndroidKeycode keycode, AndroidMetastate metastate);
+    void setInjectKeycodeMsgData(AndroidKeyeventAction action, AndroidKeycode keycode, quint32 repeat, AndroidMetastate metastate);
     void setInjectTextMsgData(QString &text);
     // id 代表一个触摸点，最多支持10个触摸点[0,9]
     // action 只能是AMOTION_EVENT_ACTION_DOWN，AMOTION_EVENT_ACTION_UP，AMOTION_EVENT_ACTION_MOVE
@@ -67,6 +73,7 @@ private:
             {
                 AndroidKeyeventAction action;
                 AndroidKeycode keycode;
+                quint32 repeat;
                 AndroidMetastate metastate;
             } injectKeycode;
             struct
