@@ -176,11 +176,15 @@ void InputConvertGame::sendTouchEvent(int id, QPointF pos, AndroidMotioneventAct
     QPoint absolutePos = calcFrameAbsolutePos(pos).toPoint();
     static QPoint lastAbsolutePos = absolutePos;
     if (AMOTION_EVENT_ACTION_MOVE == action && lastAbsolutePos == absolutePos) {
+        delete controlMsg;
         return;
     }
     lastAbsolutePos = absolutePos;
 
-    controlMsg->setInjectTouchMsgData(static_cast<quint64>(id), action, static_cast<AndroidMotioneventButtons>(0), QRect(absolutePos, m_frameSize), 1.0f);
+    controlMsg->setInjectTouchMsgData(static_cast<quint64>(id), action,
+                                      static_cast<AndroidMotioneventButtons>(0),
+                                      QRect(absolutePos, m_frameSize),
+                                      AMOTION_EVENT_ACTION_DOWN == action? 1.0f : 0.0f);
     sendControlMsg(controlMsg);
 }
 

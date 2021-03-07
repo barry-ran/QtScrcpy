@@ -44,6 +44,11 @@ void Receiver::processMsg(DeviceMsg *deviceMsg)
         QClipboard *board = QApplication::clipboard();
         QString text;
         deviceMsg->getClipboardMsgData(text);
+
+        if (board->text() == text) {
+            qDebug("Computer clipboard unchanged");
+            break;
+        }
         board->setText(text);
         break;
     }

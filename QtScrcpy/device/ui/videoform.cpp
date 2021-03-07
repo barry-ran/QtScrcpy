@@ -189,6 +189,7 @@ void VideoForm::installShortcut()
 
     // switchFullScreen
     shortcut = new QShortcut(QKeySequence("Ctrl+f"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -198,14 +199,17 @@ void VideoForm::installShortcut()
 
     // resizeSquare
     shortcut = new QShortcut(QKeySequence("Ctrl+g"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() { resizeSquare(); });
 
     // removeBlackRect
-    shortcut = new QShortcut(QKeySequence("Ctrl+x"), this);
+    shortcut = new QShortcut(QKeySequence("Ctrl+w"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() { removeBlackRect(); });
 
     // postGoHome
     shortcut = new QShortcut(QKeySequence("Ctrl+h"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -215,6 +219,7 @@ void VideoForm::installShortcut()
 
     // postGoBack
     shortcut = new QShortcut(QKeySequence("Ctrl+b"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -224,6 +229,7 @@ void VideoForm::installShortcut()
 
     // postAppSwitch
     shortcut = new QShortcut(QKeySequence("Ctrl+s"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -233,6 +239,7 @@ void VideoForm::installShortcut()
 
     // postGoMenu
     shortcut = new QShortcut(QKeySequence("Ctrl+m"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -260,6 +267,7 @@ void VideoForm::installShortcut()
 
     // postPower
     shortcut = new QShortcut(QKeySequence("Ctrl+p"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -269,6 +277,7 @@ void VideoForm::installShortcut()
 
     // setScreenPowerMode(ControlMsg::SPM_OFF)
     shortcut = new QShortcut(QKeySequence("Ctrl+o"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -278,6 +287,7 @@ void VideoForm::installShortcut()
 
     // expandNotificationPanel
     shortcut = new QShortcut(QKeySequence("Ctrl+n"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -287,6 +297,7 @@ void VideoForm::installShortcut()
 
     // collapseNotificationPanel
     shortcut = new QShortcut(QKeySequence("Ctrl+Shift+n"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -294,31 +305,44 @@ void VideoForm::installShortcut()
         emit m_device->collapseNotificationPanel();
     });
 
-    // requestDeviceClipboard
+    // copy
     shortcut = new QShortcut(QKeySequence("Ctrl+c"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
         }
-        emit m_device->requestDeviceClipboard();
+        emit m_device->postCopy();
+    });
+
+    // cut
+    shortcut = new QShortcut(QKeySequence("Ctrl+x"), this);
+    shortcut->setAutoRepeat(false);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->postCut();
     });
 
     // clipboardPaste
     shortcut = new QShortcut(QKeySequence("Ctrl+v"), this);
-    connect(shortcut, &QShortcut::activated, this, [this]() {
-        if (!m_device) {
-            return;
-        }
-        emit m_device->clipboardPaste();
-    });
-
-    // setDeviceClipboard
-    shortcut = new QShortcut(QKeySequence("Ctrl+Shift+v"), this);
+    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
         }
         emit m_device->setDeviceClipboard();
+    });
+
+    // setDeviceClipboard
+    shortcut = new QShortcut(QKeySequence("Ctrl+Shift+v"), this);
+    shortcut->setAutoRepeat(false);
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        if (!m_device) {
+            return;
+        }
+        emit m_device->clipboardPaste();
     });
 }
 

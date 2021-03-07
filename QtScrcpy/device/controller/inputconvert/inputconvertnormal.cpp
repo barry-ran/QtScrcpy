@@ -1,6 +1,8 @@
 #include <cmath>
+#include <QDebug>
 
 #include "inputconvertnormal.h"
+#include "controller.h"
 
 InputConvertNormal::InputConvertNormal(Controller *controller) : InputConvertBase(controller) {}
 
@@ -44,7 +46,10 @@ void InputConvertNormal::mouseEvent(const QMouseEvent *from, const QSize &frameS
         return;
     }
     controlMsg->setInjectTouchMsgData(
-        static_cast<quint64>(POINTER_ID_MOUSE), action, convertMouseButtons(from->buttons()), QRect(pos.toPoint(), frameSize), 1.0f);
+        static_cast<quint64>(POINTER_ID_MOUSE), action,
+                convertMouseButtons(from->buttons()),
+                QRect(pos.toPoint(), frameSize),
+                AMOTION_EVENT_ACTION_DOWN == action? 1.0f : 0.0f);
     sendControlMsg(controlMsg);
 }
 
@@ -81,6 +86,8 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize &frameSize,
         return;
     }
 
+    bool repeat = from->isAutoRepeat();
+
     // action
     AndroidKeyeventAction action;
     switch (from->type()) {
@@ -105,7 +112,14 @@ void InputConvertNormal::keyEvent(const QKeyEvent *from, const QSize &frameSize,
     if (!controlMsg) {
         return;
     }
-    controlMsg->setInjectKeycodeMsgData(action, keyCode, convertMetastate(from->modifiers()));
+
+    if (repeat) {
+        m_repeat++;
+    } else {
+        m_repeat = 0;
+    }
+
+    controlMsg->setInjectKeycodeMsgData(action, keyCode, m_repeat, convertMetastate(from->modifiers()));
     sendControlMsg(controlMsg);
 }
 

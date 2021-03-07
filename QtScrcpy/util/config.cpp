@@ -14,7 +14,7 @@
 #define COMMON_PUSHFILE_DEF "/sdcard/"
 
 #define COMMON_SERVER_VERSION_KEY "ServerVersion"
-#define COMMON_SERVER_VERSION_DEF "1.14"
+#define COMMON_SERVER_VERSION_DEF "1.17"
 
 #define COMMON_SERVER_PATH_KEY "ServerPath"
 #define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
@@ -39,6 +39,9 @@
 
 #define COMMON_CODEC_OPTIONS_KEY "CodecOptions"
 #define COMMON_CODEC_OPTIONS_DEF "-"
+
+#define COMMON_CODEC_NAME_KEY "CodecName"
+#define COMMON_CODEC_NAME_DEF "-"
 
 // user data
 #define COMMON_RECORD_KEY "RecordPath"
@@ -287,6 +290,15 @@ QString Config::getCodecOptions()
     codecOptions = m_settings->value(COMMON_CODEC_OPTIONS_KEY, COMMON_CODEC_OPTIONS_DEF).toString();
     m_settings->endGroup();
     return codecOptions;
+}
+
+QString Config::getCodecName()
+{
+    QString codecName;
+    m_settings->beginGroup(GROUP_COMMON);
+    codecName = m_settings->value(COMMON_CODEC_NAME_KEY, COMMON_CODEC_NAME_DEF).toString();
+    m_settings->endGroup();
+    return codecName;
 }
 
 QString Config::getTitle()

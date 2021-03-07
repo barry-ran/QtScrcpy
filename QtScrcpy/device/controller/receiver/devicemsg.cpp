@@ -32,7 +32,7 @@ qint32 DeviceMsg::deserialize(QByteArray &byteArray)
     char c = 0;
     qint32 ret = 0;
 
-    if (len < 3) {
+    if (len < 5) {
         // at least type + empty string length
         return 0; // not available
     }
@@ -42,8 +42,8 @@ qint32 DeviceMsg::deserialize(QByteArray &byteArray)
     switch (m_data.type) {
     case DMT_GET_CLIPBOARD: {
         m_data.clipboardMsg.text = Q_NULLPTR;
-        quint16 clipboardLen = BufferUtil::read16(buf);
-        if (clipboardLen > len - 3) {
+        quint16 clipboardLen = BufferUtil::read32(buf);
+        if (clipboardLen > len - 5) {
             ret = 0; // not available
             break;
         }
@@ -53,7 +53,7 @@ qint32 DeviceMsg::deserialize(QByteArray &byteArray)
         memcpy(m_data.clipboardMsg.text, text.data(), text.length());
         m_data.clipboardMsg.text[text.length()] = '\0';
 
-        ret = 3 + clipboardLen;
+        ret = 5 + clipboardLen;
         break;
     }
     default:
