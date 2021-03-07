@@ -128,7 +128,7 @@ QByteArray ControlMsg::serializeData()
         break;
     case CMT_SET_CLIPBOARD:
         buffer.putChar(!!m_data.setClipboard.paste);
-        BufferUtil::write16(buffer, static_cast<quint32>(strlen(m_data.setClipboard.text)));
+        BufferUtil::write32(buffer, static_cast<quint32>(strlen(m_data.setClipboard.text)));
         buffer.write(m_data.setClipboard.text, strlen(m_data.setClipboard.text));
         break;
     case CMT_SET_SCREEN_POWER_MODE:
