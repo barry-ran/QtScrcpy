@@ -16,22 +16,22 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="181"/>
+        <location filename="../../device/device.cpp" line="184"/>
         <source>install apk</source>
         <translation>install apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="183"/>
+        <location filename="../../device/device.cpp" line="186"/>
         <source>file transfer</source>
         <translation>file transfer</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="187"/>
+        <location filename="../../device/device.cpp" line="190"/>
         <source>wait current %1 to complete</source>
         <translation>wait current %1 to complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="190"/>
+        <location filename="../../device/device.cpp" line="193"/>
         <source>%1 complete, save in %2</source>
         <translation>%1 complete, save in %2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1 complete\n save in %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="193"/>
+        <location filename="../../device/device.cpp" line="196"/>
         <source>%1 failed</source>
         <translation>%1 failed</translation>
     </message>
@@ -229,6 +229,32 @@
     </message>
 </context>
 <context>
+    <name>InputConvertGame</name>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>current keymap mode: %1</source>
+        <translation>current keymap mode: %1</translation>
+    </message>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>custom</source>
+        <translation>custom</translation>
+    </message>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>normal</source>
+        <translation>normal</translation>
+    </message>
+</context>
+<context>
+    <name>KeyMap</name>
+    <message>
+        <location filename="../../device/controller/inputconvert/keymap/keymap.cpp" line="307"/>
+        <source>Script updated, current keymap mode:normal, Press ~ key to switch keymap mode</source>
+        <translation>Script updated, current keymap mode:normal, Press ~ key to switch keymap mode</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>This software is completely open source and free, you can download it at the following address:</source>
@@ -241,9 +267,13 @@ You can download it at the following address:</source>
         <translation type="vanished">This software is completely open source and free.\nStrictly used for illegal purposes, or at your own risk.\nYou can download it at the following address:</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="108"/>
         <source>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</source>
-        <translation>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</translation>
+        <translation type="vanished">This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="109"/>
+        <source>This software is completely open source and free. Use for illegal purposes is strictly prohibited, or at your own risk. You can download it at the following address:</source>
+        <translation>This software is completely open source and free. Use for illegal purposes is strictly prohibited, or at your own risk. You can download it at the following address:</translation>
     </message>
 </context>
 <context>
@@ -337,7 +367,7 @@ You can download it at the following address:</source>
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="710"/>
+        <location filename="../../device/ui/videoform.cpp" line="749"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>
