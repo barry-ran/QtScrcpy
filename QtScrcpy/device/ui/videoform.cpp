@@ -249,7 +249,6 @@ void VideoForm::installShortcut()
 
     // postVolumeUp
     shortcut = new QShortcut(QKeySequence("Ctrl+up"), this);
-    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
@@ -259,7 +258,6 @@ void VideoForm::installShortcut()
 
     // postVolumeDown
     shortcut = new QShortcut(QKeySequence("Ctrl+down"), this);
-    shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
