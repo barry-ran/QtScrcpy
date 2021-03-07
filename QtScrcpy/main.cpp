@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
     qInfo(
         "%s",
-        QObject::tr("This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the "
+        QObject::tr("This software is completely open source and free. Use for illegal purposes is strictly prohibited, or at your own risk. You can download it at the "
                     "following address:")
             .toUtf8()
             .data());

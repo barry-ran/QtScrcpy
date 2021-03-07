@@ -16,22 +16,22 @@
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="181"/>
+        <location filename="../../device/device.cpp" line="184"/>
         <source>install apk</source>
         <translation>安装apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="183"/>
+        <location filename="../../device/device.cpp" line="186"/>
         <source>file transfer</source>
         <translation>文件传输</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="187"/>
+        <location filename="../../device/device.cpp" line="190"/>
         <source>wait current %1 to complete</source>
         <translation>等待当前%1完成</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="190"/>
+        <location filename="../../device/device.cpp" line="193"/>
         <source>%1 complete, save in %2</source>
         <translation>%1完成,保存在%2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1完成\n 保存在 %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="193"/>
+        <location filename="../../device/device.cpp" line="196"/>
         <source>%1 failed</source>
         <translation>%1 失败</translation>
     </message>
@@ -229,6 +229,32 @@
     </message>
 </context>
 <context>
+    <name>InputConvertGame</name>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>current keymap mode: %1</source>
+        <translation>当前按键映射模式: %1</translation>
+    </message>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>custom</source>
+        <translation>自定义</translation>
+    </message>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>normal</source>
+        <translation>正常</translation>
+    </message>
+</context>
+<context>
+    <name>KeyMap</name>
+    <message>
+        <location filename="../../device/controller/inputconvert/keymap/keymap.cpp" line="307"/>
+        <source>Script updated, current keymap mode:normal, Press ~ key to switch keymap mode</source>
+        <translation>脚本已更新，当前按键映射模式：正常，按~键切换按键映射模式</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>This software is completely open source and free, you can download it at the following address:</source>
@@ -241,9 +267,13 @@ You can download it at the following address:</source>
         <translation type="vanished">本软件完全开源免费.\n严禁用于非法用途，否则后果自负.\n你可以在下面地址下载:</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="108"/>
         <source>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</source>
-        <translation>本软件完全开源免费，严禁用于非法用途，否则后果自负，你可以在下面地址下载:</translation>
+        <translation type="vanished">本软件完全开源免费，严禁用于非法用途，否则后果自负，你可以在下面地址下载:</translation>
+    </message>
+    <message>
+        <location filename="../../main.cpp" line="109"/>
+        <source>This software is completely open source and free. Use for illegal purposes is strictly prohibited, or at your own risk. You can download it at the following address:</source>
+        <translation>该软件是完全开源和免费的。 严禁将其用于非法目的，否则后果自负。 您可以从以下地址下载它：</translation>
     </message>
 </context>
 <context>
@@ -337,7 +367,7 @@ You can download it at the following address:</source>
         <translation type="vanished">文件传输失败</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="710"/>
+        <location filename="../../device/ui/videoform.cpp" line="749"/>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
     </message>
