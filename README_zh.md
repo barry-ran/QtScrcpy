@@ -121,6 +121,17 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 
 ### Linux
 
+#### Arch Linux
+![AUR version](https://img.shields.io/aur/version/qtscrcpy) ![AUR maintainer](https://img.shields.io/aur/maintainer/qtscrcpy)
+
+[AUR](https://aur.archlinux.org/packages/qtscrcpy/)
+
+```sh
+yay -S qtscrcpy
+```
+
+#### 其他发行版
+
 目前只提供了windows和mac平台的可执行程序，如果需要linux平台的可执行程序，
 
 您通常需要[自己编译](##如何编译)。别担心，这并不难。

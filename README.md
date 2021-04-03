@@ -120,6 +120,18 @@ For Mac OS, for simplicity, prebuilt archives with all the dependencies (includi
 or you can [build it by yourself](##Build)
 
 ### Linux
+
+#### Arch Linux
+![AUR version](https://img.shields.io/aur/version/qtscrcpy) ![AUR maintainer](https://img.shields.io/aur/maintainer/qtscrcpy)
+
+An AUR package is available as [qtscrcpy](https://aur.archlinux.org/packages/qtscrcpy/):
+
+```sh
+yay -S qtscrcpy
+```
+
+#### Other Distributions
+
 you can [build it by yourself](##Build)(just ubuntu test)
 
 
