@@ -1,15 +1,27 @@
-#ifndef CONFIG_H
+﻿#ifndef CONFIG_H
 #define CONFIG_H
 
 #include <QObject>
 #include <QPointer>
 #include <QRect>
+struct UserBootConfig
+{
+    bool recordScreen     = false;
+    bool recordBackground = false;
+    bool reverseConnect   = true;
+    bool showFPS          = false;
+    bool windowOnTop      = false;
+    bool autoOffScreen    = false;
+    bool windowFrameless  = false;
+    bool keepAlive        = false;
+};
 
 class QSettings;
 class Config : public QObject
 {
     Q_OBJECT
 public:
+
     static Config &getInstance();
     // config
     QString getTitle();
@@ -24,6 +36,8 @@ public:
     QString getLogLevel();
     QString getCodecOptions();
     QString getCodecName();
+    QStringList getConnectedGroups();
+    void deleteGroup(const QString &serial);
 
     // user data
     QString getRecordPath();
@@ -38,6 +52,10 @@ public:
     QRect getRect(const QString &serial);
     bool getFramelessWindow();
     void setFramelessWindow(bool frameless);
+    void setUserName(const QString &serial, const QString &name);
+    QString getUserName(const QString &serial);
+    void setUserBootConfig(const QString &serial, const UserBootConfig &config);
+    UserBootConfig getUserBootConfig(const QString &serial);
 
 private:
     explicit Config(QObject *parent = nullptr);

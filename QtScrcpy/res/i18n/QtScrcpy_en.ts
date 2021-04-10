@@ -16,22 +16,22 @@
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="181"/>
+        <location filename="../../device/device.cpp" line="184"/>
         <source>install apk</source>
         <translation>install apk</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="183"/>
+        <location filename="../../device/device.cpp" line="186"/>
         <source>file transfer</source>
         <translation>file transfer</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="187"/>
+        <location filename="../../device/device.cpp" line="190"/>
         <source>wait current %1 to complete</source>
         <translation>wait current %1 to complete</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="190"/>
+        <location filename="../../device/device.cpp" line="193"/>
         <source>%1 complete, save in %2</source>
         <translation>%1 complete, save in %2</translation>
     </message>
@@ -41,7 +41,7 @@
         <translation type="vanished">%1 complete\n save in %2</translation>
     </message>
     <message>
-        <location filename="../../device/device.cpp" line="193"/>
+        <location filename="../../device/device.cpp" line="196"/>
         <source>%1 failed</source>
         <translation>%1 failed</translation>
     </message>
@@ -49,93 +49,129 @@
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="../../dialog.ui" line="477"/>
+        <location filename="../../dialog.ui" line="555"/>
         <source>Wireless</source>
         <translation>Wireless</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="561"/>
+        <location filename="../../dialog.ui" line="639"/>
         <source>wireless connect</source>
         <translation>wireless connect</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="577"/>
+        <location filename="../../dialog.ui" line="655"/>
         <source>wireless disconnect</source>
         <translation>wireless disconnect</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="32"/>
+        <location filename="../../dialog.ui" line="82"/>
         <source>Start Config</source>
         <translation>Start Config</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="168"/>
+        <location filename="../../dialog.ui" line="218"/>
         <source>record save path:</source>
         <translation>record save path:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="185"/>
-        <location filename="../../dialog.cpp" line="338"/>
+        <location filename="../../dialog.ui" line="235"/>
+        <location filename="../../dialog.cpp" line="449"/>
         <source>select path</source>
         <translation>select path</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="99"/>
+        <location filename="../../dialog.ui" line="149"/>
         <source>record format：</source>
         <translation>record format:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="323"/>
+        <location filename="../../dialog.ui" line="373"/>
         <source>record screen</source>
         <translation>record screen</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="268"/>
+        <location filename="../../dialog.ui" line="318"/>
         <source>frameless</source>
         <translation>frameless</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="127"/>
+        <location filename="../../dialog.ui" line="32"/>
+        <source>Use Simple Mode</source>
+        <translatorcomment>Use Simple Mode</translatorcomment>
+        <translation>Use Simple Mode</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="42"/>
+        <source>Simple Mode</source>
+        <translatorcomment>Simple Mode</translatorcomment>
+        <translation>Simple Mode</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="53"/>
+        <source>WIFI Connect</source>
+        <translatorcomment>WIFI Connect</translatorcomment>
+        <translation>WIFI Connect</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="60"/>
+        <source>USB Connect</source>
+        <translatorcomment>USB Connect</translatorcomment>
+        <translation>USB Connect</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="177"/>
         <source>lock orientation:</source>
         <translation>lock orientation:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="330"/>
+        <location filename="../../dialog.ui" line="380"/>
         <source>show fps</source>
         <translation>show fps</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="337"/>
+        <location filename="../../dialog.ui" line="387"/>
         <source>stay awake</source>
         <translation>stay awake</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="434"/>
+        <location filename="../../dialog.ui" line="414"/>
+        <source>device name:</source>
+        <translatorcomment>device name:</translatorcomment>
+        <translation>device name:</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="431"/>
+        <source>update name</source>
+        <translatorcomment>update name</translatorcomment>
+        <translation>update name</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="512"/>
         <source>stop all server</source>
         <translation>stop all server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="611"/>
+        <location filename="../../dialog.ui" line="689"/>
         <source>adb command:</source>
         <translation>adb command:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="647"/>
+        <location filename="../../dialog.ui" line="725"/>
         <source>terminate</source>
         <translation>terminate</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="634"/>
+        <location filename="../../dialog.ui" line="712"/>
         <source>execute</source>
         <translation>execute</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="660"/>
+        <location filename="../../dialog.ui" line="738"/>
         <source>clear</source>
         <translation>clear</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="313"/>
+        <location filename="../../dialog.ui" line="363"/>
         <source>reverse connection</source>
         <translation>reverse connection</translation>
     </message>
@@ -144,57 +180,57 @@
         <translation type="vanished">auto enable</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="297"/>
+        <location filename="../../dialog.ui" line="347"/>
         <source>background record</source>
         <translation>background record</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="261"/>
+        <location filename="../../dialog.ui" line="311"/>
         <source>screen-off</source>
         <translation>screen-off</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="230"/>
+        <location filename="../../dialog.ui" line="280"/>
         <source>apply</source>
         <translation>apply</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="85"/>
+        <location filename="../../dialog.ui" line="135"/>
         <source>max size:</source>
         <translation>max size:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="281"/>
+        <location filename="../../dialog.ui" line="331"/>
         <source>always on top</source>
         <translation>always on top</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="223"/>
+        <location filename="../../dialog.ui" line="273"/>
         <source>refresh script</source>
         <translation>refresh script</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="451"/>
+        <location filename="../../dialog.ui" line="529"/>
         <source>get device IP</source>
         <translation>get device IP</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="350"/>
+        <location filename="../../dialog.ui" line="400"/>
         <source>USB line</source>
         <translation>USB line</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="406"/>
+        <location filename="../../dialog.ui" line="484"/>
         <source>stop server</source>
         <translation>stop server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="396"/>
+        <location filename="../../dialog.ui" line="474"/>
         <source>start server</source>
         <translation>start server</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="386"/>
+        <location filename="../../dialog.ui" line="464"/>
         <source>device serial:</source>
         <translation>device serial:</translation>
     </message>
@@ -203,29 +239,109 @@
         <translation type="vanished">Config</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="68"/>
+        <location filename="../../dialog.ui" line="118"/>
         <source>bit rate:</source>
         <translation>bit rate:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="461"/>
+        <location filename="../../dialog.ui" line="539"/>
         <source>start adbd</source>
         <translation>start adbd</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="441"/>
+        <location filename="../../dialog.ui" line="519"/>
         <source>refresh devices</source>
         <translation>refresh devices</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="105"/>
+        <location filename="../../dialog.cpp" line="83"/>
+        <source>show</source>
+        <translatorcomment>show</translatorcomment>
+        <translation>show</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="84"/>
+        <source>quit</source>
+        <translatorcomment>quit</translatorcomment>
+        <translation>quit</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="119"/>
         <source>original</source>
         <translation>original</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="112"/>
+        <location filename="../../dialog.cpp" line="126"/>
         <source>no lock</source>
         <translation>no lock</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="230"/>
+        <source>warning</source>
+        <translatorcomment>Warning</translatorcomment>
+        <translation>Warning</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="230"/>
+        <source>Quit or set tray?</source>
+        <translatorcomment>Quit or set tray?</translatorcomment>
+        <translation>Quit or set tray?</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="230"/>
+        <source>Quit</source>
+        <translatorcomment>Quit</translatorcomment>
+        <translation>Quit</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="230"/>
+        <source>Set tray</source>
+        <translatorcomment>Set tray</translatorcomment>
+        <translation>Set tray</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="230"/>
+        <source>Cancel</source>
+        <translatorcomment>Cancel</translatorcomment>
+        <translation>Cancel</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="240"/>
+        <source>Notice</source>
+        <translatorcomment>Notice</translatorcomment>
+        <translation>Notice</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.cpp" line="241"/>
+        <source>Hidden here!</source>
+        <translatorcomment>Hidden here!</translatorcomment>
+        <translation>Hidden here!</translation>
+    </message>
+</context>
+<context>
+    <name>InputConvertGame</name>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>current keymap mode: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>custom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../device/controller/inputconvert/inputconvertgame.cpp" line="507"/>
+        <source>normal</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>KeyMap</name>
+    <message>
+        <location filename="../../device/controller/inputconvert/keymap/keymap.cpp" line="307"/>
+        <source>Script updated, current keymap mode:normal, Press ~ key to switch keymap mode</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -241,7 +357,7 @@ You can download it at the following address:</source>
         <translation type="vanished">This software is completely open source and free.\nStrictly used for illegal purposes, or at your own risk.\nYou can download it at the following address:</translation>
     </message>
     <message>
-        <location filename="../../main.cpp" line="108"/>
+        <location filename="../../main.cpp" line="109"/>
         <source>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</source>
         <translation>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</translation>
     </message>
@@ -337,7 +453,7 @@ You can download it at the following address:</source>
         <translation type="vanished">file transfer failed</translation>
     </message>
     <message>
-        <location filename="../../device/ui/videoform.cpp" line="710"/>
+        <location filename="../../device/ui/videoform.cpp" line="749"/>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
     </message>
