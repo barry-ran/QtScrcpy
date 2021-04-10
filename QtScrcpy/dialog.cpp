@@ -579,11 +579,11 @@ void Dialog::on_wifiConnectBtn_clicked()
     on_getIPBtn_clicked();
     delayMs(200);
 
-    on_wirelessConnectBtn_clicked();
-    delayMs(2000);
-
     on_startAdbdBtn_clicked();
     delayMs(1000);
+
+    on_wirelessConnectBtn_clicked();
+    delayMs(2000);
 
     ui->serialBox->clear();
 
