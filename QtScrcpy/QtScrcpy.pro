@@ -148,52 +148,51 @@ win32 {
 # ***********************************************************
 # Mac平台下配置
 # ***********************************************************
-macos {
-    # 输出目录
-    CONFIG(debug, debug|release) {
-        DESTDIR = $$PWD/../output/mac/debug
-    } else {
-        DESTDIR = $$PWD/../output/mac/release
-    }
+#macos {
+#    # 输出目录
+#    CONFIG(debug, debug|release) {
+#        DESTDIR = $$PWD/../output/mac/debug
+#    } else {
+#        DESTDIR = $$PWD/../output/mac/release
+#    }
 
-    # 依赖模块
-    LIBS += \
-            -L$$PWD/../third_party/ffmpeg/lib -lavformat.58 \
-            -L$$PWD/../third_party/ffmpeg/lib -lavcodec.58 \
-            -L$$PWD/../third_party/ffmpeg/lib -lavutil.56 \
-            -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
+#    # 依赖模块
+#    LIBS += \
+#            -L$$PWD/../third_party/ffmpeg/lib -lavformat.58 \
+#            -L$$PWD/../third_party/ffmpeg/lib -lavcodec.58 \
+#            -L$$PWD/../third_party/ffmpeg/lib -lavutil.56 \
+#            -L$$PWD/../third_party/ffmpeg/lib -lswscale.5
 
-    # mac bundle file
-    APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server)
-    APP_SCRCPY_SERVER.path = Contents/MacOS
-    QMAKE_BUNDLE_DATA += APP_SCRCPY_SERVER
+#    # mac bundle file
+#    APP_SCRCPY_SERVER.files = $$files($$PWD/../third_party/scrcpy-server)
+#    APP_SCRCPY_SERVER.path = Contents/MacOS
+#    QMAKE_BUNDLE_DATA += APP_SCRCPY_SERVER
 
-    APP_ADB.files = $$files($$PWD/../third_party/adb/mac/adb)
-    APP_ADB.path = Contents/MacOS
-    QMAKE_BUNDLE_DATA += APP_ADB
+#    APP_ADB.files = $$files($$PWD/../third_party/adb/mac/adb)
+#    APP_ADB.path = Contents/MacOS
+#    QMAKE_BUNDLE_DATA += APP_ADB
 
-    APP_FFMPEG.files = $$files($$PWD/../third_party/ffmpeg/lib/*.dylib)
-    APP_FFMPEG.path = Contents/MacOS
-    QMAKE_BUNDLE_DATA += APP_FFMPEG
+#    APP_FFMPEG.files = $$files($$PWD/../third_party/ffmpeg/lib/*.dylib)
+#    APP_FFMPEG.path = Contents/MacOS
+#    QMAKE_BUNDLE_DATA += APP_FFMPEG
 
-    APP_CONFIG.files = $$files($$PWD/../config/config.ini)
-    APP_CONFIG.path = Contents/MacOS/config
-    QMAKE_BUNDLE_DATA += APP_CONFIG
+#    APP_CONFIG.files = $$files($$PWD/../config/config.ini)
+#    APP_CONFIG.path = Contents/MacOS/config
+#    QMAKE_BUNDLE_DATA += APP_CONFIG
+#    # mac application icon
+#    ICON = $$PWD/res/QtScrcpy.icns
+#    QMAKE_INFO_PLIST = $$PWD/res/Info_Mac.plist
 
-    # mac application icon
-    ICON = $$PWD/res/QtScrcpy.icns
-    QMAKE_INFO_PLIST = $$PWD/res/Info_Mac.plist
+#    # 定义目标命令（修改版本号字段）
+#    plistupdate.commands = /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $$VERSION\" \
+#    -c \"Set :CFBundleVersion $$VERSION\" \
+#    $$DESTDIR/$${TARGET}.app/Contents/Info.plist
 
-    # 定义目标命令（修改版本号字段）
-    plistupdate.commands = /usr/libexec/PlistBuddy -c \"Set :CFBundleShortVersionString $$VERSION\" \
-    -c \"Set :CFBundleVersion $$VERSION\" \
-    $$DESTDIR/$${TARGET}.app/Contents/Info.plist
-
-    # 增加额外目标
-    QMAKE_EXTRA_TARGETS += plistupdate
-    # 设置为前置依赖
-    PRE_TARGETDEPS += plistupdate
-}
+#    # 增加额外目标
+#    QMAKE_EXTRA_TARGETS += plistupdate
+#    # 设置为前置依赖
+#    PRE_TARGETDEPS += plistupdate
+#}
 
 # ***********************************************************
 # Linux平台下配置
