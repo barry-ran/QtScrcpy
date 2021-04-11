@@ -1,8 +1,13 @@
-#ifndef DIALOG_H
+﻿#ifndef DIALOG_H
 #define DIALOG_H
 
 #include <QDialog>
 #include <QPointer>
+#include <QMessageBox>
+#include <QMenu>
+#include <QSystemTrayIcon>
+#include <QListWidget>
+
 
 #include "adbprocess.h"
 #include "devicemanage.h"
@@ -66,16 +71,39 @@ private slots:
 
     void on_framelessCheck_stateChanged(int arg1);
 
+    void on_usbConnectBtn_clicked();
+
+    void on_wifiConnectBtn_clicked();
+
+    void on_connectedPhoneList_itemDoubleClicked(QListWidgetItem *item);
+
+    void on_updateNameBtn_clicked();
+
+    void on_useSingleModeCheck_clicked();
+
 private:
     bool checkAdbRun();
     void initUI();
     void execAdbCmd();
+    void delayMs(int ms);
     QString getGameScript(const QString &fileName);
+    void slotShow();
+    void slotActivated(QSystemTrayIcon::ActivationReason reason);
+    void updateConnectedList();
+    void updateUser();
+    void loadUser();
+
+protected:
+    void closeEvent(QCloseEvent *event);
 
 private:
     Ui::Dialog *ui;
     AdbProcess m_adb;
     DeviceManage m_deviceManage;
+    QSystemTrayIcon *m_hideIcon;
+    QMenu *m_menu;
+    QAction *m_showWindow;
+    QAction *m_quit;
 };
 
 #endif // DIALOG_H

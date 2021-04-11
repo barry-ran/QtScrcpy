@@ -1,6 +1,7 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QFileInfo>
 #include <QSettings>
+#include <QDebug>
 
 #include "config.h"
 
@@ -62,6 +63,16 @@
 #define SERIAL_WINDOW_RECT_KEY_H "WindowRectH"
 #define SERIAL_WINDOW_RECT_KEY_DEF -1
 
+#define USER_NAME "PHONE"
+#define USER_RECORD_SCREEN "RecordScreen"
+#define USER_RECORD_BACKGROUD "RecordBackGround"
+#define USER_REVERSE_CONNECT "ReverseConnect"
+#define USER_SHOW_FPS "ShowFPS"
+#define USER_WINDOW_ON_TOP "WindowOnTop"
+#define USER_AUTO_OFF_SCREEN "AutoOffScreen"
+#define USER_WINDOW_FRAMELESS "WindowFrameless"
+#define USER_KEEP_ALIVE "KeepAlive"
+
 #define COMMON_FRAMELESS_WINDOW_KEY "FramelessWindow"
 #define COMMON_FRAMELESS_WINDOW_DEF false
 
@@ -76,6 +87,8 @@ Config::Config(QObject *parent) : QObject(parent)
 
     m_userData = new QSettings(getConfigPath() + "/userdata.ini", QSettings::IniFormat);
     m_userData->setIniCodec("UTF-8");
+
+    qDebug()<<m_userData->childGroups();
 }
 
 Config &Config::getInstance()
@@ -111,6 +124,37 @@ void Config::setRecordPath(const QString &path)
     m_userData->beginGroup(GROUP_COMMON);
     m_userData->setValue(COMMON_RECORD_KEY, path);
     m_userData->endGroup();
+}
+
+void Config::setUserBootConfig(const QString &serial, const UserBootConfig &config)
+{
+    m_userData->beginGroup(serial);
+    m_userData->setValue(USER_RECORD_SCREEN, config.recordScreen);
+    m_userData->setValue(USER_RECORD_BACKGROUD, config.recordBackground);
+    m_userData->setValue(USER_REVERSE_CONNECT, config.reverseConnect);
+    m_userData->setValue(USER_SHOW_FPS, config.showFPS);
+    m_userData->setValue(USER_WINDOW_ON_TOP, config.windowOnTop);
+    m_userData->setValue(USER_AUTO_OFF_SCREEN, config.autoOffScreen);
+    m_userData->setValue(USER_WINDOW_FRAMELESS, config.windowFrameless);
+    m_userData->setValue(USER_KEEP_ALIVE, config.keepAlive);
+    m_userData->endGroup();
+    m_userData->sync();
+}
+
+UserBootConfig Config::getUserBootConfig(const QString &serial)
+{
+    UserBootConfig config;
+    m_userData->beginGroup(serial);
+    config.recordScreen = m_userData->value(USER_RECORD_SCREEN, false).toBool();
+    config.recordBackground = m_userData->value(USER_RECORD_BACKGROUD, false).toBool();
+    config.reverseConnect = m_userData->value(USER_REVERSE_CONNECT, true).toBool();
+    config.showFPS = m_userData->value(USER_SHOW_FPS, false).toBool();
+    config.windowOnTop = m_userData->value(USER_WINDOW_ON_TOP, false).toBool();
+    config.autoOffScreen = m_userData->value(USER_AUTO_OFF_SCREEN, false).toBool();
+    config.windowFrameless = m_userData->value(USER_WINDOW_FRAMELESS, false).toBool();
+    config.keepAlive = m_userData->value(USER_KEEP_ALIVE, false).toBool();
+    m_userData->endGroup();
+    return config;
 }
 
 int Config::getBitRateIndex()
@@ -189,6 +233,23 @@ void Config::setFramelessWindow(bool frameless)
     m_userData->beginGroup(GROUP_COMMON);
     m_userData->setValue(COMMON_FRAMELESS_WINDOW_KEY, frameless);
     m_userData->endGroup();
+}
+
+void Config::setUserName(const QString &serial, const QString &name)
+{
+    m_userData->beginGroup(serial);
+    m_userData->setValue(USER_NAME, name);
+    m_userData->endGroup();
+    m_userData->sync();
+}
+
+QString Config::getUserName(const QString &serial)
+{
+    QString name;
+    m_userData->beginGroup(serial);
+    name = m_userData->value(USER_NAME,"PHONE").toString();
+    m_userData->endGroup();
+    return name;
 }
 
 bool Config::getFramelessWindow()
@@ -299,6 +360,16 @@ QString Config::getCodecName()
     codecName = m_settings->value(COMMON_CODEC_NAME_KEY, COMMON_CODEC_NAME_DEF).toString();
     m_settings->endGroup();
     return codecName;
+}
+
+QStringList Config::getConnectedGroups()
+{
+    return m_userData->childGroups();
+}
+
+void Config::deleteGroup(const QString &serial)
+{
+    m_userData->remove(serial);
 }
 
 QString Config::getTitle()
