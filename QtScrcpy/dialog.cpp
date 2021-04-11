@@ -75,19 +75,19 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
         }
     });
 
-    hideIcon = new QSystemTrayIcon();
-    hideIcon->setIcon(QIcon(":/image/tray/logo.png"));
-    myMenu = new QMenu();
-    quit = new QAction();
-    showWindow = new QAction();;
-    showWindow->setText(tr("show"));
-    quit->setText(tr("quit"));
-    myMenu->addAction(showWindow);
-    myMenu->addAction(quit);
-    hideIcon->setContextMenu(myMenu);
-    connect(showWindow, &QAction::triggered, this, &Dialog::slotShow);
-    connect(quit, SIGNAL(triggered()), this, SLOT(close()));
-    connect(hideIcon, &QSystemTrayIcon::activated,this,&Dialog::slotActivated);
+    m_hideIcon = new QSystemTrayIcon();
+    m_hideIcon->setIcon(QIcon(":/image/tray/logo.png"));
+    m_menu = new QMenu();
+    m_quit = new QAction();
+    m_showWindow = new QAction();;
+    m_showWindow->setText(tr("show"));
+    m_quit->setText(tr("quit"));
+    m_menu->addAction(m_showWindow);
+    m_menu->addAction(m_quit);
+    m_hideIcon->setContextMenu(m_menu);
+    connect(m_showWindow, &QAction::triggered, this, &Dialog::slotShow);
+    connect(m_quit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(m_hideIcon, &QSystemTrayIcon::activated,this,&Dialog::slotActivated);
 }
 
 Dialog::~Dialog()
@@ -183,7 +183,7 @@ QString Dialog::getGameScript(const QString &fileName)
 void Dialog::slotShow()
 {
     this->show();
-    hideIcon->hide();
+    m_hideIcon->hide();
 }
 
 void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
@@ -191,7 +191,7 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
     switch (reason) {
     case QSystemTrayIcon::Trigger:
         this->show();
-        hideIcon->hide();
+        m_hideIcon->hide();
         break;
     default:
         break;
@@ -236,8 +236,8 @@ void Dialog::closeEvent(QCloseEvent *event)
     else if(res == 1)
     {
         this->hide();
-        hideIcon->show();
-        hideIcon->showMessage(tr("Notice"),
+        m_hideIcon->show();
+        m_hideIcon->showMessage(tr("Notice"),
                               tr("Hidden here!"),
                               QSystemTrayIcon::Information,
                               3000);

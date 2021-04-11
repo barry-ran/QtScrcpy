@@ -100,10 +100,10 @@ private:
     Ui::Dialog *ui;
     AdbProcess m_adb;
     DeviceManage m_deviceManage;
-    QSystemTrayIcon *hideIcon;
-    QMenu *myMenu;
-    QAction *showWindow;
-    QAction *quit;
+    QSystemTrayIcon *m_hideIcon;
+    QMenu *m_menu;
+    QAction *m_showWindow;
+    QAction *m_quit;
 };
 
 #endif // DIALOG_H
