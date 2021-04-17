@@ -124,7 +124,9 @@ you can [build it by yourself](##Build)(just ubuntu test)
 
 
 ## Run
-
+### Simple Mode
+Connect to your Android device on your computer, then run the program and click `USB connect` or `WiFi connect`
+### Not Simple Mode
 Connect to your Android device on your computer, then run the program and click the button below to connect to the Android device.
 
 ![run](screenshot/run.png)
