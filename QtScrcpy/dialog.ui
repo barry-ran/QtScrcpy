@@ -64,6 +64,13 @@
        </layout>
       </item>
       <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Double click to connect:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QListWidget" name="connectedPhoneList">
         <property name="maximumSize">
          <size>
