@@ -132,8 +132,6 @@ void Dialog::initUI()
 
     updateBootConfig(true);
 
-    ui->userNameEdt->setText(Config::getInstance().getNickName(ui->serialBox->currentText()));
-
     on_useSingleModeCheck_clicked();
 
     on_updateDevice_clicked();
@@ -621,4 +619,9 @@ void Dialog::on_useSingleModeCheck_clicked()
         ui->wirelessGroupBox->show();
         ui->usbGroupBox->show();
     }
+}
+
+void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
+{
+    ui->userNameEdt->setText(Config::getInstance().getNickName(arg1));
 }
