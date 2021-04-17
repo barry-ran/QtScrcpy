@@ -258,7 +258,7 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 ## Licence
 由于是复刻的scrcpy，尊重它的Licence
 
-    Copyright (C) 2020 Barry
+    Copyright (C) 2025 Rankun
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
