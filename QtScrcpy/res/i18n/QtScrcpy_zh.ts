@@ -97,14 +97,14 @@
     <message>
         <location filename="../../dialog.ui" line="32"/>
         <source>Use Simple Mode</source>
-        <translatorcomment>启用一键模式</translatorcomment>
-        <translation>启用一键模式</translation>
+        <translatorcomment>启用精简模式</translatorcomment>
+        <translation>启用精简模式</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="42"/>
         <source>Simple Mode</source>
-        <translatorcomment>一键模式</translatorcomment>
-        <translation>一键模式</translation>
+        <translatorcomment>精简模式</translatorcomment>
+        <translation>精简模式</translation>
     </message>
     <message>
         <location filename="../../dialog.ui" line="53"/>
