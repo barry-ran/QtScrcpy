@@ -49,48 +49,48 @@
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="../../dialog.ui" line="555"/>
+        <location filename="../../dialog.ui" line="562"/>
         <source>Wireless</source>
         <translation>无线</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="639"/>
+        <location filename="../../dialog.ui" line="646"/>
         <source>wireless connect</source>
         <translation>无线连接</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="655"/>
+        <location filename="../../dialog.ui" line="662"/>
         <source>wireless disconnect</source>
         <translation>无线断开</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="82"/>
+        <location filename="../../dialog.ui" line="89"/>
         <source>Start Config</source>
         <translation>启动配置</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="218"/>
+        <location filename="../../dialog.ui" line="225"/>
         <source>record save path:</source>
         <translation>录像保存路径：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="235"/>
+        <location filename="../../dialog.ui" line="242"/>
         <location filename="../../dialog.cpp" line="449"/>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="149"/>
+        <location filename="../../dialog.ui" line="156"/>
         <source>record format：</source>
         <translation>录制格式：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="373"/>
+        <location filename="../../dialog.ui" line="380"/>
         <source>record screen</source>
         <translation>录制屏幕</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="318"/>
+        <location filename="../../dialog.ui" line="325"/>
         <source>frameless</source>
         <translation>无边框</translation>
     </message>
@@ -119,59 +119,64 @@
         <translation>一键USB连接</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="177"/>
+        <location filename="../../dialog.ui" line="69"/>
+        <source>Double click to connect:</source>
+        <translation>双击连接：</translation>
+    </message>
+    <message>
+        <location filename="../../dialog.ui" line="184"/>
         <source>lock orientation:</source>
         <translation>锁定方向：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="380"/>
+        <location filename="../../dialog.ui" line="387"/>
         <source>show fps</source>
         <translation>显示fps</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="387"/>
+        <location filename="../../dialog.ui" line="394"/>
         <source>stay awake</source>
         <translation>保持唤醒</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="414"/>
+        <location filename="../../dialog.ui" line="421"/>
         <source>device name:</source>
         <translatorcomment>设备名称:</translatorcomment>
         <translation>设备名称:</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="431"/>
+        <location filename="../../dialog.ui" line="438"/>
         <source>update name</source>
         <translatorcomment>更新设置名称</translatorcomment>
         <translation>更新设置名称</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="512"/>
+        <location filename="../../dialog.ui" line="519"/>
         <source>stop all server</source>
         <translation>停止所有服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="689"/>
+        <location filename="../../dialog.ui" line="696"/>
         <source>adb command:</source>
         <translation>adb命令：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="725"/>
+        <location filename="../../dialog.ui" line="732"/>
         <source>terminate</source>
         <translation>终止</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="712"/>
+        <location filename="../../dialog.ui" line="719"/>
         <source>execute</source>
         <translation>执行</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="738"/>
+        <location filename="../../dialog.ui" line="745"/>
         <source>clear</source>
         <translation>清理</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="363"/>
+        <location filename="../../dialog.ui" line="370"/>
         <source>reverse connection</source>
         <translation>反向连接</translation>
     </message>
@@ -180,57 +185,57 @@
         <translation type="vanished">自动启用脚本</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="347"/>
+        <location filename="../../dialog.ui" line="354"/>
         <source>background record</source>
         <translation>后台录制</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="311"/>
+        <location filename="../../dialog.ui" line="318"/>
         <source>screen-off</source>
         <translation>自动息屏</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="280"/>
+        <location filename="../../dialog.ui" line="287"/>
         <source>apply</source>
         <translation>应用脚本</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="135"/>
+        <location filename="../../dialog.ui" line="142"/>
         <source>max size:</source>
         <translation>最大尺寸：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="331"/>
+        <location filename="../../dialog.ui" line="338"/>
         <source>always on top</source>
         <translation>窗口置顶</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="273"/>
+        <location filename="../../dialog.ui" line="280"/>
         <source>refresh script</source>
         <translation>刷新脚本</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="529"/>
+        <location filename="../../dialog.ui" line="536"/>
         <source>get device IP</source>
         <translation>获取设备IP</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="400"/>
+        <location filename="../../dialog.ui" line="407"/>
         <source>USB line</source>
         <translation>USB线</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="484"/>
+        <location filename="../../dialog.ui" line="491"/>
         <source>stop server</source>
         <translation>停止服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="474"/>
+        <location filename="../../dialog.ui" line="481"/>
         <source>start server</source>
         <translation>启动服务</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="464"/>
+        <location filename="../../dialog.ui" line="471"/>
         <source>device serial:</source>
         <translation>设备序列号：</translation>
     </message>
@@ -239,34 +244,34 @@
         <translation type="vanished">配置</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="118"/>
+        <location filename="../../dialog.ui" line="125"/>
         <source>bit rate:</source>
         <translation>比特率：</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="539"/>
+        <location filename="../../dialog.ui" line="546"/>
         <source>start adbd</source>
         <translation>启动adbd</translation>
     </message>
     <message>
-        <location filename="../../dialog.ui" line="519"/>
+        <location filename="../../dialog.ui" line="526"/>
         <source>refresh devices</source>
         <translation>刷新设备列表</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="83"/>
+        <location filename="../../dialog.cpp" line="85"/>
         <source>show</source>
         <translatorcomment>显示</translatorcomment>
         <translation>显示</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="84"/>
+        <location filename="../../dialog.cpp" line="86"/>
         <source>quit</source>
         <translatorcomment>退出</translatorcomment>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="119"/>
+        <location filename="../../dialog.cpp" line="121"/>
         <source>original</source>
         <translation>原始</translation>
     </message>
@@ -276,43 +281,43 @@
         <translation>不锁定</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="230"/>
+        <location filename="../../dialog.cpp" line="243"/>
         <source>warning</source>
         <translatorcomment>警告</translatorcomment>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="230"/>
+        <location filename="../../dialog.cpp" line="243"/>
         <source>Quit or set tray?</source>
         <translatorcomment>退出还是最小化到托盘？</translatorcomment>
         <translation>退出还是最小化到托盘？</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="230"/>
+        <location filename="../../dialog.cpp" line="243"/>
         <source>Quit</source>
         <translatorcomment>退出</translatorcomment>
         <translation>退出</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="230"/>
+        <location filename="../../dialog.cpp" line="243"/>
         <source>Set tray</source>
         <translatorcomment>最小化到系统托盘</translatorcomment>
         <translation>最小化到系统托盘</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="230"/>
+        <location filename="../../dialog.cpp" line="243"/>
         <source>Cancel</source>
         <translatorcomment>取消</translatorcomment>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="240"/>
+        <location filename="../../dialog.cpp" line="253"/>
         <source>Notice</source>
         <translatorcomment>提示</translatorcomment>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../../dialog.cpp" line="241"/>
+        <location filename="../../dialog.cpp" line="254"/>
         <source>Hidden here!</source>
         <translatorcomment>安卓录屏程序隐藏在这！</translatorcomment>
         <translation>安卓录屏程序隐藏在这！</translation>
