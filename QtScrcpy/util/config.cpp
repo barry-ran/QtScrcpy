@@ -1,6 +1,7 @@
-#include <QCoreApplication>
+﻿#include <QCoreApplication>
 #include <QFileInfo>
 #include <QSettings>
+#include <QDebug>
 
 #include "config.h"
 
@@ -43,7 +44,7 @@
 #define COMMON_CODEC_NAME_KEY "CodecName"
 #define COMMON_CODEC_NAME_DEF "-"
 
-// user data
+// user config
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
 
@@ -56,16 +57,44 @@
 #define COMMON_RECORD_FORMAT_INDEX_KEY "RecordFormatIndex"
 #define COMMON_RECORD_FORMAT_INDEX_DEF 0
 
+#define COMMON_LOCK_ORIENTATION_INDEX_KEY "LockDirectionIndex"
+#define COMMON_LOCK_ORIENTATION_INDEX_DEF 0
+
+#define COMMON_RECORD_SCREEN_KEY "RecordScreen"
+#define COMMON_RECORD_SCREEN_DEF false
+
+#define COMMON_RECORD_BACKGROUD_KEY "RecordBackGround"
+#define COMMON_RECORD_BACKGROUD_DEF false
+
+#define COMMON_REVERSE_CONNECT_KEY "ReverseConnect"
+#define COMMON_REVERSE_CONNECT_DEF true
+
+#define COMMON_SHOW_FPS_KEY "ShowFPS"
+#define COMMON_SHOW_FPS_DEF false
+
+#define COMMON_WINDOW_ON_TOP_KEY "WindowOnTop"
+#define COMMON_WINDOW_ON_TOP_DEF false
+
+#define COMMON_AUTO_OFF_SCREEN_KEY "AutoOffScreen"
+#define COMMON_AUTO_OFF_SCREEN_DEF false
+
+#define COMMON_FRAMELESS_WINDOW_KEY "FramelessWindow"
+#define COMMON_FRAMELESS_WINDOW_DEF false
+
+#define COMMON_KEEP_ALIVE_KEY "KeepAlive"
+#define COMMON_KEEP_ALIVE_DEF false
+
+#define COMMON_SIMPLE_MODE_KEY "SimpleMode"
+#define COMMON_SIMPLE_MODE_DEF false
+
+// device config
 #define SERIAL_WINDOW_RECT_KEY_X "WindowRectX"
 #define SERIAL_WINDOW_RECT_KEY_Y "WindowRectY"
 #define SERIAL_WINDOW_RECT_KEY_W "WindowRectW"
 #define SERIAL_WINDOW_RECT_KEY_H "WindowRectH"
 #define SERIAL_WINDOW_RECT_KEY_DEF -1
-
-#define COMMON_FRAMELESS_WINDOW_KEY "FramelessWindow"
-#define COMMON_FRAMELESS_WINDOW_DEF false
-
-// 最大尺寸 录制格式
+#define SERIAL_NICK_NAME_KEY "NickName"
+#define SERIAL_NICK_NAME_DEF "Phone"
 
 QString Config::s_configPath = "";
 
@@ -76,6 +105,8 @@ Config::Config(QObject *parent) : QObject(parent)
 
     m_userData = new QSettings(getConfigPath() + "/userdata.ini", QSettings::IniFormat);
     m_userData->setIniCodec("UTF-8");
+
+    qDebug()<<m_userData->childGroups();
 }
 
 Config &Config::getInstance()
@@ -97,68 +128,47 @@ const QString &Config::getConfigPath()
     return s_configPath;
 }
 
-QString Config::getRecordPath()
+void Config::setUserBootConfig(const UserBootConfig &config)
 {
-    QString record;
     m_userData->beginGroup(GROUP_COMMON);
-    record = m_userData->value(COMMON_RECORD_KEY, COMMON_RECORD_DEF).toString();
+    m_userData->setValue(COMMON_RECORD_KEY, config.recordPath);
+    m_userData->setValue(COMMON_BITRATE_INDEX_KEY, config.bitRateIndex);
+    m_userData->setValue(COMMON_MAX_SIZE_INDEX_KEY, config.maxSizeIndex);
+    m_userData->setValue(COMMON_RECORD_FORMAT_INDEX_KEY, config.recordFormatIndex);
+    m_userData->setValue(COMMON_FRAMELESS_WINDOW_KEY, config.framelessWindow);
+    m_userData->setValue(COMMON_LOCK_ORIENTATION_INDEX_KEY, config.lockOrientationIndex);
+    m_userData->setValue(COMMON_RECORD_SCREEN_KEY, config.recordScreen);
+    m_userData->setValue(COMMON_RECORD_BACKGROUD_KEY, config.recordBackground);
+    m_userData->setValue(COMMON_REVERSE_CONNECT_KEY, config.reverseConnect);
+    m_userData->setValue(COMMON_SHOW_FPS_KEY, config.showFPS);
+    m_userData->setValue(COMMON_WINDOW_ON_TOP_KEY, config.windowOnTop);
+    m_userData->setValue(COMMON_AUTO_OFF_SCREEN_KEY, config.autoOffScreen);
+    m_userData->setValue(COMMON_KEEP_ALIVE_KEY, config.keepAlive);
+    m_userData->setValue(COMMON_SIMPLE_MODE_KEY, config.simpleMode);
     m_userData->endGroup();
-    return record;
+    m_userData->sync();
 }
 
-void Config::setRecordPath(const QString &path)
+UserBootConfig Config::getUserBootConfig()
 {
+    UserBootConfig config;
     m_userData->beginGroup(GROUP_COMMON);
-    m_userData->setValue(COMMON_RECORD_KEY, path);
+    config.recordPath = m_userData->value(COMMON_RECORD_KEY, COMMON_RECORD_DEF).toString();
+    config.bitRateIndex = m_userData->value(COMMON_BITRATE_INDEX_KEY, COMMON_BITRATE_INDEX_DEF).toInt();
+    config.maxSizeIndex = m_userData->value(COMMON_MAX_SIZE_INDEX_KEY, COMMON_MAX_SIZE_INDEX_DEF).toInt();
+    config.recordFormatIndex = m_userData->value(COMMON_RECORD_FORMAT_INDEX_KEY, COMMON_RECORD_FORMAT_INDEX_DEF).toInt();
+    config.lockOrientationIndex = m_userData->value(COMMON_LOCK_ORIENTATION_INDEX_KEY, COMMON_LOCK_ORIENTATION_INDEX_DEF).toInt();
+    config.framelessWindow = m_userData->value(COMMON_FRAMELESS_WINDOW_KEY, COMMON_FRAMELESS_WINDOW_DEF).toBool();
+    config.recordScreen = m_userData->value(COMMON_RECORD_SCREEN_KEY, COMMON_RECORD_SCREEN_DEF).toBool();
+    config.recordBackground = m_userData->value(COMMON_RECORD_BACKGROUD_KEY, COMMON_RECORD_BACKGROUD_DEF).toBool();
+    config.reverseConnect = m_userData->value(COMMON_REVERSE_CONNECT_KEY, COMMON_REVERSE_CONNECT_DEF).toBool();
+    config.showFPS = m_userData->value(COMMON_SHOW_FPS_KEY, COMMON_SHOW_FPS_DEF).toBool();
+    config.windowOnTop = m_userData->value(COMMON_WINDOW_ON_TOP_KEY, COMMON_WINDOW_ON_TOP_DEF).toBool();
+    config.autoOffScreen = m_userData->value(COMMON_AUTO_OFF_SCREEN_KEY, COMMON_AUTO_OFF_SCREEN_DEF).toBool();
+    config.keepAlive = m_userData->value(COMMON_KEEP_ALIVE_KEY, COMMON_KEEP_ALIVE_DEF).toBool();
+    config.simpleMode = m_userData->value(COMMON_SIMPLE_MODE_KEY, COMMON_SIMPLE_MODE_DEF).toBool();
     m_userData->endGroup();
-}
-
-int Config::getBitRateIndex()
-{
-    int bitRateIndex;
-    m_userData->beginGroup(GROUP_COMMON);
-    bitRateIndex = m_userData->value(COMMON_BITRATE_INDEX_KEY, COMMON_BITRATE_INDEX_DEF).toInt();
-    m_userData->endGroup();
-    return bitRateIndex;
-}
-
-void Config::setBitRateIndex(int bitRateIndex)
-{
-    m_userData->beginGroup(GROUP_COMMON);
-    m_userData->setValue(COMMON_BITRATE_INDEX_KEY, bitRateIndex);
-    m_userData->endGroup();
-}
-
-int Config::getMaxSizeIndex()
-{
-    int maxSizeIndex;
-    m_userData->beginGroup(GROUP_COMMON);
-    maxSizeIndex = m_userData->value(COMMON_MAX_SIZE_INDEX_KEY, COMMON_MAX_SIZE_INDEX_DEF).toInt();
-    m_userData->endGroup();
-    return maxSizeIndex;
-}
-
-void Config::setMaxSizeIndex(int maxSizeIndex)
-{
-    m_userData->beginGroup(GROUP_COMMON);
-    m_userData->setValue(COMMON_MAX_SIZE_INDEX_KEY, maxSizeIndex);
-    m_userData->endGroup();
-}
-
-int Config::getRecordFormatIndex()
-{
-    int recordFormatIndex;
-    m_userData->beginGroup(GROUP_COMMON);
-    recordFormatIndex = m_userData->value(COMMON_RECORD_FORMAT_INDEX_KEY, COMMON_RECORD_FORMAT_INDEX_DEF).toInt();
-    m_userData->endGroup();
-    return recordFormatIndex;
-}
-
-void Config::setRecordFormatIndex(int recordFormatIndex)
-{
-    m_userData->beginGroup(GROUP_COMMON);
-    m_userData->setValue(COMMON_RECORD_FORMAT_INDEX_KEY, recordFormatIndex);
-    m_userData->endGroup();
+    return config;
 }
 
 void Config::setRect(const QString &serial, const QRect &rc)
@@ -184,20 +194,21 @@ QRect Config::getRect(const QString &serial)
     return rc;
 }
 
-void Config::setFramelessWindow(bool frameless)
+void Config::setNickName(const QString &serial, const QString &name)
 {
-    m_userData->beginGroup(GROUP_COMMON);
-    m_userData->setValue(COMMON_FRAMELESS_WINDOW_KEY, frameless);
+    m_userData->beginGroup(serial);
+    m_userData->setValue(SERIAL_NICK_NAME_KEY, name);
     m_userData->endGroup();
+    m_userData->sync();
 }
 
-bool Config::getFramelessWindow()
+QString Config::getNickName(const QString &serial)
 {
-    bool framelessWindow = false;
-    m_userData->beginGroup(GROUP_COMMON);
-    framelessWindow = m_userData->value(COMMON_FRAMELESS_WINDOW_KEY, COMMON_FRAMELESS_WINDOW_DEF).toBool();
+    QString name;
+    m_userData->beginGroup(serial);
+    name = m_userData->value(SERIAL_NICK_NAME_KEY, SERIAL_NICK_NAME_DEF).toString();
     m_userData->endGroup();
-    return framelessWindow;
+    return name;
 }
 
 QString Config::getServerVersion()
@@ -299,6 +310,16 @@ QString Config::getCodecName()
     codecName = m_settings->value(COMMON_CODEC_NAME_KEY, COMMON_CODEC_NAME_DEF).toString();
     m_settings->endGroup();
     return codecName;
+}
+
+QStringList Config::getConnectedGroups()
+{
+    return m_userData->childGroups();
+}
+
+void Config::deleteGroup(const QString &serial)
+{
+    m_userData->remove(serial);
 }
 
 QString Config::getTitle()

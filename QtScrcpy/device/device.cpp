@@ -33,7 +33,7 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller(params.gameScript, this);
-        m_videoForm = new VideoForm(Config::getInstance().getFramelessWindow(), Config::getInstance().getSkin());
+        m_videoForm = new VideoForm(params.framelessWindow, Config::getInstance().getSkin());
         m_videoForm->setDevice(this);
     }
 
@@ -382,7 +382,7 @@ bool Device::saveFrame(const AVFrame *frame)
 
     // save
     QString absFilePath;
-    QString fileDir(Config::getInstance().getRecordPath());
+    QString fileDir(m_params.recordPath);
     if (fileDir.isEmpty()) {
         qWarning() << "please select record save path!!!";
         return false;

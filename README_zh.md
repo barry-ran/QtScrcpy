@@ -128,7 +128,9 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 目前只在ubuntu上测试过
 
 ## 运行
-
+### 精简模式
+在你的电脑上接入Android设备，然后运行程序，点击`一键USB连接`或者`一键WIFI连接`
+### 非精简模式
 在你的电脑上接入Android设备，然后运行程序，按顺序点击如下按钮即可连接到Android设备
 
 ![运行](screenshot/run.png)
@@ -256,7 +258,7 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 ## Licence
 由于是复刻的scrcpy，尊重它的Licence
 
-    Copyright (C) 2020 Barry
+    Copyright (C) 2025 Rankun
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

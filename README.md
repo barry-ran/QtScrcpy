@@ -124,7 +124,9 @@ you can [build it by yourself](##Build)(just ubuntu test)
 
 
 ## Run
-
+### Simple Mode
+Connect to your Android device on your computer, then run the program and click `USB connect` or `WiFi connect`
+### Not Simple Mode
 Connect to your Android device on your computer, then run the program and click the button below to connect to the Android device.
 
 ![run](screenshot/run.png)
@@ -260,7 +262,7 @@ All the dependencies are provided and it is easy to compile.
 ## Licence
 Since it is based on scrcpy, respect its Licence
 
-    Copyright (C) 2020 Barry
+    Copyright (C) 2025 Rankun
     
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

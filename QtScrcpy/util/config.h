@@ -1,16 +1,36 @@
-#ifndef CONFIG_H
+﻿#ifndef CONFIG_H
 #define CONFIG_H
 
 #include <QObject>
 #include <QPointer>
 #include <QRect>
 
+struct UserBootConfig
+{
+    QString recordPath = "";
+    int bitRateIndex = 0;
+    int maxSizeIndex = 0;
+    int recordFormatIndex = 0;
+    int lockOrientationIndex = 0;
+    bool recordScreen     = false;
+    bool recordBackground = false;
+    bool reverseConnect   = true;
+    bool showFPS          = false;
+    bool windowOnTop      = false;
+    bool autoOffScreen    = false;
+    bool framelessWindow  = false;
+    bool keepAlive        = false;
+    bool simpleMode       = false;
+};
+
 class QSettings;
 class Config : public QObject
 {
     Q_OBJECT
 public:
+
     static Config &getInstance();
+
     // config
     QString getTitle();
     QString getServerVersion();
@@ -24,20 +44,19 @@ public:
     QString getLogLevel();
     QString getCodecOptions();
     QString getCodecName();
+    QStringList getConnectedGroups();
 
-    // user data
-    QString getRecordPath();
-    void setRecordPath(const QString &path);
-    int getBitRateIndex();
-    void setBitRateIndex(int bitRateIndex);
-    int getMaxSizeIndex();
-    void setMaxSizeIndex(int maxSizeIndex);
-    int getRecordFormatIndex();
-    void setRecordFormatIndex(int recordFormatIndex);
+    // user data:common
+    void setUserBootConfig(const UserBootConfig &config);
+    UserBootConfig getUserBootConfig();
+
+    // user data:device
+    void setNickName(const QString &serial, const QString &name);
+    QString getNickName(const QString &serial);
     void setRect(const QString &serial, const QRect &rc);
     QRect getRect(const QString &serial);
-    bool getFramelessWindow();
-    void setFramelessWindow(bool frameless);
+
+    void deleteGroup(const QString &serial);
 
 private:
     explicit Config(QObject *parent = nullptr);
