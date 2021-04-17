@@ -221,7 +221,7 @@ void Device::initSignals()
                     // must be show before updateShowSize
                     m_videoForm->show();
 
-                    m_videoForm->setWindowTitle(deviceName);
+                    m_videoForm->setWindowTitle(Config::getInstance().getTitle() + "-" + deviceName);
                     m_videoForm->updateShowSize(size);
 
                     bool deviceVer = size.height() > size.width();
