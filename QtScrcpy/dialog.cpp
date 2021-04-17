@@ -518,24 +518,30 @@ void Dialog::on_usbConnectBtn_clicked()
     delayMs(200);
     on_updateDevice_clicked();
     delayMs(200);
-    if(ui->serialBox->count() == 0)
-    {
-        qWarning() << "No device is found!";
+
+    int firstUsbDevice = findDeviceFromeSerialBox(false);
+    if (-1 == firstUsbDevice) {
+        qWarning() << "No use device is found!";
         return;
     }
+    ui->serialBox->setCurrentIndex(firstUsbDevice);
 
+    on_startServerBtn_clicked();
+}
+
+int Dialog::findDeviceFromeSerialBox(bool wifi) {
     QRegExp regIP("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\:([0-9]|[1-9]\\d|[1-9]\\d{2}|[1-9]\\d{3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])\\b");
-
     for (int i = 0; i < ui->serialBox->count(); ++i)
     {
-        // 连接第一个usb设备
-        if(!regIP.exactMatch(ui->serialBox->itemText(i)))
+        bool isWifi = regIP.exactMatch(ui->serialBox->itemText(i));
+        bool found = wifi ? isWifi : !isWifi;
+        if(found)
         {
-            ui->serialBox->setCurrentIndex(i);
-            on_startServerBtn_clicked();
-            break;
+            return i;
         }
     }
+
+    return -1;
 }
 
 void Dialog::on_wifiConnectBtn_clicked()
@@ -545,29 +551,13 @@ void Dialog::on_wifiConnectBtn_clicked()
 
     on_updateDevice_clicked();
     delayMs(200);
-    if(ui->serialBox->count() == 0)
-    {
-        qWarning() << "No device is found!";
-        return;
-    }
 
-    bool found = false;
-    QRegExp regIP("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\:([0-9]|[1-9]\\d|[1-9]\\d{2}|[1-9]\\d{3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])\\b");
-    for (int i = 0; i < ui->serialBox->count(); ++i)
-    {
-        // 选中第一个usb设备
-        if(!regIP.exactMatch(ui->serialBox->itemText(i)))
-        {
-            ui->serialBox->setCurrentIndex(i);
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
+    int firstUsbDevice = findDeviceFromeSerialBox(false);
+    if (-1 == firstUsbDevice) {
         qWarning() << "No use device is found!";
         return;
     }
+    ui->serialBox->setCurrentIndex(firstUsbDevice);
 
     on_getIPBtn_clicked();
     delayMs(200);
@@ -581,22 +571,12 @@ void Dialog::on_wifiConnectBtn_clicked()
     on_updateDevice_clicked();
     delayMs(200);
 
-    // 找到第一个无线设备
-    found = false;
-    for (int i = 0; i < ui->serialBox->count(); ++i)
-    {
-        if(regIP.exactMatch(ui->serialBox->itemText(i)))
-        {
-            ui->serialBox->setCurrentIndex(i);
-            found = true;
-            break;
-        }
-    }
-
-    if (!found) {
+    int firstWifiDevice = findDeviceFromeSerialBox(true);
+    if (-1 == firstWifiDevice) {
         qWarning() << "No wifi device is found!";
         return;
     }
+    ui->serialBox->setCurrentIndex(firstWifiDevice);
 
     on_startServerBtn_clicked();
 }
