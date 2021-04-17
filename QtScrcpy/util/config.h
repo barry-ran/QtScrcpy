@@ -4,15 +4,21 @@
 #include <QObject>
 #include <QPointer>
 #include <QRect>
+
 struct UserBootConfig
 {
+    QString recordPath = "";
+    int bitRateIndex = 0;
+    int maxSizeIndex = 0;
+    int recordFormatIndex = 0;
+    int lockOrientationIndex = 0;
     bool recordScreen     = false;
     bool recordBackground = false;
     bool reverseConnect   = true;
     bool showFPS          = false;
     bool windowOnTop      = false;
     bool autoOffScreen    = false;
-    bool windowFrameless  = false;
+    bool framelessWindow  = false;
     bool keepAlive        = false;
 };
 
@@ -23,6 +29,7 @@ class Config : public QObject
 public:
 
     static Config &getInstance();
+
     // config
     QString getTitle();
     QString getServerVersion();
@@ -37,25 +44,18 @@ public:
     QString getCodecOptions();
     QString getCodecName();
     QStringList getConnectedGroups();
-    void deleteGroup(const QString &serial);
 
-    // user data
-    QString getRecordPath();
-    void setRecordPath(const QString &path);
-    int getBitRateIndex();
-    void setBitRateIndex(int bitRateIndex);
-    int getMaxSizeIndex();
-    void setMaxSizeIndex(int maxSizeIndex);
-    int getRecordFormatIndex();
-    void setRecordFormatIndex(int recordFormatIndex);
+    // user data:common
+    void setUserBootConfig(const UserBootConfig &config);
+    UserBootConfig getUserBootConfig();
+
+    // user data:device
+    void setNickName(const QString &serial, const QString &name);
+    QString getNickName(const QString &serial);
     void setRect(const QString &serial, const QRect &rc);
     QRect getRect(const QString &serial);
-    bool getFramelessWindow();
-    void setFramelessWindow(bool frameless);
-    void setUserName(const QString &serial, const QString &name);
-    QString getUserName(const QString &serial);
-    void setUserBootConfig(const QString &serial, const UserBootConfig &config);
-    UserBootConfig getUserBootConfig(const QString &serial);
+
+    void deleteGroup(const QString &serial);
 
 private:
     explicit Config(QObject *parent = nullptr);

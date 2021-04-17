@@ -26,6 +26,7 @@ public:
     struct DeviceParams
     {
         QString recordFileName = "";      // 视频录制文件名
+        QString recordPath = "";          // 视频保存路径
         QString serial = "";              // 设备序列号
         quint16 localPort = 27183;        // reverse时本地监听端口
         quint16 maxSize = 720;            // 视频分辨率
@@ -37,7 +38,8 @@ public:
         QString gameScript = "";          // 游戏映射脚本
         bool renderExpiredFrames = false; // 是否渲染延迟视频帧
         int lockVideoOrientation = -1;    // 是否锁定视频方向
-        int stayAwake = false;            // 是否保持唤醒
+        bool stayAwake = false;           // 是否保持唤醒
+        bool framelessWindow = false;     // 是否无边框窗口
     };
     enum GroupControlState
     {
