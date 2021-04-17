@@ -165,6 +165,7 @@ void Dialog::updateBootConfig(bool toView)
         ui->alwaysTopCheck->setChecked(config.windowOnTop);
         ui->closeScreenCheck->setChecked(config.autoOffScreen);
         ui->stayAwakeCheck->setChecked(config.keepAlive);
+        ui->useSingleModeCheck->setChecked(config.simpleMode);
     } else {
         UserBootConfig config;
 
@@ -181,6 +182,7 @@ void Dialog::updateBootConfig(bool toView)
         config.autoOffScreen = ui->closeScreenCheck->isChecked();
         config.framelessWindow = ui->framelessCheck->isChecked();
         config.keepAlive = ui->stayAwakeCheck->isChecked();
+        config.simpleMode = ui->useSingleModeCheck->isChecked();
 
         Config::getInstance().setUserBootConfig(config);
     }

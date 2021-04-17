@@ -20,6 +20,7 @@ struct UserBootConfig
     bool autoOffScreen    = false;
     bool framelessWindow  = false;
     bool keepAlive        = false;
+    bool simpleMode       = false;
 };
 
 class QSettings;
