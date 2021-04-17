@@ -82,6 +82,7 @@ private:
     QString getGameScript(const QString &fileName);
     void slotShow();
     void slotActivated(QSystemTrayIcon::ActivationReason reason);
+    int findDeviceFromeSerialBox(bool wifi);
 
 protected:
     void closeEvent(QCloseEvent *event);
