@@ -84,6 +84,9 @@
 #define COMMON_KEEP_ALIVE_KEY "KeepAlive"
 #define COMMON_KEEP_ALIVE_DEF false
 
+#define COMMON_SIMPLE_MODE_KEY "SimpleMode"
+#define COMMON_SIMPLE_MODE_DEF false
+
 // device config
 #define SERIAL_WINDOW_RECT_KEY_X "WindowRectX"
 #define SERIAL_WINDOW_RECT_KEY_Y "WindowRectY"
@@ -141,6 +144,7 @@ void Config::setUserBootConfig(const UserBootConfig &config)
     m_userData->setValue(COMMON_WINDOW_ON_TOP_KEY, config.windowOnTop);
     m_userData->setValue(COMMON_AUTO_OFF_SCREEN_KEY, config.autoOffScreen);
     m_userData->setValue(COMMON_KEEP_ALIVE_KEY, config.keepAlive);
+    m_userData->setValue(COMMON_SIMPLE_MODE_KEY, config.simpleMode);
     m_userData->endGroup();
     m_userData->sync();
 }
@@ -162,6 +166,7 @@ UserBootConfig Config::getUserBootConfig()
     config.windowOnTop = m_userData->value(COMMON_WINDOW_ON_TOP_KEY, COMMON_WINDOW_ON_TOP_DEF).toBool();
     config.autoOffScreen = m_userData->value(COMMON_AUTO_OFF_SCREEN_KEY, COMMON_AUTO_OFF_SCREEN_DEF).toBool();
     config.keepAlive = m_userData->value(COMMON_KEEP_ALIVE_KEY, COMMON_KEEP_ALIVE_DEF).toBool();
+    config.simpleMode = m_userData->value(COMMON_SIMPLE_MODE_KEY, COMMON_SIMPLE_MODE_DEF).toBool();
     m_userData->endGroup();
     return config;
 }
