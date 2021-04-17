@@ -1,4 +1,4 @@
-#include <QDebug>
+﻿#include <QDebug>
 #include <QFile>
 #include <QFileDialog>
 #include <QKeyEvent>
@@ -43,8 +43,10 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
             if (args.contains("devices")) {
                 QStringList devices = m_adb.getDevicesSerialFromStdOut();
                 ui->serialBox->clear();
+                ui->connectedPhoneList->clear();
                 for (auto &item : devices) {
                     ui->serialBox->addItem(item);
+                    ui->connectedPhoneList->addItem(item+"-"+Config::getInstance().getNickName(item));
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
@@ -74,10 +76,25 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
             outLog(log, newLine);
         }
     });
+
+    m_hideIcon = new QSystemTrayIcon();
+    m_hideIcon->setIcon(QIcon(":/image/tray/logo.png"));
+    m_menu = new QMenu();
+    m_quit = new QAction();
+    m_showWindow = new QAction();;
+    m_showWindow->setText(tr("show"));
+    m_quit->setText(tr("quit"));
+    m_menu->addAction(m_showWindow);
+    m_menu->addAction(m_quit);
+    m_hideIcon->setContextMenu(m_menu);
+    connect(m_showWindow, &QAction::triggered, this, &Dialog::slotShow);
+    connect(m_quit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(m_hideIcon, &QSystemTrayIcon::activated,this,&Dialog::slotActivated);
 }
 
 Dialog::~Dialog()
 {
+    updateBootConfig(false);
     m_deviceManage.disconnectAllDevice();
     delete ui;
 }
@@ -95,7 +112,6 @@ void Dialog::initUI()
     ui->bitRateBox->addItem("50000000");
     ui->bitRateBox->addItem("100000000");
     ui->bitRateBox->addItem("200000000");
-    ui->bitRateBox->setCurrentIndex(Config::getInstance().getBitRateIndex());
 
     ui->maxSizeBox->addItem("640");
     ui->maxSizeBox->addItem("720");
@@ -103,11 +119,9 @@ void Dialog::initUI()
     ui->maxSizeBox->addItem("1280");
     ui->maxSizeBox->addItem("1920");
     ui->maxSizeBox->addItem(tr("original"));
-    ui->maxSizeBox->setCurrentIndex(Config::getInstance().getMaxSizeIndex());
 
     ui->formatBox->addItem("mp4");
     ui->formatBox->addItem("mkv");
-    ui->formatBox->setCurrentIndex(Config::getInstance().getRecordFormatIndex());
 
     ui->lockOrientationBox->addItem(tr("no lock"));
     ui->lockOrientationBox->addItem("0");
@@ -116,18 +130,62 @@ void Dialog::initUI()
     ui->lockOrientationBox->addItem("270");
     ui->lockOrientationBox->setCurrentIndex(0);
 
-    ui->recordPathEdt->setText(Config::getInstance().getRecordPath());
-    ui->framelessCheck->setChecked(Config::getInstance().getFramelessWindow());
+    updateBootConfig(true);
+
+    on_useSingleModeCheck_clicked();
+
+    on_updateDevice_clicked();
 
 #ifdef Q_OS_OSX
     // mac need more width
-    setFixedWidth(520);
+    setFixedWidth(550);
 #endif
 
 #ifdef Q_OS_LINUX
     // linux need more width
-    setFixedWidth(480);
+    setFixedWidth(520);
 #endif
+}
+
+void Dialog::updateBootConfig(bool toView)
+{
+    if (toView) {
+        UserBootConfig config = Config::getInstance().getUserBootConfig();
+
+        ui->bitRateBox->setCurrentIndex(config.bitRateIndex);
+        ui->maxSizeBox->setCurrentIndex(config.maxSizeIndex);
+        ui->formatBox->setCurrentIndex(config.recordFormatIndex);
+        ui->recordPathEdt->setText(config.recordPath);
+        ui->lockOrientationBox->setCurrentIndex(config.lockOrientationIndex);
+        ui->framelessCheck->setChecked(config.framelessWindow);
+        ui->recordScreenCheck->setChecked(config.recordScreen);
+        ui->notDisplayCheck->setChecked(config.recordBackground);
+        ui->useReverseCheck->setChecked(config.reverseConnect);
+        ui->fpsCheck->setChecked(config.showFPS);
+        ui->alwaysTopCheck->setChecked(config.windowOnTop);
+        ui->closeScreenCheck->setChecked(config.autoOffScreen);
+        ui->stayAwakeCheck->setChecked(config.keepAlive);
+        ui->useSingleModeCheck->setChecked(config.simpleMode);
+    } else {
+        UserBootConfig config;
+
+        config.bitRateIndex = ui->bitRateBox->currentIndex();
+        config.maxSizeIndex = ui->maxSizeBox->currentIndex();
+        config.recordFormatIndex = ui->formatBox->currentIndex();
+        config.recordPath = ui->recordPathEdt->text();
+        config.lockOrientationIndex = ui->lockOrientationBox->currentIndex();
+        config.recordScreen = ui->recordScreenCheck->isChecked();
+        config.recordBackground = ui->notDisplayCheck->isChecked();
+        config.reverseConnect = ui->useReverseCheck->isChecked();
+        config.showFPS = ui->fpsCheck->isChecked();
+        config.windowOnTop = ui->alwaysTopCheck->isChecked();
+        config.autoOffScreen = ui->closeScreenCheck->isChecked();
+        config.framelessWindow = ui->framelessCheck->isChecked();
+        config.keepAlive = ui->stayAwakeCheck->isChecked();
+        config.simpleMode = ui->useSingleModeCheck->isChecked();
+
+        Config::getInstance().setUserBootConfig(config);
+    }
 }
 
 void Dialog::execAdbCmd()
@@ -138,6 +196,15 @@ void Dialog::execAdbCmd()
     QString cmd = ui->adbCommandEdt->text().trimmed();
     outLog("adb " + cmd, false);
     m_adb.execute(ui->serialBox->currentText().trimmed(), cmd.split(" ", Qt::SkipEmptyParts));
+}
+
+void Dialog::delayMs(int ms)
+{
+    QTime dieTime = QTime::currentTime().addMSecs(ms);
+
+    while (QTime::currentTime() < dieTime) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
 }
 
 QString Dialog::getGameScript(const QString &fileName)
@@ -151,6 +218,48 @@ QString Dialog::getGameScript(const QString &fileName)
     QString ret = loadFile.readAll();
     loadFile.close();
     return ret;
+}
+
+void Dialog::slotShow()
+{
+    this->show();
+    m_hideIcon->hide();
+}
+
+void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
+{
+    switch (reason) {
+    case QSystemTrayIcon::Trigger:
+        this->show();
+        m_hideIcon->hide();
+        break;
+    default:
+        break;
+    }
+}
+
+void Dialog::closeEvent(QCloseEvent *event)
+{
+    int res = QMessageBox::question(this,tr("warning"),tr("Quit or set tray?"),tr("Quit"),tr("Set tray"),tr("Cancel"));
+
+    if(res == 0)
+    {
+       event->accept();
+    }
+    else if(res == 1)
+    {
+        this->hide();
+        m_hideIcon->show();
+        m_hideIcon->showMessage(tr("Notice"),
+                              tr("Hidden here!"),
+                              QSystemTrayIcon::Information,
+                              3000);
+        event->ignore();
+    }
+    else
+    {
+        event->ignore();
+    }
 }
 
 void Dialog::on_updateDevice_clicked()
@@ -195,6 +304,8 @@ void Dialog::on_startServerBtn_clicked()
     params.renderExpiredFrames = Config::getInstance().getRenderExpiredFrames();
     params.lockVideoOrientation = ui->lockOrientationBox->currentIndex() - 1;
     params.stayAwake = ui->stayAwakeCheck->isChecked();
+    params.framelessWindow = ui->framelessCheck->isChecked();
+    params.recordPath = ui->recordPathEdt->text().trimmed();
 
     m_deviceManage.connectDevice(params);
 
@@ -341,7 +452,6 @@ void Dialog::on_selectRecordPathBtn_clicked()
 
 void Dialog::on_recordPathEdt_textChanged(const QString &arg1)
 {
-    Config::getInstance().setRecordPath(arg1);
     ui->recordPathEdt->setToolTip(arg1.trimmed());
     ui->notDisplayCheck->setCheckable(!arg1.trimmed().isEmpty());
 }
@@ -402,23 +512,118 @@ void Dialog::on_recordScreenCheck_clicked(bool checked)
     }
 }
 
-void Dialog::on_bitRateBox_activated(int index)
+void Dialog::on_usbConnectBtn_clicked()
 {
-    Config::getInstance().setBitRateIndex(index);
+    on_stopAllServerBtn_clicked();
+    delayMs(200);
+    on_updateDevice_clicked();
+    delayMs(200);
+
+    int firstUsbDevice = findDeviceFromeSerialBox(false);
+    if (-1 == firstUsbDevice) {
+        qWarning() << "No use device is found!";
+        return;
+    }
+    ui->serialBox->setCurrentIndex(firstUsbDevice);
+
+    on_startServerBtn_clicked();
 }
 
-void Dialog::on_maxSizeBox_activated(int index)
-{
-    Config::getInstance().setMaxSizeIndex(index);
+int Dialog::findDeviceFromeSerialBox(bool wifi) {
+    QRegExp regIP("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\:([0-9]|[1-9]\\d|[1-9]\\d{2}|[1-9]\\d{3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])\\b");
+    for (int i = 0; i < ui->serialBox->count(); ++i)
+    {
+        bool isWifi = regIP.exactMatch(ui->serialBox->itemText(i));
+        bool found = wifi ? isWifi : !isWifi;
+        if(found)
+        {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
-void Dialog::on_formatBox_activated(int index)
+void Dialog::on_wifiConnectBtn_clicked()
 {
-    Config::getInstance().setRecordFormatIndex(index);
+    on_stopAllServerBtn_clicked();
+    delayMs(200);
+
+    on_updateDevice_clicked();
+    delayMs(200);
+
+    int firstUsbDevice = findDeviceFromeSerialBox(false);
+    if (-1 == firstUsbDevice) {
+        qWarning() << "No use device is found!";
+        return;
+    }
+    ui->serialBox->setCurrentIndex(firstUsbDevice);
+
+    on_getIPBtn_clicked();
+    delayMs(200);
+
+    on_startAdbdBtn_clicked();
+    delayMs(1000);
+
+    on_wirelessConnectBtn_clicked();
+    delayMs(2000);
+
+    on_updateDevice_clicked();
+    delayMs(200);
+
+    int firstWifiDevice = findDeviceFromeSerialBox(true);
+    if (-1 == firstWifiDevice) {
+        qWarning() << "No wifi device is found!";
+        return;
+    }
+    ui->serialBox->setCurrentIndex(firstWifiDevice);
+
+    on_startServerBtn_clicked();
 }
 
-void Dialog::on_framelessCheck_stateChanged(int arg1)
+void Dialog::on_connectedPhoneList_itemDoubleClicked(QListWidgetItem *item)
 {
-    Q_UNUSED(arg1)
-    Config::getInstance().setFramelessWindow(ui->framelessCheck->isChecked());
+    Q_UNUSED(item);
+    ui->serialBox->setCurrentIndex(ui->connectedPhoneList->currentRow());
+    on_startServerBtn_clicked();
+}
+
+void Dialog::on_updateNameBtn_clicked()
+{
+    if(ui->serialBox->count()!=0) {
+        if(ui->userNameEdt->text().isEmpty()) {
+            Config::getInstance().setNickName(ui->serialBox->currentText(), "Phone");
+        } else {
+            Config::getInstance().setNickName(ui->serialBox->currentText(), ui->userNameEdt->text());
+        }
+
+        on_updateDevice_clicked();
+
+        qDebug()<<"Update OK!";
+    } else {
+        qWarning()<<"No device is connected!";
+    }
+}
+
+void Dialog::on_useSingleModeCheck_clicked()
+{
+    if(ui->useSingleModeCheck->isChecked())
+    {
+        ui->configGroupBox->hide();
+        ui->adbGroupBox->hide();
+        ui->wirelessGroupBox->hide();
+        ui->usbGroupBox->hide();
+    }
+    else
+    {
+        ui->configGroupBox->show();
+        ui->adbGroupBox->show();
+        ui->wirelessGroupBox->show();
+        ui->usbGroupBox->show();
+    }
+}
+
+void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
+{
+    ui->userNameEdt->setText(Config::getInstance().getNickName(arg1));
 }

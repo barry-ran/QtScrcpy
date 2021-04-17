@@ -46,6 +46,9 @@ private:
     QPoint m_relativePos;
     bool m_adsorbed = false;
     QPointer<QWidget> m_adsorbWidget;
+    // 单独记录adsorbWidgetSize，因为Widget setGeometry的时候，会先收到Move事件，后收到Resize事件，
+    // 但是收到Move事件时Widget的size()已经是setGeometry指定的size了
+    QSize m_adsorbWidgetSize;
     AdsorbPosition m_curAdsorbPosition;
 };
 
