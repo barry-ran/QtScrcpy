@@ -63,14 +63,6 @@ private slots:
 
     void on_recordScreenCheck_clicked(bool checked);
 
-    void on_bitRateBox_activated(int index);
-
-    void on_maxSizeBox_activated(int index);
-
-    void on_formatBox_activated(int index);
-
-    void on_framelessCheck_stateChanged(int arg1);
-
     void on_usbConnectBtn_clicked();
 
     void on_wifiConnectBtn_clicked();
@@ -84,14 +76,12 @@ private slots:
 private:
     bool checkAdbRun();
     void initUI();
+    void updateBootConfig(bool toView = true);
     void execAdbCmd();
     void delayMs(int ms);
     QString getGameScript(const QString &fileName);
     void slotShow();
     void slotActivated(QSystemTrayIcon::ActivationReason reason);
-    void updateConnectedList();
-    void updateUser();
-    void loadUser();
 
 protected:
     void closeEvent(QCloseEvent *event);
