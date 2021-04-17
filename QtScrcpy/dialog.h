@@ -73,6 +73,8 @@ private slots:
 
     void on_useSingleModeCheck_clicked();
 
+    void on_serialBox_currentIndexChanged(const QString &arg1);
+
 private:
     bool checkAdbRun();
     void initUI();
