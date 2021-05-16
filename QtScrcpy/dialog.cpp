@@ -621,6 +621,10 @@ void Dialog::on_useSingleModeCheck_clicked()
         ui->wirelessGroupBox->show();
         ui->usbGroupBox->show();
     }
+
+    QTimer::singleShot(0, this, [this](){
+        resize(width(), layout()->sizeHint().height());
+    });
 }
 
 void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
