@@ -77,11 +77,11 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
         }
     });
 
-    m_hideIcon = new QSystemTrayIcon();
+    m_hideIcon = new QSystemTrayIcon(this);
     m_hideIcon->setIcon(QIcon(":/image/tray/logo.png"));
     m_menu = new QMenu();
     m_quit = new QAction();
-    m_showWindow = new QAction();;
+    m_showWindow = new QAction();
     m_showWindow->setText(tr("show"));
     m_quit->setText(tr("quit"));
     m_menu->addAction(m_showWindow);
