@@ -69,7 +69,7 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 编程语言|C|C++
 编程方式|同步|异步
 按键映射|不支持自定义|支持自定义按键映射
-编译方式|meson+gradle|Qt Creator
+编译方式|meson+gradle|qmake or CMake
 
 - 使用Qt可以非常容易的定制自己的界面
 - 基于Qt的信号槽机制的异步编程提高性能
@@ -243,9 +243,9 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 尽量提供了所有依赖资源，方便傻瓜式编译。
 
 ### PC端
-1. 目标平台上搭建Qt开发环境(Qt == 5.15.2, vs == 2019 (**不支持mingw**))
+1. 目标平台上搭建Qt开发环境(Qt == 5.15.2, VS == 2019 (**不支持MinGW**))
 2. 克隆该项目
-3. 使用QtCreator打开项目根目录all.pro
+3. 使用QtCreator打开项目根目录`all.pro`或`CMakeLists.txt`
 4. 编译，运行即可
 
 ### Android端 （没有修改需求的话直接使用自带的scrcpy-server即可）
