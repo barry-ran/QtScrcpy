@@ -45,7 +45,6 @@ private:
     void moveCenter();
     void installShortcut();
     QRect getScreenRect();
-    bool checkTrialExpire();
 
 protected:
     void mousePressEvent(QMouseEvent *event);

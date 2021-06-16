@@ -135,11 +135,11 @@ void installTranslator()
     QString languagePath = ":/i18n/";
     switch (language) {
     case QLocale::Chinese:
-        languagePath += "QtScrcpy_zh.qm";
+        languagePath += "zh_CN.qm";
         break;
     case QLocale::English:
     default:
-        languagePath += "QtScrcpy_en.qm";
+        languagePath += "en_US.qm";
     }
 
     translator.load(languagePath);
