@@ -20,7 +20,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
     # ffmpeg cannot be compiled natively by MSVC version < 12.0 (2013)
     if(MSVC_VERSION LESS 1800)
-        message(FATAL_ERROR "[QtScrCpy] FATAL ERROR: MSVC version is older than 12.0 (2013).")
+        message(FATAL_ERROR "[QtScrcpy] FATAL ERROR: MSVC version is older than 12.0 (2013).")
     endif()
 
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8")
@@ -30,7 +30,8 @@ endif()
 
 # ******************** Microsoft Windows ********************
 if(WIN32)
-    message(STATUS "[QtScrCpy] Make for Microsoft Windows.")
+    message(STATUS "[QtScrcpy] Make for Microsoft Windows.")
+
     # 通过rc的方式的话，VERSION变量rc中获取不到,定义为宏方便rc中使用
     # Define macros for .rc file
     add_compile_definitions(
@@ -41,11 +42,21 @@ if(WIN32)
     )
     
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)         # Compiler is 64-bit
-        message(STATUS "[QtScrCpy] 64-bit compiler detected.")
+        message(STATUS "[QtScrcpy] 64-bit compiler detected.")
         set(QS_DLL_PATH "${PROJECT_SOURCE_DIR}/third_party/ffmpeg/lib/x64")
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/win/x64/debug")
+        else()
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/win/x64/release")
+        endif()
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)     # Compiler is 32-bit
-        message(STATUS "[QtScrCpy] 32-bit compiler detected.")
+        message(STATUS "[QtScrcpy] 32-bit compiler detected.")
         set(QS_DLL_PATH "${PROJECT_SOURCE_DIR}/third_party/ffmpeg/lib/x86")
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/win/x86/debug")
+        else()
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/win/x86/release")
+        endif()
     endif()
 
     link_directories(${QS_DLL_PATH})
@@ -67,7 +78,7 @@ if(WIN32)
         swscale
     )
 
-    set(RC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/res/QtScrCpy.rc")
+    set(RC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/res/QtScrcpy.rc")
 
 # ******************** Unix-like OSs ********************
 elseif(UNIX)
@@ -76,10 +87,16 @@ elseif(UNIX)
 
     # ==================== macOS ====================
     if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-        message(STATUS "[QtScrCpy] Make for macOS.")
+        message(STATUS "[QtScrcpy] Make for macOS.")
+
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/mac/debug")
+        else()
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/mac/release")
+        endif()
     
         # QS_MAC_RESOURCES: esource file list stored in Contents/MacOS
-        file(GLOB QS_MAC_RESOURCES "${PROJECT_SOURCE_DIR}/third_party/ffmpeg/lib/*.dylib)")
+        file(GLOB QS_MAC_RESOURCES "${PROJECT_SOURCE_DIR}/third_party/ffmpeg/lib/*.dylib")
         list(APPEND QS_MAC_RESOURCES
             "${PROJECT_SOURCE_DIR}/third_party/scrcpy-server"
             "${PROJECT_SOURCE_DIR}/adb/mac/adb"
@@ -89,7 +106,7 @@ elseif(UNIX)
         set(QS_MAC_CONFIG "${PROJECT_SOURCE_DIR}/config/config.ini")
         
         # Icon file stored in Contents/Resources
-        set(QS_MAC_ICON_NAME "QtScrCpy.icns")
+        set(QS_MAC_ICON_NAME "QtScrcpy.icns")
         set(QS_MAC_ICON_PATH "${CMAKE_CURRENT_SOURCE_DIR}/res/${QS_MAC_ICON_NAME}")
 
         set_source_files_properties(${QS_MAC_RESOURCES} PROPERTIES
@@ -121,9 +138,15 @@ elseif(UNIX)
         
     # ========== Non-Mac Unix-like OS (Linux, BSD, etc.) ==========
     else()
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/linux/debug")
+        else()
+            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/linux/release")
+        endif()
+
         find_package(Threads REQUIRED)
 
-        message(STATUS "[QtScrCpy] Make for non-Apple Unix-like OS.")
+        message(STATUS "[QtScrcpy] Make for non-Apple Unix-like OS.")
         set(INSTALLED_FFMPEG_FOUND false)
 
         find_package(PkgConfig)
@@ -131,14 +154,14 @@ elseif(UNIX)
             pkg_check_modules(FFmpeg ffmpeg>=4)
             if(FFmpeg_FOUND)
                 set(INSTALLED_FFMPEG_FOUND true)
-                message(STATUS "[QtScrCpy] Development files of FFmpeg ${FFmpeg_VERSION} were detected in your OS and will be used.")
+                message(STATUS "[QtScrcpy] Development files of FFmpeg ${FFmpeg_VERSION} were detected in your OS and will be used.")
                 target_link_options(${CMAKE_PROJECT_NAME} "${FFmpeg_LIBRARIES}")
                 target_compile_options(${CMAKE_PROJECT_NAME} "${FFmpeg_CFLAGS}")
             endif()
         endif()
 
         if(NOT INSTALLED_FFMPEG_FOUND)
-            message(STATUS "[QtScrCpy] Development files of FFmpeg were not detected in your OS. Files within third_party/ffmpeg/ will be used.")
+            message(STATUS "[QtScrcpy] Development files of FFmpeg were not detected in your OS. Files within third_party/ffmpeg/ will be used.")
             set(QS_EXTERNAL_LIBS_FFMPEG
                 avformat
                 avcodec
@@ -150,20 +173,11 @@ elseif(UNIX)
     endif()
 endif()
 
-set(QS_SUBDIRECTORIES_MAIN
-    adb
-    common
-    device
-    devicemanage
-    fontawesome
-    uibase
-    util
-)
-
 set(QS_TS_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/zh_CN.ts
     ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/en_US.ts
     )
+set_source_files_properties(${QS_TS_FILES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/res/i18n")
 
 set(QS_SOURCES_MAIN
     dialog.cpp
@@ -174,7 +188,9 @@ set(QS_SOURCES_MAIN
 
 set(QS_QRC_MAIN "${CMAKE_CURRENT_SOURCE_DIR}/res/res.qrc")
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)     # Qt version 6
+    qt_create_translation(QS_QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${QS_TS_FILES})
+
     if(WIN32)
         qt_add_executable(${CMAKE_PROJECT_NAME} WIN32 MANUAL_FINALIZATION
             main.cpp
@@ -199,9 +215,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         endif()
     endif()
 
-    qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${QS_TS_FILES})
+else()                                      # Qt version 5
+    qt5_create_translation(QS_QM_FILES ${CMAKE_CURRENT_SOURCE_DIR} ${QS_TS_FILES})
 
-else()
     if(WIN32)
         add_executable(${CMAKE_PROJECT_NAME} WIN32
             main.cpp
@@ -225,12 +241,20 @@ else()
             )
         endif()
     endif()
-    qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${QS_TS_FILES})
 
 endif()
 
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(QS_SUBDIRECTORIES_MAIN
+    adb
+    common
+    device
+    devicemanage
+    fontawesome
+    uibase
+    util
+)
 foreach(QS_SUBDIRECTORY_MAIN ${QS_SUBDIRECTORIES_MAIN})
     add_subdirectory(${QS_SUBDIRECTORY_MAIN})
 endforeach()
