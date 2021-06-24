@@ -198,16 +198,18 @@ if(WIN32)
 # ******************** Unix-like OSs ********************
 elseif(UNIX)
     set(QS_LIB_PATH "${PROJECT_SOURCE_DIR}/third_party/ffmpeg/lib")
-    link_directories(${QS_LIB_PATH})
 
     # ==================== macOS ====================
     if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         message(STATUS "[QtScrcpy] Make for macOS.")
+        target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE ${QS_LIB_PATH})
 
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/mac/debug")
+            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/mac/debug")
         else()
-            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/mac/release")
+            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/mac/release")
         endif()
 
         # Icon file stored in Contents/Resources
@@ -244,30 +246,33 @@ elseif(UNIX)
     # =============== Non-Mac OSs (Linux, BSD, etc.) ===============
     else()
         if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/linux/debug")
+            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/linux/debug")
         else()
-            set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/linux/release")
+            set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/output/linux/release")
         endif()
 
         find_package(Threads REQUIRED)
 
-        message(STATUS "[QtScrcpy] Make for non-Apple Unix-like OS.")
+        message(STATUS "[QtScrcpy] Make for non-Mac Unix-like OS.")
         set(INSTALLED_FFMPEG_FOUND false)
 
         find_package(PkgConfig)
         if(PkgConfig_FOUND)
-            pkg_check_modules(FFmpeg ffmpeg>=4)
+            pkg_check_modules(FFmpeg libavformat>=58 libavcodec>=58 libavutil>=56 libswscale>=5)
             if(FFmpeg_FOUND)
                 set(INSTALLED_FFMPEG_FOUND true)
-                message(STATUS "[QtScrcpy] Development files of FFmpeg ${FFmpeg_VERSION} were detected in your OS and will be used.")
-                target_link_options(${CMAKE_PROJECT_NAME} "${FFmpeg_LIBRARIES}")
-                target_compile_options(${CMAKE_PROJECT_NAME} "${FFmpeg_CFLAGS}")
-                set(QS_EXTERNAL_LIBS_FFMPEG PkgConfig::FFmpeg)
+                message(STATUS "[QtScrcpy] Development files of FFmpeg were detected in your OS and will be used.")
+                target_link_options(${CMAKE_PROJECT_NAME} PRIVATE ${FFmpeg_LDFLAGS})
+                target_compile_options(${CMAKE_PROJECT_NAME} PRIVATE ${FFmpeg_CFLAGS})
+                set(QS_EXTERNAL_LIBS_FFMPEG ${FFmpeg_LIBRARIES})
             endif()
         endif()
 
         if(NOT INSTALLED_FFMPEG_FOUND)
             message(STATUS "[QtScrcpy] Development files of FFmpeg were not detected in your OS. Files within third_party/ffmpeg/ will be used.")
+            target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE ${QS_LIB_PATH})
             set(QS_EXTERNAL_LIBS_FFMPEG
                 avformat
                 avcodec
@@ -307,7 +312,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE
         ui
     util
     )
-
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${CMAKE_PROJECT_NAME})
