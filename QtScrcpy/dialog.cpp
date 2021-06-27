@@ -87,8 +87,12 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
     m_menu->addAction(m_showWindow);
     m_menu->addAction(m_quit);
     m_hideIcon->setContextMenu(m_menu);
+    m_hideIcon->show();
     connect(m_showWindow, &QAction::triggered, this, &Dialog::slotShow);
-    connect(m_quit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(m_quit, &QAction::triggered, this, [this](){
+        m_hideIcon->hide();
+        qApp->quit();
+    });
     connect(m_hideIcon, &QSystemTrayIcon::activated,this,&Dialog::slotActivated);
 }
 
@@ -240,26 +244,12 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 
 void Dialog::closeEvent(QCloseEvent *event)
 {
-    int res = QMessageBox::question(this,tr("warning"),tr("Quit or set tray?"),tr("Quit"),tr("Set tray"),tr("Cancel"));
-
-    if(res == 0)
-    {
-       event->accept();
-    }
-    else if(res == 1)
-    {
-        this->hide();
-        m_hideIcon->show();
-        m_hideIcon->showMessage(tr("Notice"),
-                              tr("Hidden here!"),
-                              QSystemTrayIcon::Information,
-                              3000);
-        event->ignore();
-    }
-    else
-    {
-        event->ignore();
-    }
+    this->hide();
+    m_hideIcon->showMessage(tr("Notice"),
+                          tr("Hidden here!"),
+                          QSystemTrayIcon::Information,
+                          3000);
+    event->ignore();
 }
 
 void Dialog::on_updateDevice_clicked()
