@@ -286,7 +286,6 @@ void InputConvertGame::onSteerWheelTimer() {
     if(m_ctrlSteerWheel.delayData.queuePos.empty() && m_ctrlSteerWheel.delayData.pressedNum == 0) {
         sendTouchUpEvent(id, m_ctrlSteerWheel.delayData.currentPos);
         detachTouchID(m_ctrlSteerWheel.touchKey);
-        qDebug() << "***************** detach:" << id;
         return;
     }
 
@@ -339,10 +338,8 @@ void InputConvertGame::processSteerWheel(const KeyMap::KeyMapNode &node, const Q
             m_ctrlSteerWheel.delayData.queuePos.clear();
         }
 
-        m_ctrlSteerWheel.delayData.queueTimer.enqueue(0);
-        m_ctrlSteerWheel.delayData.queuePos.enqueue(m_ctrlSteerWheel.delayData.currentPos);
-        m_ctrlSteerWheel.delayData.timer->start();
-
+        sendTouchUpEvent(getTouchID(m_ctrlSteerWheel.touchKey), m_ctrlSteerWheel.delayData.currentPos);
+        detachTouchID(m_ctrlSteerWheel.touchKey);
         return;
     }
 
@@ -355,7 +352,6 @@ void InputConvertGame::processSteerWheel(const KeyMap::KeyMapNode &node, const Q
     if (pressedNum == 1 && flag) {
         m_ctrlSteerWheel.touchKey = from->key();
         int id = attachTouchID(m_ctrlSteerWheel.touchKey);
-        qDebug() << "***************** attach:" << id;
         sendTouchDownEvent(id, node.data.steerWheel.centerPos);
 
         getDelayQueue(node.data.steerWheel.centerPos, node.data.steerWheel.centerPos+offset,
