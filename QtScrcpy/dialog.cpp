@@ -46,7 +46,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
                 ui->connectedPhoneList->clear();
                 for (auto &item : devices) {
                     ui->serialBox->addItem(item);
-                    ui->connectedPhoneList->addItem(item+"-"+Config::getInstance().getNickName(item));
+                    ui->connectedPhoneList->addItem(Config::getInstance().getNickName(item) + "-" + item);
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
