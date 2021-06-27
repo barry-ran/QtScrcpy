@@ -2,6 +2,7 @@
 #define INPUTCONVERTGAME_H
 
 #include <QPointF>
+#include <QQueue>
 
 #include "inputconvertnormal.h"
 #include "keymap.h"
@@ -60,8 +61,15 @@ protected:
     bool checkCursorPos(const QMouseEvent *from);
     void hideMouseCursor(bool hide);
 
+    void getDelayQueue(const QPointF& start, const QPointF& end,
+                       const double& distanceStep, const double& posStepconst, const double& timerStep,
+                       QQueue<QPointF>& queuePos, QQueue<double>& queueTimer);
+
 protected:
     void timerEvent(QTimerEvent *event);
+
+private slots:
+    void onSteerWheelTimer();
 
 private:
     QSize m_frameSize;
@@ -82,8 +90,15 @@ private:
         bool pressedDown = false;
         bool pressedLeft = false;
         bool pressedRight = false;
-        // for last up
-        QPointF lastOffset;
+
+        // for delay
+        struct {
+            QPointF currentPos;
+            QTimer* timer = nullptr;
+            QQueue<QPointF> queuePos;
+            QQueue<double> queueTimer;
+            int pressedNum = 0;
+        } delayData;
     } m_ctrlSteerWheel;
 
     // mouse move
