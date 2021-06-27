@@ -367,16 +367,6 @@ QRect VideoForm::getScreenRect()
     return screenRect;
 }
 
-bool VideoForm::checkTrialExpire()
-{
-    static int trialTimes = 0;
-    if (++trialTimes > TRIAL_TIMES) {
-        QMessageBox::warning(this, "QtScrcpy", QStringLiteral("试用已结束，购买正式版本请联系作者"), QMessageBox::Ok);
-        return true;
-    }
-    return false;
-}
-
 void VideoForm::updateStyleSheet(bool vertical)
 {
     if (vertical) {
@@ -534,12 +524,6 @@ void VideoForm::setDevice(Device *device)
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
-#ifdef TRIAL_EXPIRE_CHECK
-    if (checkTrialExpire()) {
-        return;
-    }
-#endif
-
     if (event->button() == Qt::MiddleButton) {
         if (m_device && !m_device->isCurrentCustomKeymap()) {
             emit m_device->postGoHome();

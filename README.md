@@ -72,7 +72,7 @@ cross-platform|self implemented|provided by Qt
 language|C|C++
 style|sync|async
 keymap|no custom keymap|support custom keymap
-build|meson+gradle|Qt Creator
+build|meson+gradle|qmake or CMake
 
 - It's very easy to customize your GUI with Qt
 - Asynchronous programming of Qt-based signal slot mechanism improves performance
@@ -246,9 +246,9 @@ There are several reasons listed as below according to importance (high to low).
 All the dependencies are provided and it is easy to compile.
 
 ### PC client
-1. Set up the Qt development environment on the target platform (Qt == 5.15.2, vs == 2019 (mingw not supported))
+1. Set up the Qt development environment on the target platform (Qt == 5.15.2, VS == 2019, MinGW not supported)
 2. Clone the project
-3. Open the project root directory all.pro with QtCreator
+3. Open the project root directory `all.pro` or `CMakeLists.txt` with QtCreator
 4. Compile and run
 
 ### Android (If you do not have special requirements, you can directly use the built-in scrcpy-server.jar)
