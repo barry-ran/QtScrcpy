@@ -422,18 +422,65 @@ void InputConvertGame::processKeyClickMulti(const KeyMap::DelayClickNode *nodes,
     }
 }
 
+void InputConvertGame::onDragTimer() {
+    if(m_dragDelayData.queuePos.empty()) {
+        return;
+    }
+    int id = getTouchID(m_dragDelayData.pressKey);
+    m_dragDelayData.currentPos = m_dragDelayData.queuePos.dequeue();
+    sendTouchMoveEvent(id, m_dragDelayData.currentPos);
+
+    if(m_dragDelayData.queuePos.empty()) {
+        delete m_dragDelayData.timer;
+        m_dragDelayData.timer = nullptr;
+
+        sendTouchUpEvent(id, m_dragDelayData.currentPos);
+        detachTouchID(m_dragDelayData.pressKey);
+
+        m_dragDelayData.currentPos = QPointF();
+        m_dragDelayData.pressKey = 0;
+        return;
+    }
+
+    if(!m_dragDelayData.queuePos.empty()) {
+        m_dragDelayData.timer->start(m_dragDelayData.queueTimer.dequeue());
+    }
+}
+
 void InputConvertGame::processKeyDrag(const QPointF &startPos, QPointF endPos, const QKeyEvent *from)
 {
     if (QEvent::KeyPress == from->type()) {
+        // stop last
+        if (m_dragDelayData.timer && m_dragDelayData.timer->isActive()) {
+            m_dragDelayData.timer->stop();
+            delete m_dragDelayData.timer;
+            m_dragDelayData.timer = nullptr;
+            m_dragDelayData.queuePos.clear();
+            m_dragDelayData.queueTimer.clear();
+
+            sendTouchUpEvent(getTouchID(m_dragDelayData.pressKey), m_dragDelayData.currentPos);
+            detachTouchID(m_dragDelayData.pressKey);
+
+            m_dragDelayData.currentPos = QPointF();
+            m_dragDelayData.pressKey = 0;
+        }
+
+        // start this
         int id = attachTouchID(from->key());
         sendTouchDownEvent(id, startPos);
-        sendTouchMoveEvent(id, endPos);
-    }
 
-    if (QEvent::KeyRelease == from->type()) {
-        int id = getTouchID(from->key());
-        sendTouchUpEvent(id, endPos);
-        detachTouchID(from->key());
+        m_dragDelayData.timer = new QTimer(this);
+        m_dragDelayData.timer->setSingleShot(true);
+        connect(m_dragDelayData.timer, &QTimer::timeout, this, &InputConvertGame::onDragTimer);
+        m_dragDelayData.pressKey = from->key();
+        m_dragDelayData.currentPos = startPos;
+        m_dragDelayData.queuePos.clear();
+        m_dragDelayData.queueTimer.clear();
+        getDelayQueue(startPos, endPos,
+                      0.01f, 0.002f, 2.0f,
+                      m_dragDelayData.queuePos,
+                      m_dragDelayData.queueTimer);
+        m_dragDelayData.timer->start();
     }
 }
 
