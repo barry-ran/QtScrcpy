@@ -62,8 +62,9 @@ protected:
     void hideMouseCursor(bool hide);
 
     void getDelayQueue(const QPointF& start, const QPointF& end,
-                       const double& distanceStep, const double& posStepconst, const double& timerStep,
-                       QQueue<QPointF>& queuePos, QQueue<double>& queueTimer);
+                       const double& distanceStep, const double& posStepconst,
+                       quint32 lowestTimer, quint32 highestTimer,
+                       QQueue<QPointF>& queuePos, QQueue<quint32>& queueTimer);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -97,7 +98,7 @@ private:
             QPointF currentPos;
             QTimer* timer = nullptr;
             QQueue<QPointF> queuePos;
-            QQueue<double> queueTimer;
+            QQueue<quint32> queueTimer;
             int pressedNum = 0;
         } delayData;
     } m_ctrlSteerWheel;
@@ -117,7 +118,7 @@ private:
         QPointF currentPos;
         QTimer* timer = nullptr;
         QQueue<QPointF> queuePos;
-        QQueue<double> queueTimer;
+        QQueue<quint32> queueTimer;
         int pressKey = 0;
     } m_dragDelayData;
 };

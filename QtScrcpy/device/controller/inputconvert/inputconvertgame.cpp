@@ -246,9 +246,9 @@ int InputConvertGame::getTouchID(int key)
 // -------- steer wheel event --------
 
 void InputConvertGame::getDelayQueue(const QPointF& start, const QPointF& end,
-                                     const double& distanceStep, const double& posStepconst, const double& timerStep,
-                                     QQueue<QPointF>& queuePos, QQueue<double>& queueTimer) {
-    double timerBase = 5.0f; // ms
+                                     const double& distanceStep, const double& posStepconst,
+                                     quint32 lowestTimer, quint32 highestTimer,
+                                     QQueue<QPointF>& queuePos, QQueue<quint32>& queueTimer) {
     double x1 = start.x();
     double y1 = start.y();
     double x2 = end.x();
@@ -262,11 +262,11 @@ void InputConvertGame::getDelayQueue(const QPointF& start, const QPointF& end,
     dy/=e;
 
     QQueue<QPointF> queue;
-    QQueue<double> queue2;
+    QQueue<quint32> queue2;
     for(int i=1;i<=e;i++) {
         QPointF pos(x1+(QRandomGenerator::global()->bounded(posStepconst*2)-posStepconst), y1+(QRandomGenerator::global()->bounded(posStepconst*2)-posStepconst));
         queue.enqueue(pos);
-        queue2.enqueue(QRandomGenerator::global()->bounded(timerStep*2)-timerStep + timerBase);
+        queue2.enqueue(QRandomGenerator::global()->bounded(lowestTimer, highestTimer));
         x1+=dx;
         y1+=dy;
     }
@@ -355,12 +355,12 @@ void InputConvertGame::processSteerWheel(const KeyMap::KeyMapNode &node, const Q
         sendTouchDownEvent(id, node.data.steerWheel.centerPos);
 
         getDelayQueue(node.data.steerWheel.centerPos, node.data.steerWheel.centerPos+offset,
-                      0.01f, 0.002f, 3.0f,
+                      0.01f, 0.002f, 2, 8,
                       m_ctrlSteerWheel.delayData.queuePos,
                       m_ctrlSteerWheel.delayData.queueTimer);
     } else {
         getDelayQueue(m_ctrlSteerWheel.delayData.currentPos, node.data.steerWheel.centerPos+offset,
-                      0.01f, 0.002f, 3.0f,
+                      0.01f, 0.002f, 2, 8,
                       m_ctrlSteerWheel.delayData.queuePos,
                       m_ctrlSteerWheel.delayData.queueTimer);
     }
@@ -477,7 +477,7 @@ void InputConvertGame::processKeyDrag(const QPointF &startPos, QPointF endPos, c
         m_dragDelayData.queuePos.clear();
         m_dragDelayData.queueTimer.clear();
         getDelayQueue(startPos, endPos,
-                      0.01f, 0.002f, 2.0f,
+                      0.01f, 0.002f, 0, 2,
                       m_dragDelayData.queuePos,
                       m_dragDelayData.queueTimer);
         m_dragDelayData.timer->start();
