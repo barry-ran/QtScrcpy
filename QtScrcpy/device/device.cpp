@@ -212,6 +212,7 @@ void Device::initSignals()
             }
         });
         connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size) {
+            Q_UNUSED(deviceName);
             if (success) {
                 double diff = m_startTimeCount.elapsed() / 1000.0;
                 qInfo() << QString("server start finish in %1s").arg(diff).toStdString().c_str();
@@ -220,8 +221,11 @@ void Device::initSignals()
                 if (m_videoForm) {
                     // must be show before updateShowSize
                     m_videoForm->show();
-
-                    m_videoForm->setWindowTitle(deviceName);
+                    QString name = Config::getInstance().getNickName(m_params.serial);
+                    if (name.isEmpty()) {
+                        name = Config::getInstance().getTitle();
+                    }
+                    m_videoForm->setWindowTitle(name + "-" + m_params.serial);
                     m_videoForm->updateShowSize(size);
 
                     bool deviceVer = size.height() > size.width();
