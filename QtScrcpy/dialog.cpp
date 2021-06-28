@@ -46,7 +46,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
                 ui->connectedPhoneList->clear();
                 for (auto &item : devices) {
                     ui->serialBox->addItem(item);
-                    ui->connectedPhoneList->addItem(item+"-"+Config::getInstance().getNickName(item));
+                    ui->connectedPhoneList->addItem(Config::getInstance().getNickName(item) + "-" + item);
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
@@ -77,18 +77,22 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
         }
     });
 
-    m_hideIcon = new QSystemTrayIcon();
+    m_hideIcon = new QSystemTrayIcon(this);
     m_hideIcon->setIcon(QIcon(":/image/tray/logo.png"));
-    m_menu = new QMenu();
-    m_quit = new QAction();
-    m_showWindow = new QAction();;
+    m_menu = new QMenu(this);
+    m_quit = new QAction(this);
+    m_showWindow = new QAction(this);
     m_showWindow->setText(tr("show"));
     m_quit->setText(tr("quit"));
     m_menu->addAction(m_showWindow);
     m_menu->addAction(m_quit);
     m_hideIcon->setContextMenu(m_menu);
+    m_hideIcon->show();
     connect(m_showWindow, &QAction::triggered, this, &Dialog::slotShow);
-    connect(m_quit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(m_quit, &QAction::triggered, this, [this](){
+        m_hideIcon->hide();
+        qApp->quit();
+    });
     connect(m_hideIcon, &QSystemTrayIcon::activated,this,&Dialog::slotActivated);
 }
 
@@ -240,26 +244,12 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 
 void Dialog::closeEvent(QCloseEvent *event)
 {
-    int res = QMessageBox::question(this,tr("warning"),tr("Quit or set tray?"),tr("Quit"),tr("Set tray"),tr("Cancel"));
-
-    if(res == 0)
-    {
-       event->accept();
-    }
-    else if(res == 1)
-    {
-        this->hide();
-        m_hideIcon->show();
-        m_hideIcon->showMessage(tr("Notice"),
-                              tr("Hidden here!"),
-                              QSystemTrayIcon::Information,
-                              3000);
-        event->ignore();
-    }
-    else
-    {
-        event->ignore();
-    }
+    this->hide();
+    m_hideIcon->showMessage(tr("Notice"),
+                          tr("Hidden here!"),
+                          QSystemTrayIcon::Information,
+                          3000);
+    event->ignore();
 }
 
 void Dialog::on_updateDevice_clicked()
@@ -621,6 +611,10 @@ void Dialog::on_useSingleModeCheck_clicked()
         ui->wirelessGroupBox->show();
         ui->usbGroupBox->show();
     }
+
+    QTimer::singleShot(0, this, [this](){
+        resize(width(), layout()->sizeHint().height());
+    });
 }
 
 void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
