@@ -70,6 +70,7 @@ protected:
 
 private slots:
     void onSteerWheelTimer();
+    void onDragTimer();
 
 private:
     QSize m_frameSize;
@@ -110,6 +111,15 @@ private:
         int timer = 0;
         bool smallEyes = false;
     } m_ctrlMouseMove;
+
+    // for drag delay
+    struct {
+        QPointF currentPos;
+        QTimer* timer = nullptr;
+        QQueue<QPointF> queuePos;
+        QQueue<double> queueTimer;
+        int pressKey = 0;
+    } m_dragDelayData;
 };
 
 #endif // INPUTCONVERTGAME_H
