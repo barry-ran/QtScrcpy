@@ -1,4 +1,4 @@
-#ifndef DEVICE_H
+﻿#ifndef DEVICE_H
 #define DEVICE_H
 
 #include <QElapsedTimer>
@@ -30,7 +30,7 @@ public:
         QString serial = "";              // 设备序列号
         quint16 localPort = 27183;        // reverse时本地监听端口
         quint16 maxSize = 720;            // 视频分辨率
-        quint32 bitRate = 8000000;        // 视频比特率
+        quint32 bitRate = 2000000;        // 视频比特率
         quint32 maxFps = 60;              // 视频最大帧率
         bool closeScreen = false;         // 启动时自动息屏
         bool useReverse = true;           // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
