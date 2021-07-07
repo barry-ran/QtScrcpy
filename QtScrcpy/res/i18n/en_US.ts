@@ -234,27 +234,27 @@
     <message>
         <source>warning</source>
         <translatorcomment>Warning</translatorcomment>
-        <translation>Warning</translation>
+        <translation type="vanished">Warning</translation>
     </message>
     <message>
         <source>Quit or set tray?</source>
         <translatorcomment>Quit or set tray?</translatorcomment>
-        <translation>Quit or set tray?</translation>
+        <translation type="vanished">Quit or set tray?</translation>
     </message>
     <message>
         <source>Quit</source>
         <translatorcomment>Quit</translatorcomment>
-        <translation>Quit</translation>
+        <translation type="vanished">Quit</translation>
     </message>
     <message>
         <source>Set tray</source>
         <translatorcomment>Set tray</translatorcomment>
-        <translation>Set tray</translation>
+        <translation type="vanished">Set tray</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translatorcomment>Cancel</translatorcomment>
-        <translation>Cancel</translation>
+        <translation type="vanished">Cancel</translation>
     </message>
     <message>
         <source>Notice</source>
@@ -265,6 +265,10 @@
         <source>Hidden here!</source>
         <translatorcomment>Hidden here!</translatorcomment>
         <translation>Hidden here!</translation>
+    </message>
+    <message>
+        <source>2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

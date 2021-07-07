@@ -32,47 +32,26 @@ public:
 
 private slots:
     void on_updateDevice_clicked();
-
     void on_startServerBtn_clicked();
-
     void on_stopServerBtn_clicked();
-
     void on_wirelessConnectBtn_clicked();
-
     void on_startAdbdBtn_clicked();
-
     void on_getIPBtn_clicked();
-
     void on_wirelessDisConnectBtn_clicked();
-
     void on_selectRecordPathBtn_clicked();
-
     void on_recordPathEdt_textChanged(const QString &arg1);
-
     void on_adbCommandBtn_clicked();
-
     void on_stopAdbBtn_clicked();
-
     void on_clearOut_clicked();
-
     void on_stopAllServerBtn_clicked();
-
     void on_refreshGameScriptBtn_clicked();
-
     void on_applyScriptBtn_clicked();
-
     void on_recordScreenCheck_clicked(bool checked);
-
     void on_usbConnectBtn_clicked();
-
     void on_wifiConnectBtn_clicked();
-
     void on_connectedPhoneList_itemDoubleClicked(QListWidgetItem *item);
-
     void on_updateNameBtn_clicked();
-
     void on_useSingleModeCheck_clicked();
-
     void on_serialBox_currentIndexChanged(const QString &arg1);
 
 private:
@@ -85,6 +64,7 @@ private:
     void slotShow();
     void slotActivated(QSystemTrayIcon::ActivationReason reason);
     int findDeviceFromeSerialBox(bool wifi);
+    quint32 getBitRate();
 
 protected:
     void closeEvent(QCloseEvent *event);

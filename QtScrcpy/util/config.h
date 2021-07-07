@@ -8,7 +8,7 @@
 struct UserBootConfig
 {
     QString recordPath = "";
-    int bitRateIndex = 0;
+    quint32 bitRate = 2000000;
     int maxSizeIndex = 0;
     int recordFormatIndex = 0;
     int lockOrientationIndex = 0;

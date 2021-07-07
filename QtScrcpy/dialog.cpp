@@ -98,6 +98,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 
 Dialog::~Dialog()
 {
+    qDebug() << "~Dialog()";
     updateBootConfig(false);
     m_deviceManage.disconnectAllDevice();
     delete ui;
@@ -108,14 +109,9 @@ void Dialog::initUI()
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
-    ui->bitRateBox->addItem("2000000");
-    ui->bitRateBox->addItem("6000000");
-    ui->bitRateBox->addItem("8000000");
-    ui->bitRateBox->addItem("10000000");
-    ui->bitRateBox->addItem("20000000");
-    ui->bitRateBox->addItem("50000000");
-    ui->bitRateBox->addItem("100000000");
-    ui->bitRateBox->addItem("200000000");
+    setWindowTitle(Config::getInstance().getTitle());
+
+    ui->bitRateEdit->setValidator(new QIntValidator(1, 99999, this));
 
     ui->maxSizeBox->addItem("640");
     ui->maxSizeBox->addItem("720");
@@ -156,7 +152,16 @@ void Dialog::updateBootConfig(bool toView)
     if (toView) {
         UserBootConfig config = Config::getInstance().getUserBootConfig();
 
-        ui->bitRateBox->setCurrentIndex(config.bitRateIndex);
+        if(config.bitRate == 0) {
+            ui->bitRateBox->setCurrentText("Mbps");
+        } else if(config.bitRate % 1000000 == 0) {
+            ui->bitRateEdit->setText(QString::number(config.bitRate / 1000000));
+            ui->bitRateBox->setCurrentText("Mbps");
+        } else {
+            ui->bitRateEdit->setText(QString::number(config.bitRate / 1000));
+            ui->bitRateBox->setCurrentText("Kbps");
+        }
+
         ui->maxSizeBox->setCurrentIndex(config.maxSizeIndex);
         ui->formatBox->setCurrentIndex(config.recordFormatIndex);
         ui->recordPathEdt->setText(config.recordPath);
@@ -173,7 +178,7 @@ void Dialog::updateBootConfig(bool toView)
     } else {
         UserBootConfig config;
 
-        config.bitRateIndex = ui->bitRateBox->currentIndex();
+        config.bitRate = getBitRate();
         config.maxSizeIndex = ui->maxSizeBox->currentIndex();
         config.recordFormatIndex = ui->formatBox->currentIndex();
         config.recordPath = ui->recordPathEdt->text();
@@ -187,7 +192,6 @@ void Dialog::updateBootConfig(bool toView)
         config.framelessWindow = ui->framelessCheck->isChecked();
         config.keepAlive = ui->stayAwakeCheck->isChecked();
         config.simpleMode = ui->useSingleModeCheck->isChecked();
-
         Config::getInstance().setUserBootConfig(config);
     }
 }
@@ -235,7 +239,6 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
     switch (reason) {
     case QSystemTrayIcon::Trigger:
         this->show();
-        m_hideIcon->hide();
         break;
     default:
         break;
@@ -278,13 +281,12 @@ void Dialog::on_startServerBtn_clicked()
         }
     }
 
-    quint32 bitRate = ui->bitRateBox->currentText().trimmed().toUInt();
     // this is ok that "native" toUshort is 0
     quint16 videoSize = ui->maxSizeBox->currentText().trimmed().toUShort();
     Device::DeviceParams params;
     params.serial = ui->serialBox->currentText().trimmed();
     params.maxSize = videoSize;
-    params.bitRate = bitRate;
+    params.bitRate = getBitRate();
     // on devices with Android >= 10, the capture frame rate can be limited
     params.maxFps = static_cast<quint32>(Config::getInstance().getMaxFps());
     params.recordFileName = absFilePath;
@@ -620,4 +622,10 @@ void Dialog::on_useSingleModeCheck_clicked()
 void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
 {
     ui->userNameEdt->setText(Config::getInstance().getNickName(arg1));
+}
+
+quint32 Dialog::getBitRate()
+{
+    return ui->bitRateEdit->text().trimmed().toUInt() *
+            (ui->bitRateBox->currentText() == QString("Mbps") ? 1000000 : 1000);
 }
