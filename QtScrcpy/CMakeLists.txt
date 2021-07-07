@@ -5,19 +5,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# ***********************************************************
-# Qt Package finding
-# ***********************************************************
-
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network LinguistTools REQUIRED)
 
-# ***********************************************************
-# Cross-platform settings
-# ***********************************************************
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-
+if(MSVC)
     # FFmpeg cannot be compiled natively by MSVC version < 12.0 (2013)
     if(MSVC_VERSION LESS 1800)
         message(FATAL_ERROR "[QtScrcpy] FATAL ERROR: MSVC version is older than 12.0 (2013).")
@@ -25,7 +16,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /utf-8")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
-
 endif()
 
 
@@ -145,6 +135,7 @@ if(WIN32)
         endif()
 
         set(QS_DLL_PATH "${PROJECT_SOURCE_DIR}/third_party/ffmpeg/bin/x64")
+
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)                                 # Compiler is 32-bit
         message(STATUS "[QtScrcpy] 32-bit compiler detected.")
 
@@ -173,17 +164,17 @@ if(WIN32)
         )
     endforeach()
 
-    # If MinGW is used, it is not appropriate to link static MSVC libs.
-    # Instead, we link DLLs directly
     if(MSVC)
         message(STATUS "[QtScrcpy] Microsoft Visual C++ is used.")
-        link_directories(${QS_LIB_PATH})
+        target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE ${QS_LIB_PATH})
         set(QS_EXTERNAL_LIBS_FFMPEG
             avformat
             avcodec
             avutil
             swscale
         )
+    # If MinGW is used, it is not appropriate to link static MSVC libs.
+    # Instead, we link DLLs directly
     elseif(MINGW)
         message(STATUS "[QtScrcpy] MinGW GCC is used.")
         target_link_options(${CMAKE_PROJECT_NAME} PRIVATE
