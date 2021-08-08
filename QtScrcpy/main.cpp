@@ -12,7 +12,6 @@
 #include "stream.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
-
 static QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 void installTranslator();
@@ -104,8 +103,7 @@ int main(int argc, char *argv[])
         file.close();
     }
 
-    g_mainDlg = new Dialog;
-    g_mainDlg->setWindowTitle(Config::getInstance().getTitle());
+    g_mainDlg = new Dialog {};
     g_mainDlg->show();
 
     qInfo() << QObject::tr("This software is completely open source and free. Use it at your own risk. You can download it at the "
@@ -113,6 +111,7 @@ int main(int argc, char *argv[])
     qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion());
 
     int ret = a.exec();
+    delete g_mainDlg;
 
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->quitMouseEventTap();
@@ -173,12 +172,12 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
         g_oldMessageHandler(type, context, msg);
     }
 
-    // qt log info big than warning?
-    float fLogLevel = 1.0f * g_msgType;
+    // Is Qt log level higher than warning?
+    float fLogLevel = g_msgType;
     if (QtInfoMsg == g_msgType) {
         fLogLevel = QtDebugMsg + 0.5f;
     }
-    float fLogLevel2 = 1.0f * type;
+    float fLogLevel2 = type;
     if (QtInfoMsg == type) {
         fLogLevel2 = QtDebugMsg + 0.5f;
     }
