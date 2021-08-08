@@ -527,6 +527,14 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::MiddleButton) {
         if (m_device && !m_device->isCurrentCustomKeymap()) {
             emit m_device->postGoHome();
+            return;
+        }
+    }
+
+    if (event->button() == Qt::RightButton) {
+        if (m_device && !m_device->isCurrentCustomKeymap()) {
+            emit m_device->postGoBack();
+            return;
         }
     }
 

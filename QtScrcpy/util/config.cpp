@@ -48,8 +48,8 @@
 #define COMMON_RECORD_KEY "RecordPath"
 #define COMMON_RECORD_DEF ""
 
-#define COMMON_BITRATE_INDEX_KEY "BitRateIndex"
-#define COMMON_BITRATE_INDEX_DEF 2
+#define COMMON_BITRATE_KEY "BitRate"
+#define COMMON_BITRATE_DEF 2000000
 
 #define COMMON_MAX_SIZE_INDEX_KEY "MaxSizeIndex"
 #define COMMON_MAX_SIZE_INDEX_DEF 2
@@ -132,7 +132,7 @@ void Config::setUserBootConfig(const UserBootConfig &config)
 {
     m_userData->beginGroup(GROUP_COMMON);
     m_userData->setValue(COMMON_RECORD_KEY, config.recordPath);
-    m_userData->setValue(COMMON_BITRATE_INDEX_KEY, config.bitRateIndex);
+    m_userData->setValue(COMMON_BITRATE_KEY, config.bitRate);
     m_userData->setValue(COMMON_MAX_SIZE_INDEX_KEY, config.maxSizeIndex);
     m_userData->setValue(COMMON_RECORD_FORMAT_INDEX_KEY, config.recordFormatIndex);
     m_userData->setValue(COMMON_FRAMELESS_WINDOW_KEY, config.framelessWindow);
@@ -154,7 +154,7 @@ UserBootConfig Config::getUserBootConfig()
     UserBootConfig config;
     m_userData->beginGroup(GROUP_COMMON);
     config.recordPath = m_userData->value(COMMON_RECORD_KEY, COMMON_RECORD_DEF).toString();
-    config.bitRateIndex = m_userData->value(COMMON_BITRATE_INDEX_KEY, COMMON_BITRATE_INDEX_DEF).toInt();
+    config.bitRate = m_userData->value(COMMON_BITRATE_KEY, COMMON_BITRATE_DEF).toUInt();
     config.maxSizeIndex = m_userData->value(COMMON_MAX_SIZE_INDEX_KEY, COMMON_MAX_SIZE_INDEX_DEF).toInt();
     config.recordFormatIndex = m_userData->value(COMMON_RECORD_FORMAT_INDEX_KEY, COMMON_RECORD_FORMAT_INDEX_DEF).toInt();
     config.lockOrientationIndex = m_userData->value(COMMON_LOCK_ORIENTATION_INDEX_KEY, COMMON_LOCK_ORIENTATION_INDEX_DEF).toInt();

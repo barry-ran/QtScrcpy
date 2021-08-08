@@ -234,27 +234,27 @@
     <message>
         <source>warning</source>
         <translatorcomment>警告</translatorcomment>
-        <translation>警告</translation>
+        <translation type="vanished">警告</translation>
     </message>
     <message>
         <source>Quit or set tray?</source>
         <translatorcomment>退出还是最小化到托盘？</translatorcomment>
-        <translation>退出还是最小化到托盘？</translation>
+        <translation type="vanished">退出还是最小化到托盘？</translation>
     </message>
     <message>
         <source>Quit</source>
         <translatorcomment>退出</translatorcomment>
-        <translation>退出</translation>
+        <translation type="vanished">退出</translation>
     </message>
     <message>
         <source>Set tray</source>
         <translatorcomment>最小化到系统托盘</translatorcomment>
-        <translation>最小化到系统托盘</translation>
+        <translation type="vanished">最小化到系统托盘</translation>
     </message>
     <message>
         <source>Cancel</source>
         <translatorcomment>取消</translatorcomment>
-        <translation>取消</translation>
+        <translation type="vanished">取消</translation>
     </message>
     <message>
         <source>Notice</source>
@@ -265,6 +265,10 @@
         <source>Hidden here!</source>
         <translatorcomment>安卓录屏程序隐藏在这！</translatorcomment>
         <translation>安卓录屏程序隐藏在这！</translation>
+    </message>
+    <message>
+        <source>2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
