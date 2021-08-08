@@ -36,7 +36,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
             }
             break;
         case AdbProcess::AER_ERROR_MISSING_BINARY:
-            log = "adb not find";
+            log = "adb not found";
             break;
         case AdbProcess::AER_SUCCESS_EXEC:
             //log = m_adb.getStdOut();
