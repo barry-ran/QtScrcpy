@@ -627,6 +627,7 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 
 void VideoForm::wheelEvent(QWheelEvent *event)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     if (m_videoWidget->geometry().contains(event->position().toPoint())) {
         if (!m_device) {
             return;
@@ -634,6 +635,17 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         QPointF pos = m_videoWidget->mapFrom(this, event->position().toPoint());
         QWheelEvent wheelEvent(
             pos, event->globalPosition(), event->pixelDelta(), event->angleDelta(), event->buttons(), event->modifiers(), event->phase(), event->inverted());
+#else
+    if (m_videoWidget->geometry().contains(event->pos())) {
+        if (!m_device) {
+            return;
+        }
+        QPointF pos = m_videoWidget->mapFrom(this, event->pos());
+
+        QWheelEvent wheelEvent(
+            pos, event->globalPosF(), event->pixelDelta(), event->angleDelta(), event->delta(), event->orientation(),
+            event->buttons(), event->modifiers(), event->phase(), event->source(), event->inverted());
+#endif
         emit m_device->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
