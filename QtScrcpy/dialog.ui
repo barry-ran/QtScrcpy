@@ -207,9 +207,6 @@
            <property name="currentText">
             <string notr="true">Mbps</string>
            </property>
-           <property name="placeholderText">
-            <string notr="true"/>
-           </property>
            <item>
             <property name="text">
              <string notr="true">Mbps</string>

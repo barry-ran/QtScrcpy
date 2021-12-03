@@ -89,11 +89,11 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
     m_hideIcon->setContextMenu(m_menu);
     m_hideIcon->show();
     connect(m_showWindow, &QAction::triggered, this, &Dialog::slotShow);
-    connect(m_quit, &QAction::triggered, this, [this](){
+    connect(m_quit, &QAction::triggered, this, [this]() {
         m_hideIcon->hide();
         qApp->quit();
     });
-    connect(m_hideIcon, &QSystemTrayIcon::activated,this,&Dialog::slotActivated);
+    connect(m_hideIcon, &QSystemTrayIcon::activated, this, &Dialog::slotActivated);
 }
 
 Dialog::~Dialog()
@@ -152,9 +152,9 @@ void Dialog::updateBootConfig(bool toView)
     if (toView) {
         UserBootConfig config = Config::getInstance().getUserBootConfig();
 
-        if(config.bitRate == 0) {
+        if (config.bitRate == 0) {
             ui->bitRateBox->setCurrentText("Mbps");
-        } else if(config.bitRate % 1000000 == 0) {
+        } else if (config.bitRate % 1000000 == 0) {
             ui->bitRateEdit->setText(QString::number(config.bitRate / 1000000));
             ui->bitRateBox->setCurrentText("Mbps");
         } else {
@@ -203,7 +203,11 @@ void Dialog::execAdbCmd()
     }
     QString cmd = ui->adbCommandEdt->text().trimmed();
     outLog("adb " + cmd, false);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     m_adb.execute(ui->serialBox->currentText().trimmed(), cmd.split(" ", Qt::SkipEmptyParts));
+#else
+    m_adb.execute(ui->serialBox->currentText().trimmed(), cmd.split(" ", QString::SkipEmptyParts));
+#endif
 }
 
 void Dialog::delayMs(int ms)
@@ -249,9 +253,9 @@ void Dialog::closeEvent(QCloseEvent *event)
 {
     this->hide();
     m_hideIcon->showMessage(tr("Notice"),
-                          tr("Hidden here!"),
-                          QSystemTrayIcon::Information,
-                          3000);
+                            tr("Hidden here!"),
+                            QSystemTrayIcon::Information,
+                            3000);
     event->ignore();
 }
 
@@ -521,14 +525,13 @@ void Dialog::on_usbConnectBtn_clicked()
     on_startServerBtn_clicked();
 }
 
-int Dialog::findDeviceFromeSerialBox(bool wifi) {
+int Dialog::findDeviceFromeSerialBox(bool wifi)
+{
     QRegExp regIP("\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\:([0-9]|[1-9]\\d|[1-9]\\d{2}|[1-9]\\d{3}|[1-5]\\d{4}|6[0-4]\\d{3}|65[0-4]\\d{2}|655[0-2]\\d|6553[0-5])\\b");
-    for (int i = 0; i < ui->serialBox->count(); ++i)
-    {
+    for (int i = 0; i < ui->serialBox->count(); ++i) {
         bool isWifi = regIP.exactMatch(ui->serialBox->itemText(i));
         bool found = wifi ? isWifi : !isWifi;
-        if(found)
-        {
+        if (found) {
             return i;
         }
     }
@@ -582,8 +585,8 @@ void Dialog::on_connectedPhoneList_itemDoubleClicked(QListWidgetItem *item)
 
 void Dialog::on_updateNameBtn_clicked()
 {
-    if(ui->serialBox->count()!=0) {
-        if(ui->userNameEdt->text().isEmpty()) {
+    if (ui->serialBox->count() != 0) {
+        if (ui->userNameEdt->text().isEmpty()) {
             Config::getInstance().setNickName(ui->serialBox->currentText(), "Phone");
         } else {
             Config::getInstance().setNickName(ui->serialBox->currentText(), ui->userNameEdt->text());
@@ -591,30 +594,27 @@ void Dialog::on_updateNameBtn_clicked()
 
         on_updateDevice_clicked();
 
-        qDebug()<<"Update OK!";
+        qDebug() << "Update OK!";
     } else {
-        qWarning()<<"No device is connected!";
+        qWarning() << "No device is connected!";
     }
 }
 
 void Dialog::on_useSingleModeCheck_clicked()
 {
-    if(ui->useSingleModeCheck->isChecked())
-    {
+    if (ui->useSingleModeCheck->isChecked()) {
         ui->configGroupBox->hide();
         ui->adbGroupBox->hide();
         ui->wirelessGroupBox->hide();
         ui->usbGroupBox->hide();
-    }
-    else
-    {
+    } else {
         ui->configGroupBox->show();
         ui->adbGroupBox->show();
         ui->wirelessGroupBox->show();
         ui->usbGroupBox->show();
     }
 
-    QTimer::singleShot(0, this, [this](){
+    QTimer::singleShot(0, this, [this]() {
         resize(width(), layout()->sizeHint().height());
     });
 }
@@ -627,5 +627,5 @@ void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
 quint32 Dialog::getBitRate()
 {
     return ui->bitRateEdit->text().trimmed().toUInt() *
-            (ui->bitRateBox->currentText() == QString("Mbps") ? 1000000 : 1000);
+           (ui->bitRateBox->currentText() == QString("Mbps") ? 1000000 : 1000);
 }
