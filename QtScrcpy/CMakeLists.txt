@@ -58,8 +58,7 @@ if (MSVC)
     # ensure we use minimal "windows.h" lib without the crazy min max macros
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
     
-    # disable SAFESEH - to vs2019 avoid "LNK2026: module unsafe"
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D \"SAFESEH:NO\"")
+    # disable SAFESEH - avoid "LNK2026: module unsafe"(Qt5.15&&vs2019)     
     add_link_options(/SAFESEH:NO)
 endif()
 
@@ -79,6 +78,8 @@ set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
+
+message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}")
 
 #
 # Sources
