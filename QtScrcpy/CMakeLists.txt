@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 # QC Custom config
 set(QC_PROJECT_NAME "QtScrcpy")
 # Read version numbers from file
-file (STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/version QC_FILE_VERSION)
+file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/version QC_FILE_VERSION)
 set(QC_PROJECT_VERSION ${QC_FILE_VERSION})
 
 # Project declare
@@ -27,18 +27,16 @@ else()
 endif()
 message(STATUS "[${PROJECT_NAME}] CPU_ARCH:${QC_CPU_ARCH}")
 
-# check build type
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    set(QC_BUILD_TYPE debug)
-else()
-    set(QC_BUILD_TYPE release)
-endif()
-message(STATUS "[${PROJECT_NAME}] BUILD_TYPE:${QC_BUILD_TYPE}")
-
 # CMake set
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# default debug
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+message(STATUS "[${PROJECT_NAME}] BUILD_TYPE:${CMAKE_BUILD_TYPE}")
 
 # Compiler set
 message(STATUS "[${PROJECT_NAME}] C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
@@ -54,6 +52,7 @@ if (MSVC)
 
     # avoid warning C4819
     add_compile_options(-source-charset:utf-8)
+    #add_compile_options(/utf-8)
 
     # ensure we use minimal "windows.h" lib without the crazy min max macros
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
@@ -66,6 +65,9 @@ if (NOT MSVC)
     message(STATUS "[${PROJECT_NAME}] Set warnings as error")
     # lots of warnings and all warnings as errors
     add_compile_options(-Wall -Wextra -pedantic -Werror)
+
+    # disable some warning
+    add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions)
 endif()
 
 #
@@ -236,7 +238,15 @@ set(QC_PROJECT_SOURCES
     ${QC_PLANTFORM_SOURCES}
 )
 
-add_executable(${PROJECT_NAME} ${QC_PROJECT_SOURCES})
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(QC_RUNTIME_TYPE MACOSX_BUNDLE)
+endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(QC_RUNTIME_TYPE WIN32)
+endif()
+
+
+add_executable(${PROJECT_NAME} ${QC_RUNTIME_TYPE} ${QC_PROJECT_SOURCES})
 
 #
 # Internal include path (todo: remove this, use absolute path include)
@@ -274,7 +284,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 # output dir
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${QC_BUILD_TYPE}"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}"
 )
 
 #
@@ -305,4 +315,50 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swresample-3.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swscale-5.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
     )
+endif()
+
+# MacOS
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # ffmpeg
+    # include
+    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
+    # link
+    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib")
+    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        avformat.58
+        avcodec.58
+        avutil.56
+        swscale.5
+    )
+
+    # copy bundle file
+    get_target_property(MACOS_BUNDLE_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+    set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${PROJECT_NAME}.app/Contents)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        # dylib,scrcpy-server,adb copy to Contents/MacOS
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavcodec.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavformat.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavutil.56.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswresample.3.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswscale.5.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/scrcpy-server" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/adb/mac/adb" "${MACOS_BUNDLE_PATH}/MacOS"
+        # config file copy to Contents/MacOS/config
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config"
+    )
+
+    # plist
+    set(INFO_PLIST_TEMPLATE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/res/Info_Mac.plist.in")
+    set(INFO_PLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/res/Info_Mac.plist")
+    file(READ "${INFO_PLIST_TEMPLATE_FILE}" plist_contents)
+    string(REPLACE "\${BUNDLE_VERSION}" "${PROJECT_VERSION}" plist_contents ${plist_contents})
+    file(WRITE ${INFO_PLIST_FILE} ${plist_contents})
+    set_target_properties(${PROJECT_NAME} PROPERTIES
+        MACOSX_BUNDLE_INFO_PLIST "${INFO_PLIST_FILE}"
+        #RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.icns"
+    )
+
+    # mac framework
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework AppKit")
 endif()
