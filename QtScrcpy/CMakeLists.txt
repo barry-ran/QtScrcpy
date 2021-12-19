@@ -318,7 +318,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avcodec-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avformat-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avutil-56.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swresample-3.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swscale-5.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
     )
 endif()
@@ -346,7 +345,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavcodec.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavformat.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavutil.56.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswresample.3.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswscale.5.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/scrcpy-server" "${MACOS_BUNDLE_PATH}/MacOS"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/adb/mac/adb" "${MACOS_BUNDLE_PATH}/MacOS"
@@ -372,4 +370,22 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
     # mac framework
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework AppKit")
+endif()
+
+# Linux
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    # ffmpeg
+    # include
+    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
+    # link
+    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib")
+    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        avformat
+        avcodec
+        avutil
+        swscale
+    )
+
+    # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
 endif()
