@@ -8,7 +8,7 @@ echo ---------------------------------------------------------------
 # 从环境变量获取必要参数
 # 例如 /Users/barry/Qt5.12.5/5.12.5
 echo ENV_QT_PATH $ENV_QT_PATH
-qt_clang_path=$ENV_QT_PATH/clang_64
+qt_cmake_path=$ENV_QT_PATH/clang_64/lib/cmake/Qt5
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -40,44 +40,43 @@ fi
 echo current build mode: $build_mode
 
 # 环境变量设置
-export PATH=$qt_clang_path/bin:$PATH
+#export PATH=$qt_cmake_path:$PATH
 
 echo
 echo
 echo ---------------------------------------------------------------
-echo begin qmake build
+echo begin cmake build
 echo ---------------------------------------------------------------
 
 # 删除输出目录
-output_path=$script_path../../output/mac/$build_mode
+output_path=$script_path../../output
 if [ -d "$output_path" ]; then
     rm -rf $output_path
 fi
-# 删除临时目录
-temp_path=$script_path/../temp
-if [ -d "$temp_path" ]; then
-    rm -rf $temp_path
+# 删除编译目录
+build_path=$script_path/../temp
+if [ -d "$build_path" ]; then
+    rm -rf $build_path
 fi
-mkdir $temp_path
-cd $temp_path
+mkdir $build_path
+cd $build_path
 
-qmake_params="-spec macx-clang"
+cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path"
 if [ $build_mode == "debug" ]; then
-    qmake_params="$qmake_params CONFIG+=debug CONFIG+=x86_64 CONFIG+=qml_debug"
+    cmake_params="$cmake_params -DCMAKE_BUILD_TYPE=Debug"
 else
-    qmake_params="$qmake_params CONFIG+=x86_64 CONFIG+=qtquickcompiler"
+    cmake_params="$cmake_params -DCMAKE_BUILD_TYPE=Release"
 fi
 
-# qmake ../../all.pro -spec macx-clang CONFIG+=debug CONFIG+=x86_64 CONFIG+=qml_debug
-qmake ../../all.pro $qmake_params
+cmake $cmake_params ../..
 if [ $? -ne 0 ] ;then
-    echo "qmake failed"
+    echo "cmake failed"
     exit 1
 fi
 
-make -j8
+cmake --build . -j8
 if [ $? -ne 0 ] ;then
-    echo "make failed"
+    echo "cmake build failed"
     exit 1
 fi
 
