@@ -224,6 +224,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         "${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.rc"
     )
 endif()
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # Step 1. add icns to source file, for MACOSX_PACKAGE_LOCATION copy
+    set(QC_PLANTFORM_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.icns"
+    )
+endif()
 
 # all sources
 set(QC_PROJECT_SOURCES
@@ -348,7 +354,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config"
     )
 
-    # plist
+    # Step 2. ues MACOSX_PACKAGE_LOCATION copy icns to Resources
+    set_source_files_properties(
+        ${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.icns
+        PROPERTIES MACOSX_PACKAGE_LOCATION Resources
+    )
+
+    # use MACOSX_BUNDLE_INFO_PLIST custom plist, not use MACOSX_BUNDLE_BUNDLE_NAME etc..
     set(INFO_PLIST_TEMPLATE_FILE "${CMAKE_CURRENT_SOURCE_DIR}/res/Info_Mac.plist.in")
     set(INFO_PLIST_FILE "${CMAKE_CURRENT_SOURCE_DIR}/res/Info_Mac.plist")
     file(READ "${INFO_PLIST_TEMPLATE_FILE}" plist_contents)
@@ -356,7 +368,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     file(WRITE ${INFO_PLIST_FILE} ${plist_contents})
     set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST "${INFO_PLIST_FILE}"
-        #RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.icns"
     )
 
     # mac framework
