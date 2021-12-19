@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 #
 
 # QC is "Qt CMake"
+# https://www.kdab.com/wp-content/uploads/stories/QTVTC20-Using-Modern-CMake-Kevin-Funk.pdf
 
 # QC Custom config
 set(QC_PROJECT_NAME "QtScrcpy")
@@ -78,8 +79,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network LinguistTools REQUIRED)
 
 message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}")
 
@@ -231,6 +232,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 endif()
 
+# language file
+qt5_create_translation(QC_QM_FILES ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/zh_CN.ts 
+    ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/en_US.ts
+)
+
 # all sources
 set(QC_PROJECT_SOURCES
     ${QC_ADB_SOURCES}
@@ -242,6 +249,7 @@ set(QC_PROJECT_SOURCES
     ${QC_UTIL_SOURCES}
     ${QC_MAIN_SOURCES}
     ${QC_PLANTFORM_SOURCES}
+    ${QC_QM_FILES}
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
