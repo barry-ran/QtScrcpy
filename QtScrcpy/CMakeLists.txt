@@ -49,7 +49,7 @@ if (MSVC)
 
     message(STATUS "[${PROJECT_NAME}] Set Warnings as error")
     # warning level 3 and all warnings as errors
-    add_compile_options(/W3 /WX)
+    add_compile_options(/W3 /WX /wd4566)
 
     # avoid warning C4819
     add_compile_options(-source-charset:utf-8)
