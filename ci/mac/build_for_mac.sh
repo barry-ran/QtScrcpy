@@ -21,26 +21,23 @@ old_cd=$(pwd)
 cd $(dirname "$0")
 
 # 启动参数声明
-build_mode=debug
+build_mode=RelWithDebInfo
 
 echo
 echo
 echo ---------------------------------------------------------------
-echo check build param[debug/release]
+echo check build param[Debug/Release/MinSizeRel/RelWithDebInfo]
 echo ---------------------------------------------------------------
 
 # 编译参数检查
-build_mode=$(echo $1 | tr '[:upper:]' '[:lower:]')
-if [[ $build_mode != "release" && $build_mode != "debug" ]]; then
+build_mode=$(echo $1)
+if [[ $build_mode != "Release" && $build_mode != "Debug" && $build_mode != "MinSizeRel" && $build_mode != "RelWithDebInfo" ]]; then
     echo "error: unkonow build mode -- $1"
     exit 1
 fi
 
 # 提示
 echo current build mode: $build_mode
-
-# 环境变量设置
-#export PATH=$qt_cmake_path:$PATH
 
 echo
 echo
@@ -54,27 +51,21 @@ if [ -d "$output_path" ]; then
     rm -rf $output_path
 fi
 # 删除编译目录
-build_path=$script_path/../temp
+build_path=$script_path/../build_temp
 if [ -d "$build_path" ]; then
     rm -rf $build_path
 fi
 mkdir $build_path
 cd $build_path
 
-cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path"
-if [ $build_mode == "debug" ]; then
-    cmake_params="$cmake_params -DCMAKE_BUILD_TYPE=Debug"
-else
-    cmake_params="$cmake_params -DCMAKE_BUILD_TYPE=Release"
-fi
-
+cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path -DCMAKE_BUILD_TYPE=$build_mode -G Xcode"
 cmake $cmake_params ../..
 if [ $? -ne 0 ] ;then
     echo "cmake failed"
     exit 1
 fi
 
-cmake --build . -j8
+cmake --build . --config $build_mode -j8
 if [ $? -ne 0 ] ;then
     echo "cmake build failed"
     exit 1

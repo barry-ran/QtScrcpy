@@ -33,9 +33,9 @@ message(STATUS "[${PROJECT_NAME}] CPU_ARCH:${QC_CPU_ARCH}")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# default debug
+# default RelWithDebInfo
 if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 message(STATUS "[${PROJECT_NAME}] BUILD_TYPE:${CMAKE_BUILD_TYPE}")
 
@@ -297,8 +297,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 # output dir
+if(MSVC)
+    # msvc不需要指定CMAKE_BUILD_TYPE，会自动生成到CMAKE_ARCHIVE_OUTPUT_DIRECTORY/[Debug/Release/..]
+    set(QC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}")
+else()
+    set(QC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}")
+endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}"
+    RUNTIME_OUTPUT_DIRECTORY "${QC_OUTPUT_DIR}"
 )
 
 #
@@ -322,6 +328,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # copy
     set(FFMPEG_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/bin/${QC_CPU_ARCH}")
     get_target_property(FFMPEG_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+    # msvc output dir need append build type
+    set(FFMPEG_BIN_OUTPUT_PATH ${FFMPEG_BIN_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avcodec-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avformat-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
