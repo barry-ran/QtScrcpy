@@ -297,14 +297,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 # output dir
-if(MSVC)
-    # msvc不需要指定CMAKE_BUILD_TYPE，会自动生成到CMAKE_ARCHIVE_OUTPUT_DIRECTORY/[Debug/Release/..]
-    set(QC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}")
-else()
-    set(QC_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}")
-endif()
+# https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
+get_property(QC_IS_MUTIL_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+message(STATUS "multi config:" QC_IS_MUTIL_CONFIG)
+# $<0:> 使用生成器表达式为每个config设置RUNTIME_OUTPUT_DIRECTORY，这样multi config就不会自动追加CMAKE_BUILD_TYPE子目录了
+# 1. multi config介绍 https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
+# 2. multi config在不用表达式生成器时自动追加子目录说明 https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
+# 3. 使用表达式生成器禁止multi config自动追加子目录解决方案 https://stackoverflow.com/questions/7747857/in-cmake-how-do-i-work-around-the-debug-and-release-directories-visual-studio-2
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${QC_OUTPUT_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}/$<0:>"
 )
 
 #
@@ -328,8 +329,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # copy
     set(FFMPEG_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/bin/${QC_CPU_ARCH}")
     get_target_property(FFMPEG_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
-    # msvc output dir need append build type
-    set(FFMPEG_BIN_OUTPUT_PATH ${FFMPEG_BIN_OUTPUT_PATH}/${CMAKE_BUILD_TYPE})
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avcodec-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avformat-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
@@ -385,6 +384,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     file(WRITE ${INFO_PLIST_FILE} ${plist_contents})
     set_target_properties(${PROJECT_NAME} PROPERTIES
         MACOSX_BUNDLE_INFO_PLIST "${INFO_PLIST_FILE}"
+        # "" disable code sign
+        XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
     )
 
     # mac framework
