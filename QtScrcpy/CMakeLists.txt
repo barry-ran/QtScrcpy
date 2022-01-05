@@ -400,32 +400,27 @@ endif()
 
 # Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    # ffmpeg
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+
     # include
     target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
     # link
     set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib")
     target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
     target_link_libraries(${PROJECT_NAME} PRIVATE
+        # ffmpeg
         avformat
         avcodec
         avutil
         swscale
-    )
-    
-    # Qt
-    target_link_libraries(${PROJECT_NAME} PRIVATE 
+        # qx11
         Qt${QT_VERSION_MAJOR}::X11Extras
+        # xcb https://doc.qt.io/qt-5/linux-requirements.html
+        xcb
+        # pthread
+        Threads::Threads
     )
-
-    # xcb
-    find_package(XCB REQUIRED)
-    target_link_libraries(${PROJECT_NAME} ${XCB_XCB_LIBRARY})
-
-    # pthread
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 
     # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
 endif()
