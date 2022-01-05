@@ -1,5 +1,6 @@
 # For VS2019 and Xcode 12+ support.
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 #
 # Global config
@@ -419,7 +420,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     # xcb
     find_package(XCB REQUIRED)
-    target_link_libraries(${PROJECT_NAME} ${LIBXCB_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ${XCB_LIBRARIES})
 
     # pthread
     set(THREADS_PREFER_PTHREAD_FLAG ON)
