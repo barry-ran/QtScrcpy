@@ -47,4 +47,4 @@ jobs:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           python ci/generate-version.py
-          ci/linux/build_for_ubuntu.sh release
+          ci/linux/build_for_ubuntu.sh RelWithDebInfo
