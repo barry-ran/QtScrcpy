@@ -81,6 +81,10 @@ set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network LinguistTools REQUIRED)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
+    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
+endif()
 
 message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}")
 
