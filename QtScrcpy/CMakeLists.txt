@@ -417,5 +417,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         Qt${QT_VERSION_MAJOR}::X11Extras
     )
 
+    # pthread
+    set(THREADS_PREFER_PTHREAD_FLAG ON)
+    find_package(Threads REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+
     # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
 endif()
