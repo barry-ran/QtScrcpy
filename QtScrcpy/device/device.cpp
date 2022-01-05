@@ -300,14 +300,14 @@ void Device::startServer()
         // support wireless connect, example:
         //m_server->start("192.168.0.174:5555", 27183, m_maxSize, m_bitRate, "");
         // only one devices, serial can be null
-        // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
+        // mark: crop input format: "width:height:x:y" or "" for no crop, for example: "100:200:0:0"
         Server::ServerParams params;
         params.serial = m_params.serial;
         params.localPort = m_params.localPort;
         params.maxSize = m_params.maxSize;
         params.bitRate = m_params.bitRate;
         params.maxFps = m_params.maxFps;
-        params.crop = "-";
+        params.crop = "";
         params.control = true;
         params.useReverse = m_params.useReverse;
         params.lockVideoOrientation = m_params.lockVideoOrientation;
