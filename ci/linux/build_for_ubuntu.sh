@@ -45,7 +45,7 @@ echo current build mode: $build_mode
 echo
 echo
 echo ---------------------------------------------------------------
-echo begin qmake build
+echo begin cmake build
 echo ---------------------------------------------------------------
 
 # 删除输出目录

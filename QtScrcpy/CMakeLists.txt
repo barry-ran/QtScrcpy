@@ -407,6 +407,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         avutil
         swscale
     )
+    
+    # Qt
+    target_link_libraries(${PROJECT_NAME} PRIVATE 
+        Qt${QT_VERSION_MAJOR}::X11Extras
+    )
 
     # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
 endif()
