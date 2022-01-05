@@ -420,7 +420,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     # xcb
     find_package(XCB REQUIRED)
-    target_link_libraries(${PROJECT_NAME} ${XCB_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} ${XCB_XCB_LIBRARY})
 
     # pthread
     set(THREADS_PREFER_PTHREAD_FLAG ON)
