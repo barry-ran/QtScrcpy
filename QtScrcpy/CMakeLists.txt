@@ -417,6 +417,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         Qt${QT_VERSION_MAJOR}::X11Extras
     )
 
+    # xcb
+    find_package(XCB REQUIRED)
+    target_link_libraries(${PROJECT_NAME} ${LIBXCB_LIBRARIES})
+
     # pthread
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
