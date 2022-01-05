@@ -6,6 +6,7 @@ on:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
       - '.github/workflows/ubuntu.yml'
+      - 'ci/linux/**'
   pull_request:
     paths:
       - 'QtScrcpy/**'
