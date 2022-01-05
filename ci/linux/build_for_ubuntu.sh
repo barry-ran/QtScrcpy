@@ -30,7 +30,7 @@ echo check build param[Debug/Release/MinSizeRel/RelWithDebInfo]
 echo ---------------------------------------------------------------
 
 # 编译参数检查
-build_mode=$(echo $1 | tr '[:upper:]' '[:lower:]')
+build_mode=$(echo $1)
 if [[ $build_mode != "Release" && $build_mode != "Debug" && $build_mode != "MinSizeRel" && $build_mode != "RelWithDebInfo" ]]; then
     echo "error: unkonow build mode -- $1"
     exit 1
