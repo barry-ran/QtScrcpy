@@ -1,6 +1,5 @@
 # For VS2019 and Xcode 12+ support.
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/../cmake")
 
 #
 # Global config
