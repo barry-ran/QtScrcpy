@@ -5,13 +5,17 @@ import com.genymobile.scrcpy.wrappers.SurfaceControl;
 import android.graphics.Rect;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.os.IBinder;
 import android.view.Surface;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -26,17 +30,19 @@ public class ScreenEncoder implements Device.RotationListener {
     private final AtomicBoolean rotationChanged = new AtomicBoolean();
     private final ByteBuffer headerBuffer = ByteBuffer.allocate(12);
 
+    private String encoderName;
     private List<CodecOption> codecOptions;
     private int bitRate;
     private int maxFps;
     private boolean sendFrameMeta;
     private long ptsOrigin;
 
-    public ScreenEncoder(boolean sendFrameMeta, int bitRate, int maxFps, List<CodecOption> codecOptions) {
+    public ScreenEncoder(boolean sendFrameMeta, int bitRate, int maxFps, List<CodecOption> codecOptions, String encoderName) {
         this.sendFrameMeta = sendFrameMeta;
         this.bitRate = bitRate;
         this.maxFps = maxFps;
         this.codecOptions = codecOptions;
+        this.encoderName = encoderName;
     }
 
     @Override
@@ -50,17 +56,13 @@ public class ScreenEncoder implements Device.RotationListener {
 
     public void streamScreen(Device device, FileDescriptor fd) throws IOException {
         Workarounds.prepareMainLooper();
-
-        try {
-            internalStreamScreen(device, fd);
-        } catch (NullPointerException e) {
-            // Retry with workarounds enabled:
-            // <https://github.com/Genymobile/scrcpy/issues/365>
-            // <https://github.com/Genymobile/scrcpy/issues/940>
-            Ln.d("Applying workarounds to avoid NullPointerException");
+        if (Build.BRAND.equalsIgnoreCase("meizu")) {
+            // <https://github.com/Genymobile/scrcpy/issues/240>
+            // <https://github.com/Genymobile/scrcpy/issues/2656>
             Workarounds.fillAppInfo();
-            internalStreamScreen(device, fd);
         }
+
+        internalStreamScreen(device, fd);
     }
 
     private void internalStreamScreen(Device device, FileDescriptor fd) throws IOException {
@@ -69,7 +71,7 @@ public class ScreenEncoder implements Device.RotationListener {
         boolean alive;
         try {
             do {
-                MediaCodec codec = createCodec();
+                MediaCodec codec = createCodec(encoderName);
                 IBinder display = createDisplay();
                 ScreenInfo screenInfo = device.getScreenInfo();
                 Rect contentRect = screenInfo.getContentRect();
@@ -150,8 +152,30 @@ public class ScreenEncoder implements Device.RotationListener {
         IO.writeFully(fd, headerBuffer);
     }
 
-    private static MediaCodec createCodec() throws IOException {
-        return MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC);
+    private static MediaCodecInfo[] listEncoders() {
+        List<MediaCodecInfo> result = new ArrayList<>();
+        MediaCodecList list = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        for (MediaCodecInfo codecInfo : list.getCodecInfos()) {
+            if (codecInfo.isEncoder() && Arrays.asList(codecInfo.getSupportedTypes()).contains(MediaFormat.MIMETYPE_VIDEO_AVC)) {
+                result.add(codecInfo);
+            }
+        }
+        return result.toArray(new MediaCodecInfo[result.size()]);
+    }
+
+    private static MediaCodec createCodec(String encoderName) throws IOException {
+        if (encoderName != null) {
+            Ln.d("Creating encoder by name: '" + encoderName + "'");
+            try {
+                return MediaCodec.createByCodecName(encoderName);
+            } catch (IllegalArgumentException e) {
+                MediaCodecInfo[] encoders = listEncoders();
+                throw new InvalidEncoderException(encoderName, encoders);
+            }
+        }
+        MediaCodec codec = MediaCodec.createEncoderByType(MediaFormat.MIMETYPE_VIDEO_AVC);
+        Ln.d("Using encoder: '" + codec.getName() + "'");
+        return codec;
     }
 
     private static void setCodecOption(MediaFormat format, CodecOption codecOption) {
@@ -198,7 +222,11 @@ public class ScreenEncoder implements Device.RotationListener {
     }
 
     private static IBinder createDisplay() {
-        return SurfaceControl.createDisplay("scrcpy", true);
+        // Since Android 12 (preview), secure displays could not be created with shell permissions anymore.
+        // On Android 12 preview, SDK_INT is still R (not S), but CODENAME is "S".
+        boolean secure = Build.VERSION.SDK_INT < Build.VERSION_CODES.R || (Build.VERSION.SDK_INT == Build.VERSION_CODES.R && !"S"
+                .equals(Build.VERSION.CODENAME));
+        return SurfaceControl.createDisplay("scrcpy", secure);
     }
 
     private static void configure(MediaCodec codec, MediaFormat format) {
