@@ -97,9 +97,9 @@ win32 {
         message("x64")
         # 输出目录
         CONFIG(debug, debug|release) {
-            DESTDIR = $$PWD/../output/win/x64/debug
+            DESTDIR = $$PWD/../output/x64/debug
         } else {
-            DESTDIR = $$PWD/../output/win/x64/release
+            DESTDIR = $$PWD/../output/x64/release
         }
 
         # 依赖模块
@@ -114,9 +114,9 @@ win32 {
         message("x86")
         # 输出目录
         CONFIG(debug, debug|release) {
-            DESTDIR = $$PWD/../output/win/x86/debug
+            DESTDIR = $$PWD/../output/x86/debug
         } else {
-            DESTDIR = $$PWD/../output/win/x86/release
+            DESTDIR = $$PWD/../output/x86/release
         }
 
         # 依赖模块
@@ -147,9 +147,9 @@ win32 {
 macos {
     # 输出目录
     CONFIG(debug, debug|release) {
-        DESTDIR = $$PWD/../output/mac/debug
+        DESTDIR = $$PWD/../output/debug
     } else {
-        DESTDIR = $$PWD/../output/mac/release
+        DESTDIR = $$PWD/../output/release
     }
 
     # 依赖模块
@@ -196,9 +196,9 @@ macos {
 linux {
     # 输出目录
     CONFIG(debug, debug|release) {
-        DESTDIR = $$PWD/../output/linux/debug
+        DESTDIR = $$PWD/../output/debug
     } else {
-        DESTDIR = $$PWD/../output/linux/release
+        DESTDIR = $$PWD/../output/release
     }
 
     # 依赖模块

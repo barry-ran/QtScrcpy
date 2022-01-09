@@ -142,18 +142,18 @@ bool Server::execute()
         args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
     args << Config::getInstance().getServerVersion();
-    args << QString("log_level=%1").arg(Config::getInstance().getLogLevel());
+
+    if (!Config::getInstance().getLogLevel().isEmpty()) {
+        args << QString("log_level=%1").arg(Config::getInstance().getLogLevel());
+    }
     args << QString("max_size=%1").arg(QString::number(m_params.maxSize));
     args << QString("bit_rate=%1").arg(QString::number(m_params.bitRate));
     args << QString("max_fps=%1").arg(QString::number(m_params.maxFps));
     args << QString("lock_video_orientation=%1").arg(QString::number(m_params.lockVideoOrientation));
     args << QString("tunnel_forward=%1").arg((m_tunnelForward ? "true" : "false"));
-    if (m_params.crop.isEmpty()) {
-        args << "crop=";
-    } else {
+    if (!m_params.crop.isEmpty()) {
         args << QString("crop=%1").arg(m_params.crop);
     }
-    args << "send_frame_meta=true"; // always send frame meta (packet boundaries + timestamp)
     args << QString("control=%1").arg((m_params.control ? "true" : "false"));
     args << "display_id=0";                                     // display id
     args << "show_touches=false";                                 // show touch
@@ -161,8 +161,12 @@ bool Server::execute()
     // code option
     // https://github.com/Genymobile/scrcpy/commit/080a4ee3654a9b7e96c8ffe37474b5c21c02852a
     // <https://d.android.com/reference/android/media/MediaFormat>
-    args << QString("codec_options=%1").arg(Config::getInstance().getCodecOptions());
-    args << QString("encoder_name=%1").arg(Config::getInstance().getCodecName());
+    if (Config::getInstance().getCodecOptions() != "") {
+        args << QString("codec_options=%1").arg(Config::getInstance().getCodecOptions());
+    }
+    if (Config::getInstance().getCodecName() != "") {
+        args << QString("encoder_name=%1").arg(Config::getInstance().getCodecName());
+    }
 
 #ifdef SERVER_DEBUGGER
     qInfo("Server debugger waiting for a client on device port " SERVER_DEBUGGER_PORT "...");

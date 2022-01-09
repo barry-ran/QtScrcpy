@@ -76,7 +76,7 @@ jobs:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           call python ci\generate-version.py
-          call "ci\win\build_for_win.bat" release ${{ matrix.msvc-arch }}
+          call "ci\win\build_for_win.bat" RelWithDebInfo ${{ matrix.msvc-arch }}
       # 获取ref最后一个/后的内容
       - name: Get the version
         shell: bash
