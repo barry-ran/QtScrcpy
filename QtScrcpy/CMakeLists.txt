@@ -236,11 +236,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 endif()
 
-# language file
-qt5_create_translation(QC_QM_FILES ${CMAKE_CURRENT_SOURCE_DIR}
+# 使用qt5_add_translation 根据已有ts文件生成qm文件，不用qt5_create_translation
+# 感兴趣可以了解下qt5_create_translation用法 https://www.cnblogs.com/apocelipes/p/14355460.html
+set(QC_TS_FILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/zh_CN.ts 
     ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/en_US.ts
 )
+set_source_files_properties(${QC_TS_FILES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/res/i18n")
+qt5_add_translation(QC_QM_FILES ${QC_TS_FILES})
 
 # all sources
 set(QC_PROJECT_SOURCES
@@ -253,7 +256,6 @@ set(QC_PROJECT_SOURCES
     ${QC_UTIL_SOURCES}
     ${QC_MAIN_SOURCES}
     ${QC_PLANTFORM_SOURCES}
-    ${QC_QM_FILES}
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
