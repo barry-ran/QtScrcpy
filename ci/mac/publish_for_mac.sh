@@ -30,7 +30,7 @@ keymap_path=$script_path/../../keymap
 # config_path=$script_path/../../config
 
 publish_path=$script_path/$publish_dir
-release_path=$script_path/../../output/mac/release
+release_path=$script_path/../../output/x64/RelWithDebInfo
 
 export PATH=$qt_clang_path/bin:$PATH
 
