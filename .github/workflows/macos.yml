@@ -13,7 +13,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macos-latest
+    runs-on: macos-10.15
     strategy:
       matrix:
         qt-ver: [5.15.1]
@@ -44,7 +44,7 @@ jobs:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           python ci/generate-version.py
-          ci/mac/build_for_mac.sh release
+          ci/mac/build_for_mac.sh RelWithDebInfo
       # 获取ref最后一个/后的内容
       - name: Get the version
         shell: bash

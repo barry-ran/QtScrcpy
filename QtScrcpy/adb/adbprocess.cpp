@@ -116,9 +116,17 @@ QStringList AdbProcess::getDevicesSerialFromStdOut()
 {
     // get devices serial by adb devices
     QStringList serials;
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     QStringList devicesInfoList = m_standardOutput.split(QRegExp("\r\n|\n"), Qt::SkipEmptyParts);
+#else
+    QStringList devicesInfoList = m_standardOutput.split(QRegExp("\r\n|\n"), QString::SkipEmptyParts);
+#endif
     for (QString deviceInfo : devicesInfoList) {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
         QStringList deviceInfos = deviceInfo.split(QRegExp("\t"), Qt::SkipEmptyParts);
+#else
+        QStringList deviceInfos = deviceInfo.split(QRegExp("\t"), QString::SkipEmptyParts);
+#endif
         if (2 == deviceInfos.count() && 0 == deviceInfos[1].compare("device")) {
             serials << deviceInfos[0];
         }
@@ -131,7 +139,7 @@ QString AdbProcess::getDeviceIPFromStdOut()
     QString ip = "";
 #if 0
     QString strIPExp = "inet [\\d.]*";
-    QRegExp ipRegExp(strIPExp,Qt::CaseInsensitive);
+    QRegExp ipRegExp(strIPExp, Qt::CaseInsensitive);
     if (ipRegExp.indexIn(m_standardOutput) != -1) {
         ip = ipRegExp.cap(0);
         ip = ip.right(ip.size() - 5);

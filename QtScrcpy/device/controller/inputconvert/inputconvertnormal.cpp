@@ -47,9 +47,9 @@ void InputConvertNormal::mouseEvent(const QMouseEvent *from, const QSize &frameS
     }
     controlMsg->setInjectTouchMsgData(
         static_cast<quint64>(POINTER_ID_MOUSE), action,
-                convertMouseButtons(from->buttons()),
-                QRect(pos.toPoint(), frameSize),
-                AMOTION_EVENT_ACTION_DOWN == action? 1.0f : 0.0f);
+        convertMouseButtons(from->buttons()),
+        QRect(pos.toPoint(), frameSize),
+        AMOTION_EVENT_ACTION_DOWN == action ? 1.0f : 0.0f);
     sendControlMsg(controlMsg);
 }
 
@@ -64,7 +64,11 @@ void InputConvertNormal::wheelEvent(const QWheelEvent *from, const QSize &frameS
     qint32 vScroll = from->angleDelta().y() == 0 ? 0 : from->angleDelta().y() / abs(from->angleDelta().y()) * 2;
 
     // pos
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     QPointF pos = from->position();
+#else
+    QPointF pos = from->posF();
+#endif
     // convert pos
     pos.setX(pos.x() * frameSize.width() / showSize.width());
     pos.setY(pos.y() * frameSize.height() / showSize.height());
@@ -132,7 +136,11 @@ AndroidMotioneventButtons InputConvertNormal::convertMouseButtons(Qt::MouseButto
     if (buttonState & Qt::RightButton) {
         buttons |= AMOTION_EVENT_BUTTON_SECONDARY;
     }
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+    if (buttonState & Qt::MiddleButton) {
+#else
     if (buttonState & Qt::MidButton) {
+#endif    
         buttons |= AMOTION_EVENT_BUTTON_TERTIARY;
     }
     if (buttonState & Qt::XButton1) {

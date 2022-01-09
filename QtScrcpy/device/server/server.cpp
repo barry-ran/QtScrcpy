@@ -142,27 +142,31 @@ bool Server::execute()
         args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
     args << Config::getInstance().getServerVersion();
-    args << Config::getInstance().getLogLevel();
-    args << QString::number(m_params.maxSize);
-    args << QString::number(m_params.bitRate);
-    args << QString::number(m_params.maxFps);
-    args << QString::number(m_params.lockVideoOrientation);
-    args << (m_tunnelForward ? "true" : "false");
-    if (m_params.crop.isEmpty()) {
-        args << "-";
-    } else {
-        args << m_params.crop;
+
+    if (!Config::getInstance().getLogLevel().isEmpty()) {
+        args << QString("log_level=%1").arg(Config::getInstance().getLogLevel());
     }
-    args << "true"; // always send frame meta (packet boundaries + timestamp)
-    args << (m_params.control ? "true" : "false");
-    args << "0";                                     // display id
-    args << "false";                                 // show touch
-    args << (m_params.stayAwake ? "true" : "false"); // stay awake
+    args << QString("max_size=%1").arg(QString::number(m_params.maxSize));
+    args << QString("bit_rate=%1").arg(QString::number(m_params.bitRate));
+    args << QString("max_fps=%1").arg(QString::number(m_params.maxFps));
+    args << QString("lock_video_orientation=%1").arg(QString::number(m_params.lockVideoOrientation));
+    args << QString("tunnel_forward=%1").arg((m_tunnelForward ? "true" : "false"));
+    if (!m_params.crop.isEmpty()) {
+        args << QString("crop=%1").arg(m_params.crop);
+    }
+    args << QString("control=%1").arg((m_params.control ? "true" : "false"));
+    args << "display_id=0";                                     // display id
+    args << "show_touches=false";                                 // show touch
+    args << QString("stay_awake=%1").arg((m_params.stayAwake ? "true" : "false")); // stay awake
     // code option
     // https://github.com/Genymobile/scrcpy/commit/080a4ee3654a9b7e96c8ffe37474b5c21c02852a
     // <https://d.android.com/reference/android/media/MediaFormat>
-    args << Config::getInstance().getCodecOptions();
-    args << Config::getInstance().getCodecName();
+    if (Config::getInstance().getCodecOptions() != "") {
+        args << QString("codec_options=%1").arg(Config::getInstance().getCodecOptions());
+    }
+    if (Config::getInstance().getCodecName() != "") {
+        args << QString("encoder_name=%1").arg(Config::getInstance().getCodecName());
+    }
 
 #ifdef SERVER_DEBUGGER
     qInfo("Server debugger waiting for a client on device port " SERVER_DEBUGGER_PORT "...");
@@ -176,7 +180,7 @@ bool Server::execute()
 #endif
 
     // adb -s P7C0218510000537 shell CLASSPATH=/data/local/tmp/scrcpy-server app_process / com.genymobile.scrcpy.Server 0 8000000 false
-    // mark: crop input format: "width:height:x:y" or - for no crop, for example: "100:200:0:0"
+    // mark: crop input format: "width:height:x:y" or "" for no crop, for example: "100:200:0:0"
     // 这条adb命令是阻塞运行的，m_serverProcess进程不会退出了
     m_serverProcess.execute(m_params.serial, args);
     return true;

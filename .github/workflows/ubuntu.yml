@@ -6,6 +6,7 @@ on:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
       - '.github/workflows/ubuntu.yml'
+      - 'ci/linux/**'
   pull_request:
     paths:
       - 'QtScrcpy/**'
@@ -17,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-16.04,ubuntu-18.04]
+        os: [ubuntu-18.04]
         qt-ver: [5.15.1]
         qt-arch-install: [gcc_64]
         gcc-arch: [x64]
@@ -47,4 +48,4 @@ jobs:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           python ci/generate-version.py
-          ci/linux/build_for_ubuntu.sh release
+          ci/linux/build_for_ubuntu.sh RelWithDebInfo

@@ -7,7 +7,7 @@ echo check ENV
 echo ---------------------------------------------------------------
 
 :: 从环境变量获取必要参数
-:: example: D:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\VC\Auxiliary\Build\vcvarsall.bat
+:: example: D:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\VC\Auxiliary\Build\vcvarsall.bat
 set vcvarsall="%ENV_VCVARSALL%"
 :: 例如 d:\a\QtScrcpy\Qt\5.12.7
 set qt_msvc_path="%ENV_QT_PATH%"
@@ -47,12 +47,12 @@ set config_path=%script_path%..\..\config
 
 if /i %cpu_mode% == x86 (
     set publish_path=%script_path%%publish_dir%\
-    set release_path=%script_path%..\..\output\win\x86\release
-    set qt_msvc_path=%qt_msvc_path%\msvc2017\bin
+    set release_path=%script_path%..\..\output\x86\RelWithDebInfo
+    set qt_msvc_path=%qt_msvc_path%\msvc2019\bin
 ) else (
     set publish_path=%script_path%%publish_dir%\
-    set release_path=%script_path%..\..\output\win\x64\release
-    set qt_msvc_path=%qt_msvc_path%\msvc2017_64\bin
+    set release_path=%script_path%..\..\output\x64\RelWithDebInfo
+    set qt_msvc_path=%qt_msvc_path%\msvc2019_64\bin
 )
 set PATH=%qt_msvc_path%;%PATH%
 
@@ -100,10 +100,17 @@ if /i %cpu_mode% == x86 (
 )
 
 :: copy vcruntime dll
-:: 只有在64位下需要这个
 if /i %cpu_mode% == x64 (
-    cp "C:\Windows\System32\vcruntime140_1.dll" %publish_path%\vcruntime140_1.dll
     cp "C:\Windows\System32\msvcp140_1.dll" %publish_path%\msvcp140_1.dll
+    cp "C:\Windows\System32\msvcp140.dll" %publish_path%\msvcp140.dll
+    cp "C:\Windows\System32\vcruntime140.dll" %publish_path%\vcruntime140.dll
+    :: 只有x64需要
+    cp "C:\Windows\System32\vcruntime140_1.dll" %publish_path%\vcruntime140_1.dll
+) else (
+    cp "C:\Windows\SysWOW64\msvcp140_1.dll" %publish_path%\msvcp140_1.dll
+    cp "C:\Windows\SysWOW64\msvcp140.dll" %publish_path%\msvcp140.dll
+    cp "C:\Windows\SysWOW64\vcruntime140.dll" %publish_path%\vcruntime140.dll
+    
 )
 
 ::cp "C:\Program Files (x86)\Microsoft Visual Studio\Installer\VCRUNTIME140.dll" %publish_path%\VCRUNTIME140.dll
