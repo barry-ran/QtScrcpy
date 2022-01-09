@@ -97,11 +97,13 @@ set(QC_ADB_SOURCES
     adb/adbprocess.h
     adb/adbprocess.cpp
 )
+source_group(adb FILES ${QC_ADB_SOURCES})
 
 # common
 set(QC_COMMON_SOURCES
     common/qscrcpyevent.h
 )
+source_group(common FILES ${QC_COMMON_SOURCES})
 
 # device
 set(QC_DEVICE_SOURCES
@@ -154,18 +156,21 @@ set(QC_DEVICE_SOURCES
     device/ui/videoform.cpp
     device/ui/videoform.ui
 )
+source_group(device FILES ${QC_DEVICE_SOURCES})
 
 # devicemanage
 set(QC_DEVICEMANAGE_SOURCES
     devicemanage/devicemanage.h
     devicemanage/devicemanage.cpp
 )
+source_group(devicemanage FILES ${QC_DEVICEMANAGE_SOURCES})
 
 # fontawesome
 set(QC_FONTAWESOME_SOURCES
     fontawesome/iconhelper.h
     fontawesome/iconhelper.cpp
 )
+source_group(fontawesome FILES ${QC_FONTAWESOME_SOURCES})
 
 # uibase
 set(QC_UIBASE_SOURCES
@@ -174,6 +179,7 @@ set(QC_UIBASE_SOURCES
     uibase/magneticwidget.h
     uibase/magneticwidget.cpp
 )
+source_group(uibase FILES ${QC_UIBASE_SOURCES})
 
 # util
 set(QC_UTIL_SOURCES
@@ -203,6 +209,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         util/mousetap/cocoamousetap.mm
     )
 endif()
+source_group(util FILES ${QC_UTIL_SOURCES})
 
 # qrc
 set(QC_QRC_SOURCES "res/res.qrc")
