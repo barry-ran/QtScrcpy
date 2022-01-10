@@ -183,7 +183,8 @@ void CocoaMouseTap::run()
 
     m_tapData->runloop = CFRunLoopGetCurrent();
     CFRunLoopAddSource(m_tapData->runloop, m_tapData->runloopSource, kCFRunLoopCommonModes);
-    CFRunLoopTimerContext context = {.info = &m_runloopStartedSemaphore};
+    CFRunLoopTimerContext context{};
+    context.info = &m_runloopStartedSemaphore;
     /* We signal the runloop started semaphore *after* the run loop has started, indicating it's safe to CFRunLoopStop it. */
     CFRunLoopTimerRef timer = CFRunLoopTimerCreate(kCFAllocatorDefault, CFAbsoluteTimeGetCurrent(), 0, 0, 0, &SemaphorePostCallback, &context);
     CFRunLoopAddTimer(m_tapData->runloop, timer, kCFRunLoopCommonModes);
