@@ -12,8 +12,6 @@
 
 QtScrcpy connects to Android devices via USB (or via TCP/IP) for display and control. It does NOT require the root privileges.
 
-A single instance supports up to 16 Android device connections at the same time.
-
 It supports three major platforms: GNU/Linux, Windows and MacOS.
 
 It focuses on:

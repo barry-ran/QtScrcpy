@@ -11,8 +11,6 @@
 
 QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和控制。不需要root权限。
 
-单个应用程序最多支持16个安卓设备同时连接。
-
 同时支持GNU/Linux，Windows和MacOS三大主流桌面平台
 
 它专注于:
