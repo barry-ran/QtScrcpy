@@ -17,6 +17,7 @@
     (CONTROL_MSG_MAX_SIZE - 6)
 
 #define POINTER_ID_MOUSE static_cast<quint64>(-1)
+#define POINTER_ID_VIRTUAL_FINGER UINT64_C(-2)
 
 // ControlMsg
 class ControlMsg : public QScrcpyEvent
@@ -31,10 +32,12 @@ public:
         CMT_INJECT_SCROLL,
         CMT_BACK_OR_SCREEN_ON,
         CMT_EXPAND_NOTIFICATION_PANEL,
-        CMT_COLLAPSE_NOTIFICATION_PANEL,
+        CMT_EXPAND_SETTINGS_PANEL,
+        CMT_COLLAPSE_PANELS,
         CMT_GET_CLIPBOARD,
         CMT_SET_CLIPBOARD,
-        CMT_SET_SCREEN_POWER_MODE
+        CMT_SET_SCREEN_POWER_MODE,
+        CMT_ROTATE_DEVICE
     };
 
     enum ScreenPowerMode
@@ -42,6 +45,12 @@ public:
         // see <https://android.googlesource.com/platform/frameworks/base.git/+/pie-release-2/core/java/android/view/SurfaceControl.java#305>
         SPM_OFF = 0,
         SPM_NORMAL = 2,
+    };
+
+    enum GetClipboardCopyKey {
+        GCCK_NONE,
+        GCCK_COPY,
+        GCCK_CUT,
     };
 
     ControlMsg(ControlMsgType controlMsgType);
@@ -54,8 +63,10 @@ public:
     // position action动作对应的位置
     void setInjectTouchMsgData(quint64 id, AndroidMotioneventAction action, AndroidMotioneventButtons buttons, QRect position, float pressure);
     void setInjectScrollMsgData(QRect position, qint32 hScroll, qint32 vScroll);
+    void setGetClipboardMsgData(ControlMsg::GetClipboardCopyKey copyKey); 
     void setSetClipboardMsgData(QString &text, bool paste);
     void setSetScreenPowerModeData(ControlMsg::ScreenPowerMode mode);
+    void setBackOrScreenOnData(bool down);
 
     QByteArray serializeData();
 
@@ -96,6 +107,16 @@ private:
             } injectScroll;
             struct
             {
+                AndroidKeyeventAction action; // action for the BACK key
+                // screen may only be turned on on ACTION_DOWN
+            } backOrScreenOn;
+            struct
+            {
+                enum GetClipboardCopyKey copyKey;
+            } getClipboard;
+            struct
+            {
+                uint64_t sequence = 0;
                 char *text = Q_NULLPTR;
                 bool paste = true;
             } setClipboard;

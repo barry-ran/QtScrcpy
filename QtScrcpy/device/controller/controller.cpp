@@ -65,9 +65,10 @@ bool Controller::isCurrentCustomKeymap()
     return m_inputConvert->isCurrentCustomKeymap();
 }
 
-void Controller::onPostBackOrScreenOn()
+void Controller::onPostBackOrScreenOn(bool down)
 {
     ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_BACK_OR_SCREEN_ON);
+    controlMsg->setBackOrScreenOnData(down);
     if (!controlMsg) {
         return;
     }
@@ -128,9 +129,9 @@ void Controller::onExpandNotificationPanel()
     postControlMsg(controlMsg);
 }
 
-void Controller::onCollapseNotificationPanel()
+void Controller::onCollapsePanel()
 {
-    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_COLLAPSE_NOTIFICATION_PANEL);
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_COLLAPSE_PANELS);
     if (!controlMsg) {
         return;
     }
@@ -143,6 +144,17 @@ void Controller::onRequestDeviceClipboard()
     if (!controlMsg) {
         return;
     }
+    postControlMsg(controlMsg);
+}
+
+void Controller::onGetDeviceClipboard(bool cut)
+{
+    ControlMsg *controlMsg = new ControlMsg(ControlMsg::CMT_GET_CLIPBOARD);
+    if (!controlMsg) {
+        return;
+    }
+    ControlMsg::GetClipboardCopyKey copyKey = cut ? ControlMsg::GCCK_CUT : ControlMsg::GCCK_COPY;
+    controlMsg->setGetClipboardMsgData(copyKey);
     postControlMsg(controlMsg);
 }
 

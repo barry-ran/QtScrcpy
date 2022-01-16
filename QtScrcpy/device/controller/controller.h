@@ -34,7 +34,7 @@ public slots:
     void onCopy();
     void onCut();
     void onExpandNotificationPanel();
-    void onCollapseNotificationPanel();
+    void onCollapsePanel();
     void onSetScreenPowerMode(ControlMsg::ScreenPowerMode mode);
 
     // for input convert
@@ -43,8 +43,10 @@ public slots:
     void onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize);
 
     // turn the screen on if it was off, press BACK otherwise
-    void onPostBackOrScreenOn();
+    // If the screen is off, it is turned on only on down
+    void onPostBackOrScreenOn(bool down);
     void onRequestDeviceClipboard();
+    void onGetDeviceClipboard(bool cut = false);
     void onSetDeviceClipboard(bool pause = true);
     void onClipboardPaste();
     void onPostTextInput(QString &text);
