@@ -142,6 +142,7 @@ QByteArray ControlMsg::serializeData()
         break;
     case CMT_GET_CLIPBOARD:
         buffer.putChar(m_data.getClipboard.copyKey);
+        break;
     case CMT_SET_CLIPBOARD:
         BufferUtil::write64(buffer, m_data.setClipboard.sequence);
         buffer.putChar(!!m_data.setClipboard.paste);
