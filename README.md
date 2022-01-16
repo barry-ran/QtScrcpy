@@ -12,8 +12,6 @@
 
 QtScrcpy connects to Android devices via USB (or via TCP/IP) for display and control. It does NOT require the root privileges.
 
-A single instance supports up to 16 Android device connections at the same time.
-
 It supports three major platforms: GNU/Linux, Windows and MacOS.
 
 It focuses on:
@@ -247,7 +245,7 @@ All the dependencies are provided and it is easy to compile.
 
 ### PC client
 1. Set up the Qt development environment on the target platform.
-An Up-to-date Qt5 (i.e. 5.15.2 or later) is recommended. For Windows, you can choose MSVC 2019 or MinGW 8.1.0, but please be noted that currently only **CMake** scripts support MinGW.
+Qt version>=5.12 (use MSVC 2019 on Windows)
 2. Clone the project
 3. Open the project root directory `all.pro` or `CMakeLists.txt` with QtCreator
 4. Compile and run

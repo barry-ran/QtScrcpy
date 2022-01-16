@@ -130,7 +130,7 @@ void DeviceManage::setGroupControlSignals(Device *host, Device *client, bool ins
         connect(host, &Device::postVolumeDown, client, &Device::postVolumeDown);
         connect(host, &Device::setScreenPowerMode, client, &Device::setScreenPowerMode);
         connect(host, &Device::expandNotificationPanel, client, &Device::expandNotificationPanel);
-        connect(host, &Device::collapseNotificationPanel, client, &Device::collapseNotificationPanel);
+        connect(host, &Device::collapsePanel, client, &Device::collapsePanel);
         connect(host, &Device::postBackOrScreenOn, client, &Device::postBackOrScreenOn);
         connect(host, &Device::postTextInput, client, &Device::postTextInput);
         connect(host, &Device::setDeviceClipboard, client, &Device::setDeviceClipboard);
@@ -149,7 +149,7 @@ void DeviceManage::setGroupControlSignals(Device *host, Device *client, bool ins
         disconnect(host, &Device::postVolumeDown, client, &Device::postVolumeDown);
         disconnect(host, &Device::setScreenPowerMode, client, &Device::setScreenPowerMode);
         disconnect(host, &Device::expandNotificationPanel, client, &Device::expandNotificationPanel);
-        disconnect(host, &Device::collapseNotificationPanel, client, &Device::collapseNotificationPanel);
+        disconnect(host, &Device::collapsePanel, client, &Device::collapsePanel);
         disconnect(host, &Device::postBackOrScreenOn, client, &Device::postBackOrScreenOn);
         disconnect(host, &Device::postTextInput, client, &Device::postTextInput);
         disconnect(host, &Device::setDeviceClipboard, client, &Device::setDeviceClipboard);

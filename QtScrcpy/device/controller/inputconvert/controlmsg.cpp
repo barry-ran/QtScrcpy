@@ -56,6 +56,11 @@ void ControlMsg::setInjectScrollMsgData(QRect position, qint32 hScroll, qint32 v
     m_data.injectScroll.vScroll = vScroll;
 }
 
+void ControlMsg::setGetClipboardMsgData(ControlMsg::GetClipboardCopyKey copyKey) 
+{
+    m_data.getClipboard.copyKey = copyKey;
+}
+
 void ControlMsg::setSetClipboardMsgData(QString &text, bool paste)
 {
     if (text.isEmpty()) {
@@ -70,11 +75,17 @@ void ControlMsg::setSetClipboardMsgData(QString &text, bool paste)
     memcpy(m_data.setClipboard.text, tmp.data(), tmp.length());
     m_data.setClipboard.text[tmp.length()] = '\0';
     m_data.setClipboard.paste = paste;
+    m_data.setClipboard.sequence = 0;
 }
 
 void ControlMsg::setSetScreenPowerModeData(ControlMsg::ScreenPowerMode mode)
 {
     m_data.setScreenPowerMode.mode = mode;
+}
+
+void ControlMsg::setBackOrScreenOnData(bool down)
+{
+    m_data.backOrScreenOn.action = down ? AKEY_EVENT_ACTION_DOWN : AKEY_EVENT_ACTION_UP;
 }
 
 void ControlMsg::writePosition(QBuffer &buffer, const QRect &value)
@@ -126,7 +137,14 @@ QByteArray ControlMsg::serializeData()
         BufferUtil::write32(buffer, m_data.injectScroll.hScroll);
         BufferUtil::write32(buffer, m_data.injectScroll.vScroll);
         break;
+    case CMT_BACK_OR_SCREEN_ON:
+        buffer.putChar(m_data.backOrScreenOn.action);
+        break;
+    case CMT_GET_CLIPBOARD:
+        buffer.putChar(m_data.getClipboard.copyKey);
+        break;
     case CMT_SET_CLIPBOARD:
+        BufferUtil::write64(buffer, m_data.setClipboard.sequence);
         buffer.putChar(!!m_data.setClipboard.paste);
         BufferUtil::write32(buffer, static_cast<quint32>(strlen(m_data.setClipboard.text)));
         buffer.write(m_data.setClipboard.text, strlen(m_data.setClipboard.text));
@@ -134,10 +152,10 @@ QByteArray ControlMsg::serializeData()
     case CMT_SET_SCREEN_POWER_MODE:
         buffer.putChar(m_data.setScreenPowerMode.mode);
         break;
-    case CMT_BACK_OR_SCREEN_ON:
     case CMT_EXPAND_NOTIFICATION_PANEL:
-    case CMT_COLLAPSE_NOTIFICATION_PANEL:
-    case CMT_GET_CLIPBOARD:
+    case CMT_EXPAND_SETTINGS_PANEL:
+    case CMT_COLLAPSE_PANELS:
+    case CMT_ROTATE_DEVICE:
         break;
     default:
         qDebug() << "Unknown event type:" << m_data.type;

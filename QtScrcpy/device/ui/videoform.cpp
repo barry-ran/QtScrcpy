@@ -295,14 +295,14 @@ void VideoForm::installShortcut()
         emit m_device->expandNotificationPanel();
     });
 
-    // collapseNotificationPanel
+    // collapsePanel
     shortcut = new QShortcut(QKeySequence("Ctrl+Shift+n"), this);
     shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
         if (!m_device) {
             return;
         }
-        emit m_device->collapseNotificationPanel();
+        emit m_device->collapsePanel();
     });
 
     // copy
@@ -613,7 +613,7 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
     }
 
     if (event->button() == Qt::RightButton && m_device && !m_device->isCurrentCustomKeymap()) {
-        emit m_device->postBackOrScreenOn();
+        emit m_device->postBackOrScreenOn(event->type() == QEvent::MouseButtonPress);
     }
 
     if (m_videoWidget->geometry().contains(event->pos())) {

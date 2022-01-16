@@ -76,8 +76,8 @@ signals:
     void postCut();
     void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
     void expandNotificationPanel();
-    void collapseNotificationPanel();
-    void postBackOrScreenOn();
+    void collapsePanel();
+    void postBackOrScreenOn(bool down);
     void postTextInput(QString &text);
     void requestDeviceClipboard();
     void setDeviceClipboard(bool pause = true);

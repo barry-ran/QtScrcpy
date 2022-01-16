@@ -39,10 +39,10 @@
 #define COMMON_LOG_LEVEL_DEF "info"
 
 #define COMMON_CODEC_OPTIONS_KEY "CodecOptions"
-#define COMMON_CODEC_OPTIONS_DEF "-"
+#define COMMON_CODEC_OPTIONS_DEF ""
 
 #define COMMON_CODEC_NAME_KEY "CodecName"
-#define COMMON_CODEC_NAME_DEF "-"
+#define COMMON_CODEC_NAME_DEF ""
 
 // user config
 #define COMMON_RECORD_KEY "RecordPath"
