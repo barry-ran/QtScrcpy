@@ -44,7 +44,7 @@ if "%1"=="MinSizeRel" (
 if "%1"=="RelWithDebInfo" (
     goto build_mode_ok
 )
-echo error: unkonow build mode -- %1
+echo error: unknown build mode -- %1
 goto return
 :build_mode_ok
 
