@@ -37,7 +37,14 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
         m_videoForm->setDevice(this);
     }
 
-    m_stream = new Stream(this);
+    m_stream = new Stream([this](quint8 *buf, qint32 bufSize) -> qint32 {
+        auto videoSocket = m_server->getVideoSocket();
+        if (!videoSocket) {
+            return 0;
+        }
+
+        return videoSocket->subThreadRecvData(buf, bufSize);
+    }, this);
     if (m_decoder) {
         m_stream->setDecoder(m_decoder);
     }
@@ -245,7 +252,6 @@ void Device::initSignals()
                 }
 
                 // init decoder
-                m_stream->setVideoSocket(m_server->getVideoSocket());
                 m_stream->startDecode();
 
                 // init controller
