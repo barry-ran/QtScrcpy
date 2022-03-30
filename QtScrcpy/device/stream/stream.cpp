@@ -13,7 +13,10 @@
 
 typedef qint32 (*ReadPacketFunc)(void *, quint8 *, qint32);
 
-Stream::Stream(QObject *parent) : QThread(parent) {}
+Stream::Stream(std::function<qint32(quint8*, qint32)> recvData, QObject *parent)
+    : QThread(parent)
+    , m_recvData(recvData)
+{}
 
 Stream::~Stream() {}
 
@@ -81,11 +84,6 @@ static quint64 bufferRead64be(quint8 *buf)
     return (static_cast<quint64>(msb) << 32) | lsb;
 }
 
-void Stream::setVideoSocket(VideoSocket *videoSocket)
-{
-    m_videoSocket = videoSocket;
-}
-
 void Stream::setRecoder(Recorder *recorder)
 {
     m_recorder = recorder;
@@ -93,19 +91,17 @@ void Stream::setRecoder(Recorder *recorder)
 
 qint32 Stream::recvData(quint8 *buf, qint32 bufSize)
 {
-    if (!buf) {
+    if (!buf || !m_recvData) {
         return 0;
     }
-    if (m_videoSocket) {
-        qint32 len = m_videoSocket->subThreadRecvData(buf, bufSize);
-        return len;
-    }
-    return 0;
+
+    qint32 len = m_recvData(buf, bufSize);
+    return len;
 }
 
 bool Stream::startDecode()
 {
-    if (!m_videoSocket) {
+    if (!m_recvData) {
         return false;
     }
     start();
