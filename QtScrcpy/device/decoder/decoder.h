@@ -15,10 +15,9 @@ public:
     Decoder(VideoBuffer *vb, QObject *parent = Q_NULLPTR);
     virtual ~Decoder();
 
-    bool open(const AVCodec *codec);
+    bool open();
     void close();
     bool push(const AVPacket *packet);
-    void interrupt();
 
 signals:
     void onNewFrame();
