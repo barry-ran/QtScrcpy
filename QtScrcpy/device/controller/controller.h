@@ -1,3 +1,4 @@
+
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
@@ -9,15 +10,16 @@
 class QTcpSocket;
 class Receiver;
 class InputConvertBase;
+class DeviceMsg;
 class Controller : public QObject
 {
     Q_OBJECT
 public:
-    Controller(QString gameScript = "", QObject *parent = Q_NULLPTR);
+    Controller(std::function<qint64(const QByteArray&)> sendData, QString gameScript = "", QObject *parent = Q_NULLPTR);
     virtual ~Controller();
 
-    void setControlSocket(QTcpSocket *controlSocket);
     void postControlMsg(ControlMsg *controlMsg);
+    void recvDeviceMsg(DeviceMsg *deviceMsg);
     void test(QRect rc);
 
     void updateScript(QString gameScript = "");
@@ -62,9 +64,9 @@ private:
     void postKeyCodeClick(AndroidKeycode keycode);
 
 private:
-    QPointer<QTcpSocket> m_controlSocket;
     QPointer<Receiver> m_receiver;
     QPointer<InputConvertBase> m_inputConvert;
+    std::function<qint64(const QByteArray&)> m_sendData = Q_NULLPTR;
 };
 
 #endif // CONTROLLER_H

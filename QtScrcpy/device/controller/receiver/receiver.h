@@ -3,7 +3,6 @@
 
 #include <QPointer>
 
-class QTcpSocket;
 class DeviceMsg;
 class Receiver : public QObject
 {
@@ -12,16 +11,7 @@ public:
     explicit Receiver(QObject *parent = Q_NULLPTR);
     virtual ~Receiver();
 
-    void setControlSocket(QTcpSocket *controlSocket);
-
-public slots:
-    void onReadyRead();
-
-protected:
-    void processMsg(DeviceMsg *deviceMsg);
-
-private:
-    QPointer<QTcpSocket> m_controlSocket;
+    void recvDeviceMsg(DeviceMsg *deviceMsg);
 };
 
 #endif // RECEIVER_H
