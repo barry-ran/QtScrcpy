@@ -51,8 +51,15 @@ void Recorder::setFormat(Recorder::RecorderFormat format)
     m_format = format;
 }
 
-bool Recorder::open(const AVCodec *inputCodec)
+bool Recorder::open()
 {
+    // codec
+    AVCodec* inputCodec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    if (!inputCodec) {
+        qCritical("H.264 decoder not found");
+        return false;
+    }
+
     QString formatName = recorderGetFormatName(m_format);
     Q_ASSERT(!formatName.isEmpty());
     const AVOutputFormat *format = findMuxer(formatName.toUtf8());

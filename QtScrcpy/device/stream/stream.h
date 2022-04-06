@@ -24,13 +24,13 @@ public:
     static bool init();
     static void deInit();
 
-    void setDecoder(Decoder *decoder);
-    void setRecoder(Recorder *recorder);
     bool startDecode();
     void stopDecode();
 
 signals:
     void onStreamStop();
+    void getFrame(AVPacket* packet);
+    void getConfigFrame(AVPacket* packet);
 
 protected:
     void run();
@@ -43,9 +43,6 @@ protected:
 
 private:
     std::function<qint32(quint8*, qint32)> m_recvData = nullptr;
-    // for recorder
-    Recorder *m_recorder = Q_NULLPTR;
-    Decoder *m_decoder = Q_NULLPTR;
 
     AVCodecContext *m_codecCtx = Q_NULLPTR;
     AVCodecParserContext *m_parser = Q_NULLPTR;

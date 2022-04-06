@@ -8,8 +8,16 @@ Decoder::Decoder(VideoBuffer *vb, QObject *parent) : QObject(parent), m_vb(vb) {
 
 Decoder::~Decoder() {}
 
-bool Decoder::open(const AVCodec *codec)
+bool Decoder::open()
 {
+    // codec
+    AVCodec *codec = Q_NULLPTR;
+    codec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    if (!codec) {
+        qCritical("H.264 decoder not found");
+        return false;
+    }
+
     // codec context
     m_codecCtx = avcodec_alloc_context3(codec);
     if (!m_codecCtx) {
@@ -26,6 +34,10 @@ bool Decoder::open(const AVCodec *codec)
 
 void Decoder::close()
 {
+    if (m_vb) {
+        m_vb->interrupt();
+    }
+
     if (!m_codecCtx) {
         return;
     }
@@ -96,13 +108,6 @@ bool Decoder::push(const AVPacket *packet)
     }
 #endif
     return true;
-}
-
-void Decoder::interrupt()
-{
-    if (m_vb) {
-        m_vb->interrupt();
-    }
 }
 
 void Decoder::pushFrame()

@@ -45,13 +45,10 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
 
         return videoSocket->subThreadRecvData(buf, bufSize);
     }, this);
-    if (m_decoder) {
-        m_stream->setDecoder(m_decoder);
-    }
+
     m_server = new Server(this);
     if (!m_params.recordFileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(m_params.recordFileName);
-        m_stream->setRecoder(m_recorder);
     }
     initSignals();
     startServer();
@@ -62,12 +59,22 @@ Device::~Device()
     if (m_server) {
         m_server->stop();
     }
-    // server must stop before decoder, because decoder block main thread
+
     if (m_stream) {
         m_stream->stopDecode();
     }
 
+    // server must stop before decoder, because decoder block main thread
+    if (m_decoder) {
+        m_decoder->close();
+    }
+
     if (m_recorder) {
+        if (m_recorder->isRunning()) {
+            m_recorder->stopRecorder();
+            m_recorder->wait();
+        }
+        m_recorder->close();
         delete m_recorder;
     }
     if (m_vb) {
@@ -249,6 +256,18 @@ void Device::initSignals()
                 // init recorder
                 if (m_recorder) {
                     m_recorder->setFrameSize(size);
+                    if (!m_recorder->open()) {
+                        qCritical("Could not open recorder");
+                    }
+
+                    if (!m_recorder->startRecorder()) {
+                        qCritical("Could not start recorder");
+                    }
+                }
+
+                // init decoder
+                if (m_decoder) {
+                    m_decoder->open();
                 }
 
                 // init decoder
@@ -276,6 +295,20 @@ void Device::initSignals()
             deleteLater();
             qDebug() << "stream thread stop";
         });
+        connect(m_stream, &Stream::getFrame, this, [this](AVPacket *packet) {
+            if (m_decoder && !m_decoder->push(packet)) {
+                qCritical("Could not send packet to decoder");
+            }
+
+            if (m_recorder && !m_recorder->push(packet)) {
+                qCritical("Could not send packet to recorder");
+            }
+        }, Qt::DirectConnection);
+        connect(m_stream, &Stream::getConfigFrame, this, [this](AVPacket *packet) {
+            if (m_recorder && !m_recorder->push(packet)) {
+                qCritical("Could not send config packet to recorder");
+            }
+        }, Qt::DirectConnection);
     }
 
     if (m_decoder && m_vb) {
