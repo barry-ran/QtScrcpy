@@ -2,10 +2,7 @@
 #include <QTime>
 
 #include "compat.h"
-#include "decoder.h"
-#include "recorder.h"
 #include "stream.h"
-#include "videosocket.h"
 
 #define BUFSIZE 0x10000
 #define HEADER_SIZE 12
