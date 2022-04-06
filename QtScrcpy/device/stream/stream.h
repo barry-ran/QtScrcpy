@@ -10,9 +10,6 @@ extern "C"
 #include "libavformat/avformat.h"
 }
 
-class VideoSocket;
-class Recorder;
-class Decoder;
 class Stream : public QThread
 {
     Q_OBJECT
