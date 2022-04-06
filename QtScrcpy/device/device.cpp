@@ -5,6 +5,7 @@
 #include "avframeconvert.h"
 #include "config.h"
 #include "controller.h"
+#include "devicemsg.h"
 #include "decoder.h"
 #include "device.h"
 #include "filehandler.h"
@@ -32,7 +33,13 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
         m_vb->init(params.renderExpiredFrames);
         m_decoder = new Decoder(m_vb, this);
         m_fileHandler = new FileHandler(this);
-        m_controller = new Controller(params.gameScript, this);
+        m_controller = new Controller([this](const QByteArray& buffer) -> qint64 {
+            if (!m_server || !m_server->getControlSocket()) {
+                return 0;
+            }
+
+            return m_server->getControlSocket()->write(buffer.data(), buffer.length());
+        }, params.gameScript, this);
         m_videoForm = new VideoForm(params.framelessWindow, Config::getInstance().getSkin());
         m_videoForm->setDevice(this);
     }
@@ -273,10 +280,24 @@ void Device::initSignals()
                 // init decoder
                 m_stream->startDecode();
 
-                // init controller
-                if (m_controller) {
-                    m_controller->setControlSocket(m_server->getControlSocket());
-                }
+                // recv device msg
+                connect(m_server->getControlSocket(), &QTcpSocket::readyRead, this, [this](){
+                    if (!m_controller) {
+                        return;
+                    }
+
+                    auto controlSocket = m_server->getControlSocket();
+                    while (controlSocket->bytesAvailable()) {
+                        QByteArray byteArray = controlSocket->peek(controlSocket->bytesAvailable());
+                        DeviceMsg deviceMsg;
+                        qint32 consume = deviceMsg.deserialize(byteArray);
+                        if (0 >= consume) {
+                            break;
+                        }
+                        controlSocket->read(consume);
+                        m_controller->recvDeviceMsg(&deviceMsg);
+                    }
+                });
 
                 // 显示界面时才自动息屏（m_params.display）
                 if (m_params.closeScreen && m_params.display && m_controller) {

@@ -7,7 +7,9 @@
 #include "receiver.h"
 #include "videosocket.h"
 
-Controller::Controller(QString gameScript, QObject *parent) : QObject(parent)
+Controller::Controller(std::function<qint64(const QByteArray&)> sendData, QString gameScript, QObject *parent)
+    : QObject(parent)
+    , m_sendData(sendData)
 {
     m_receiver = new Receiver(this);
     Q_ASSERT(m_receiver);
@@ -17,20 +19,20 @@ Controller::Controller(QString gameScript, QObject *parent) : QObject(parent)
 
 Controller::~Controller() {}
 
-void Controller::setControlSocket(QTcpSocket *controlSocket)
-{
-    if (m_controlSocket || !controlSocket) {
-        return;
-    }
-    m_controlSocket = controlSocket;
-    m_receiver->setControlSocket(controlSocket);
-}
-
 void Controller::postControlMsg(ControlMsg *controlMsg)
 {
     if (controlMsg) {
         QCoreApplication::postEvent(this, controlMsg);
     }
+}
+
+void Controller::recvDeviceMsg(DeviceMsg *deviceMsg)
+{
+    if (!m_receiver) {
+        return;
+    }
+
+    m_receiver->recvDeviceMsg(deviceMsg);
 }
 
 void Controller::test(QRect rc)
@@ -236,8 +238,8 @@ bool Controller::sendControl(const QByteArray &buffer)
         return false;
     }
     qint32 len = 0;
-    if (m_controlSocket) {
-        len = static_cast<qint32>(m_controlSocket->write(buffer.data(), buffer.length()));
+    if (m_sendData) {
+        len = static_cast<qint32>(m_sendData(buffer));
     }
     return len == buffer.length() ? true : false;
 }
