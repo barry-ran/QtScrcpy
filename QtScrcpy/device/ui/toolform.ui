@@ -71,6 +71,16 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="openScreenBtn">
+     <property name="toolTip">
+      <string>open screen</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="closeScreenBtn">
      <property name="toolTip">
       <string>close screen</string>
