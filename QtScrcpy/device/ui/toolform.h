@@ -48,6 +48,8 @@ private slots:
 
     void onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
+    void on_openScreenBtn_clicked();
+
 private:
     void initStyle();
     void updateGroupControl();
