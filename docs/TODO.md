@@ -1,5 +1,3 @@
-最后同步scrcpy 08baaf4b575aef7ee56d14683be3f4e3a86d39aa
-
 # TODO
 ## 低优先级
 - text转换 https://github.com/Genymobile/scrcpy/commit/c916af0984f72a60301d13fa8ef9a85112f54202?tdsourcetag=s_pctim_aiomsg
@@ -23,6 +21,9 @@
 # mark
 ## ffmpeg
 [ffmpeg编译参数详解](https://www.cnblogs.com/wainiwann/p/4204230.html)
+
+## fontawesome
+[fontawesome 在线搜索](http://www.fontawesome.com.cn/cheatsheet/)
 
 ## adb
 以下是 ADB 和 Fastboot 的谷歌官方下载链接：

@@ -376,6 +376,10 @@ You can download it at the following address:</source>
         <source>screen shot</source>
         <translation>screen shot</translation>
     </message>
+    <message>
+        <source>open screen</source>
+        <translation>open screen</translation>
+    </message>
 </context>
 <context>
     <name>VideoForm</name>
