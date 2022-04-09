@@ -41,6 +41,7 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->appSwitchBtn, QChar(0xf24d), 15);
     IconHelper::Instance()->SetIcon(ui->volumeUpBtn, QChar(0xf028), 15);
     IconHelper::Instance()->SetIcon(ui->volumeDownBtn, QChar(0xf027), 15);
+    IconHelper::Instance()->SetIcon(ui->openScreenBtn, QChar(0xf06e), 15);
     IconHelper::Instance()->SetIcon(ui->closeScreenBtn, QChar(0xf070), 15);
     IconHelper::Instance()->SetIcon(ui->powerBtn, QChar(0xf011), 15);
     IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), 15);
@@ -219,4 +220,12 @@ void ToolForm::onControlStateChange(Device *device, Device::GroupControlState ol
     Q_UNUSED(oldState)
     Q_UNUSED(newState)
     updateGroupControl();
+}
+
+void ToolForm::on_openScreenBtn_clicked()
+{
+    if (!m_device) {
+        return;
+    }
+    emit m_device->setScreenPowerMode(ControlMsg::SPM_NORMAL);
 }

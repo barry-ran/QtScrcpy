@@ -2,9 +2,9 @@
 #include <QMessageBox>
 #include <QTimer>
 
-#include "avframeconvert.h"
 #include "config.h"
 #include "controller.h"
+#include "devicemsg.h"
 #include "decoder.h"
 #include "device.h"
 #include "filehandler.h"
@@ -12,12 +12,7 @@
 #include "recorder.h"
 #include "server.h"
 #include "stream.h"
-#include "videobuffer.h"
 #include "videoform.h"
-extern "C"
-{
-#include "libavutil/imgutils.h"
-}
 
 Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params(params)
 {
@@ -28,23 +23,36 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
     }
 
     if (params.display) {
-        m_vb = new VideoBuffer();
-        m_vb->init(params.renderExpiredFrames);
-        m_decoder = new Decoder(m_vb, this);
+
+        m_decoder = new Decoder([this](int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV) {
+            if (m_videoForm) {
+                m_videoForm->updateRender(width, height, dataY, dataU, dataV, linesizeY, linesizeU, linesizeV);
+            }
+        }, this);
         m_fileHandler = new FileHandler(this);
-        m_controller = new Controller(params.gameScript, this);
+        m_controller = new Controller([this](const QByteArray& buffer) -> qint64 {
+            if (!m_server || !m_server->getControlSocket()) {
+                return 0;
+            }
+
+            return m_server->getControlSocket()->write(buffer.data(), buffer.length());
+        }, params.gameScript, this);
         m_videoForm = new VideoForm(params.framelessWindow, Config::getInstance().getSkin());
         m_videoForm->setDevice(this);
     }
 
-    m_stream = new Stream(this);
-    if (m_decoder) {
-        m_stream->setDecoder(m_decoder);
-    }
+    m_stream = new Stream([this](quint8 *buf, qint32 bufSize) -> qint32 {
+        auto videoSocket = m_server->getVideoSocket();
+        if (!videoSocket) {
+            return 0;
+        }
+
+        return videoSocket->subThreadRecvData(buf, bufSize);
+    }, this);
+
     m_server = new Server(this);
     if (!m_params.recordFileName.trimmed().isEmpty()) {
         m_recorder = new Recorder(m_params.recordFileName);
-        m_stream->setRecoder(m_recorder);
     }
     initSignals();
     startServer();
@@ -55,17 +63,23 @@ Device::~Device()
     if (m_server) {
         m_server->stop();
     }
-    // server must stop before decoder, because decoder block main thread
+
     if (m_stream) {
         m_stream->stopDecode();
     }
 
-    if (m_recorder) {
-        delete m_recorder;
+    // server must stop before decoder, because decoder block main thread
+    if (m_decoder) {
+        m_decoder->close();
     }
-    if (m_vb) {
-        m_vb->deInit();
-        delete m_vb;
+
+    if (m_recorder) {
+        if (m_recorder->isRunning()) {
+            m_recorder->stopRecorder();
+            m_recorder->wait();
+        }
+        m_recorder->close();
+        delete m_recorder;
     }
     if (m_videoForm) {
         m_videoForm->close();
@@ -107,14 +121,14 @@ void Device::updateScript(QString script)
 
 void Device::onScreenshot()
 {
-    if (!m_vb) {
+    if (!m_decoder) {
         return;
     }
 
-    m_vb->lock();
     // screenshot
-    saveFrame(m_vb->peekRenderedFrame());
-    m_vb->unLock();
+    m_decoder->peekFrame([this](int width, int height, uint8_t* dataRGB32) {
+       saveFrame(width, height, dataRGB32);
+    });
 }
 
 void Device::onShowTouch(bool show)
@@ -242,16 +256,41 @@ void Device::initSignals()
                 // init recorder
                 if (m_recorder) {
                     m_recorder->setFrameSize(size);
+                    if (!m_recorder->open()) {
+                        qCritical("Could not open recorder");
+                    }
+
+                    if (!m_recorder->startRecorder()) {
+                        qCritical("Could not start recorder");
+                    }
                 }
 
                 // init decoder
-                m_stream->setVideoSocket(m_server->getVideoSocket());
+                if (m_decoder) {
+                    m_decoder->open();
+                }
+
+                // init decoder
                 m_stream->startDecode();
 
-                // init controller
-                if (m_controller) {
-                    m_controller->setControlSocket(m_server->getControlSocket());
-                }
+                // recv device msg
+                connect(m_server->getControlSocket(), &QTcpSocket::readyRead, this, [this](){
+                    if (!m_controller) {
+                        return;
+                    }
+
+                    auto controlSocket = m_server->getControlSocket();
+                    while (controlSocket->bytesAvailable()) {
+                        QByteArray byteArray = controlSocket->peek(controlSocket->bytesAvailable());
+                        DeviceMsg deviceMsg;
+                        qint32 consume = deviceMsg.deserialize(byteArray);
+                        if (0 >= consume) {
+                            break;
+                        }
+                        controlSocket->read(consume);
+                        m_controller->recvDeviceMsg(&deviceMsg);
+                    }
+                });
 
                 // 显示界面时才自动息屏（m_params.display）
                 if (m_params.closeScreen && m_params.display && m_controller) {
@@ -270,24 +309,24 @@ void Device::initSignals()
             deleteLater();
             qDebug() << "stream thread stop";
         });
+        connect(m_stream, &Stream::getFrame, this, [this](AVPacket *packet) {
+            if (m_decoder && !m_decoder->push(packet)) {
+                qCritical("Could not send packet to decoder");
+            }
+
+            if (m_recorder && !m_recorder->push(packet)) {
+                qCritical("Could not send packet to recorder");
+            }
+        }, Qt::DirectConnection);
+        connect(m_stream, &Stream::getConfigFrame, this, [this](AVPacket *packet) {
+            if (m_recorder && !m_recorder->push(packet)) {
+                qCritical("Could not send config packet to recorder");
+            }
+        }, Qt::DirectConnection);
     }
 
-    if (m_decoder && m_vb) {
-        // must be Qt::QueuedConnection, ui update must be main thread
-        connect(
-            m_decoder,
-            &Decoder::onNewFrame,
-            this,
-            [this]() {
-                m_vb->lock();
-                const AVFrame *frame = m_vb->consumeRenderedFrame();
-                if (m_videoForm) {
-                    m_videoForm->updateRender(frame);
-                }
-                m_vb->unLock();
-            },
-            Qt::QueuedConnection);
-        connect(m_vb->getFPSCounter(), &::FpsCounter::updateFPS, m_videoForm, &VideoForm::updateFPS);
+    if (m_decoder) {
+        connect(m_decoder, &Decoder::updateFPS, m_videoForm, &VideoForm::updateFPS);
     }
 }
 
@@ -352,37 +391,13 @@ bool Device::isCurrentCustomKeymap()
     return m_controller->isCurrentCustomKeymap();
 }
 
-bool Device::saveFrame(const AVFrame *frame)
+bool Device::saveFrame(int width, int height, uint8_t* dataRGB32)
 {
-    if (!frame) {
+    if (!dataRGB32) {
         return false;
     }
 
-    // create buffer
-    QImage rgbImage(frame->width, frame->height, QImage::Format_RGB32);
-    AVFrame *rgbFrame = av_frame_alloc();
-    if (!rgbFrame) {
-        return false;
-    }
-
-    // bind buffer to AVFrame
-    av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, rgbImage.bits(), AV_PIX_FMT_RGB32, frame->width, frame->height, 4);
-
-    // convert
-    AVFrameConvert convert;
-    convert.setSrcFrameInfo(frame->width, frame->height, AV_PIX_FMT_YUV420P);
-    convert.setDstFrameInfo(frame->width, frame->height, AV_PIX_FMT_RGB32);
-    bool ret = false;
-    ret = convert.init();
-    if (!ret) {
-        return false;
-    }
-    ret = convert.convert(frame, rgbFrame);
-    if (!ret) {
-        return false;
-    }
-    convert.deInit();
-    av_free(rgbFrame);
+    QImage rgbImage(dataRGB32, width, height, QImage::Format_RGB32);
 
     // save
     QString absFilePath;
@@ -396,7 +411,7 @@ bool Device::saveFrame(const AVFrame *frame)
     fileName = Config::getInstance().getTitle() + fileName + ".png";
     QDir dir(fileDir);
     absFilePath = dir.absoluteFilePath(fileName);
-    ret = rgbImage.save(absFilePath, "PNG", 100);
+    int ret = rgbImage.save(absFilePath, "PNG", 100);
     if (!ret) {
         return false;
     }

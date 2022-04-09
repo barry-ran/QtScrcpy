@@ -2,10 +2,7 @@
 #include <QTime>
 
 #include "compat.h"
-#include "decoder.h"
-#include "recorder.h"
 #include "stream.h"
-#include "videosocket.h"
 
 #define BUFSIZE 0x10000
 #define HEADER_SIZE 12
@@ -13,7 +10,10 @@
 
 typedef qint32 (*ReadPacketFunc)(void *, quint8 *, qint32);
 
-Stream::Stream(QObject *parent) : QThread(parent) {}
+Stream::Stream(std::function<qint32(quint8*, qint32)> recvData, QObject *parent)
+    : QThread(parent)
+    , m_recvData(recvData)
+{}
 
 Stream::~Stream() {}
 
@@ -64,11 +64,6 @@ void Stream::deInit()
     avformat_network_deinit(); // ignore failure
 }
 
-void Stream::setDecoder(Decoder *decoder)
-{
-    m_decoder = decoder;
-}
-
 static quint32 bufferRead32be(quint8 *buf)
 {
     return static_cast<quint32>((buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3]);
@@ -81,31 +76,19 @@ static quint64 bufferRead64be(quint8 *buf)
     return (static_cast<quint64>(msb) << 32) | lsb;
 }
 
-void Stream::setVideoSocket(VideoSocket *videoSocket)
-{
-    m_videoSocket = videoSocket;
-}
-
-void Stream::setRecoder(Recorder *recorder)
-{
-    m_recorder = recorder;
-}
-
 qint32 Stream::recvData(quint8 *buf, qint32 bufSize)
 {
-    if (!buf) {
+    if (!buf || !m_recvData) {
         return 0;
     }
-    if (m_videoSocket) {
-        qint32 len = m_videoSocket->subThreadRecvData(buf, bufSize);
-        return len;
-    }
-    return 0;
+
+    qint32 len = m_recvData(buf, bufSize);
+    return len;
 }
 
 bool Stream::startDecode()
 {
-    if (!m_videoSocket) {
+    if (!m_recvData) {
         return false;
     }
     start();
@@ -114,9 +97,6 @@ bool Stream::startDecode()
 
 void Stream::stopDecode()
 {
-    if (m_decoder) {
-        m_decoder->interrupt();
-    }
     wait();
 }
 
@@ -138,23 +118,6 @@ void Stream::run()
     if (!m_codecCtx) {
         qCritical("Could not allocate codec context");
         goto runQuit;
-    }
-
-    if (m_decoder && !m_decoder->open(codec)) {
-        qCritical("Could not open m_decoder");
-        goto runQuit;
-    }
-
-    if (m_recorder) {
-        if (!m_recorder->open(codec)) {
-            qCritical("Could not open recorder");
-            goto runQuit;
-        }
-
-        if (!m_recorder->startRecorder()) {
-            qCritical("Could not start recorder");
-            goto runQuit;
-        }
     }
 
     m_parser = av_parser_init(AV_CODEC_ID_H264);
@@ -192,16 +155,6 @@ void Stream::run()
     av_parser_close(m_parser);
 
 runQuit:
-    if (m_recorder) {
-        if (m_recorder->isRunning()) {
-            m_recorder->stopRecorder();
-            m_recorder->wait();
-        }
-        m_recorder->close();
-    }
-    if (m_decoder) {
-        m_decoder->close();
-    }
     if (m_codecCtx) {
         avcodec_free_context(&m_codecCtx);
     }
@@ -309,10 +262,7 @@ bool Stream::pushPacket(AVPacket *packet)
 
 bool Stream::processConfigPacket(AVPacket *packet)
 {
-    if (m_recorder && !m_recorder->push(packet)) {
-        qCritical("Could not send config packet to recorder");
-        return false;
-    }
+    emit getConfigFrame(packet);
     return true;
 }
 
@@ -344,18 +294,7 @@ bool Stream::parse(AVPacket *packet)
 
 bool Stream::processFrame(AVPacket *packet)
 {
-    if (m_decoder && !m_decoder->push(packet)) {
-        return false;
-    }
-
-    if (m_recorder) {
-        packet->dts = packet->pts;
-
-        if (!m_recorder->push(packet)) {
-            qCritical("Could not send packet to recorder");
-            return false;
-        }
-    }
-
+    packet->dts = packet->pts;
+    emit getFrame(packet);
     return true;
 }

@@ -10,29 +10,24 @@ extern "C"
 #include "libavformat/avformat.h"
 }
 
-class VideoSocket;
-class Recorder;
-class Decoder;
 class Stream : public QThread
 {
     Q_OBJECT
 public:
-    Stream(QObject *parent = Q_NULLPTR);
+    Stream(std::function<qint32(quint8*, qint32)> recvData, QObject *parent = Q_NULLPTR);
     virtual ~Stream();
 
 public:
     static bool init();
     static void deInit();
 
-    void setDecoder(Decoder *decoder);
-    void setRecoder(Recorder *recorder);
-    void setVideoSocket(VideoSocket *deviceSocket);
-    qint32 recvData(quint8 *buf, qint32 bufSize);
     bool startDecode();
     void stopDecode();
 
 signals:
     void onStreamStop();
+    void getFrame(AVPacket* packet);
+    void getConfigFrame(AVPacket* packet);
 
 protected:
     void run();
@@ -41,12 +36,10 @@ protected:
     bool processConfigPacket(AVPacket *packet);
     bool parse(AVPacket *packet);
     bool processFrame(AVPacket *packet);
+    qint32 recvData(quint8 *buf, qint32 bufSize);
 
 private:
-    QPointer<VideoSocket> m_videoSocket;
-    // for recorder
-    Recorder *m_recorder = Q_NULLPTR;
-    Decoder *m_decoder = Q_NULLPTR;
+    std::function<qint32(quint8*, qint32)> m_recvData = nullptr;
 
     AVCodecContext *m_codecCtx = Q_NULLPTR;
     AVCodecParserContext *m_parser = Q_NULLPTR;

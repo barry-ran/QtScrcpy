@@ -135,16 +135,6 @@ void Dialog::initUI()
     on_useSingleModeCheck_clicked();
 
     on_updateDevice_clicked();
-
-#ifdef Q_OS_OSX
-    // mac need more width
-    setFixedWidth(550);
-#endif
-
-#ifdef Q_OS_LINUX
-    // linux need more width
-    setFixedWidth(520);
-#endif
 }
 
 void Dialog::updateBootConfig(bool toView)
@@ -603,19 +593,13 @@ void Dialog::on_updateNameBtn_clicked()
 void Dialog::on_useSingleModeCheck_clicked()
 {
     if (ui->useSingleModeCheck->isChecked()) {
-        ui->configGroupBox->hide();
-        ui->adbGroupBox->hide();
-        ui->wirelessGroupBox->hide();
-        ui->usbGroupBox->hide();
+        ui->rightWidget->hide();
     } else {
-        ui->configGroupBox->show();
-        ui->adbGroupBox->show();
-        ui->wirelessGroupBox->show();
-        ui->usbGroupBox->show();
+        ui->rightWidget->show();
     }
 
     QTimer::singleShot(0, this, [this]() {
-        resize(width(), layout()->sizeHint().height());
+        resize(layout()->sizeHint().width(), height());
     });
 }
 

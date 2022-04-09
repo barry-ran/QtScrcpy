@@ -4,12 +4,31 @@
 #include "decoder.h"
 #include "videobuffer.h"
 
-Decoder::Decoder(VideoBuffer *vb, QObject *parent) : QObject(parent), m_vb(vb) {}
-
-Decoder::~Decoder() {}
-
-bool Decoder::open(const AVCodec *codec)
+Decoder::Decoder(std::function<void(int, int, uint8_t*, uint8_t*, uint8_t*, int, int, int)> onFrame, QObject *parent)
+    : QObject(parent)
+    , m_vb(new VideoBuffer())
+    , m_onFrame(onFrame)
 {
+    m_vb->init();
+    connect(this, &Decoder::newFrame, this, &Decoder::onNewFrame, Qt::QueuedConnection);
+    connect(m_vb, &VideoBuffer::updateFPS, this, &Decoder::updateFPS);
+}
+
+Decoder::~Decoder() {
+    m_vb->deInit();
+    delete m_vb;
+}
+
+bool Decoder::open()
+{
+    // codec
+    AVCodec *codec = Q_NULLPTR;
+    codec = avcodec_find_decoder(AV_CODEC_ID_H264);
+    if (!codec) {
+        qCritical("H.264 decoder not found");
+        return false;
+    }
+
     // codec context
     m_codecCtx = avcodec_alloc_context3(codec);
     if (!m_codecCtx) {
@@ -26,6 +45,10 @@ bool Decoder::open(const AVCodec *codec)
 
 void Decoder::close()
 {
+    if (m_vb) {
+        m_vb->interrupt();
+    }
+
     if (!m_codecCtx) {
         return;
     }
@@ -98,11 +121,12 @@ bool Decoder::push(const AVPacket *packet)
     return true;
 }
 
-void Decoder::interrupt()
+void Decoder::peekFrame(std::function<void (int, int, uint8_t *)> onFrame)
 {
-    if (m_vb) {
-        m_vb->interrupt();
+    if (!m_vb) {
+        return;
     }
+    m_vb->peekRenderedFrame(onFrame);
 }
 
 void Decoder::pushFrame()
@@ -116,5 +140,16 @@ void Decoder::pushFrame()
         // the previous newFrame will consume this frame
         return;
     }
-    emit onNewFrame();
+    emit newFrame();
+}
+
+void Decoder::onNewFrame() {
+    if (!m_onFrame) {
+        return;
+    }
+
+    m_vb->lock();
+    const AVFrame *frame = m_vb->consumeRenderedFrame();
+    m_onFrame(frame->width, frame->height, frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+    m_vb->unLock();
 }

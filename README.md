@@ -171,7 +171,7 @@ Note: it is not necessary to keep you Android device connected via USB after you
 - Screen recording
 - Screenshot to png
 - Wireless connection
-- Supports up to 16 device connections (the number can be higher if your PC performance allows. You need to compile it by yourself)
+- Supports multiple device connections
 - Full-screen display
 - Display on the top
 - Install apk: drag and drop apk to the video window to install

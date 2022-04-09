@@ -108,7 +108,7 @@ public slots:
 private:
     void initSignals();
     void startServer();
-    bool saveFrame(const AVFrame *frame);
+    bool saveFrame(int width, int height, uint8_t* dataRGB32);
 
 private:
     // server relevant
@@ -117,7 +117,6 @@ private:
     QPointer<Controller> m_controller;
     QPointer<FileHandler> m_fileHandler;
     QPointer<Stream> m_stream;
-    VideoBuffer *m_vb = Q_NULLPTR;
     Recorder *m_recorder = Q_NULLPTR;
 
     // ui

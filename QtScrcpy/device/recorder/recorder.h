@@ -28,7 +28,7 @@ public:
 
     void setFrameSize(const QSize &declaredFrameSize);
     void setFormat(Recorder::RecorderFormat format);
-    bool open(const AVCodec *inputCodec);
+    bool open();
     void close();
     bool write(AVPacket *packet);
     bool startRecorder();
