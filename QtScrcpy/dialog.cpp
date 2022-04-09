@@ -135,16 +135,6 @@ void Dialog::initUI()
     on_useSingleModeCheck_clicked();
 
     on_updateDevice_clicked();
-
-#ifdef Q_OS_OSX
-    // mac need more width
-    setFixedWidth(550);
-#endif
-
-#ifdef Q_OS_LINUX
-    // linux need more width
-    setFixedWidth(520);
-#endif
 }
 
 void Dialog::updateBootConfig(bool toView)
