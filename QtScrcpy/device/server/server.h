@@ -26,12 +26,14 @@ class Server : public QObject
 public:
     struct ServerParams
     {
+        QString serverLocalPath = "";  // 本地安卓server路径
+        QString serverRemotePath = ""; // 要推送到远端设备的server路径
         QString serial = "";           // 设备序列号
         quint16 localPort = 27183;     // reverse时本地监听端口
         quint16 maxSize = 720;         // 视频分辨率
         quint32 bitRate = 8000000;     // 视频比特率
         quint32 maxFps = 60;           // 视频最大帧率
-        QString crop = "";            // 视频裁剪
+        QString crop = "";             // 视频裁剪
         bool control = true;           // 安卓端是否接收键鼠控制
         bool useReverse = true;        // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
         int lockVideoOrientation = -1; // 是否锁定视频方向
@@ -42,14 +44,11 @@ public:
     virtual ~Server();
 
     bool start(Server::ServerParams params);
-    bool connectTo();
+    void stop();
     bool isReverse();
     Server::ServerParams getParams();
-
     VideoSocket *getVideoSocket();
     QTcpSocket *getControlSocket();
-
-    void stop();
 
 signals:
     void serverStarted(bool success, const QString &deviceName = "", const QSize &size = QSize());
@@ -62,13 +61,13 @@ protected:
     void timerEvent(QTimerEvent *event);
 
 private:
-    const QString &getServerPath();
     bool pushServer();
     bool enableTunnelReverse();
     bool disableTunnelReverse();
     bool enableTunnelForward();
     bool disableTunnelForward();
     bool execute();
+    bool connectTo();
     bool startServerByStep();
     bool readInfo(VideoSocket *videoSocket, QString &deviceName, QSize &size);
     void startAcceptTimeoutTimer();
@@ -78,7 +77,6 @@ private:
     void onConnectTimer();
 
 private:
-    QString m_serverPath = "";
     AdbProcess m_workProcess;
     AdbProcess m_serverProcess;
     TcpServer m_serverSocket; // only used if !tunnel_forward

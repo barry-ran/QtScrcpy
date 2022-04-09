@@ -65,6 +65,7 @@ private:
     void slotActivated(QSystemTrayIcon::ActivationReason reason);
     int findDeviceFromeSerialBox(bool wifi);
     quint32 getBitRate();
+    const QString &getServerPath();
 
 protected:
     void closeEvent(QCloseEvent *event);

@@ -292,6 +292,8 @@ void Dialog::on_startServerBtn_clicked()
     params.stayAwake = ui->stayAwakeCheck->isChecked();
     params.framelessWindow = ui->framelessCheck->isChecked();
     params.recordPath = ui->recordPathEdt->text().trimmed();
+    params.serverLocalPath = getServerPath();
+    params.serverRemotePath = Config::getInstance().getServerPath();
 
     m_deviceManage.connectDevice(params);
 
@@ -611,5 +613,18 @@ void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
 quint32 Dialog::getBitRate()
 {
     return ui->bitRateEdit->text().trimmed().toUInt() *
-           (ui->bitRateBox->currentText() == QString("Mbps") ? 1000000 : 1000);
+            (ui->bitRateBox->currentText() == QString("Mbps") ? 1000000 : 1000);
+}
+
+const QString &Dialog::getServerPath()
+{
+    static QString serverPath;
+    if (serverPath.isEmpty()) {
+        serverPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_SERVER_PATH"));
+        QFileInfo fileInfo(serverPath);
+        if (serverPath.isEmpty() || !fileInfo.isFile()) {
+            serverPath = QCoreApplication::applicationDirPath() + "/scrcpy-server";
+        }
+    }
+    return serverPath;
 }

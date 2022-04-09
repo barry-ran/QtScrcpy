@@ -47,24 +47,12 @@ Server::Server(QObject *parent) : QObject(parent)
 
 Server::~Server() {}
 
-const QString &Server::getServerPath()
-{
-    if (m_serverPath.isEmpty()) {
-        m_serverPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_SERVER_PATH"));
-        QFileInfo fileInfo(m_serverPath);
-        if (m_serverPath.isEmpty() || !fileInfo.isFile()) {
-            m_serverPath = QCoreApplication::applicationDirPath() + "/scrcpy-server";
-        }
-    }
-    return m_serverPath;
-}
-
 bool Server::pushServer()
 {
     if (m_workProcess.isRuning()) {
         m_workProcess.kill();
     }
-    m_workProcess.push(m_params.serial, getServerPath(), Config::getInstance().getServerPath());
+    m_workProcess.push(m_params.serial, m_params.serverLocalPath, m_params.serverRemotePath);
     return true;
 }
 
