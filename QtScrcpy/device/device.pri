@@ -12,7 +12,6 @@ include ($$PWD/android/android.pri)
 include ($$PWD/controller/controller.pri)
 include ($$PWD/filehandler/filehandler.pri)
 include ($$PWD/recorder/recorder.pri)
-include ($$PWD/ui/ui.pri)
 
 INCLUDEPATH += \
         $$PWD/../../third_party/ffmpeg/include \
@@ -23,5 +22,4 @@ INCLUDEPATH += \
         $$PWD/android \
         $$PWD/controller \
         $$PWD/filehandler \
-        $$PWD/recorder \
-        $$PWD/ui
+        $$PWD/recorder
