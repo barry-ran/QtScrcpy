@@ -25,6 +25,8 @@ class Device : public QObject
 public:
     struct DeviceParams
     {
+        QString serverLocalPath = "";     // 本地安卓server路径
+        QString serverRemotePath = "";    // 要推送到远端设备的server路径
         QString recordFileName = "";      // 视频录制文件名
         QString recordPath = "";          // 视频保存路径
         QString serial = "";              // 设备序列号

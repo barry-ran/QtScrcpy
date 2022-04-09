@@ -335,6 +335,8 @@ void Device::startServer()
         // only one devices, serial can be null
         // mark: crop input format: "width:height:x:y" or "" for no crop, for example: "100:200:0:0"
         Server::ServerParams params;
+        params.serverLocalPath = m_params.serverLocalPath;
+        params.serverRemotePath = m_params.serverRemotePath;
         params.serial = m_params.serial;
         params.localPort = m_params.localPort;
         params.maxSize = m_params.maxSize;
