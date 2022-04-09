@@ -39,19 +39,13 @@ msvc{
 
 # 源码
 SOURCES += \
-        main.cpp \
-        dialog.cpp
-
-HEADERS += \
-        dialog.h
-
-FORMS += \
-        dialog.ui
+        main.cpp
 
 # 子工程
 include ($$PWD/common/common.pri)
 include ($$PWD/adb/adb.pri)
 include ($$PWD/uibase/uibase.pri)
+include ($$PWD/ui/ui.pri)
 include ($$PWD/fontawesome/fontawesome.pri)
 include ($$PWD/util/util.pri)
 include ($$PWD/device/device.pri)
@@ -61,7 +55,8 @@ include ($$PWD/devicemanage/devicemanage.pri)
 INCLUDEPATH += \
         $$PWD/common \        
         $$PWD/adb \        
-        $$PWD/uibase \        
+        $$PWD/uibase \
+        $$PWD/ui \
         $$PWD/util \
         $$PWD/device \
         $$PWD/devicemanage \

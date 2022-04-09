@@ -149,12 +149,6 @@ set(QC_DEVICE_SOURCES
     device/server/videosocket.cpp
     device/stream/stream.h
     device/stream/stream.cpp
-    device/ui/toolform.h
-    device/ui/toolform.cpp
-    device/ui/toolform.ui
-    device/ui/videoform.h
-    device/ui/videoform.cpp
-    device/ui/videoform.ui
 )
 source_group(device FILES ${QC_DEVICE_SOURCES})
 
@@ -180,6 +174,20 @@ set(QC_UIBASE_SOURCES
     uibase/magneticwidget.cpp
 )
 source_group(uibase FILES ${QC_UIBASE_SOURCES})
+
+# ui
+set(QC_UI_SOURCES
+    ui/toolform.h
+    ui/toolform.cpp
+    ui/toolform.ui
+    ui/videoform.h
+    ui/videoform.cpp
+    ui/videoform.ui
+    ui/dialog.cpp
+    ui/dialog.h
+    ui/dialog.ui
+)
+source_group(ui FILES ${QC_UI_SOURCES})
 
 # util
 set(QC_UTIL_SOURCES
@@ -217,9 +225,6 @@ set(QC_QRC_SOURCES "res/res.qrc")
 # main
 set(QC_MAIN_SOURCES
     main.cpp
-    dialog.cpp
-    dialog.h
-    dialog.ui
     ${QC_QRC_SOURCES}
 )
 
@@ -260,6 +265,7 @@ set(QC_PROJECT_SOURCES
     ${QC_DEVICEMANAGE_SOURCES}
     ${QC_FONTAWESOME_SOURCES}
     ${QC_UIBASE_SOURCES}
+    ${QC_UI_SOURCES}
     ${QC_UTIL_SOURCES}
     ${QC_MAIN_SOURCES}
     ${QC_PLANTFORM_SOURCES}
@@ -298,6 +304,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE devicemanage)
 target_include_directories(${PROJECT_NAME} PRIVATE fontawesome)
 target_include_directories(${PROJECT_NAME} PRIVATE util)
 target_include_directories(${PROJECT_NAME} PRIVATE uibase)
+target_include_directories(${PROJECT_NAME} PRIVATE ui)
 
 #
 # common deps
