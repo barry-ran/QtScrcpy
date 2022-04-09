@@ -148,7 +148,7 @@ void VideoForm::showFPS(bool show)
     m_fpsLabel->setVisible(show);
 }
 
-void VideoForm::updateRender(const AVFrame *frame)
+void VideoForm::updateRender(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV)
 {
     if (m_videoWidget->isHidden()) {
         if (m_loadingWidget) {
@@ -157,9 +157,9 @@ void VideoForm::updateRender(const AVFrame *frame)
         m_videoWidget->show();
     }
 
-    updateShowSize(QSize(frame->width, frame->height));
-    m_videoWidget->setFrameSize(QSize(frame->width, frame->height));
-    m_videoWidget->updateTextures(frame->data[0], frame->data[1], frame->data[2], frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+    updateShowSize(QSize(width, height));
+    m_videoWidget->setFrameSize(QSize(width, height));
+    m_videoWidget->updateTextures(dataY, dataU, dataV, linesizeY, linesizeU, linesizeV);
 }
 
 void VideoForm::showToolForm(bool show)

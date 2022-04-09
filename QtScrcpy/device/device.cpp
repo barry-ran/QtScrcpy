@@ -2,7 +2,6 @@
 #include <QMessageBox>
 #include <QTimer>
 
-#include "avframeconvert.h"
 #include "config.h"
 #include "controller.h"
 #include "devicemsg.h"
@@ -13,12 +12,7 @@
 #include "recorder.h"
 #include "server.h"
 #include "stream.h"
-#include "videobuffer.h"
 #include "videoform.h"
-extern "C"
-{
-#include "libavutil/imgutils.h"
-}
 
 Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params(params)
 {
@@ -29,9 +23,12 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
     }
 
     if (params.display) {
-        m_vb = new VideoBuffer();
-        m_vb->init(params.renderExpiredFrames);
-        m_decoder = new Decoder(m_vb, this);
+
+        m_decoder = new Decoder([this](int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV) {
+            if (m_videoForm) {
+                m_videoForm->updateRender(width, height, dataY, dataU, dataV, linesizeY, linesizeU, linesizeV);
+            }
+        }, this);
         m_fileHandler = new FileHandler(this);
         m_controller = new Controller([this](const QByteArray& buffer) -> qint64 {
             if (!m_server || !m_server->getControlSocket()) {
@@ -84,10 +81,6 @@ Device::~Device()
         m_recorder->close();
         delete m_recorder;
     }
-    if (m_vb) {
-        m_vb->deInit();
-        delete m_vb;
-    }
     if (m_videoForm) {
         m_videoForm->close();
         delete m_videoForm;
@@ -128,14 +121,14 @@ void Device::updateScript(QString script)
 
 void Device::onScreenshot()
 {
-    if (!m_vb) {
+    if (!m_decoder) {
         return;
     }
 
-    m_vb->lock();
     // screenshot
-    saveFrame(m_vb->peekRenderedFrame());
-    m_vb->unLock();
+    m_decoder->peekFrame([this](int width, int height, uint8_t* dataRGB32) {
+       saveFrame(width, height, dataRGB32);
+    });
 }
 
 void Device::onShowTouch(bool show)
@@ -332,22 +325,8 @@ void Device::initSignals()
         }, Qt::DirectConnection);
     }
 
-    if (m_decoder && m_vb) {
-        // must be Qt::QueuedConnection, ui update must be main thread
-        connect(
-            m_decoder,
-            &Decoder::onNewFrame,
-            this,
-            [this]() {
-                m_vb->lock();
-                const AVFrame *frame = m_vb->consumeRenderedFrame();
-                if (m_videoForm) {
-                    m_videoForm->updateRender(frame);
-                }
-                m_vb->unLock();
-            },
-            Qt::QueuedConnection);
-        connect(m_vb->getFPSCounter(), &::FpsCounter::updateFPS, m_videoForm, &VideoForm::updateFPS);
+    if (m_decoder) {
+        connect(m_decoder, &Decoder::updateFPS, m_videoForm, &VideoForm::updateFPS);
     }
 }
 
@@ -412,37 +391,13 @@ bool Device::isCurrentCustomKeymap()
     return m_controller->isCurrentCustomKeymap();
 }
 
-bool Device::saveFrame(const AVFrame *frame)
+bool Device::saveFrame(int width, int height, uint8_t* dataRGB32)
 {
-    if (!frame) {
+    if (!dataRGB32) {
         return false;
     }
 
-    // create buffer
-    QImage rgbImage(frame->width, frame->height, QImage::Format_RGB32);
-    AVFrame *rgbFrame = av_frame_alloc();
-    if (!rgbFrame) {
-        return false;
-    }
-
-    // bind buffer to AVFrame
-    av_image_fill_arrays(rgbFrame->data, rgbFrame->linesize, rgbImage.bits(), AV_PIX_FMT_RGB32, frame->width, frame->height, 4);
-
-    // convert
-    AVFrameConvert convert;
-    convert.setSrcFrameInfo(frame->width, frame->height, AV_PIX_FMT_YUV420P);
-    convert.setDstFrameInfo(frame->width, frame->height, AV_PIX_FMT_RGB32);
-    bool ret = false;
-    ret = convert.init();
-    if (!ret) {
-        return false;
-    }
-    ret = convert.convert(frame, rgbFrame);
-    if (!ret) {
-        return false;
-    }
-    convert.deInit();
-    av_free(rgbFrame);
+    QImage rgbImage(dataRGB32, width, height, QImage::Format_RGB32);
 
     // save
     QString absFilePath;
@@ -456,7 +411,7 @@ bool Device::saveFrame(const AVFrame *frame)
     fileName = Config::getInstance().getTitle() + fileName + ".png";
     QDir dir(fileDir);
     absFilePath = dir.absoluteFilePath(fileName);
-    ret = rgbImage.save(absFilePath, "PNG", 100);
+    int ret = rgbImage.save(absFilePath, "PNG", 100);
     if (!ret) {
         return false;
     }
