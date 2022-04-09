@@ -52,9 +52,8 @@ public:
     void stop();
 
 signals:
-    void serverStartResult(bool success);
-    void connectToResult(bool success, const QString &deviceName = "", const QSize &size = QSize());
-    void onServerStop();
+    void serverStarted(bool success, const QString &deviceName = "", const QSize &size = QSize());
+    void serverStoped();
 
 private slots:
     void onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult);

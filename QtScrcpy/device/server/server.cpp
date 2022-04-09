@@ -24,7 +24,7 @@ Server::Server(QObject *parent) : QObject(parent)
             m_videoSocket = dynamic_cast<VideoSocket *>(tmp);
             if (!m_videoSocket->isValid() || !readInfo(m_videoSocket, m_deviceName, m_deviceSize)) {
                 stop();
-                emit connectToResult(false);
+                emit serverStarted(false);
             }
         } else {
             m_controlSocket = tmp;
@@ -35,10 +35,10 @@ Server::Server(QObject *parent) : QObject(parent)
                 // we don't need the adb tunnel anymore
                 disableTunnelReverse();
                 m_tunnelEnabled = false;
-                emit connectToResult(true, m_deviceName, m_deviceSize);
+                emit serverStarted(true, m_deviceName, m_deviceSize);
             } else {
                 stop();
-                emit connectToResult(false);
+                emit serverStarted(false);
             }
             stopAcceptTimeoutTimer();
         }
@@ -223,7 +223,7 @@ void Server::timerEvent(QTimerEvent *event)
 {
     if (event && m_acceptTimeoutTimer == event->timerId()) {
         stopAcceptTimeoutTimer();
-        emit connectToResult(false, "", QSize());
+        emit serverStarted(false);
     } else if (event && m_connectTimeoutTimer == event->timerId()) {
         onConnectTimer();
     }
@@ -294,7 +294,7 @@ bool Server::startServerByStep()
     }
 
     if (!stepSuccess) {
-        emit serverStartResult(false);
+        emit serverStarted(false);
     }
     return stepSuccess;
 }
@@ -405,7 +405,7 @@ result:
         disableTunnelForward();
         m_tunnelEnabled = false;
         m_restartCount = 0;
-        emit connectToResult(success, deviceName, deviceSize);
+        emit serverStarted(success, deviceName, deviceSize);
         return;
     }
 
@@ -424,7 +424,7 @@ result:
             start(m_params);
         } else {
             m_restartCount = 0;
-            emit connectToResult(false);
+            emit serverStarted(false);
         }
     }
 }
@@ -446,7 +446,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 } else if (AdbProcess::AER_SUCCESS_START != processResult) {
                     qCritical("adb push failed");
                     m_serverStartStep = SSS_NULL;
-                    emit serverStartResult(false);
+                    emit serverStarted(false);
                 }
                 break;
             case SSS_ENABLE_TUNNEL_REVERSE:
@@ -461,7 +461,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                         qCritical() << QString("Could not listen on port %1").arg(m_params.localPort).toStdString().c_str();
                         m_serverStartStep = SSS_NULL;
                         disableTunnelReverse();
-                        emit serverStartResult(false);
+                        emit serverStarted(false);
                         break;
                     }
 
@@ -483,7 +483,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 } else if (AdbProcess::AER_SUCCESS_START != processResult) {
                     qCritical("adb forward failed");
                     m_serverStartStep = SSS_NULL;
-                    emit serverStartResult(false);
+                    emit serverStarted(false);
                 }
                 break;
             default:
@@ -496,7 +496,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
             if (AdbProcess::AER_SUCCESS_START == processResult) {
                 m_serverStartStep = SSS_RUNNING;
                 m_tunnelEnabled = true;
-                emit serverStartResult(true);
+                connectTo();
             } else if (AdbProcess::AER_ERROR_START == processResult) {
                 if (!m_tunnelForward) {
                     m_serverSocket.close();
@@ -506,11 +506,11 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 }
                 qCritical("adb shell start server failed");
                 m_serverStartStep = SSS_NULL;
-                emit serverStartResult(false);
+                emit serverStarted(false);
             }
         } else if (SSS_RUNNING == m_serverStartStep) {
             m_serverStartStep = SSS_NULL;
-            emit onServerStop();
+            emit serverStoped();
         }
     }
 }
