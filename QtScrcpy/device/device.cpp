@@ -217,14 +217,7 @@ void Device::initSignals()
     }
 
     if (m_server) {
-        connect(m_server, &Server::serverStartResult, this, [this](bool success) {
-            if (success) {
-                m_server->connectTo();
-            } else {
-                deleteLater();
-            }
-        });
-        connect(m_server, &Server::connectToResult, this, [this](bool success, const QString &deviceName, const QSize &size) {
+        connect(m_server, &Server::serverStarted, this, [this](bool success, const QString &deviceName, const QSize &size) {
             Q_UNUSED(deviceName);
             if (success) {
                 double diff = m_startTimeCount.elapsed() / 1000.0;
@@ -299,7 +292,7 @@ void Device::initSignals()
                 deleteLater();
             }
         });
-        connect(m_server, &Server::onServerStop, this, [this]() {
+        connect(m_server, &Server::serverStoped, this, [this]() {
             deleteLater();
             qDebug() << "server process stop";
         });
