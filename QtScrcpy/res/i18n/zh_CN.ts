@@ -362,6 +362,10 @@
         <source>screen shot</source>
         <translation>截图</translation>
     </message>
+    <message>
+        <source>open screen</source>
+        <translation>打开屏幕</translation>
+    </message>
 </context>
 <context>
     <name>VideoForm</name>
