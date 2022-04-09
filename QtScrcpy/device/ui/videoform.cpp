@@ -90,8 +90,8 @@ QRect VideoForm::getGrabCursorRect()
 #if defined(Q_OS_WIN32)
     rc = QRect(ui->keepRatioWidget->mapToGlobal(m_videoWidget->pos()), m_videoWidget->size());
     // high dpi support
-    rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatio());
-    rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatio());
+    rc.setTopLeft(rc.topLeft() * m_videoWidget->devicePixelRatioF());
+    rc.setBottomRight(rc.bottomRight() * m_videoWidget->devicePixelRatioF());
 
     rc.setX(rc.x() + 10);
     rc.setY(rc.y() + 10);
