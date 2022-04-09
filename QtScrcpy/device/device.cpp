@@ -23,7 +23,6 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
     }
 
     if (params.display) {
-
         m_decoder = new Decoder([this](int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV) {
             if (m_videoForm) {
                 m_videoForm->updateRender(width, height, dataY, dataU, dataV, linesizeY, linesizeU, linesizeV);
@@ -296,6 +295,8 @@ void Device::initSignals()
                 if (m_params.closeScreen && m_params.display && m_controller) {
                     emit m_controller->onSetScreenPowerMode(ControlMsg::SPM_OFF);
                 }
+            } else {
+                deleteLater();
             }
         });
         connect(m_server, &Server::onServerStop, this, [this]() {
