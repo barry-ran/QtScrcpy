@@ -3,22 +3,25 @@
 
 #include <QMutex>
 #include <QWaitCondition>
+#include <QObject>
 
 #include "fpscounter.h"
 
 // forward declarations
 typedef struct AVFrame AVFrame;
 
-class VideoBuffer
+class VideoBuffer : public QObject
 {
+    Q_OBJECT
 public:
-    VideoBuffer();
+    VideoBuffer(QObject *parent = Q_NULLPTR);
     virtual ~VideoBuffer();
 
-    bool init(bool renderExpiredFrames = false);
+    bool init();
     void deInit();
     void lock();
     void unLock();
+    void setRenderExpiredFrames(bool renderExpiredFrames);
 
     AVFrame *decodingFrame();
     // set the decoder frame as ready for rendering
@@ -32,12 +35,13 @@ public:
     // unlocking m_mutex
     const AVFrame *consumeRenderedFrame();
 
-    const AVFrame *peekRenderedFrame();
+    void peekRenderedFrame(std::function<void(int width, int height, uint8_t* dataRGB32)> onFrame);
 
     // wake up and avoid any blocking call
     void interrupt();
 
-    FpsCounter *getFPSCounter();
+signals:
+    void updateFPS(quint32 fps);
 
 private:
     void swap();

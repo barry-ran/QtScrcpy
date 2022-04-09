@@ -9,7 +9,6 @@ namespace Ui
     class videoForm;
 }
 
-struct AVFrame;
 class ToolForm;
 class Device;
 class FileHandler;
@@ -24,7 +23,7 @@ public:
 
     void staysOnTop(bool top = true);
     void updateShowSize(const QSize &newSize);
-    void updateRender(const AVFrame *frame);
+    void updateRender(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV);
     void setDevice(Device *device);
     QRect getGrabCursorRect();
     const QSize &frameSize();
