@@ -135,6 +135,7 @@ void installTranslator()
     case QLocale::English:
     default:
         languagePath += "en_US.qm";
+        break;
     }
 
     translator.load(languagePath);
