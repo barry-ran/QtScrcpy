@@ -257,7 +257,7 @@ void Device::initSignals()
                     emit m_controller->onSetScreenPowerMode(ControlMsg::SPM_OFF);
                 }
             } else {
-                disconnectDevice();
+                m_server->stop();
             }
         });
         connect(m_server, &Server::serverStoped, this, [this]() {

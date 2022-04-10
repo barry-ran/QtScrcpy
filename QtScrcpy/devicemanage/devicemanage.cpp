@@ -40,6 +40,7 @@ bool DeviceManage::connectDevice(Device::DeviceParams params)
     }
     */
     Device *device = new Device(params);
+    connect(device, &Device::deviceConnected, this, &DeviceManage::onDeviceConnected);
     connect(device, &Device::deviceDisconnected, this, &DeviceManage::onDeviceDisconnected);
     connect(device, &Device::controlStateChange, this, &DeviceManage::onControlStateChange);
     if (!device->connectDevice()) {
@@ -190,15 +191,16 @@ void DeviceManage::setGroupControlHost(Device *host, bool install)
     }
 }
 
+void DeviceManage::onDeviceConnected(bool success, const QString &serial, const QString &deviceName, const QSize &size)
+{
+    if (!success) {
+        removeDevice(serial);
+    }
+}
+
 void DeviceManage::onDeviceDisconnected(QString serial)
 {
-    if (!serial.isEmpty() && m_devices.contains(serial)) {
-        if (m_devices[serial]->controlState() == Device::GroupControlState::GCS_HOST) {
-            setGroupControlHost(nullptr, false);
-        }
-        m_devices[serial]->deleteLater();
-        m_devices.remove(serial);
-    }
+    removeDevice(serial);
 }
 
 void DeviceManage::onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState)
@@ -299,4 +301,15 @@ quint16 DeviceManage::getFreePort()
         port++;
     }
     return 0;
+}
+
+void DeviceManage::removeDevice(const QString &serial)
+{
+    if (!serial.isEmpty() && m_devices.contains(serial)) {
+        if (m_devices[serial]->controlState() == Device::GroupControlState::GCS_HOST) {
+            setGroupControlHost(nullptr, false);
+        }
+        m_devices[serial]->deleteLater();
+        m_devices.remove(serial);
+    }
 }
