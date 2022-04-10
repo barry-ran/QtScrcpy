@@ -26,6 +26,7 @@ protected:
     void setGroupControlHost(Device *host, bool install);
 
 protected slots:
+    void onDeviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
     void onDeviceDisconnected(QString serial);
     void onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
@@ -36,6 +37,7 @@ protected slots:
 
 private:
     quint16 getFreePort();
+    void removeDevice(const QString& serial);
 
 private:
     QMap<QString, QPointer<Device>> m_devices;
