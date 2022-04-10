@@ -18,7 +18,6 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
 {
     if (!params.display && m_params.recordFileName.trimmed().isEmpty()) {
         qCritical("not display must be recorded");
-        deleteLater();
         return;
     }
 
@@ -51,40 +50,14 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
 
     m_server = new Server(this);
     if (!m_params.recordFileName.trimmed().isEmpty()) {
-        m_recorder = new Recorder(m_params.recordFileName);
+        m_recorder = new Recorder(m_params.recordFileName, this);
     }
     initSignals();
-    startServer();
 }
 
 Device::~Device()
 {
-    if (m_server) {
-        m_server->stop();
-    }
-
-    if (m_stream) {
-        m_stream->stopDecode();
-    }
-
-    // server must stop before decoder, because decoder block main thread
-    if (m_decoder) {
-        m_decoder->close();
-    }
-
-    if (m_recorder) {
-        if (m_recorder->isRunning()) {
-            m_recorder->stopRecorder();
-            m_recorder->wait();
-        }
-        m_recorder->close();
-        delete m_recorder;
-    }
-    if (m_videoForm) {
-        m_videoForm->close();
-        delete m_videoForm;
-    }
-    emit deviceDisconnect(m_params.serial);
+    disconnectDevice();
 }
 
 VideoForm *Device::getVideoForm()
@@ -179,11 +152,6 @@ void Device::initSignals()
         connect(this, &Device::postTextInput, m_controller, &Controller::onPostTextInput);
     }
     if (m_videoForm) {
-        connect(m_videoForm, &VideoForm::destroyed, this, [this](QObject *obj) {
-            Q_UNUSED(obj)
-            deleteLater();
-        });
-
         connect(this, &Device::switchFullScreen, m_videoForm, &VideoForm::onSwitchFullScreen);
     }
     if (m_fileHandler) {
@@ -218,10 +186,11 @@ void Device::initSignals()
 
     if (m_server) {
         connect(m_server, &Server::serverStarted, this, [this](bool success, const QString &deviceName, const QSize &size) {
-            Q_UNUSED(deviceName);
+            emit deviceConnected(success, m_params.serial, deviceName, size);
             if (success) {
                 double diff = m_startTimeCount.elapsed() / 1000.0;
                 qInfo() << QString("server start finish in %1s").arg(diff).toStdString().c_str();
+
 
                 // update ui
                 if (m_videoForm) {
@@ -289,18 +258,18 @@ void Device::initSignals()
                     emit m_controller->onSetScreenPowerMode(ControlMsg::SPM_OFF);
                 }
             } else {
-                deleteLater();
+                disconnectDevice();
             }
         });
         connect(m_server, &Server::serverStoped, this, [this]() {
-            deleteLater();
+            disconnectDevice();
             qDebug() << "server process stop";
         });
     }
 
     if (m_stream) {
         connect(m_stream, &Stream::onStreamStop, this, [this]() {
-            deleteLater();
+            disconnectDevice();
             qDebug() << "stream thread stop";
         });
         connect(m_stream, &Stream::getFrame, this, [this](AVPacket *packet) {
@@ -324,8 +293,12 @@ void Device::initSignals()
     }
 }
 
-void Device::startServer()
+void Device::connectDevice()
 {
+    if (!m_server) {
+        return;
+    }
+
     // fix: macos cant recv finished signel, timer is ok
     QTimer::singleShot(0, this, [this]() {
         m_startTimeCount.start();
@@ -349,6 +322,38 @@ void Device::startServer()
         params.stayAwake = m_params.stayAwake;
         m_server->start(params);
     });
+}
+
+void Device::disconnectDevice()
+{
+    if (!m_server) {
+        return;
+    }
+    m_server->stop();
+    m_server = Q_NULLPTR;
+
+    if (m_stream) {
+        m_stream->stopDecode();
+    }
+
+    // server must stop before decoder, because decoder block main thread
+    if (m_decoder) {
+        m_decoder->close();
+    }
+
+    if (m_recorder) {
+        if (m_recorder->isRunning()) {
+            m_recorder->stopRecorder();
+            m_recorder->wait();
+        }
+        m_recorder->close();
+    }
+    if (m_videoForm) {
+        m_videoForm->close();
+        m_videoForm->deleteLater();
+    }
+
+    emit deviceDisconnected(m_params.serial);
 }
 
 void Device::onSetControlState(Device *device, Device::GroupControlState state)

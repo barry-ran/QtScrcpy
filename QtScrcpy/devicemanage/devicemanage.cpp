@@ -40,9 +40,10 @@ bool DeviceManage::connectDevice(Device::DeviceParams params)
     }
     */
     Device *device = new Device(params);
-    connect(device, &Device::deviceDisconnect, this, &DeviceManage::onDeviceDisconnect);
+    connect(device, &Device::deviceDisconnected, this, &DeviceManage::onDeviceDisconnected);
     connect(device, &Device::controlStateChange, this, &DeviceManage::onControlStateChange);
     m_devices[params.serial] = device;
+    device->connectDevice();
     if (!m_script.isEmpty()) {
         device->updateScript(m_script);
     }
@@ -186,12 +187,13 @@ void DeviceManage::setGroupControlHost(Device *host, bool install)
     }
 }
 
-void DeviceManage::onDeviceDisconnect(QString serial)
+void DeviceManage::onDeviceDisconnected(QString serial)
 {
     if (!serial.isEmpty() && m_devices.contains(serial)) {
         if (m_devices[serial]->controlState() == Device::GroupControlState::GCS_HOST) {
             setGroupControlHost(nullptr, false);
         }
+        m_devices[serial]->deleteLater();
         m_devices.remove(serial);
     }
 }
