@@ -42,8 +42,11 @@ bool DeviceManage::connectDevice(Device::DeviceParams params)
     Device *device = new Device(params);
     connect(device, &Device::deviceDisconnected, this, &DeviceManage::onDeviceDisconnected);
     connect(device, &Device::controlStateChange, this, &DeviceManage::onControlStateChange);
+    if (!device->connectDevice()) {
+        delete device;
+        return false;
+    }
     m_devices[params.serial] = device;
-    device->connectDevice();
     if (!m_script.isEmpty()) {
         device->updateScript(m_script);
     }

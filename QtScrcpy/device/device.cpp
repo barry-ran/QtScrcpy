@@ -167,20 +167,19 @@ void Device::initSignals()
                 tipsType = tr("file transfer");
             }
             QString tips;
-            if (FileHandler::FAR_IS_RUNNING == processResult && m_videoForm) {
+            if (FileHandler::FAR_IS_RUNNING == processResult) {
                 tips = tr("wait current %1 to complete").arg(tipsType);
             }
-            if (FileHandler::FAR_SUCCESS_EXEC == processResult && m_videoForm) {
+            if (FileHandler::FAR_SUCCESS_EXEC == processResult) {
                 tips = tr("%1 complete, save in %2").arg(tipsType).arg(Config::getInstance().getPushFilePath());
             }
-            if (FileHandler::FAR_ERROR_EXEC == processResult && m_videoForm) {
+            if (FileHandler::FAR_ERROR_EXEC == processResult) {
                 tips = tr("%1 failed").arg(tipsType);
             }
             qInfo() << tips;
             if (m_controlState == GCS_CLIENT) {
                 return;
             }
-            //QMessageBox::information(m_videoForm, "QtScrcpy", tips, QMessageBox::Ok);
         });
     }
 
@@ -293,10 +292,10 @@ void Device::initSignals()
     }
 }
 
-void Device::connectDevice()
+bool Device::connectDevice()
 {
     if (!m_server) {
-        return;
+        return false;
     }
 
     // fix: macos cant recv finished signel, timer is ok
@@ -322,6 +321,8 @@ void Device::connectDevice()
         params.stayAwake = m_params.stayAwake;
         m_server->start(params);
     });
+
+    return true;
 }
 
 void Device::disconnectDevice()

@@ -52,7 +52,7 @@ public:
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
 
-    void connectDevice();
+    bool connectDevice();
     void disconnectDevice();
 
     VideoForm *getVideoForm();
