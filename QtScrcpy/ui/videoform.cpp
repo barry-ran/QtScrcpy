@@ -48,7 +48,6 @@ VideoForm::~VideoForm()
 
 void VideoForm::initUI()
 {
-    setAttribute(Qt::WA_DeleteOnClose);
     if (m_skin) {
         QPixmap phone;
         if (phone.load(":/res/phone.png")) {
@@ -720,6 +719,7 @@ void VideoForm::closeEvent(QCloseEvent *event)
         return;
     }
     Config::getInstance().setRect(m_device->getSerial(), geometry());
+    m_device->disconnectDevice();
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)

@@ -26,7 +26,7 @@ protected:
     void setGroupControlHost(Device *host, bool install);
 
 protected slots:
-    void onDeviceDisconnect(QString serial);
+    void onDeviceDisconnected(QString serial);
     void onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState);
 
     // neend convert frameSize to its frameSize

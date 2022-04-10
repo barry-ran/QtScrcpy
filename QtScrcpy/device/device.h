@@ -52,6 +52,9 @@ public:
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
 
+    void connectDevice();
+    void disconnectDevice();
+
     VideoForm *getVideoForm();
     Server *getServer();
     const QString &getSerial();
@@ -63,7 +66,8 @@ public:
     bool isCurrentCustomKeymap();
 
 signals:
-    void deviceDisconnect(QString serial);
+    void deviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
+    void deviceDisconnected(QString serial);
 
     // tool bar
     void switchFullScreen();
@@ -109,7 +113,6 @@ public slots:
 
 private:
     void initSignals();
-    void startServer();
     bool saveFrame(int width, int height, uint8_t* dataRGB32);
 
 private:
@@ -119,7 +122,7 @@ private:
     QPointer<Controller> m_controller;
     QPointer<FileHandler> m_fileHandler;
     QPointer<Stream> m_stream;
-    Recorder *m_recorder = Q_NULLPTR;
+    QPointer<Recorder> m_recorder = Q_NULLPTR;
 
     // ui
     QPointer<VideoForm> m_videoForm;
