@@ -14,12 +14,16 @@ public:
     virtual ~DeviceManage();
 
     bool connectDevice(Device::DeviceParams params);
+    bool disconnectDevice(const QString &serial);
+    void disconnectAllDevice();
+
     void updateScript(QString script);
     bool staysOnTop(const QString &serial);
     void showFPS(const QString &serial, bool show);
 
-    bool disconnectDevice(const QString &serial);
-    void disconnectAllDevice();
+signals:
+    void deviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
+    void deviceDisconnected(QString serial);
 
 protected:
     void setGroupControlSignals(Device *host, Device *client, bool install);
