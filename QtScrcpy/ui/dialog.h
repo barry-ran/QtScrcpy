@@ -31,6 +31,9 @@ public:
     void getIPbyIp();
 
 private slots:
+    void onDeviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
+    void onDeviceDisconnected(QString serial);
+
     void on_updateDevice_clicked();
     void on_startServerBtn_clicked();
     void on_stopServerBtn_clicked();

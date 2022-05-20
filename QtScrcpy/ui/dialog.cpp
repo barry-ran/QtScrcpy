@@ -94,6 +94,9 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
         qApp->quit();
     });
     connect(m_hideIcon, &QSystemTrayIcon::activated, this, &Dialog::slotActivated);
+
+    connect(&m_deviceManage, &DeviceManage::deviceConnected, this, &Dialog::onDeviceConnected);
+    connect(&m_deviceManage, &DeviceManage::deviceDisconnected, this, &Dialog::onDeviceDisconnected);
 }
 
 Dialog::~Dialog()
@@ -416,6 +419,16 @@ void Dialog::getIPbyIp()
     adbArgs << "ip -o a";
 
     m_adb.execute(ui->serialBox->currentText().trimmed(), adbArgs);
+}
+
+void Dialog::onDeviceConnected(bool success, const QString &serial, const QString &deviceName, const QSize &size)
+{
+
+}
+
+void Dialog::onDeviceDisconnected(QString serial)
+{
+
 }
 
 void Dialog::on_wirelessDisConnectBtn_clicked()

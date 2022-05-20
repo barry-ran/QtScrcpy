@@ -196,11 +196,13 @@ void DeviceManage::onDeviceConnected(bool success, const QString &serial, const 
     if (!success) {
         removeDevice(serial);
     }
+    emit deviceConnected(success, serial, deviceName, size);
 }
 
 void DeviceManage::onDeviceDisconnected(QString serial)
 {
     removeDevice(serial);
+    emit deviceDisconnected(serial);
 }
 
 void DeviceManage::onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState)
