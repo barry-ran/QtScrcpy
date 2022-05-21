@@ -91,7 +91,7 @@ void Device::updateScript(QString script)
     }
 }
 
-void Device::onScreenshot()
+void Device::screenshot()
 {
     if (!m_decoder) {
         return;
@@ -103,7 +103,7 @@ void Device::onScreenshot()
     });
 }
 
-void Device::onShowTouch(bool show)
+void Device::showTouch(bool show)
 {
     AdbProcess *adb = new AdbProcess();
     if (!adb) {
@@ -121,18 +121,11 @@ void Device::onShowTouch(bool show)
 
 void Device::initSignals()
 {
-    connect(this, &Device::screenshot, this, &Device::onScreenshot);
-    connect(this, &Device::showTouch, this, &Device::onShowTouch);
-    connect(this, &Device::setControlState, this, &Device::onSetControlState);
-    connect(this, &Device::grabCursor, this, &Device::onGrabCursor);
-
     if (m_controller) {
         connect(m_controller, &Controller::grabCursor, this, &Device::grabCursor);
     }
     if (m_controller) {
-        connect(this, &Device::postGoBack, m_controller, &Controller::onPostGoBack);
-        connect(this, &Device::postGoHome, m_controller, &Controller::onPostGoHome);
-        connect(this, &Device::postGoMenu, m_controller, &Controller::onPostGoMenu);
+        /*
         connect(this, &Device::postAppSwitch, m_controller, &Controller::onPostAppSwitch);
         connect(this, &Device::postPower, m_controller, &Controller::onPostPower);
         connect(this, &Device::postVolumeUp, m_controller, &Controller::onPostVolumeUp);
@@ -150,15 +143,9 @@ void Device::initSignals()
         connect(this, &Device::setDeviceClipboard, m_controller, &Controller::onSetDeviceClipboard);
         connect(this, &Device::clipboardPaste, m_controller, &Controller::onClipboardPaste);
         connect(this, &Device::postTextInput, m_controller, &Controller::onPostTextInput);
-    }
-    if (m_videoForm) {
-        connect(this, &Device::switchFullScreen, m_videoForm, &VideoForm::onSwitchFullScreen);
+        */
     }
     if (m_fileHandler) {
-        connect(this, &Device::pushFileRequest, this, [this](const QString &file, const QString &devicePath) {
-            m_fileHandler->onPushFileRequest(getSerial(), file, devicePath);
-        });
-        connect(this, &Device::installApkRequest, this, [this](const QString &apkFile) { m_fileHandler->onInstallApkRequest(getSerial(), apkFile); });
         connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
             QString tipsType = "";
             if (isApk) {
@@ -177,9 +164,6 @@ void Device::initSignals()
                 tips = tr("%1 failed").arg(tipsType);
             }
             qInfo() << tips;
-            if (m_controlState == GCS_CLIENT) {
-                return;
-            }
         });
     }
 
@@ -254,7 +238,7 @@ void Device::initSignals()
 
                 // 显示界面时才自动息屏（m_params.display）
                 if (m_params.closeScreen && m_params.display && m_controller) {
-                    emit m_controller->onSetScreenPowerMode(ControlMsg::SPM_OFF);
+                    m_controller->setScreenPowerMode(ControlMsg::SPM_OFF);
                 }
             } else {
                 m_server->stop();
@@ -357,32 +341,189 @@ void Device::disconnectDevice()
     emit deviceDisconnected(m_params.serial);
 }
 
-void Device::onSetControlState(Device *device, Device::GroupControlState state)
+void Device::postGoBack()
 {
-    Q_UNUSED(device)
-    if (m_controlState == state) {
+    if (!m_controller) {
         return;
     }
-    GroupControlState oldState = m_controlState;
-    m_controlState = state;
-    emit controlStateChange(this, oldState, m_controlState);
+    m_controller->postGoBack();
 }
 
-void Device::onGrabCursor(bool grab)
+void Device::postGoHome()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postGoHome();
+}
+
+void Device::postGoMenu()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postGoMenu();
+}
+
+void Device::postAppSwitch()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postAppSwitch();
+}
+
+void Device::postPower()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postPower();
+}
+
+void Device::postVolumeUp()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postVolumeUp();
+}
+
+void Device::postVolumeDown()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postVolumeDown();
+}
+
+void Device::postCopy()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->copy();
+}
+
+void Device::postCut()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->cut();
+}
+
+void Device::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->setScreenPowerMode(mode);
+}
+
+void Device::expandNotificationPanel()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->expandNotificationPanel();
+}
+
+void Device::collapsePanel()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->collapsePanel();
+}
+
+void Device::postBackOrScreenOn(bool down)
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postBackOrScreenOn(down);
+}
+
+void Device::postTextInput(QString &text)
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->postTextInput(text);
+}
+
+void Device::requestDeviceClipboard()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->requestDeviceClipboard();
+}
+
+void Device::setDeviceClipboard(bool pause)
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->setDeviceClipboard(pause);
+}
+
+void Device::clipboardPaste()
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->clipboardPaste();
+}
+
+void Device::pushFileRequest(const QString &file, const QString &devicePath)
+{
+    if (!m_fileHandler) {
+        return;
+    }
+    m_fileHandler->onPushFileRequest(getSerial(), file, devicePath);
+}
+
+void Device::installApkRequest(const QString &apkFile)
+{
+    if (!m_fileHandler) {
+        return;
+    }
+    m_fileHandler->onInstallApkRequest(getSerial(), apkFile);
+}
+
+void Device::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->mouseEvent(from, frameSize, showSize);
+}
+
+void Device::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->wheelEvent(from, frameSize, showSize);
+}
+
+void Device::keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
+{
+    if (!m_controller) {
+        return;
+    }
+    m_controller->keyEvent(from, frameSize, showSize);
+}
+
+void Device::grabCursor(bool grab)
 {
     if (!m_videoForm) {
         return;
     }
-    if (m_controlState == GCS_CLIENT) {
-        return;
-    }
     QRect rc = m_videoForm->getGrabCursorRect();
     MouseTap::getInstance()->enableMouseEventTap(rc, grab);
-}
-
-Device::GroupControlState Device::controlState()
-{
-    return m_controlState;
 }
 
 bool Device::isCurrentCustomKeymap()

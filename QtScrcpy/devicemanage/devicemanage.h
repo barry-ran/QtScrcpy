@@ -25,19 +25,9 @@ signals:
     void deviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
     void deviceDisconnected(QString serial);
 
-protected:
-    void setGroupControlSignals(Device *host, Device *client, bool install);
-    void setGroupControlHost(Device *host, bool install);
-
 protected slots:
     void onDeviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
     void onDeviceDisconnected(QString serial);
-    void onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState);
-
-    // neend convert frameSize to its frameSize
-    void onMouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize);
-    void onWheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize);
-    void onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize);
 
 private:
     quint16 getFreePort();

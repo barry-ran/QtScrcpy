@@ -193,7 +193,7 @@ void VideoForm::installShortcut()
         if (!m_device) {
             return;
         }
-        emit m_device->switchFullScreen();
+        switchFullScreen();
     });
 
     // resizeSquare
@@ -213,7 +213,7 @@ void VideoForm::installShortcut()
         if (!m_device) {
             return;
         }
-        emit m_device->postGoHome();
+        m_device->postGoHome();
     });
 
     // postGoBack
@@ -223,7 +223,7 @@ void VideoForm::installShortcut()
         if (!m_device) {
             return;
         }
-        emit m_device->postGoBack();
+        m_device->postGoBack();
     });
 
     // postAppSwitch
@@ -243,7 +243,7 @@ void VideoForm::installShortcut()
         if (!m_device) {
             return;
         }
-        emit m_device->postGoMenu();
+        m_device->postGoMenu();
     });
 
     // postVolumeUp
@@ -421,7 +421,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
         }
 
         if (isFullScreen() && m_device) {
-            emit m_device->switchFullScreen();
+            switchFullScreen();
         }
 
         if (isMaximized()) {
@@ -444,7 +444,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
     }
 }
 
-void VideoForm::onSwitchFullScreen()
+void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
         // 横屏全屏铺满全屏，恢复时，恢复保持宽高比
@@ -525,14 +525,14 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::MiddleButton) {
         if (m_device && !m_device->isCurrentCustomKeymap()) {
-            emit m_device->postGoHome();
+            m_device->postGoHome();
             return;
         }
     }
 
     if (event->button() == Qt::RightButton) {
         if (m_device && !m_device->isCurrentCustomKeymap()) {
-            emit m_device->postGoBack();
+            m_device->postGoBack();
             return;
         }
     }
@@ -655,7 +655,7 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         return;
     }
     if (Qt::Key_Escape == event->key() && !event->isAutoRepeat() && isFullScreen()) {
-        emit m_device->switchFullScreen();
+        switchFullScreen();
     }
 
     emit m_device->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());

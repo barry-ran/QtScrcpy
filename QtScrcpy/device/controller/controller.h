@@ -25,33 +25,32 @@ public:
     void updateScript(QString gameScript = "");
     bool isCurrentCustomKeymap();
 
-public slots:
-    void onPostGoBack();
-    void onPostGoHome();
-    void onPostGoMenu();
-    void onPostAppSwitch();
-    void onPostPower();
-    void onPostVolumeUp();
-    void onPostVolumeDown();
-    void onCopy();
-    void onCut();
-    void onExpandNotificationPanel();
-    void onCollapsePanel();
-    void onSetScreenPowerMode(ControlMsg::ScreenPowerMode mode);
+    void postGoBack();
+    void postGoHome();
+    void postGoMenu();
+    void postAppSwitch();
+    void postPower();
+    void postVolumeUp();
+    void postVolumeDown();
+    void copy();
+    void cut();
+    void expandNotificationPanel();
+    void collapsePanel();
+    void setScreenPowerMode(ControlMsg::ScreenPowerMode mode);
 
     // for input convert
-    void onMouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize);
-    void onWheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize);
-    void onKeyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize);
+    void mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize);
+    void wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize);
+    void keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize);
 
     // turn the screen on if it was off, press BACK otherwise
     // If the screen is off, it is turned on only on down
-    void onPostBackOrScreenOn(bool down);
-    void onRequestDeviceClipboard();
-    void onGetDeviceClipboard(bool cut = false);
-    void onSetDeviceClipboard(bool pause = true);
-    void onClipboardPaste();
-    void onPostTextInput(QString &text);
+    void postBackOrScreenOn(bool down);
+    void requestDeviceClipboard();
+    void getDeviceClipboard(bool cut = false);
+    void setDeviceClipboard(bool pause = true);
+    void clipboardPaste();
+    void postTextInput(QString &text);
 
 signals:
     void grabCursor(bool grab);
