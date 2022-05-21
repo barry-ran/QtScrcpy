@@ -7,6 +7,7 @@
 #include "iconhelper.h"
 #include "toolform.h"
 #include "ui_toolform.h"
+#include "videoform.h"
 
 ToolForm::ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos) : MagneticWidget(adsorbWidget, adsorbPos), ui(new Ui::ToolForm)
 {
@@ -28,7 +29,6 @@ void ToolForm::setDevice(Device *device)
         return;
     }
     m_device = device;
-    connect(m_device, &Device::controlStateChange, this, &ToolForm::onControlStateChange);
 }
 
 void ToolForm::initStyle()
@@ -54,17 +54,6 @@ void ToolForm::updateGroupControl()
 {
     if (!m_device) {
         return;
-    }
-    switch (m_device->controlState()) {
-    case Device::GroupControlState::GCS_FREE:
-        ui->groupControlBtn->setStyleSheet("color: #DCDCDC");
-        break;
-    case Device::GroupControlState::GCS_HOST:
-        ui->groupControlBtn->setStyleSheet("color: red");
-        break;
-    case Device::GroupControlState::GCS_CLIENT:
-        ui->groupControlBtn->setStyleSheet("color: green");
-        break;
     }
 }
 
@@ -107,7 +96,7 @@ void ToolForm::on_fullScreenBtn_clicked()
         return;
     }
 
-    emit m_device->switchFullScreen();
+    dynamic_cast<VideoForm*>(parent())->switchFullScreen();
 }
 
 void ToolForm::on_returnBtn_clicked()
@@ -115,7 +104,7 @@ void ToolForm::on_returnBtn_clicked()
     if (!m_device) {
         return;
     }
-    emit m_device->postGoBack();
+    m_device->postGoBack();
 }
 
 void ToolForm::on_homeBtn_clicked()
@@ -123,7 +112,7 @@ void ToolForm::on_homeBtn_clicked()
     if (!m_device) {
         return;
     }
-    emit m_device->postGoHome();
+    m_device->postGoHome();
 }
 
 void ToolForm::on_menuBtn_clicked()
@@ -131,7 +120,7 @@ void ToolForm::on_menuBtn_clicked()
     if (!m_device) {
         return;
     }
-    emit m_device->postGoMenu();
+    m_device->postGoMenu();
 }
 
 void ToolForm::on_appSwitchBtn_clicked()
@@ -155,7 +144,7 @@ void ToolForm::on_screenShotBtn_clicked()
     if (!m_device) {
         return;
     }
-    emit m_device->screenshot();
+    m_device->screenshot();
 }
 
 void ToolForm::on_volumeUpBtn_clicked()
@@ -197,7 +186,7 @@ void ToolForm::on_touchBtn_clicked()
     }
 
     m_showTouch = !m_showTouch;
-    emit m_device->showTouch(m_showTouch);
+    m_device->showTouch(m_showTouch);
 }
 
 void ToolForm::on_groupControlBtn_clicked()
@@ -205,21 +194,6 @@ void ToolForm::on_groupControlBtn_clicked()
     if (!m_device) {
         return;
     }
-    Device::GroupControlState state = m_device->controlState();
-    if (state == Device::GroupControlState::GCS_FREE) {
-        emit m_device->setControlState(m_device, Device::GroupControlState::GCS_HOST);
-    }
-    if (state == Device::GroupControlState::GCS_HOST) {
-        emit m_device->setControlState(m_device, Device::GroupControlState::GCS_FREE);
-    }
-}
-
-void ToolForm::onControlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState)
-{
-    Q_UNUSED(device)
-    Q_UNUSED(oldState)
-    Q_UNUSED(newState)
-    updateGroupControl();
 }
 
 void ToolForm::on_openScreenBtn_clicked()

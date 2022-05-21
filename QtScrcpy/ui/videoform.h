@@ -30,9 +30,9 @@ public:
     void resizeSquare();
     void removeBlackRect();
     void showFPS(bool show);
+    void switchFullScreen();
 
 public slots:
-    void onSwitchFullScreen();
     void updateFPS(quint32 fps);
 
 private:

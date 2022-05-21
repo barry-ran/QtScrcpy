@@ -43,34 +43,11 @@ public:
         bool stayAwake = false;           // 是否保持唤醒
         bool framelessWindow = false;     // 是否无边框窗口
     };
-    enum GroupControlState
-    {
-        GCS_FREE = 0,
-        GCS_HOST,
-        GCS_CLIENT,
-    };
     explicit Device(DeviceParams params, QObject *parent = nullptr);
     virtual ~Device();
 
     bool connectDevice();
     void disconnectDevice();
-
-    VideoForm *getVideoForm();
-    Server *getServer();
-    const QString &getSerial();
-    const QSize frameSize();
-
-    void updateScript(QString script);
-    Device::GroupControlState controlState();
-
-    bool isCurrentCustomKeymap();
-
-signals:
-    void deviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
-    void deviceDisconnected(QString serial);
-
-    // tool bar
-    void switchFullScreen();
     void postGoBack();
     void postGoHome();
     void postGoMenu();
@@ -95,21 +72,23 @@ signals:
     void mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize);
     void wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize);
     void keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize);
+    
 
-    // self connect signal and slots
     void screenshot();
     void showTouch(bool show);
-    void setControlState(Device *device, Device::GroupControlState state);
     void grabCursor(bool grab);
 
-    // for notify
-    void controlStateChange(Device *device, Device::GroupControlState oldState, Device::GroupControlState newState);
+    VideoForm *getVideoForm();
+    Server *getServer();
+    const QString &getSerial();
+    const QSize frameSize();
 
-public slots:
-    void onScreenshot();
-    void onShowTouch(bool show);
-    void onSetControlState(Device *device, Device::GroupControlState state);
-    void onGrabCursor(bool grab);
+    void updateScript(QString script);
+    bool isCurrentCustomKeymap();
+
+signals:
+    void deviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
+    void deviceDisconnected(QString serial);
 
 private:
     void initSignals();
@@ -129,8 +108,6 @@ private:
 
     QElapsedTimer m_startTimeCount;
     DeviceParams m_params;
-
-    GroupControlState m_controlState = GCS_FREE;
 };
 
 #endif // DEVICE_H
