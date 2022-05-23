@@ -6,14 +6,30 @@
 #include "devicemanage.h"
 #include "server.h"
 #include "videoform.h"
+#include "device.h"
+
+namespace qsc {
 
 #define DM_MAX_DEVICES_NUM 1000
 
-DeviceManage::DeviceManage(QObject *parent) : QObject(parent) {}
+IDeviceManage& IDeviceManage::getInstance() {
+    static DeviceManage dm;
+    return dm;
+}
+
+DeviceManage::DeviceManage() {}
 
 DeviceManage::~DeviceManage() {}
 
-bool DeviceManage::connectDevice(Device::DeviceParams params)
+QPointer<IDevice> DeviceManage::getDevice(const QString &serial)
+{
+    if (!m_devices.contains(serial)) {
+        return QPointer<IDevice>();
+    }
+    return m_devices[serial];
+}
+
+bool DeviceManage::connectDevice(qsc::DeviceParams params)
 {
     if (params.serial.trimmed().isEmpty()) {
         return false;
@@ -39,7 +55,7 @@ bool DeviceManage::connectDevice(Device::DeviceParams params)
         }
     }
     */
-    Device *device = new Device(params);
+    IDevice *device = new Device(params);
     connect(device, &Device::deviceConnected, this, &DeviceManage::onDeviceConnected);
     connect(device, &Device::deviceDisconnected, this, &DeviceManage::onDeviceDisconnected);
     if (!device->connectDevice()) {
@@ -56,43 +72,13 @@ bool DeviceManage::connectDevice(Device::DeviceParams params)
 void DeviceManage::updateScript(QString script)
 {
     m_script = script;
-    QMapIterator<QString, QPointer<Device>> i(m_devices);
+    QMapIterator<QString, QPointer<IDevice>> i(m_devices);
     while (i.hasNext()) {
         i.next();
         if (i.value()) {
             i.value()->updateScript(script);
         }
     }
-}
-
-bool DeviceManage::staysOnTop(const QString &serial)
-{
-    if (!serial.isEmpty() && m_devices.contains(serial)) {
-        auto it = m_devices.find(serial);
-        if (!it->data()) {
-            return false;
-        }
-        if (!it->data()->getVideoForm()) {
-            return false;
-        }
-        it->data()->getVideoForm()->staysOnTop();
-    }
-    return true;
-}
-
-void DeviceManage::showFPS(const QString &serial, bool show)
-{
-    if (!serial.isEmpty() && m_devices.contains(serial)) {
-        auto it = m_devices.find(serial);
-        if (!it->data()) {
-            return;
-        }
-        if (!it->data()->getVideoForm()) {
-            return;
-        }
-        it->data()->getVideoForm()->showFPS(show);
-    }
-    return;
 }
 
 bool DeviceManage::disconnectDevice(const QString &serial)
@@ -110,7 +96,7 @@ bool DeviceManage::disconnectDevice(const QString &serial)
 
 void DeviceManage::disconnectAllDevice()
 {
-    QMapIterator<QString, QPointer<Device>> i(m_devices);
+    QMapIterator<QString, QPointer<IDevice>> i(m_devices);
     while (i.hasNext()) {
         i.next();
         if (i.value()) {
@@ -121,16 +107,16 @@ void DeviceManage::disconnectAllDevice()
 
 void DeviceManage::onDeviceConnected(bool success, const QString &serial, const QString &deviceName, const QSize &size)
 {
+    emit deviceConnected(success, serial, deviceName, size);
     if (!success) {
         removeDevice(serial);
     }
-    emit deviceConnected(success, serial, deviceName, size);
 }
 
 void DeviceManage::onDeviceDisconnected(QString serial)
 {
-    removeDevice(serial);
     emit deviceDisconnected(serial);
+    removeDevice(serial);
 }
 
 quint16 DeviceManage::getFreePort()
@@ -138,11 +124,11 @@ quint16 DeviceManage::getFreePort()
     quint16 port = m_localPortStart;
     while (port < m_localPortStart + DM_MAX_DEVICES_NUM) {
         bool used = false;
-        QMapIterator<QString, QPointer<Device>> i(m_devices);
+        QMapIterator<QString, QPointer<IDevice>> i(m_devices);
         while (i.hasNext()) {
             i.next();
             auto device = i.value();
-            if (device && device->getServer() && device->getServer()->isReverse() && port == device->getServer()->getParams().localPort) {
+            if (device && device->isReversePort(port)) {
                 used = true;
                 break;
             }
@@ -161,4 +147,6 @@ void DeviceManage::removeDevice(const QString &serial)
         m_devices[serial]->deleteLater();
         m_devices.remove(serial);
     }
+}
+
 }

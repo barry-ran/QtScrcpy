@@ -8,13 +8,14 @@
 #include "decoder.h"
 #include "device.h"
 #include "filehandler.h"
-#include "mousetap/mousetap.h"
 #include "recorder.h"
 #include "server.h"
 #include "stream.h"
 #include "videoform.h"
 
-Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params(params)
+namespace qsc {
+
+Device::Device(DeviceParams params, QObject *parent) : IDevice(parent), m_params(params)
 {
     if (!params.display && m_params.recordFileName.trimmed().isEmpty()) {
         qCritical("not display must be recorded");
@@ -23,8 +24,8 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
 
     if (params.display) {
         m_decoder = new Decoder([this](int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV) {
-            if (m_videoForm) {
-                m_videoForm->updateRender(width, height, dataY, dataU, dataV, linesizeY, linesizeU, linesizeV);
+            for (const auto& item : m_deviceObservers) {
+                item->onFrame(width, height, dataY, dataU, dataV, linesizeY, linesizeU, linesizeV);
             }
         }, this);
         m_fileHandler = new FileHandler(this);
@@ -35,8 +36,6 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
 
             return m_server->getControlSocket()->write(buffer.data(), buffer.length());
         }, params.gameScript, this);
-        m_videoForm = new VideoForm(params.framelessWindow, Config::getInstance().getSkin());
-        m_videoForm->setDevice(this);
     }
 
     m_stream = new Stream([this](quint8 *buf, qint32 bufSize) -> qint32 {
@@ -57,31 +56,32 @@ Device::Device(DeviceParams params, QObject *parent) : QObject(parent), m_params
 
 Device::~Device()
 {
-    disconnectDevice();
+    Device::disconnectDevice();
 }
 
-VideoForm *Device::getVideoForm()
+void Device::setUserData(void *data)
 {
-    return m_videoForm;
+    m_userData = data;
 }
 
-Server *Device::getServer()
+void *Device::getUserData()
 {
-    return m_server;
+    return m_userData;
+}
+
+void Device::registerDeviceObserver(DeviceObserver *observer)
+{
+    m_deviceObservers.insert(observer);
+}
+
+void Device::deRegisterDeviceObserver(DeviceObserver *observer)
+{
+    m_deviceObservers.erase(observer);
 }
 
 const QString &Device::getSerial()
 {
     return m_params.serial;
-}
-
-const QSize Device::frameSize()
-{
-    QSize size;
-    if (!m_videoForm) {
-        return size;
-    }
-    return m_videoForm->frameSize();
 }
 
 void Device::updateScript(QString script)
@@ -119,34 +119,26 @@ void Device::showTouch(bool show)
     qInfo() << getSerial() << " show touch " << (show ? "enable" : "disable");
 }
 
+bool Device::isReversePort(quint16 port)
+{
+    if (m_server && m_server->isReverse() && port == m_server->getParams().localPort) {
+        return true;
+    }
+
+    return false;
+}
+
 void Device::initSignals()
 {
     if (m_controller) {
-        connect(m_controller, &Controller::grabCursor, this, &Device::grabCursor);
-    }
-    if (m_controller) {
-        /*
-        connect(this, &Device::postAppSwitch, m_controller, &Controller::onPostAppSwitch);
-        connect(this, &Device::postPower, m_controller, &Controller::onPostPower);
-        connect(this, &Device::postVolumeUp, m_controller, &Controller::onPostVolumeUp);
-        connect(this, &Device::postVolumeDown, m_controller, &Controller::onPostVolumeDown);
-        connect(this, &Device::postCopy, m_controller, &Controller::onCopy);
-        connect(this, &Device::postCut, m_controller, &Controller::onCut);
-        connect(this, &Device::setScreenPowerMode, m_controller, &Controller::onSetScreenPowerMode);
-        connect(this, &Device::expandNotificationPanel, m_controller, &Controller::onExpandNotificationPanel);
-        connect(this, &Device::collapsePanel, m_controller, &Controller::onCollapsePanel);
-        connect(this, &Device::mouseEvent, m_controller, &Controller::onMouseEvent);
-        connect(this, &Device::wheelEvent, m_controller, &Controller::onWheelEvent);
-        connect(this, &Device::keyEvent, m_controller, &Controller::onKeyEvent);
-
-        connect(this, &Device::postBackOrScreenOn, m_controller, &Controller::onPostBackOrScreenOn);
-        connect(this, &Device::setDeviceClipboard, m_controller, &Controller::onSetDeviceClipboard);
-        connect(this, &Device::clipboardPaste, m_controller, &Controller::onClipboardPaste);
-        connect(this, &Device::postTextInput, m_controller, &Controller::onPostTextInput);
-        */
+        connect(m_controller, &Controller::grabCursor, this, [this](bool grab){
+            for (const auto& item : m_deviceObservers) {
+                item->grabCursor(grab);
+            }
+        });
     }
     if (m_fileHandler) {
-        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
+        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
             QString tipsType = "";
             if (isApk) {
                 tipsType = tr("install apk");
@@ -173,29 +165,6 @@ void Device::initSignals()
             if (success) {
                 double diff = m_startTimeCount.elapsed() / 1000.0;
                 qInfo() << QString("server start finish in %1s").arg(diff).toStdString().c_str();
-
-
-                // update ui
-                if (m_videoForm) {
-                    // must be show before updateShowSize
-                    m_videoForm->show();
-                    QString name = Config::getInstance().getNickName(m_params.serial);
-                    if (name.isEmpty()) {
-                        name = Config::getInstance().getTitle();
-                    }
-                    m_videoForm->setWindowTitle(name + "-" + m_params.serial);
-                    m_videoForm->updateShowSize(size);
-
-                    bool deviceVer = size.height() > size.width();
-                    QRect rc = Config::getInstance().getRect(getSerial());
-                    bool rcVer = rc.height() > rc.width();
-                    // same width/height rate
-                    if (rc.isValid() && (deviceVer == rcVer)) {
-                        // mark: resize is for fix setGeometry magneticwidget bug
-                        m_videoForm->resize(rc.size());
-                        m_videoForm->setGeometry(rc);
-                    }
-                }
 
                 // init recorder
                 if (m_recorder) {
@@ -272,7 +241,11 @@ void Device::initSignals()
     }
 
     if (m_decoder) {
-        connect(m_decoder, &Decoder::updateFPS, m_videoForm, &VideoForm::updateFPS);
+        connect(m_decoder, &Decoder::updateFPS, this, [this](quint32 fps) {
+            for (const auto& item : m_deviceObservers) {
+                item->updateFPS(fps);
+            }
+        });
     }
 }
 
@@ -332,10 +305,6 @@ void Device::disconnectDevice()
             m_recorder->wait();
         }
         m_recorder->close();
-    }
-    if (m_videoForm) {
-        m_videoForm->close();
-        m_videoForm->deleteLater();
     }
 
     emit deviceDisconnected(m_params.serial);
@@ -413,10 +382,16 @@ void Device::postCut()
     m_controller->cut();
 }
 
-void Device::setScreenPowerMode(ControlMsg::ScreenPowerMode mode)
+void Device::setScreenPowerMode(bool open)
 {
     if (!m_controller) {
         return;
+    }
+    ControlMsg::ScreenPowerMode mode{};
+    if (open) {
+        mode = ControlMsg::SPM_NORMAL;
+    } else {
+        mode = ControlMsg::SPM_OFF;
     }
     m_controller->setScreenPowerMode(mode);
 }
@@ -517,15 +492,6 @@ void Device::keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize
     m_controller->keyEvent(from, frameSize, showSize);
 }
 
-void Device::grabCursor(bool grab)
-{
-    if (!m_videoForm) {
-        return;
-    }
-    QRect rc = m_videoForm->getGrabCursorRect();
-    MouseTap::getInstance()->enableMouseEventTap(rc, grab);
-}
-
 bool Device::isCurrentCustomKeymap()
 {
     if (!m_controller) {
@@ -561,4 +527,6 @@ bool Device::saveFrame(int width, int height, uint8_t* dataRGB32)
 
     qInfo() << "screenshot save to " << absFilePath;
     return true;
+}
+
 }

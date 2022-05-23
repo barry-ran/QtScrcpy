@@ -4,26 +4,24 @@
 #include <QMap>
 #include <QPointer>
 
-#include "device.h"
+#include "../include/QtScrcpyCore.h"
 
-class DeviceManage : public QObject
+namespace qsc {
+
+class DeviceManage : public IDeviceManage
 {
     Q_OBJECT
 public:
-    explicit DeviceManage(QObject *parent = nullptr);
+    explicit DeviceManage();
     virtual ~DeviceManage();
 
-    bool connectDevice(Device::DeviceParams params);
-    bool disconnectDevice(const QString &serial);
-    void disconnectAllDevice();
+    virtual QPointer<IDevice> getDevice(const QString& serial) override;
 
-    void updateScript(QString script);
-    bool staysOnTop(const QString &serial);
-    void showFPS(const QString &serial, bool show);
+    bool connectDevice(qsc::DeviceParams params) override;
+    bool disconnectDevice(const QString &serial) override;
+    void disconnectAllDevice() override;
 
-signals:
-    void deviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
-    void deviceDisconnected(QString serial);
+    void updateScript(QString script) override;
 
 protected slots:
     void onDeviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
@@ -34,9 +32,10 @@ private:
     void removeDevice(const QString& serial);
 
 private:
-    QMap<QString, QPointer<Device>> m_devices;
+    QMap<QString, QPointer<IDevice>> m_devices;
     quint16 m_localPortStart = 27183;
     QString m_script;
 };
 
+}
 #endif // DEVICEMANAGE_H

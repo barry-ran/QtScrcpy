@@ -4,7 +4,7 @@
 #include <QPointer>
 #include <QWidget>
 
-#include "device.h"
+#include "../include/QtScrcpyCore.h"
 #include "magneticwidget.h"
 
 namespace Ui
@@ -21,7 +21,7 @@ public:
     explicit ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos);
     ~ToolForm();
 
-    void setDevice(Device *device);
+    void setSerial(const QString& serial);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -54,7 +54,7 @@ private:
 private:
     Ui::ToolForm *ui;
     QPoint m_dragPosition;
-    QPointer<Device> m_device;
+    QString m_serial;
     bool m_showTouch = false;
 };
 
