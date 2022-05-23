@@ -105,6 +105,13 @@ set(QC_COMMON_SOURCES
 )
 source_group(common FILES ${QC_COMMON_SOURCES})
 
+# include
+set(QC_INCLUDE_SOURCES
+    include/QtScrcpyCore.h
+    include/QtScrcpyCoreDef.h
+)
+source_group(include FILES ${QC_INCLUDE_SOURCES})
+
 # device
 set(QC_DEVICE_SOURCES
     device/device.h
@@ -259,6 +266,7 @@ qt5_add_translation(QC_QM_FILES ${QC_TS_FILES})
 
 # all sources
 set(QC_PROJECT_SOURCES
+    ${QC_INCLUDE_SOURCES}
     ${QC_ADB_SOURCES}
     ${QC_COMMON_SOURCES}
     ${QC_DEVICE_SOURCES}

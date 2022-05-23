@@ -95,15 +95,15 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
     });
     connect(m_hideIcon, &QSystemTrayIcon::activated, this, &Dialog::slotActivated);
 
-    connect(&m_deviceManage, &DeviceManage::deviceConnected, this, &Dialog::onDeviceConnected);
-    connect(&m_deviceManage, &DeviceManage::deviceDisconnected, this, &Dialog::onDeviceDisconnected);
+    connect(&qsc::IDeviceManage::getInstance(), &qsc::IDeviceManage::deviceConnected, this, &Dialog::onDeviceConnected);
+    connect(&qsc::IDeviceManage::getInstance(), &qsc::IDeviceManage::deviceDisconnected, this, &Dialog::onDeviceDisconnected);
 }
 
 Dialog::~Dialog()
 {
     qDebug() << "~Dialog()";
     updateBootConfig(false);
-    m_deviceManage.disconnectAllDevice();
+    qsc::IDeviceManage::getInstance().disconnectAllDevice();
     delete ui;
 }
 
@@ -280,7 +280,7 @@ void Dialog::on_startServerBtn_clicked()
 
     // this is ok that "native" toUshort is 0
     quint16 videoSize = ui->maxSizeBox->currentText().trimmed().toUShort();
-    Device::DeviceParams params;
+    qsc::DeviceParams params;
     params.serial = ui->serialBox->currentText().trimmed();
     params.maxSize = videoSize;
     params.bitRate = getBitRate();
@@ -298,17 +298,12 @@ void Dialog::on_startServerBtn_clicked()
     params.serverLocalPath = getServerPath();
     params.serverRemotePath = Config::getInstance().getServerPath();
 
-    m_deviceManage.connectDevice(params);
-
-    if (ui->alwaysTopCheck->isChecked()) {
-        m_deviceManage.staysOnTop(params.serial);
-    }
-    m_deviceManage.showFPS(params.serial, ui->fpsCheck->isChecked());
+    qsc::IDeviceManage::getInstance().connectDevice(params);
 }
 
 void Dialog::on_stopServerBtn_clicked()
 {
-    if (m_deviceManage.disconnectDevice(ui->serialBox->currentText().trimmed())) {
+    if (qsc::IDeviceManage::getInstance().disconnectDevice(ui->serialBox->currentText().trimmed())) {
         outLog("stop server");
     }
 }
@@ -423,12 +418,51 @@ void Dialog::getIPbyIp()
 
 void Dialog::onDeviceConnected(bool success, const QString &serial, const QString &deviceName, const QSize &size)
 {
+    if (!success) {
+        return;
+    }
+
+    auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin());
+    videoForm->setSerial(serial);
+
+    qsc::IDeviceManage::getInstance().getDevice(serial)->setUserData(static_cast<void*>(videoForm));
+    qsc::IDeviceManage::getInstance().getDevice(serial)->registerDeviceObserver(videoForm);
+
+    videoForm->showFPS(ui->fpsCheck->isChecked());
+    if (ui->alwaysTopCheck->isChecked()) {
+        videoForm->staysOnTop();
+    }
+
+    // must be show before updateShowSize
+    videoForm->show();
+    QString name = Config::getInstance().getNickName(serial);
+    if (name.isEmpty()) {
+        name = Config::getInstance().getTitle();
+    }
+    videoForm->setWindowTitle(name + "-" + serial);
+    videoForm->updateShowSize(size);
+
+    bool deviceVer = size.height() > size.width();
+    QRect rc = Config::getInstance().getRect(serial);
+    bool rcVer = rc.height() > rc.width();
+    // same width/height rate
+    if (rc.isValid() && (deviceVer == rcVer)) {
+        // mark: resize is for fix setGeometry magneticwidget bug
+        videoForm->resize(rc.size());
+        videoForm->setGeometry(rc);
+    }
 
 }
 
 void Dialog::onDeviceDisconnected(QString serial)
 {
-
+    auto data = qsc::IDeviceManage::getInstance().getDevice(serial)->getUserData();
+    if (data) {
+        VideoForm* vf = static_cast<VideoForm*>(data);
+        qsc::IDeviceManage::getInstance().getDevice(serial)->deRegisterDeviceObserver(vf);
+        vf->close();
+        vf->deleteLater();
+    }
 }
 
 void Dialog::on_wirelessDisConnectBtn_clicked()
@@ -474,7 +508,7 @@ void Dialog::on_clearOut_clicked()
 
 void Dialog::on_stopAllServerBtn_clicked()
 {
-    m_deviceManage.disconnectAllDevice();
+    qsc::IDeviceManage::getInstance().disconnectAllDevice();
 }
 
 void Dialog::on_refreshGameScriptBtn_clicked()
@@ -497,7 +531,7 @@ void Dialog::on_refreshGameScriptBtn_clicked()
 
 void Dialog::on_applyScriptBtn_clicked()
 {
-    m_deviceManage.updateScript(getGameScript(ui->gameBox->currentText()));
+    qsc::IDeviceManage::getInstance().updateScript(getGameScript(ui->gameBox->currentText()));
 }
 
 void Dialog::on_recordScreenCheck_clicked(bool checked)

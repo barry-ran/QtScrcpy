@@ -42,6 +42,7 @@ SOURCES += \
         main.cpp
 
 # 子工程
+include ($$PWD/include/include.pri)
 include ($$PWD/common/common.pri)
 include ($$PWD/adb/adb.pri)
 include ($$PWD/uibase/uibase.pri)

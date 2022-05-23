@@ -4,17 +4,18 @@
 #include <QPointer>
 #include <QWidget>
 
+#include "../include/QtScrcpyCore.h"
+
 namespace Ui
 {
     class videoForm;
 }
 
 class ToolForm;
-class Device;
 class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
-class VideoForm : public QWidget
+class VideoForm : public QWidget, public qsc::DeviceObserver
 {
     Q_OBJECT
 public:
@@ -24,7 +25,7 @@ public:
     void staysOnTop(bool top = true);
     void updateShowSize(const QSize &newSize);
     void updateRender(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV);
-    void setDevice(Device *device);
+    void setSerial(const QString& serial);
     QRect getGrabCursorRect();
     const QSize &frameSize();
     void resizeSquare();
@@ -32,10 +33,12 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
 
-public slots:
-    void updateFPS(quint32 fps);
-
 private:
+    void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
+                 int linesizeY, int linesizeU, int linesizeV) override;
+    void updateFPS(quint32 fps) override;
+    void grabCursor(bool grab) override;
+
     void updateStyleSheet(bool vertical);
     QMargins getMargins(bool vertical);
     void initUI();
@@ -78,9 +81,7 @@ private:
     float m_widthHeightRatio = 0.5f;
     bool m_skin = true;
     QPoint m_fullScreenBeforePos;
-
-    //outside member
-    QPointer<Device> m_device;
+    QString m_serial;
 };
 
 #endif // VIDEOFORM_H

@@ -10,7 +10,7 @@
 
 
 #include "adbprocess.h"
-#include "devicemanage.h"
+#include "../include/QtScrcpyCore.h"
 
 namespace Ui
 {
@@ -76,7 +76,6 @@ protected:
 private:
     Ui::Dialog *ui;
     AdbProcess m_adb;
-    DeviceManage m_deviceManage;
     QSystemTrayIcon *m_hideIcon;
     QMenu *m_menu;
     QAction *m_showWindow;
