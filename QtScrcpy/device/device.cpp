@@ -17,7 +17,7 @@ namespace qsc {
 
 Device::Device(DeviceParams params, QObject *parent) : IDevice(parent), m_params(params)
 {
-    if (!params.display && m_params.recordFileName.trimmed().isEmpty()) {
+    if (!params.display && !m_params.recordFile) {
         qCritical("not display must be recorded");
         return;
     }
@@ -48,8 +48,17 @@ Device::Device(DeviceParams params, QObject *parent) : IDevice(parent), m_params
     }, this);
 
     m_server = new Server(this);
-    if (!m_params.recordFileName.trimmed().isEmpty()) {
-        m_recorder = new Recorder(m_params.recordFileName, this);
+    if (m_params.recordFile && !m_params.recordPath.trimmed().isEmpty()) {
+        QString absFilePath;
+        QString fileDir(m_params.recordPath);
+        if (!fileDir.isEmpty()) {
+            QDateTime dateTime = QDateTime::currentDateTime();
+            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
+            fileName = m_params.serial + fileName + "." + m_params.recordFileFormat;
+            QDir dir(fileDir);
+            absFilePath = dir.absoluteFilePath(fileName);
+        }
+        m_recorder = new Recorder(absFilePath, this);
     }
     initSignals();
 }

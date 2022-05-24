@@ -265,19 +265,6 @@ void Dialog::on_startServerBtn_clicked()
 {
     outLog("start server...", false);
 
-    QString absFilePath;
-    if (ui->recordScreenCheck->isChecked()) {
-        QString fileDir(ui->recordPathEdt->text().trimmed());
-        if (!fileDir.isEmpty()) {
-            QDateTime dateTime = QDateTime::currentDateTime();
-            QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
-            QString ext = ui->formatBox->currentText().trimmed();
-            fileName = windowTitle() + fileName + "." + ext;
-            QDir dir(fileDir);
-            absFilePath = dir.absoluteFilePath(fileName);
-        }
-    }
-
     // this is ok that "native" toUshort is 0
     quint16 videoSize = ui->maxSizeBox->currentText().trimmed().toUShort();
     qsc::DeviceParams params;
@@ -286,15 +273,14 @@ void Dialog::on_startServerBtn_clicked()
     params.bitRate = getBitRate();
     // on devices with Android >= 10, the capture frame rate can be limited
     params.maxFps = static_cast<quint32>(Config::getInstance().getMaxFps());
-    params.recordFileName = absFilePath;
     params.closeScreen = ui->closeScreenCheck->isChecked();
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
     params.renderExpiredFrames = Config::getInstance().getRenderExpiredFrames();
     params.lockVideoOrientation = ui->lockOrientationBox->currentIndex() - 1;
     params.stayAwake = ui->stayAwakeCheck->isChecked();
-    params.framelessWindow = ui->framelessCheck->isChecked();
     params.recordPath = ui->recordPathEdt->text().trimmed();
+    params.recordFileFormat = ui->formatBox->currentText().trimmed();
     params.serverLocalPath = getServerPath();
     params.serverRemotePath = Config::getInstance().getServerPath();
 
