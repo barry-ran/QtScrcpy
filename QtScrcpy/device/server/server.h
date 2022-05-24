@@ -26,18 +26,21 @@ class Server : public QObject
 public:
     struct ServerParams
     {
-        QString serverLocalPath = "";  // 本地安卓server路径
-        QString serverRemotePath = ""; // 要推送到远端设备的server路径
-        QString serial = "";           // 设备序列号
+        // necessary
+        QString serial = "";              // 设备序列号
+        QString serverLocalPath = "";     // 本地安卓server路径
+
+        // optional
+        QString serverRemotePath = "/data/local/tmp/scrcpy-server.jar";    // 要推送到远端设备的server路径
         quint16 localPort = 27183;     // reverse时本地监听端口
         quint16 maxSize = 720;         // 视频分辨率
         quint32 bitRate = 8000000;     // 视频比特率
         quint32 maxFps = 60;           // 视频最大帧率
-        QString crop = "";             // 视频裁剪
-        bool control = true;           // 安卓端是否接收键鼠控制
         bool useReverse = true;        // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
         int lockVideoOrientation = -1; // 是否锁定视频方向
         int stayAwake = false;         // 是否保持唤醒
+        QString crop = "";             // 视频裁剪
+        bool control = true;           // 安卓端是否接收键鼠控制
     };
 
     explicit Server(QObject *parent = nullptr);
