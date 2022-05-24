@@ -280,11 +280,11 @@ bool Device::connectDevice()
         params.maxSize = m_params.maxSize;
         params.bitRate = m_params.bitRate;
         params.maxFps = m_params.maxFps;
-        params.crop = "";
-        params.control = true;
         params.useReverse = m_params.useReverse;
         params.lockVideoOrientation = m_params.lockVideoOrientation;
         params.stayAwake = m_params.stayAwake;
+        params.crop = "";
+        params.control = true;
         m_server->start(params);
     });
 
