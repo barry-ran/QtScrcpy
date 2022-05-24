@@ -77,13 +77,10 @@ class IDeviceManage : public QObject {
     Q_OBJECT
 public:
     static IDeviceManage& getInstance();
-
-    virtual QPointer<IDevice> getDevice(const QString& serial) = 0;
     virtual bool connectDevice(DeviceParams params) = 0;
     virtual bool disconnectDevice(const QString &serial) = 0;
     virtual void disconnectAllDevice() = 0;
-
-    virtual void updateScript(QString script) = 0;
+    virtual QPointer<IDevice> getDevice(const QString& serial) = 0;
 
 signals:
     void deviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);

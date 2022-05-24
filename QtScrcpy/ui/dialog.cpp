@@ -283,6 +283,7 @@ void Dialog::on_startServerBtn_clicked()
     params.recordFileFormat = ui->formatBox->currentText().trimmed();
     params.serverLocalPath = getServerPath();
     params.serverRemotePath = Config::getInstance().getServerPath();
+    params.gameScript = getGameScript(ui->gameBox->currentText());
 
     qsc::IDeviceManage::getInstance().connectDevice(params);
 }
@@ -517,7 +518,13 @@ void Dialog::on_refreshGameScriptBtn_clicked()
 
 void Dialog::on_applyScriptBtn_clicked()
 {
-    qsc::IDeviceManage::getInstance().updateScript(getGameScript(ui->gameBox->currentText()));
+    auto curSerial = ui->serialBox->currentText().trimmed();
+    auto device = qsc::IDeviceManage::getInstance().getDevice(curSerial);
+    if (!device) {
+        return;
+    }
+
+    device->updateScript(getGameScript(ui->gameBox->currentText()));
 }
 
 void Dialog::on_recordScreenCheck_clicked(bool checked)
