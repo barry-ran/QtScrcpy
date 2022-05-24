@@ -63,22 +63,7 @@ bool DeviceManage::connectDevice(qsc::DeviceParams params)
         return false;
     }
     m_devices[params.serial] = device;
-    if (!m_script.isEmpty()) {
-        device->updateScript(m_script);
-    }
     return true;
-}
-
-void DeviceManage::updateScript(QString script)
-{
-    m_script = script;
-    QMapIterator<QString, QPointer<IDevice>> i(m_devices);
-    while (i.hasNext()) {
-        i.next();
-        if (i.value()) {
-            i.value()->updateScript(script);
-        }
-    }
 }
 
 bool DeviceManage::disconnectDevice(const QString &serial)

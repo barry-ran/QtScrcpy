@@ -21,8 +21,6 @@ public:
     bool disconnectDevice(const QString &serial) override;
     void disconnectAllDevice() override;
 
-    void updateScript(QString script) override;
-
 protected slots:
     void onDeviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);
     void onDeviceDisconnected(QString serial);
