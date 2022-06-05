@@ -94,10 +94,10 @@ message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSIO
 
 # adb
 set(QC_ADB_SOURCES
-    adb/adbprocess.h
-    adb/adbprocess.cpp
+    QtScrcpyCore/src/adb/adbprocess.h
+    QtScrcpyCore/src/adb/adbprocess.cpp
 )
-source_group(adb FILES ${QC_ADB_SOURCES})
+source_group(QtScrcpyCore/src/adb FILES ${QC_ADB_SOURCES})
 
 # common
 set(QC_COMMON_SOURCES
@@ -107,64 +107,64 @@ source_group(common FILES ${QC_COMMON_SOURCES})
 
 # include
 set(QC_INCLUDE_SOURCES
-    include/QtScrcpyCore.h
-    include/QtScrcpyCoreDef.h
+    QtScrcpyCore/include/QtScrcpyCore.h
+    QtScrcpyCore/include/QtScrcpyCoreDef.h
 )
-source_group(include FILES ${QC_INCLUDE_SOURCES})
+source_group(QtScrcpyCore/include FILES ${QC_INCLUDE_SOURCES})
 
 # device
 set(QC_DEVICE_SOURCES
-    device/device.h
-    device/device.cpp
-    device/android/input.h
-    device/android/keycodes.h
-    device/controller/controller.h
-    device/controller/controller.cpp
-    device/controller/inputconvert/inputconvertbase.h
-    device/controller/inputconvert/inputconvertbase.cpp
-    device/controller/inputconvert/inputconvertnormal.h
-    device/controller/inputconvert/inputconvertnormal.cpp
-    device/controller/inputconvert/inputconvertgame.h
-    device/controller/inputconvert/inputconvertgame.cpp
-    device/controller/inputconvert/controlmsg.h
-    device/controller/inputconvert/controlmsg.cpp
-    device/controller/inputconvert/keymap/keymap.h
-    device/controller/inputconvert/keymap/keymap.cpp
-    device/controller/receiver/devicemsg.h
-    device/controller/receiver/devicemsg.cpp
-    device/controller/receiver/receiver.h
-    device/controller/receiver/receiver.cpp
-    device/decoder/avframeconvert.h
-    device/decoder/avframeconvert.cpp
-    device/decoder/decoder.h
-    device/decoder/decoder.cpp
-    device/decoder/fpscounter.h
-    device/decoder/fpscounter.cpp
-    device/decoder/videobuffer.h
-    device/decoder/videobuffer.cpp
-    device/filehandler/filehandler.h
-    device/filehandler/filehandler.cpp
-    device/recorder/recorder.h
-    device/recorder/recorder.cpp
-    device/render/qyuvopenglwidget.h
-    device/render/qyuvopenglwidget.cpp
-    device/server/server.h
-    device/server/server.cpp
-    device/server/tcpserver.h
-    device/server/tcpserver.cpp
-    device/server/videosocket.h
-    device/server/videosocket.cpp
-    device/stream/stream.h
-    device/stream/stream.cpp
+    QtScrcpyCore/src/device/device.h
+    QtScrcpyCore/src/device/device.cpp
+    QtScrcpyCore/src/device/android/input.h
+    QtScrcpyCore/src/device/android/keycodes.h
+    QtScrcpyCore/src/device/controller/controller.h
+    QtScrcpyCore/src/device/controller/controller.cpp
+    QtScrcpyCore/src/device/controller/inputconvert/inputconvertbase.h
+    QtScrcpyCore/src/device/controller/inputconvert/inputconvertbase.cpp
+    QtScrcpyCore/src/device/controller/inputconvert/inputconvertnormal.h
+    QtScrcpyCore/src/device/controller/inputconvert/inputconvertnormal.cpp
+    QtScrcpyCore/src/device/controller/inputconvert/inputconvertgame.h
+    QtScrcpyCore/src/device/controller/inputconvert/inputconvertgame.cpp
+    QtScrcpyCore/src/device/controller/inputconvert/controlmsg.h
+    QtScrcpyCore/src/device/controller/inputconvert/controlmsg.cpp
+    QtScrcpyCore/src/device/controller/inputconvert/keymap/keymap.h
+    QtScrcpyCore/src/device/controller/inputconvert/keymap/keymap.cpp
+    QtScrcpyCore/src/device/controller/receiver/devicemsg.h
+    QtScrcpyCore/src/device/controller/receiver/devicemsg.cpp
+    QtScrcpyCore/src/device/controller/receiver/receiver.h
+    QtScrcpyCore/src/device/controller/receiver/receiver.cpp
+    QtScrcpyCore/src/device/decoder/avframeconvert.h
+    QtScrcpyCore/src/device/decoder/avframeconvert.cpp
+    QtScrcpyCore/src/device/decoder/decoder.h
+    QtScrcpyCore/src/device/decoder/decoder.cpp
+    QtScrcpyCore/src/device/decoder/fpscounter.h
+    QtScrcpyCore/src/device/decoder/fpscounter.cpp
+    QtScrcpyCore/src/device/decoder/videobuffer.h
+    QtScrcpyCore/src/device/decoder/videobuffer.cpp
+    QtScrcpyCore/src/device/filehandler/filehandler.h
+    QtScrcpyCore/src/device/filehandler/filehandler.cpp
+    QtScrcpyCore/src/device/recorder/recorder.h
+    QtScrcpyCore/src/device/recorder/recorder.cpp
+    QtScrcpyCore/src/device/render/qyuvopenglwidget.h
+    QtScrcpyCore/src/device/render/qyuvopenglwidget.cpp
+    QtScrcpyCore/src/device/server/server.h
+    QtScrcpyCore/src/device/server/server.cpp
+    QtScrcpyCore/src/device/server/tcpserver.h
+    QtScrcpyCore/src/device/server/tcpserver.cpp
+    QtScrcpyCore/src/device/server/videosocket.h
+    QtScrcpyCore/src/device/server/videosocket.cpp
+    QtScrcpyCore/src/device/stream/stream.h
+    QtScrcpyCore/src/device/stream/stream.cpp
 )
-source_group(device FILES ${QC_DEVICE_SOURCES})
+source_group(QtScrcpyCore/src/device FILES ${QC_DEVICE_SOURCES})
 
 # devicemanage
 set(QC_DEVICEMANAGE_SOURCES
-    devicemanage/devicemanage.h
-    devicemanage/devicemanage.cpp
+    QtScrcpyCore/src/devicemanage/devicemanage.h
+    QtScrcpyCore/src/devicemanage/devicemanage.cpp
 )
-source_group(devicemanage FILES ${QC_DEVICEMANAGE_SOURCES})
+source_group(QtScrcpyCore/src/devicemanage FILES ${QC_DEVICEMANAGE_SOURCES})
 
 # fontawesome
 set(QC_FONTAWESOME_SOURCES
@@ -293,22 +293,22 @@ add_executable(${PROJECT_NAME} ${QC_RUNTIME_TYPE} ${QC_PROJECT_SOURCES})
 # Internal include path (todo: remove this, use absolute path include)
 #
 
-target_include_directories(${PROJECT_NAME} PRIVATE adb)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/adb)
 target_include_directories(${PROJECT_NAME} PRIVATE common)
-target_include_directories(${PROJECT_NAME} PRIVATE device)
-target_include_directories(${PROJECT_NAME} PRIVATE device/filehandler)
-target_include_directories(${PROJECT_NAME} PRIVATE device/android)
-target_include_directories(${PROJECT_NAME} PRIVATE device/decoder)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller/receiver)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller/inputconvert)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller/inputconvert/keymap)
-target_include_directories(${PROJECT_NAME} PRIVATE device/server)
-target_include_directories(${PROJECT_NAME} PRIVATE device/stream)
-target_include_directories(${PROJECT_NAME} PRIVATE device/render)
-target_include_directories(${PROJECT_NAME} PRIVATE device/ui)
-target_include_directories(${PROJECT_NAME} PRIVATE device/recorder)
-target_include_directories(${PROJECT_NAME} PRIVATE devicemanage)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/filehandler)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/android)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/decoder)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller/receiver)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller/inputconvert)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller/inputconvert/keymap)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/server)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/stream)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/render)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/ui)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/recorder)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/devicemanage)
 target_include_directories(${PROJECT_NAME} PRIVATE fontawesome)
 target_include_directories(${PROJECT_NAME} PRIVATE util)
 target_include_directories(${PROJECT_NAME} PRIVATE uibase)

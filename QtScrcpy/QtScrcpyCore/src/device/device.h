@@ -6,7 +6,7 @@
 #include <QPointer>
 #include <QTime>
 
-#include "../include/QtScrcpyCore.h"
+#include "../../include/QtScrcpyCore.h"
 
 #include "controlmsg.h"
 

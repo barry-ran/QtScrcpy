@@ -10,7 +10,7 @@
 
 
 #include "adbprocess.h"
-#include "../include/QtScrcpyCore.h"
+#include "../QtScrcpyCore/include/QtScrcpyCore.h"
 
 namespace Ui
 {
