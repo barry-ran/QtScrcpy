@@ -2,7 +2,6 @@
 #include <QMessageBox>
 #include <QTimer>
 
-#include "config.h"
 #include "controller.h"
 #include "devicemsg.h"
 #include "decoder.h"
@@ -147,7 +146,7 @@ void Device::initSignals()
         });
     }
     if (m_fileHandler) {
-        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
+        connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
             QString tipsType = "";
             if (isApk) {
                 tipsType = tr("install apk");
@@ -159,7 +158,7 @@ void Device::initSignals()
                 tips = tr("wait current %1 to complete").arg(tipsType);
             }
             if (FileHandler::FAR_SUCCESS_EXEC == processResult) {
-                tips = tr("%1 complete, save in %2").arg(tipsType).arg(Config::getInstance().getPushFilePath());
+                tips = tr("%1 complete, save in %2").arg(tipsType).arg(m_params.pushFilePath);
             }
             if (FileHandler::FAR_ERROR_EXEC == processResult) {
                 tips = tr("%1 failed").arg(tipsType);
@@ -526,7 +525,7 @@ bool Device::saveFrame(int width, int height, uint8_t* dataRGB32)
     }
     QDateTime dateTime = QDateTime::currentDateTime();
     QString fileName = dateTime.toString("_yyyyMMdd_hhmmss_zzz");
-    fileName = Config::getInstance().getTitle() + fileName + ".png";
+    fileName = m_params.serial + fileName + ".png";
     QDir dir(fileDir);
     absFilePath = dir.absoluteFilePath(fileName);
     int ret = rgbImage.save(absFilePath, "PNG", 100);

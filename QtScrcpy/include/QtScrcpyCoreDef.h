@@ -22,6 +22,8 @@ struct DeviceParams {
     QString recordFileFormat = "mp4"; // 视频保存格式 mp4/mkv
     bool recordFile = false;          // 录制到文件
 
+    QString pushFilePath = "/sdcard/"; // 推送到安卓设备的文件保存路径（必须以/结尾）
+
     bool closeScreen = false;         // 启动时自动息屏
     bool display = true;              // 是否显示画面（或者仅仅后台录制）
     bool renderExpiredFrames = false; // 是否渲染延迟视频帧
