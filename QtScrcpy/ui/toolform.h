@@ -4,7 +4,7 @@
 #include <QPointer>
 #include <QWidget>
 
-#include "../include/QtScrcpyCore.h"
+#include "../QtScrcpyCore/include/QtScrcpyCore.h"
 #include "magneticwidget.h"
 
 namespace Ui

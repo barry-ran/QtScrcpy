@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QPointer>
 
-#include "../include/QtScrcpyCore.h"
+#include "../../include/QtScrcpyCore.h"
 
 namespace qsc {
 
