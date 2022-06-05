@@ -17,6 +17,15 @@ struct DeviceParams {
     bool useReverse = true;           // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
     int lockVideoOrientation = -1;    // 是否锁定视频方向
     bool stayAwake = false;           // 是否保持唤醒
+    QString serverVersion = "1.21";// server版本
+    QString logLevel = "info";     // log级别 debug/info/warn/error
+    // 编码选项 ""表示默认
+    // 例如 CodecOptions="profile=1,level=2"
+    // 更多编码选项参考 https://d.android.com/reference/android/media/MediaFormat
+    QString codecOptions = "";
+    // 指定编码器名称(必须是H.264编码器)，""表示默认
+    // 例如 CodecName="OMX.qcom.video.encoder.avc"
+    QString codecName = "";
 
     QString recordPath = "";          // 视频保存路径
     QString recordFileFormat = "mp4"; // 视频保存格式 mp4/mkv
