@@ -101,9 +101,9 @@ source_group(QtScrcpyCore/src/adb FILES ${QC_ADB_SOURCES})
 
 # common
 set(QC_COMMON_SOURCES
-    common/qscrcpyevent.h
+    QtScrcpyCore/src/common/qscrcpyevent.h
 )
-source_group(common FILES ${QC_COMMON_SOURCES})
+source_group(QtScrcpyCore/src/common FILES ${QC_COMMON_SOURCES})
 
 # include
 set(QC_INCLUDE_SOURCES
@@ -120,6 +120,8 @@ set(QC_DEVICE_SOURCES
     QtScrcpyCore/src/device/android/keycodes.h
     QtScrcpyCore/src/device/controller/controller.h
     QtScrcpyCore/src/device/controller/controller.cpp
+    QtScrcpyCore/src/device/controller/bufferutil.h
+    QtScrcpyCore/src/device/controller/bufferutil.cpp
     QtScrcpyCore/src/device/controller/inputconvert/inputconvertbase.h
     QtScrcpyCore/src/device/controller/inputconvert/inputconvertbase.cpp
     QtScrcpyCore/src/device/controller/inputconvert/inputconvertnormal.h
@@ -201,8 +203,6 @@ set(QC_UTIL_SOURCES
     util/compat.h
     util/config.h
     util/config.cpp
-    util/bufferutil.h
-    util/bufferutil.cpp
     util/mousetap/mousetap.h
     util/mousetap/mousetap.cpp
 )
@@ -294,7 +294,7 @@ add_executable(${PROJECT_NAME} ${QC_RUNTIME_TYPE} ${QC_PROJECT_SOURCES})
 #
 
 target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/adb)
-target_include_directories(${PROJECT_NAME} PRIVATE common)
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/common)
 target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device)
 target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/filehandler)
 target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/android)
