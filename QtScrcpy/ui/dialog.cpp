@@ -283,6 +283,7 @@ void Dialog::on_startServerBtn_clicked()
     params.recordFileFormat = ui->formatBox->currentText().trimmed();
     params.serverLocalPath = getServerPath();
     params.serverRemotePath = Config::getInstance().getServerPath();
+    params.pushFilePath = Config::getInstance().getPushFilePath();
     params.gameScript = getGameScript(ui->gameBox->currentText());
 
     qsc::IDeviceManage::getInstance().connectDevice(params);
