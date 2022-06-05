@@ -94,7 +94,8 @@ message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSIO
 
 # adb
 set(QC_ADB_SOURCES
-    QtScrcpyCore/src/adb/adbprocess.h
+    QtScrcpyCore/src/adb/adbprocessimpl.h
+    QtScrcpyCore/src/adb/adbprocessimpl.cpp
     QtScrcpyCore/src/adb/adbprocess.cpp
 )
 source_group(QtScrcpyCore/src/adb FILES ${QC_ADB_SOURCES})
@@ -109,6 +110,7 @@ source_group(QtScrcpyCore/src/common FILES ${QC_COMMON_SOURCES})
 set(QC_INCLUDE_SOURCES
     QtScrcpyCore/include/QtScrcpyCore.h
     QtScrcpyCore/include/QtScrcpyCoreDef.h
+    QtScrcpyCore/include/adbprocess.h
 )
 source_group(QtScrcpyCore/include FILES ${QC_INCLUDE_SOURCES})
 
@@ -293,6 +295,7 @@ add_executable(${PROJECT_NAME} ${QC_RUNTIME_TYPE} ${QC_PROJECT_SOURCES})
 # Internal include path (todo: remove this, use absolute path include)
 #
 
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/include)
 target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/adb)
 target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/common)
 target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device)

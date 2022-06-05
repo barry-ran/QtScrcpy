@@ -103,6 +103,8 @@ int main(int argc, char *argv[])
         file.close();
     }
 
+    qsc::AdbProcess::setAdbPath(Config::getInstance().getAdbPath());
+
     g_mainDlg = new Dialog {};
     g_mainDlg->show();
 

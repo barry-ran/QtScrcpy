@@ -75,7 +75,7 @@ protected:
 
 private:
     Ui::Dialog *ui;
-    AdbProcess m_adb;
+    qsc::AdbProcess m_adb;
     QSystemTrayIcon *m_hideIcon;
     QMenu *m_menu;
     QAction *m_showWindow;

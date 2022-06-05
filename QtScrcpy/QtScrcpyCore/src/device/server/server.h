@@ -39,6 +39,16 @@ public:
         bool useReverse = true;        // true:先使用adb reverse，失败后自动使用adb forward；false:直接使用adb forward
         int lockVideoOrientation = -1; // 是否锁定视频方向
         int stayAwake = false;         // 是否保持唤醒
+        QString serverVersion = "1.21";// server版本
+        QString logLevel = "info";     // log级别 debug/info/warn/error
+        // 编码选项 ""表示默认
+        // 例如 CodecOptions="profile=1,level=2"
+        // 更多编码选项参考 https://d.android.com/reference/android/media/MediaFormat
+        QString codecOptions = "";
+        // 指定编码器名称(必须是H.264编码器)，""表示默认
+        // 例如 CodecName="OMX.qcom.video.encoder.avc"
+        QString codecName = "";
+
         QString crop = "";             // 视频裁剪
         bool control = true;           // 安卓端是否接收键鼠控制
     };
@@ -58,7 +68,7 @@ signals:
     void serverStoped();
 
 private slots:
-    void onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult);
+    void onWorkProcessResult(qsc::AdbProcess::ADB_EXEC_RESULT processResult);
 
 protected:
     void timerEvent(QTimerEvent *event);
@@ -80,8 +90,8 @@ private:
     void onConnectTimer();
 
 private:
-    AdbProcess m_workProcess;
-    AdbProcess m_serverProcess;
+    qsc::AdbProcess m_workProcess;
+    qsc::AdbProcess m_serverProcess;
     TcpServer m_serverSocket; // only used if !tunnel_forward
     QPointer<VideoSocket> m_videoSocket = Q_NULLPTR;
     QPointer<QTcpSocket> m_controlSocket = Q_NULLPTR;

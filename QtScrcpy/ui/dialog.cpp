@@ -17,28 +17,28 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
     ui->setupUi(this);
     initUI();
 
-    connect(&m_adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
+    connect(&m_adb, &qsc::AdbProcess::adbProcessResult, this, [this](qsc::AdbProcess::ADB_EXEC_RESULT processResult) {
         QString log = "";
         bool newLine = true;
         QStringList args = m_adb.arguments();
 
         switch (processResult) {
-        case AdbProcess::AER_ERROR_START:
+        case qsc::AdbProcess::AER_ERROR_START:
             break;
-        case AdbProcess::AER_SUCCESS_START:
+        case qsc::AdbProcess::AER_SUCCESS_START:
             log = "adb run";
             newLine = false;
             break;
-        case AdbProcess::AER_ERROR_EXEC:
+        case qsc::AdbProcess::AER_ERROR_EXEC:
             //log = m_adb.getErrorOut();
             if (args.contains("ifconfig") && args.contains("wlan0")) {
                 getIPbyIp();
             }
             break;
-        case AdbProcess::AER_ERROR_MISSING_BINARY:
+        case qsc::AdbProcess::AER_ERROR_MISSING_BINARY:
             log = "adb not found";
             break;
-        case AdbProcess::AER_SUCCESS_EXEC:
+        case qsc::AdbProcess::AER_SUCCESS_EXEC:
             //log = m_adb.getStdOut();
             if (args.contains("devices")) {
                 QStringList devices = m_adb.getDevicesSerialFromStdOut();
@@ -285,6 +285,10 @@ void Dialog::on_startServerBtn_clicked()
     params.serverRemotePath = Config::getInstance().getServerPath();
     params.pushFilePath = Config::getInstance().getPushFilePath();
     params.gameScript = getGameScript(ui->gameBox->currentText());
+    params.serverVersion = Config::getInstance().getServerVersion();
+    params.logLevel = Config::getInstance().getLogLevel();
+    params.codecOptions = Config::getInstance().getCodecOptions();
+    params.codecName = Config::getInstance().getCodecName();
 
     qsc::IDeviceManage::getInstance().connectDevice(params);
 }

@@ -5,7 +5,6 @@
 #include <QTimer>
 #include <QTimerEvent>
 
-#include "config.h"
 #include "server.h"
 
 #define DEVICE_NAME_FIELD_LENGTH 64
@@ -15,8 +14,8 @@
 
 Server::Server(QObject *parent) : QObject(parent)
 {
-    connect(&m_workProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
-    connect(&m_serverProcess, &AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
+    connect(&m_workProcess, &qsc::AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
+    connect(&m_serverProcess, &qsc::AdbProcess::adbProcessResult, this, &Server::onWorkProcessResult);
 
     connect(&m_serverSocket, &QTcpServer::newConnection, this, [this]() {
         QTcpSocket *tmp = m_serverSocket.nextPendingConnection();
@@ -67,12 +66,12 @@ bool Server::enableTunnelReverse()
 
 bool Server::disableTunnelReverse()
 {
-    AdbProcess *adb = new AdbProcess();
+    qsc::AdbProcess *adb = new qsc::AdbProcess();
     if (!adb) {
         return false;
     }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
-        if (AdbProcess::AER_SUCCESS_START != processResult) {
+    connect(adb, &qsc::AdbProcess::adbProcessResult, this, [this](qsc::AdbProcess::ADB_EXEC_RESULT processResult) {
+        if (qsc::AdbProcess::AER_SUCCESS_START != processResult) {
             sender()->deleteLater();
         }
     });
@@ -90,12 +89,12 @@ bool Server::enableTunnelForward()
 }
 bool Server::disableTunnelForward()
 {
-    AdbProcess *adb = new AdbProcess();
+    qsc::AdbProcess *adb = new qsc::AdbProcess();
     if (!adb) {
         return false;
     }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
-        if (AdbProcess::AER_SUCCESS_START != processResult) {
+    connect(adb, &qsc::AdbProcess::adbProcessResult, this, [this](qsc::AdbProcess::ADB_EXEC_RESULT processResult) {
+        if (qsc::AdbProcess::AER_SUCCESS_START != processResult) {
             sender()->deleteLater();
         }
     });
@@ -110,7 +109,7 @@ bool Server::execute()
     }
     QStringList args;
     args << "shell";
-    args << QString("CLASSPATH=%1").arg(Config::getInstance().getServerPath());
+    args << QString("CLASSPATH=%1").arg(m_params.serverRemotePath);
     args << "app_process";
 
 #ifdef SERVER_DEBUGGER
@@ -129,10 +128,10 @@ bool Server::execute()
 
         args << "/"; // unused;
     args << "com.genymobile.scrcpy.Server";
-    args << Config::getInstance().getServerVersion();
+    args << m_params.serverVersion;
 
-    if (!Config::getInstance().getLogLevel().isEmpty()) {
-        args << QString("log_level=%1").arg(Config::getInstance().getLogLevel());
+    if (!m_params.logLevel.isEmpty()) {
+        args << QString("log_level=%1").arg(m_params.logLevel);
     }
     args << QString("max_size=%1").arg(QString::number(m_params.maxSize));
     args << QString("bit_rate=%1").arg(QString::number(m_params.bitRate));
@@ -149,11 +148,11 @@ bool Server::execute()
     // code option
     // https://github.com/Genymobile/scrcpy/commit/080a4ee3654a9b7e96c8ffe37474b5c21c02852a
     // <https://d.android.com/reference/android/media/MediaFormat>
-    if (Config::getInstance().getCodecOptions() != "") {
-        args << QString("codec_options=%1").arg(Config::getInstance().getCodecOptions());
+    if (!m_params.codecOptions.isEmpty()) {
+        args << QString("codec_options=%1").arg(m_params.codecOptions);
     }
-    if (Config::getInstance().getCodecName() != "") {
-        args << QString("encoder_name=%1").arg(Config::getInstance().getCodecName());
+    if (!m_params.codecName.isEmpty()) {
+        args << QString("encoder_name=%1").arg(m_params.codecName);
     }
 
 #ifdef SERVER_DEBUGGER
@@ -417,13 +416,13 @@ result:
     }
 }
 
-void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
+void Server::onWorkProcessResult(qsc::AdbProcess::ADB_EXEC_RESULT processResult)
 {
     if (sender() == &m_workProcess) {
         if (SSS_NULL != m_serverStartStep) {
             switch (m_serverStartStep) {
             case SSS_PUSH:
-                if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                if (qsc::AdbProcess::AER_SUCCESS_EXEC == processResult) {
                     if (m_params.useReverse) {
                         m_serverStartStep = SSS_ENABLE_TUNNEL_REVERSE;
                     } else {
@@ -431,14 +430,14 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                         m_serverStartStep = SSS_ENABLE_TUNNEL_FORWARD;
                     }
                     startServerByStep();
-                } else if (AdbProcess::AER_SUCCESS_START != processResult) {
+                } else if (qsc::AdbProcess::AER_SUCCESS_START != processResult) {
                     qCritical("adb push failed");
                     m_serverStartStep = SSS_NULL;
                     emit serverStarted(false);
                 }
                 break;
             case SSS_ENABLE_TUNNEL_REVERSE:
-                if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                if (qsc::AdbProcess::AER_SUCCESS_EXEC == processResult) {
                     // At the application level, the device part is "the server" because it
                     // serves video stream and control. However, at the network level, the
                     // client listens and the server connects to the client. That way, the
@@ -455,7 +454,7 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
 
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
-                } else if (AdbProcess::AER_SUCCESS_START != processResult) {
+                } else if (qsc::AdbProcess::AER_SUCCESS_START != processResult) {
                     // 有一些设备reverse会报错more than o'ne device，adb的bug
                     // https://github.com/Genymobile/scrcpy/issues/5
                     qCritical("adb reverse failed");
@@ -465,10 +464,10 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
                 }
                 break;
             case SSS_ENABLE_TUNNEL_FORWARD:
-                if (AdbProcess::AER_SUCCESS_EXEC == processResult) {
+                if (qsc::AdbProcess::AER_SUCCESS_EXEC == processResult) {
                     m_serverStartStep = SSS_EXECUTE_SERVER;
                     startServerByStep();
-                } else if (AdbProcess::AER_SUCCESS_START != processResult) {
+                } else if (qsc::AdbProcess::AER_SUCCESS_START != processResult) {
                     qCritical("adb forward failed");
                     m_serverStartStep = SSS_NULL;
                     emit serverStarted(false);
@@ -481,11 +480,11 @@ void Server::onWorkProcessResult(AdbProcess::ADB_EXEC_RESULT processResult)
     }
     if (sender() == &m_serverProcess) {
         if (SSS_EXECUTE_SERVER == m_serverStartStep) {
-            if (AdbProcess::AER_SUCCESS_START == processResult) {
+            if (qsc::AdbProcess::AER_SUCCESS_START == processResult) {
                 m_serverStartStep = SSS_RUNNING;
                 m_tunnelEnabled = true;
                 connectTo();
-            } else if (AdbProcess::AER_ERROR_START == processResult) {
+            } else if (qsc::AdbProcess::AER_ERROR_START == processResult) {
                 if (!m_tunnelForward) {
                     m_serverSocket.close();
                     disableTunnelReverse();

@@ -1,9 +1,12 @@
 #ifndef ADBPROCESS_H
 #define ADBPROCESS_H
 
-#include <QProcess>
+#include <QObject>
 
-class AdbProcess : public QProcess
+class AdbProcessImpl;
+namespace qsc {
+
+class AdbProcess : public QObject
 {
     Q_OBJECT
 
@@ -20,6 +23,8 @@ public:
     explicit AdbProcess(QObject *parent = nullptr);
     virtual ~AdbProcess();
 
+    static void setAdbPath(const QString& adbPath);
+
     void execute(const QString &serial, const QStringList &args);
     void forward(const QString &serial, quint16 localPort, const QString &deviceSocketName);
     void forwardRemove(const QString &serial, quint16 localPort);
@@ -30,24 +35,20 @@ public:
     void removePath(const QString &serial, const QString &path);
     bool isRuning();
     void setShowTouchesEnabled(const QString &serial, bool enabled);
+    void kill();
+    QStringList arguments();
     QStringList getDevicesSerialFromStdOut();
     QString getDeviceIPFromStdOut();
     QString getDeviceIPByIpFromStdOut();
     QString getStdOut();
     QString getErrorOut();
 
-    static const QString &getAdbPath();
-
 signals:
     void adbProcessResult(ADB_EXEC_RESULT processResult);
 
 private:
-    void initSignals();
-
-private:
-    QString m_standardOutput = "";
-    QString m_errorOutput = "";
-    static QString s_adbPath;
+    AdbProcessImpl* m_adbImpl = nullptr;
 };
 
+}
 #endif // ADBPROCESS_H

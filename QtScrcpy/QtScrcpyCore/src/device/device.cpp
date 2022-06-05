@@ -113,11 +113,11 @@ void Device::screenshot()
 
 void Device::showTouch(bool show)
 {
-    AdbProcess *adb = new AdbProcess();
+    AdbProcess *adb = new qsc::AdbProcess();
     if (!adb) {
         return;
     }
-    connect(adb, &AdbProcess::adbProcessResult, this, [this](AdbProcess::ADB_EXEC_RESULT processResult) {
+    connect(adb, &qsc::AdbProcess::adbProcessResult, this, [this](qsc::AdbProcess::ADB_EXEC_RESULT processResult) {
         if (AdbProcess::AER_SUCCESS_START != processResult) {
             sender()->deleteLater();
         }
@@ -282,6 +282,11 @@ bool Device::connectDevice()
         params.useReverse = m_params.useReverse;
         params.lockVideoOrientation = m_params.lockVideoOrientation;
         params.stayAwake = m_params.stayAwake;
+        params.serverVersion = m_params.serverVersion;
+        params.logLevel = m_params.logLevel;
+        params.codecOptions = m_params.codecOptions;
+        params.codecName = m_params.codecName;
+
         params.crop = "";
         params.control = true;
         m_server->start(params);
