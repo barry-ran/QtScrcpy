@@ -199,9 +199,6 @@ endif()
 
 # Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads REQUIRED)
-
     # include
     target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/include)
     # link
@@ -213,12 +210,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
         avcodec
         avutil
         swscale
-        # qx11
-        Qt${QT_VERSION_MAJOR}::X11Extras
-        # xcb https://doc.qt.io/qt-5/linux-requirements.html
-        xcb
-        # pthread
-        Threads::Threads
     )
 
 endif()
