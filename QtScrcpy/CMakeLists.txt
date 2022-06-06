@@ -279,7 +279,9 @@ endif()
 
 # Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(QSC_DEPLOY_PATH "")
+    get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+    set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
+
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
 
