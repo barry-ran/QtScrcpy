@@ -348,9 +348,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # ffmpeg
     # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
+    target_include_directories(${PROJECT_NAME} PRIVATE ../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/include)
     # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/${QC_CPU_ARCH}")
+    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/${QC_CPU_ARCH}")
     target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
     target_link_libraries(${PROJECT_NAME} PRIVATE
         avformat
@@ -359,7 +359,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         swscale
     )
     # copy
-    set(FFMPEG_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/bin/${QC_CPU_ARCH}")
+    set(FFMPEG_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/bin/${QC_CPU_ARCH}")
     get_target_property(FFMPEG_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avcodec-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
@@ -374,9 +374,9 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # ffmpeg
     # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
+    target_include_directories(${PROJECT_NAME} PRIVATE ../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/include)
     # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib")
+    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib")
     target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
     target_link_libraries(${PROJECT_NAME} PRIVATE
         avformat.58
@@ -390,14 +390,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${PROJECT_NAME}.app/Contents)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         # dylib,scrcpy-server,adb copy to Contents/MacOS
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavcodec.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavformat.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavutil.56.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswscale.5.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswresample.3.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libavcodec.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libavformat.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libavutil.56.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libswscale.5.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libswresample.3.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
 
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/scrcpy-server" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/adb/mac/adb" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/adb/mac/adb" "${MACOS_BUNDLE_PATH}/MacOS"
         # config file copy to Contents/MacOS/config
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config"
     )
@@ -430,9 +430,9 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(Threads REQUIRED)
 
     # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
+    target_include_directories(${PROJECT_NAME} PRIVATE ../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/include)
     # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib")
+    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib")
     target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
     target_link_libraries(${PROJECT_NAME} PRIVATE
         # ffmpeg
