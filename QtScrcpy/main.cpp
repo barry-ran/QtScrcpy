@@ -9,7 +9,6 @@
 #include "config.h"
 #include "dialog.h"
 #include "mousetap/mousetap.h"
-#include "stream.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
 static QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
@@ -73,7 +72,6 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(varFormat);
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
-    Stream::init();
     QApplication a(argc, argv);
 
     // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
@@ -118,8 +116,6 @@ int main(int argc, char *argv[])
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->quitMouseEventTap();
 #endif
-
-    Stream::deInit();
     return ret;
 }
 

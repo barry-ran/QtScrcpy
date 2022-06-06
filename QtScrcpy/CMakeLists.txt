@@ -29,7 +29,7 @@ endif()
 message(STATUS "[${PROJECT_NAME}] CPU_ARCH:${QC_CPU_ARCH}")
 
 # CMake set
-#set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -92,84 +92,6 @@ message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSIO
 # Sources
 #
 
-# adb
-set(QC_ADB_SOURCES
-    QtScrcpyCore/src/adb/adbprocessimpl.h
-    QtScrcpyCore/src/adb/adbprocessimpl.cpp
-    QtScrcpyCore/src/adb/adbprocess.cpp
-)
-source_group(QtScrcpyCore/src/adb FILES ${QC_ADB_SOURCES})
-
-# common
-set(QC_COMMON_SOURCES
-    QtScrcpyCore/src/common/qscrcpyevent.h
-)
-source_group(QtScrcpyCore/src/common FILES ${QC_COMMON_SOURCES})
-
-# include
-set(QC_INCLUDE_SOURCES
-    QtScrcpyCore/include/QtScrcpyCore.h
-    QtScrcpyCore/include/QtScrcpyCoreDef.h
-    QtScrcpyCore/include/adbprocess.h
-)
-source_group(QtScrcpyCore/include FILES ${QC_INCLUDE_SOURCES})
-
-# device
-set(QC_DEVICE_SOURCES
-    QtScrcpyCore/src/device/device.h
-    QtScrcpyCore/src/device/device.cpp
-    QtScrcpyCore/src/device/android/input.h
-    QtScrcpyCore/src/device/android/keycodes.h
-    QtScrcpyCore/src/device/controller/controller.h
-    QtScrcpyCore/src/device/controller/controller.cpp
-    QtScrcpyCore/src/device/controller/bufferutil.h
-    QtScrcpyCore/src/device/controller/bufferutil.cpp
-    QtScrcpyCore/src/device/controller/inputconvert/inputconvertbase.h
-    QtScrcpyCore/src/device/controller/inputconvert/inputconvertbase.cpp
-    QtScrcpyCore/src/device/controller/inputconvert/inputconvertnormal.h
-    QtScrcpyCore/src/device/controller/inputconvert/inputconvertnormal.cpp
-    QtScrcpyCore/src/device/controller/inputconvert/inputconvertgame.h
-    QtScrcpyCore/src/device/controller/inputconvert/inputconvertgame.cpp
-    QtScrcpyCore/src/device/controller/inputconvert/controlmsg.h
-    QtScrcpyCore/src/device/controller/inputconvert/controlmsg.cpp
-    QtScrcpyCore/src/device/controller/inputconvert/keymap/keymap.h
-    QtScrcpyCore/src/device/controller/inputconvert/keymap/keymap.cpp
-    QtScrcpyCore/src/device/controller/receiver/devicemsg.h
-    QtScrcpyCore/src/device/controller/receiver/devicemsg.cpp
-    QtScrcpyCore/src/device/controller/receiver/receiver.h
-    QtScrcpyCore/src/device/controller/receiver/receiver.cpp
-    QtScrcpyCore/src/device/decoder/avframeconvert.h
-    QtScrcpyCore/src/device/decoder/avframeconvert.cpp
-    QtScrcpyCore/src/device/decoder/decoder.h
-    QtScrcpyCore/src/device/decoder/decoder.cpp
-    QtScrcpyCore/src/device/decoder/fpscounter.h
-    QtScrcpyCore/src/device/decoder/fpscounter.cpp
-    QtScrcpyCore/src/device/decoder/videobuffer.h
-    QtScrcpyCore/src/device/decoder/videobuffer.cpp
-    QtScrcpyCore/src/device/filehandler/filehandler.h
-    QtScrcpyCore/src/device/filehandler/filehandler.cpp
-    QtScrcpyCore/src/device/recorder/recorder.h
-    QtScrcpyCore/src/device/recorder/recorder.cpp
-    QtScrcpyCore/src/device/render/qyuvopenglwidget.h
-    QtScrcpyCore/src/device/render/qyuvopenglwidget.cpp
-    QtScrcpyCore/src/device/server/server.h
-    QtScrcpyCore/src/device/server/server.cpp
-    QtScrcpyCore/src/device/server/tcpserver.h
-    QtScrcpyCore/src/device/server/tcpserver.cpp
-    QtScrcpyCore/src/device/server/videosocket.h
-    QtScrcpyCore/src/device/server/videosocket.cpp
-    QtScrcpyCore/src/device/stream/stream.h
-    QtScrcpyCore/src/device/stream/stream.cpp
-)
-source_group(QtScrcpyCore/src/device FILES ${QC_DEVICE_SOURCES})
-
-# devicemanage
-set(QC_DEVICEMANAGE_SOURCES
-    QtScrcpyCore/src/devicemanage/devicemanage.h
-    QtScrcpyCore/src/devicemanage/devicemanage.cpp
-)
-source_group(QtScrcpyCore/src/devicemanage FILES ${QC_DEVICEMANAGE_SOURCES})
-
 # fontawesome
 set(QC_FONTAWESOME_SOURCES
     fontawesome/iconhelper.h
@@ -197,12 +119,13 @@ set(QC_UI_SOURCES
     ui/dialog.cpp
     ui/dialog.h
     ui/dialog.ui
+    render/qyuvopenglwidget.h
+    render/qyuvopenglwidget.cpp
 )
 source_group(ui FILES ${QC_UI_SOURCES})
 
 # util
 set(QC_UTIL_SOURCES
-    util/compat.h
     util/config.h
     util/config.cpp
     util/mousetap/mousetap.h
@@ -268,11 +191,6 @@ qt5_add_translation(QC_QM_FILES ${QC_TS_FILES})
 
 # all sources
 set(QC_PROJECT_SOURCES
-    ${QC_INCLUDE_SOURCES}
-    ${QC_ADB_SOURCES}
-    ${QC_COMMON_SOURCES}
-    ${QC_DEVICE_SOURCES}
-    ${QC_DEVICEMANAGE_SOURCES}
     ${QC_FONTAWESOME_SOURCES}
     ${QC_UIBASE_SOURCES}
     ${QC_UI_SOURCES}
@@ -295,37 +213,11 @@ add_executable(${PROJECT_NAME} ${QC_RUNTIME_TYPE} ${QC_PROJECT_SOURCES})
 # Internal include path (todo: remove this, use absolute path include)
 #
 
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/include)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/adb)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/common)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/filehandler)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/android)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/decoder)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller/receiver)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller/inputconvert)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller/inputconvert/keymap)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/server)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/stream)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/render)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/ui)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/recorder)
-target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/devicemanage)
 target_include_directories(${PROJECT_NAME} PRIVATE fontawesome)
 target_include_directories(${PROJECT_NAME} PRIVATE util)
 target_include_directories(${PROJECT_NAME} PRIVATE uibase)
 target_include_directories(${PROJECT_NAME} PRIVATE ui)
-
-#
-# common deps
-#
-
-# Qt
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-)
+target_include_directories(${PROJECT_NAME} PRIVATE render)
 
 # output dir
 # https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
@@ -346,58 +238,19 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # windows
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    # ffmpeg
-    # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/include)
-    # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/${QC_CPU_ARCH}")
-    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        avformat
-        avcodec
-        avutil
-        swscale
-    )
-    # copy
-    set(FFMPEG_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/bin/${QC_CPU_ARCH}")
-    get_target_property(FFMPEG_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avcodec-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avformat-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avutil-56.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swscale-5.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swresample-3.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-    )
+    get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+    set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
 endif()
 
 # MacOS
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    # ffmpeg
-    # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/include)
-    # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib")
-    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        avformat.58
-        avcodec.58
-        avutil.56
-        swscale.5
-    )
-
     # copy bundle file
     get_target_property(MACOS_BUNDLE_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
-    set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${PROJECT_NAME}.app/Contents)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        # dylib,scrcpy-server,adb copy to Contents/MacOS
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libavcodec.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libavformat.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libavutil.56.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libswscale.5.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib/libswresample.3.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
+    set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${QSC_PROJECT_NAME}.app/Contents)
 
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/adb/mac/adb" "${MACOS_BUNDLE_PATH}/MacOS"
+    set(QSC_DEPLOY_PATH ${MACOS_BUNDLE_PATH})
+
+    add_custom_command(TARGET ${QSC_PROJECT_NAME} POST_BUILD
         # config file copy to Contents/MacOS/config
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config"
     )
@@ -426,27 +279,19 @@ endif()
 
 # Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-    find_package(Threads REQUIRED)
-
-    # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/include)
-    # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../QtScrcpy/QtScrcpyCore/src/third_party/ffmpeg/lib")
-    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        # ffmpeg
-        avformat
-        avcodec
-        avutil
-        swscale
-        # qx11
-        Qt${QT_VERSION_MAJOR}::X11Extras
-        # xcb https://doc.qt.io/qt-5/linux-requirements.html
-        xcb
-        # pthread
-        Threads::Threads
-    )
-
+    set(QSC_DEPLOY_PATH "")
     # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
 endif()
+
+#
+# common deps
+#
+
+add_subdirectory(QtScrcpyCore)
+
+# Qt
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Network
+    QtScrcpyCore
+)

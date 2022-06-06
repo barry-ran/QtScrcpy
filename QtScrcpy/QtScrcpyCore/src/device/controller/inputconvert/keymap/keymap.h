@@ -117,8 +117,6 @@ public:
     bool isValidSteerWheelMap();
     const KeyMap::KeyMapNode &getMouseMoveMap();
 
-    static const QString &getKeyMapPath();
-
 private:
     // set up the reverse map from key/event event to keyMapNode
     void makeReverseMap();
