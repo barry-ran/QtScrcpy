@@ -246,13 +246,13 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # copy bundle file
     get_target_property(MACOS_BUNDLE_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
-    set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${QSC_PROJECT_NAME}.app/Contents)
+    set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${PROJECT_NAME}.app/Contents)
 
     set(QSC_DEPLOY_PATH ${MACOS_BUNDLE_PATH})
 
-    add_custom_command(TARGET ${QSC_PROJECT_NAME} POST_BUILD
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         # config file copy to Contents/MacOS/config
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config/config.ini"
     )
 
     # Step 2. ues MACOSX_PACKAGE_LOCATION copy icns to Resources
