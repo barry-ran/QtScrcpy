@@ -247,7 +247,7 @@ All the dependencies are provided and it is easy to compile.
 1. Set up the Qt development environment on the target platform.
 Qt version>=5.12 (use MSVC 2019 on Windows)
 2. Clone the project
-3. Open the project root directory `all.pro` or `CMakeLists.txt` with QtCreator
+3. Open the project root directory `CMakeLists.txt` with QtCreator
 4. Compile and run
 
 ### Android (If you do not have special requirements, you can directly use the built-in scrcpy-server.jar)
