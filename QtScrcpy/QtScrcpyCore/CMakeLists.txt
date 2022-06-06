@@ -116,6 +116,10 @@ target_link_libraries(QtScrcpyCore PRIVATE
     Qt${QT_VERSION_MAJOR}::Network
 )
 
+set_target_properties(${QSC_PROJECT_NAME} PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${QSC_DEPLOY_PATH}/$<0:>"
+)
+
 target_include_directories(${QSC_PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/adb)
 target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/common)
@@ -132,7 +136,6 @@ target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DI
 target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/device/ui)
 target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/device/recorder)
 target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/devicemanage)
-
 
 #
 # plantform deps
