@@ -153,13 +153,18 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         swscale
     )
     # copy
-    set(FFMPEG_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/bin/${QSC_CPU_ARCH}")
+    set(THIRD_PARTY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party")
+    set(FFMPEG_BIN_PATH "${THIRD_PARTY_PATH}/ffmpeg/bin/${QSC_CPU_ARCH}")
     add_custom_command(TARGET ${QSC_PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avcodec-58.dll" "${QSC_DEPLOY_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avformat-58.dll" "${QSC_DEPLOY_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avutil-56.dll" "${QSC_DEPLOY_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swscale-5.dll" "${QSC_DEPLOY_PATH}"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swresample-3.dll" "${QSC_DEPLOY_PATH}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${THIRD_PARTY_PATH}/adb/win/adb.exe" "${QSC_DEPLOY_PATH}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${THIRD_PARTY_PATH}/adb/win/AdbWinApi.dll" "${QSC_DEPLOY_PATH}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${THIRD_PARTY_PATH}/adb/win/AdbWinUsbApi.dll" "${QSC_DEPLOY_PATH}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${THIRD_PARTY_PATH}/scrcpy-server" "${QSC_DEPLOY_PATH}"
     )
 endif()
 
