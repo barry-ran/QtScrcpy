@@ -658,9 +658,7 @@ void Dialog::on_useSingleModeCheck_clicked()
         ui->rightWidget->show();
     }
 
-    QTimer::singleShot(0, this, [this]() {
-        resize(layout()->sizeHint().width(), height());
-    });
+    resize(layout()->sizeHint().width(), height());
 }
 
 void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)

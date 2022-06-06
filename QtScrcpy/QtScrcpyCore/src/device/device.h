@@ -87,7 +87,7 @@ private:
     QPointer<Controller> m_controller;
     QPointer<FileHandler> m_fileHandler;
     QPointer<Stream> m_stream;
-    QPointer<Recorder> m_recorder = Q_NULLPTR;
+    QPointer<Recorder> m_recorder;
 
     QElapsedTimer m_startTimeCount;
     DeviceParams m_params;

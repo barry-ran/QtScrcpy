@@ -181,14 +181,14 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # copy bundle file
     add_custom_command(TARGET ${QSC_PROJECT_NAME} POST_BUILD
         # dylib,scrcpy-server,adb copy to Contents/MacOS
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libavcodec.58.dylib" "${QSC_DEPLOY_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libavformat.58.dylib" "${QSC_DEPLOY_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libavutil.56.dylib" "${QSC_DEPLOY_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libswscale.5.dylib" "${QSC_DEPLOY_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libswresample.3.dylib" "${QSC_DEPLOY_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libavcodec.58.dylib" "${QSC_DEPLOY_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libavformat.58.dylib" "${QSC_DEPLOY_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libavutil.56.dylib" "${QSC_DEPLOY_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libswscale.5.dylib" "${QSC_DEPLOY_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib/libswresample.3.dylib" "${QSC_DEPLOY_PATH}/MacOS"
 
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/scrcpy-server" "${QSC_DEPLOY_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/adb/mac/adb" "${QSC_DEPLOY_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/scrcpy-server" "${QSC_DEPLOY_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/adb/mac/adb" "${QSC_DEPLOY_PATH}/MacOS"
     )
 endif()
 
@@ -200,7 +200,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     # include
     target_include_directories(${QSC_PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/include)
     # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib")
+    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/src/third_party/ffmpeg/lib")
     target_link_directories(${QSC_PROJECT_NAME} PUBLIC ${FFMPEG_LIB_PATH})
     target_link_libraries(${QSC_PROJECT_NAME} PRIVATE
         # ffmpeg
