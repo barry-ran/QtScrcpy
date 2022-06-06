@@ -10,7 +10,6 @@
 #include "recorder.h"
 #include "server.h"
 #include "stream.h"
-#include "videoform.h"
 
 namespace qsc {
 

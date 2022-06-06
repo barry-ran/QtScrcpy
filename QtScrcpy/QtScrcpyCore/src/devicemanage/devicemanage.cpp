@@ -5,8 +5,8 @@
 
 #include "devicemanage.h"
 #include "server.h"
-#include "videoform.h"
 #include "device.h"
+#include "stream.h"
 
 namespace qsc {
 
@@ -17,9 +17,13 @@ IDeviceManage& IDeviceManage::getInstance() {
     return dm;
 }
 
-DeviceManage::DeviceManage() {}
+DeviceManage::DeviceManage() {
+    Stream::init();
+}
 
-DeviceManage::~DeviceManage() {}
+DeviceManage::~DeviceManage() {
+    Stream::deInit();
+}
 
 QPointer<IDevice> DeviceManage::getDevice(const QString &serial)
 {

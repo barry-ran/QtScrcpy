@@ -6,11 +6,23 @@
 #include <QTimer>
 
 #include "config.h"
-#include "device.h"
 #include "dialog.h"
-#include "keymap.h"
 #include "ui_dialog.h"
 #include "videoform.h"
+
+QString s_keyMapPath = "";
+
+const QString &getKeyMapPath()
+{
+    if (s_keyMapPath.isEmpty()) {
+        s_keyMapPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_KEYMAP_PATH"));
+        QFileInfo fileInfo(s_keyMapPath);
+        if (s_keyMapPath.isEmpty() || !fileInfo.isDir()) {
+            s_keyMapPath = QCoreApplication::applicationDirPath() + "/keymap";
+        }
+    }
+    return s_keyMapPath;
+}
 
 Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
 {
@@ -214,7 +226,7 @@ void Dialog::delayMs(int ms)
 
 QString Dialog::getGameScript(const QString &fileName)
 {
-    QFile loadFile(KeyMap::getKeyMapPath() + "/" + fileName);
+    QFile loadFile(getKeyMapPath() + "/" + fileName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
         outLog("open file failed:" + fileName, true);
         return "";
@@ -410,6 +422,7 @@ void Dialog::getIPbyIp()
 
 void Dialog::onDeviceConnected(bool success, const QString &serial, const QString &deviceName, const QSize &size)
 {
+    Q_UNUSED(deviceName);
     if (!success) {
         return;
     }
@@ -506,7 +519,7 @@ void Dialog::on_stopAllServerBtn_clicked()
 void Dialog::on_refreshGameScriptBtn_clicked()
 {
     ui->gameBox->clear();
-    QDir dir(KeyMap::getKeyMapPath());
+    QDir dir(getKeyMapPath());
     if (!dir.exists()) {
         outLog("keymap directory not find", true);
         return;

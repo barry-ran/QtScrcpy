@@ -8,23 +8,9 @@
 
 #include "keymap.h"
 
-QString KeyMap::s_keyMapPath = "";
-
 KeyMap::KeyMap(QObject *parent) : QObject(parent) {}
 
 KeyMap::~KeyMap() {}
-
-const QString &KeyMap::getKeyMapPath()
-{
-    if (s_keyMapPath.isEmpty()) {
-        s_keyMapPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_KEYMAP_PATH"));
-        QFileInfo fileInfo(s_keyMapPath);
-        if (s_keyMapPath.isEmpty() || !fileInfo.isDir()) {
-            s_keyMapPath = QCoreApplication::applicationDirPath() + "/keymap";
-        }
-    }
-    return s_keyMapPath;
-}
 
 void KeyMap::loadKeyMap(const QString &json)
 {

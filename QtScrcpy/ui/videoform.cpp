@@ -14,17 +14,12 @@
 #include <QtWidgets/QHBoxLayout>
 
 #include "config.h"
-#include "controller.h"
 #include "iconhelper.h"
 #include "qyuvopenglwidget.h"
 #include "toolform.h"
 #include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "videoform.h"
-extern "C"
-{
-#include "libavutil/frame.h"
-}
 
 VideoForm::VideoForm(bool framelessWindow, bool skin, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin)
 {
@@ -287,7 +282,6 @@ void VideoForm::installShortcut()
         emit device->postPower();
     });
 
-    // setScreenPowerMode(ControlMsg::SPM_OFF)
     shortcut = new QShortcut(QKeySequence("Ctrl+o"), this);
     shortcut->setAutoRepeat(false);
     connect(shortcut, &QShortcut::activated, this, [this]() {
@@ -295,7 +289,7 @@ void VideoForm::installShortcut()
         if (!device) {
             return;
         }
-        emit device->setScreenPowerMode(ControlMsg::SPM_OFF);
+        emit device->setScreenPowerMode(false);
     });
 
     // expandNotificationPanel
