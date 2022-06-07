@@ -506,6 +506,11 @@ void VideoForm::switchFullScreen()
     }
 }
 
+bool VideoForm::isHost()
+{
+    return m_toolForm->isHost();
+}
+
 void VideoForm::updateFPS(quint32 fps)
 {
     //qDebug() << "FPS:" << fps;

@@ -9,6 +9,7 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 #include "videoform.h"
+#include "../groupcontroller/groupcontroller.h"
 
 QString s_keyMapPath = "";
 
@@ -457,10 +458,13 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
         videoForm->setGeometry(rc);
     }
 
+    GroupController::instance().addDevice(serial);
 }
 
 void Dialog::onDeviceDisconnected(QString serial)
 {
+    GroupController::instance().removeDevice(serial);
+
     auto data = qsc::IDeviceManage::getInstance().getDevice(serial)->getUserData();
     if (data) {
         VideoForm* vf = static_cast<VideoForm*>(data);

@@ -33,6 +33,8 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
 
+    bool isHost();
+
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
                  int linesizeY, int linesizeU, int linesizeV) override;
