@@ -328,6 +328,10 @@ void Device::postGoBack()
         return;
     }
     m_controller->postGoBack();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postGoBack();
+    }
 }
 
 void Device::postGoHome()
@@ -336,6 +340,10 @@ void Device::postGoHome()
         return;
     }
     m_controller->postGoHome();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postGoHome();
+    }
 }
 
 void Device::postGoMenu()
@@ -344,6 +352,10 @@ void Device::postGoMenu()
         return;
     }
     m_controller->postGoMenu();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postGoMenu();
+    }
 }
 
 void Device::postAppSwitch()
@@ -352,6 +364,10 @@ void Device::postAppSwitch()
         return;
     }
     m_controller->postAppSwitch();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postAppSwitch();
+    }
 }
 
 void Device::postPower()
@@ -360,6 +376,10 @@ void Device::postPower()
         return;
     }
     m_controller->postPower();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postPower();
+    }
 }
 
 void Device::postVolumeUp()
@@ -368,6 +388,10 @@ void Device::postVolumeUp()
         return;
     }
     m_controller->postVolumeUp();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postVolumeUp();
+    }
 }
 
 void Device::postVolumeDown()
@@ -376,6 +400,10 @@ void Device::postVolumeDown()
         return;
     }
     m_controller->postVolumeDown();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postVolumeDown();
+    }
 }
 
 void Device::postCopy()
@@ -384,6 +412,10 @@ void Device::postCopy()
         return;
     }
     m_controller->copy();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postCopy();
+    }
 }
 
 void Device::postCut()
@@ -392,6 +424,10 @@ void Device::postCut()
         return;
     }
     m_controller->cut();
+
+    for (const auto& item : m_deviceObservers) {
+        item->postCut();
+    }
 }
 
 void Device::setScreenPowerMode(bool open)
@@ -406,6 +442,10 @@ void Device::setScreenPowerMode(bool open)
         mode = ControlMsg::SPM_OFF;
     }
     m_controller->setScreenPowerMode(mode);
+
+    for (const auto& item : m_deviceObservers) {
+        item->setScreenPowerMode(open);
+    }
 }
 
 void Device::expandNotificationPanel()
@@ -414,6 +454,10 @@ void Device::expandNotificationPanel()
         return;
     }
     m_controller->expandNotificationPanel();
+
+    for (const auto& item : m_deviceObservers) {
+        item->expandNotificationPanel();
+    }
 }
 
 void Device::collapsePanel()
@@ -422,6 +466,10 @@ void Device::collapsePanel()
         return;
     }
     m_controller->collapsePanel();
+
+    for (const auto& item : m_deviceObservers) {
+        item->collapsePanel();
+    }
 }
 
 void Device::postBackOrScreenOn(bool down)
@@ -430,6 +478,10 @@ void Device::postBackOrScreenOn(bool down)
         return;
     }
     m_controller->postBackOrScreenOn(down);
+
+    for (const auto& item : m_deviceObservers) {
+        item->postBackOrScreenOn(down);
+    }
 }
 
 void Device::postTextInput(QString &text)
@@ -438,6 +490,10 @@ void Device::postTextInput(QString &text)
         return;
     }
     m_controller->postTextInput(text);
+
+    for (const auto& item : m_deviceObservers) {
+        item->postTextInput(text);
+    }
 }
 
 void Device::requestDeviceClipboard()
@@ -446,6 +502,10 @@ void Device::requestDeviceClipboard()
         return;
     }
     m_controller->requestDeviceClipboard();
+
+    for (const auto& item : m_deviceObservers) {
+        item->requestDeviceClipboard();
+    }
 }
 
 void Device::setDeviceClipboard(bool pause)
@@ -454,6 +514,10 @@ void Device::setDeviceClipboard(bool pause)
         return;
     }
     m_controller->setDeviceClipboard(pause);
+
+    for (const auto& item : m_deviceObservers) {
+        item->setDeviceClipboard(pause);
+    }
 }
 
 void Device::clipboardPaste()
@@ -462,6 +526,10 @@ void Device::clipboardPaste()
         return;
     }
     m_controller->clipboardPaste();
+
+    for (const auto& item : m_deviceObservers) {
+        item->clipboardPaste();
+    }
 }
 
 void Device::pushFileRequest(const QString &file, const QString &devicePath)
@@ -470,6 +538,10 @@ void Device::pushFileRequest(const QString &file, const QString &devicePath)
         return;
     }
     m_fileHandler->onPushFileRequest(getSerial(), file, devicePath);
+
+    for (const auto& item : m_deviceObservers) {
+        item->pushFileRequest(file, devicePath);
+    }
 }
 
 void Device::installApkRequest(const QString &apkFile)
@@ -478,6 +550,10 @@ void Device::installApkRequest(const QString &apkFile)
         return;
     }
     m_fileHandler->onInstallApkRequest(getSerial(), apkFile);
+
+    for (const auto& item : m_deviceObservers) {
+        item->installApkRequest(apkFile);
+    }
 }
 
 void Device::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
@@ -486,6 +562,10 @@ void Device::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const Q
         return;
     }
     m_controller->mouseEvent(from, frameSize, showSize);
+
+    for (const auto& item : m_deviceObservers) {
+        item->mouseEvent(from, frameSize, showSize);
+    }
 }
 
 void Device::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
@@ -494,6 +574,10 @@ void Device::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const Q
         return;
     }
     m_controller->wheelEvent(from, frameSize, showSize);
+
+    for (const auto& item : m_deviceObservers) {
+        item->wheelEvent(from, frameSize, showSize);
+    }
 }
 
 void Device::keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
@@ -502,6 +586,10 @@ void Device::keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize
         return;
     }
     m_controller->keyEvent(from, frameSize, showSize);
+
+    for (const auto& item : m_deviceObservers) {
+        item->keyEvent(from, frameSize, showSize);
+    }
 }
 
 bool Device::isCurrentCustomKeymap()

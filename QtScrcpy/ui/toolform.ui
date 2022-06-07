@@ -22,6 +22,9 @@
    </property>
    <item>
     <widget class="QPushButton" name="groupControlBtn">
+     <property name="toolTip">
+      <string>group control</string>
+     </property>
      <property name="text">
       <string/>
      </property>

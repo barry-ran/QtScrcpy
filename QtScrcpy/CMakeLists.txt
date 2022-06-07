@@ -124,6 +124,13 @@ set(QC_UI_SOURCES
 )
 source_group(ui FILES ${QC_UI_SOURCES})
 
+# group controller
+set(QC_GROUP_CONTROLLER
+    groupcontroller/groupcontroller.h
+    groupcontroller/groupcontroller.cpp
+)
+source_group(groupcontroller FILES ${QC_GROUP_CONTROLLER})
+
 # util
 set(QC_UTIL_SOURCES
     util/config.h
@@ -196,6 +203,7 @@ set(QC_PROJECT_SOURCES
     ${QC_UI_SOURCES}
     ${QC_UTIL_SOURCES}
     ${QC_MAIN_SOURCES}
+    ${QC_GROUP_CONTROLLER}
     ${QC_PLANTFORM_SOURCES}
 )
 

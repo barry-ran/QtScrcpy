@@ -7,12 +7,15 @@
 #include "toolform.h"
 #include "ui_toolform.h"
 #include "videoform.h"
+#include "../groupcontroller/groupcontroller.h"
 
 ToolForm::ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos) : MagneticWidget(adsorbWidget, adsorbPos), ui(new Ui::ToolForm)
 {
     ui->setupUi(this);
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     //setWindowFlags(windowFlags() & ~Qt::WindowMinMaxButtonsHint);
+
+    updateGroupControl();
 
     initStyle();
 }
@@ -25,6 +28,11 @@ ToolForm::~ToolForm()
 void ToolForm::setSerial(const QString &serial)
 {
     m_serial = serial;
+}
+
+bool ToolForm::isHost()
+{
+    return m_isHost;
 }
 
 void ToolForm::initStyle()
@@ -48,10 +56,13 @@ void ToolForm::initStyle()
 
 void ToolForm::updateGroupControl()
 {
-    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
-    if (!device) {
-        return;
+    if (m_isHost) {
+        ui->groupControlBtn->setStyleSheet("color: red");
+    } else {
+        ui->groupControlBtn->setStyleSheet("color: green");
     }
+
+    GroupController::instance().updateDeviceState(m_serial);
 }
 
 void ToolForm::mousePressEvent(QMouseEvent *event)
@@ -130,7 +141,7 @@ void ToolForm::on_appSwitchBtn_clicked()
     if (!device) {
         return;
     }
-    emit device->postAppSwitch();
+    device->postAppSwitch();
 }
 
 void ToolForm::on_powerBtn_clicked()
@@ -139,7 +150,7 @@ void ToolForm::on_powerBtn_clicked()
     if (!device) {
         return;
     }
-    emit device->postPower();
+    device->postPower();
 }
 
 void ToolForm::on_screenShotBtn_clicked()
@@ -157,7 +168,7 @@ void ToolForm::on_volumeUpBtn_clicked()
     if (!device) {
         return;
     }
-    emit device->postVolumeUp();
+    device->postVolumeUp();
 }
 
 void ToolForm::on_volumeDownBtn_clicked()
@@ -166,7 +177,7 @@ void ToolForm::on_volumeDownBtn_clicked()
     if (!device) {
         return;
     }
-    emit device->postVolumeDown();
+    device->postVolumeDown();
 }
 
 void ToolForm::on_closeScreenBtn_clicked()
@@ -175,7 +186,7 @@ void ToolForm::on_closeScreenBtn_clicked()
     if (!device) {
         return;
     }
-    emit device->setScreenPowerMode(false);
+    device->setScreenPowerMode(false);
 }
 
 void ToolForm::on_expandNotifyBtn_clicked()
@@ -184,7 +195,7 @@ void ToolForm::on_expandNotifyBtn_clicked()
     if (!device) {
         return;
     }
-    emit device->expandNotificationPanel();
+    device->expandNotificationPanel();
 }
 
 void ToolForm::on_touchBtn_clicked()
@@ -200,7 +211,8 @@ void ToolForm::on_touchBtn_clicked()
 
 void ToolForm::on_groupControlBtn_clicked()
 {
-
+    m_isHost = !m_isHost;
+    updateGroupControl();
 }
 
 void ToolForm::on_openScreenBtn_clicked()
@@ -209,5 +221,5 @@ void ToolForm::on_openScreenBtn_clicked()
     if (!device) {
         return;
     }
-    emit device->setScreenPowerMode(true);
+    device->setScreenPowerMode(true);
 }

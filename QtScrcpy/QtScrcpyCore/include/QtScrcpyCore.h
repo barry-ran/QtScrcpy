@@ -27,6 +27,47 @@ public:
     }
     virtual void updateFPS(quint32 fps) { Q_UNUSED(fps); }
     virtual void grabCursor(bool grab) {Q_UNUSED(grab);}
+
+    virtual void mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize) {
+        Q_UNUSED(from);
+        Q_UNUSED(frameSize);
+        Q_UNUSED(showSize);
+    }
+    virtual void wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize) {
+        Q_UNUSED(from);
+        Q_UNUSED(frameSize);
+        Q_UNUSED(showSize);
+    }
+    virtual void keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize) {
+        Q_UNUSED(from);
+        Q_UNUSED(frameSize);
+        Q_UNUSED(showSize);
+    }
+
+    virtual void postGoBack() {}
+    virtual void postGoHome() {}
+    virtual void postGoMenu() {}
+    virtual void postAppSwitch() {}
+    virtual void postPower() {}
+    virtual void postVolumeUp() {}
+    virtual void postVolumeDown() {}
+    virtual void postCopy() {}
+    virtual void postCut() {}
+    virtual void setScreenPowerMode(bool open) { Q_UNUSED(open); }
+    virtual void expandNotificationPanel() {}
+    virtual void collapsePanel() {}
+    virtual void postBackOrScreenOn(bool down) { Q_UNUSED(down); }
+    virtual void postTextInput(QString &text) { Q_UNUSED(text); }
+    virtual void requestDeviceClipboard() {}
+    virtual void setDeviceClipboard(bool pause = true) { Q_UNUSED(pause); }
+    virtual void clipboardPaste() {}
+    virtual void pushFileRequest(const QString &file, const QString &devicePath) {
+        Q_UNUSED(file);
+        Q_UNUSED(devicePath);
+    }
+    virtual void installApkRequest(const QString &apkFile) { Q_UNUSED(apkFile); }
+    virtual void screenshot() {}
+    virtual void showTouch(bool show) { Q_UNUSED(show); }
 };
 
 class IDevice : public QObject {

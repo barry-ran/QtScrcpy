@@ -22,6 +22,7 @@ public:
     ~ToolForm();
 
     void setSerial(const QString& serial);
+    bool isHost();
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -56,6 +57,7 @@ private:
     QPoint m_dragPosition;
     QString m_serial;
     bool m_showTouch = false;
+    bool m_isHost = false;
 };
 
 #endif // TOOLFORM_H
