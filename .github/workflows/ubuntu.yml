@@ -43,6 +43,7 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
+          submodules: 'true'
       - name: Build Ubuntu
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}

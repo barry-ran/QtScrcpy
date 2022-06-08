@@ -38,6 +38,7 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
+          submodules: 'true'
       # 编译
       - name: Build MacOS
         env:
