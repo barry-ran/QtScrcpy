@@ -9,7 +9,6 @@
 #include "config.h"
 #include "dialog.h"
 #include "mousetap/mousetap.h"
-#include "stream.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
 static QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
@@ -23,8 +22,8 @@ int main(int argc, char *argv[])
 {
     // set env
 #ifdef Q_OS_WIN32
-    qputenv("QTSCRCPY_ADB_PATH", "../../../third_party/adb/win/adb.exe");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../../third_party/scrcpy-server");
+    qputenv("QTSCRCPY_ADB_PATH", "D:/android/sdk/platform-tools/adb.exe");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
     qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
 #endif
@@ -34,8 +33,8 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef Q_OS_LINUX
-    qputenv("QTSCRCPY_ADB_PATH", "../../third_party/adb/linux/adb");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../third_party/scrcpy-server");
+    qputenv("QTSCRCPY_ADB_PATH", "../../QtScrcpy/QtScrcpyCore/src/third_party/adb/linux/adb");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
     qputenv("QTSCRCPY_CONFIG_PATH", "../../config");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../keymap");
 #endif
@@ -73,7 +72,6 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(varFormat);
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
-    Stream::init();
     QApplication a(argc, argv);
 
     // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
@@ -103,6 +101,8 @@ int main(int argc, char *argv[])
         file.close();
     }
 
+    qsc::AdbProcess::setAdbPath(Config::getInstance().getAdbPath());
+
     g_mainDlg = new Dialog {};
     g_mainDlg->show();
 
@@ -116,8 +116,6 @@ int main(int argc, char *argv[])
 #if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
     MouseTap::getInstance()->quitMouseEventTap();
 #endif
-
-    Stream::deInit();
     return ret;
 }
 

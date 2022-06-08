@@ -40,8 +40,8 @@ echo current build mode: %cpu_mode%
 echo current publish dir: %publish_dir%
 
 :: 环境变量设置
-set adb_path=%script_path%..\..\third_party\adb\win\*.*
-set jar_path=%script_path%..\..\third_party\scrcpy-server
+set adb_path=%script_path%..\..\QtScrcpy\QtScrcpyCore\src\third_party\adb\win\*.*
+set jar_path=%script_path%..\..\QtScrcpy\QtScrcpyCore\src\third_party\scrcpy-server
 set keymap_path=%script_path%..\..\keymap
 set config_path=%script_path%..\..\config
 

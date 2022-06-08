@@ -243,8 +243,8 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 ### PC端
 1. 在目标平台上搭建Qt开发环境
 Qt版本>=5.12（在Windows上使用MSVC 2019）
-2. 克隆该项目
-3. 使用QtCreator打开项目根目录`all.pro`或`CMakeLists.txt`
+2. 克隆该项目（git clone --recursive git@github.com:barry-ran/QtScrcpy.git）
+3. 使用QtCreator打开项目根目录`CMakeLists.txt`
 4. 编译，运行
 
 ### Android端 （没有修改需求的话直接使用自带的scrcpy-server即可）

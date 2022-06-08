@@ -29,7 +29,7 @@ endif()
 message(STATUS "[${PROJECT_NAME}] CPU_ARCH:${QC_CPU_ARCH}")
 
 # CMake set
-#set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -68,7 +68,7 @@ if (NOT MSVC)
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 
     # disable some warning
-    add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions)
+    add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions -Wno-overloaded-virtual)
 endif()
 
 #
@@ -79,8 +79,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network LinguistTools REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
     find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
@@ -91,79 +91,6 @@ message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSIO
 #
 # Sources
 #
-
-# adb
-set(QC_ADB_SOURCES
-    adb/adbprocess.h
-    adb/adbprocess.cpp
-)
-source_group(adb FILES ${QC_ADB_SOURCES})
-
-# common
-set(QC_COMMON_SOURCES
-    common/qscrcpyevent.h
-)
-source_group(common FILES ${QC_COMMON_SOURCES})
-
-# device
-set(QC_DEVICE_SOURCES
-    device/device.h
-    device/device.cpp
-    device/android/input.h
-    device/android/keycodes.h
-    device/controller/controller.h
-    device/controller/controller.cpp
-    device/controller/inputconvert/inputconvertbase.h
-    device/controller/inputconvert/inputconvertbase.cpp
-    device/controller/inputconvert/inputconvertnormal.h
-    device/controller/inputconvert/inputconvertnormal.cpp
-    device/controller/inputconvert/inputconvertgame.h
-    device/controller/inputconvert/inputconvertgame.cpp
-    device/controller/inputconvert/controlmsg.h
-    device/controller/inputconvert/controlmsg.cpp
-    device/controller/inputconvert/keymap/keymap.h
-    device/controller/inputconvert/keymap/keymap.cpp
-    device/controller/receiver/devicemsg.h
-    device/controller/receiver/devicemsg.cpp
-    device/controller/receiver/receiver.h
-    device/controller/receiver/receiver.cpp
-    device/decoder/avframeconvert.h
-    device/decoder/avframeconvert.cpp
-    device/decoder/decoder.h
-    device/decoder/decoder.cpp
-    device/decoder/fpscounter.h
-    device/decoder/fpscounter.cpp
-    device/decoder/videobuffer.h
-    device/decoder/videobuffer.cpp
-    device/filehandler/filehandler.h
-    device/filehandler/filehandler.cpp
-    device/recorder/recorder.h
-    device/recorder/recorder.cpp
-    device/render/qyuvopenglwidget.h
-    device/render/qyuvopenglwidget.cpp
-    device/server/server.h
-    device/server/server.cpp
-    device/server/tcpserver.h
-    device/server/tcpserver.cpp
-    device/server/videosocket.h
-    device/server/videosocket.cpp
-    device/stream/stream.h
-    device/stream/stream.cpp
-    device/ui/toolform.h
-    device/ui/toolform.cpp
-    device/ui/toolform.ui
-    device/ui/videoform.h
-    device/ui/videoform.cpp
-    device/ui/videoform.ui
-)
-source_group(device FILES ${QC_DEVICE_SOURCES})
-
-# devicemanage
-set(QC_DEVICEMANAGE_SOURCES
-    devicemanage/devicemanage.h
-    devicemanage/devicemanage.cpp
-)
-source_group(devicemanage FILES ${QC_DEVICEMANAGE_SOURCES})
 
 # fontawesome
 set(QC_FONTAWESOME_SOURCES
@@ -181,13 +108,33 @@ set(QC_UIBASE_SOURCES
 )
 source_group(uibase FILES ${QC_UIBASE_SOURCES})
 
+# ui
+set(QC_UI_SOURCES
+    ui/toolform.h
+    ui/toolform.cpp
+    ui/toolform.ui
+    ui/videoform.h
+    ui/videoform.cpp
+    ui/videoform.ui
+    ui/dialog.cpp
+    ui/dialog.h
+    ui/dialog.ui
+    render/qyuvopenglwidget.h
+    render/qyuvopenglwidget.cpp
+)
+source_group(ui FILES ${QC_UI_SOURCES})
+
+# group controller
+set(QC_GROUP_CONTROLLER
+    groupcontroller/groupcontroller.h
+    groupcontroller/groupcontroller.cpp
+)
+source_group(groupcontroller FILES ${QC_GROUP_CONTROLLER})
+
 # util
 set(QC_UTIL_SOURCES
-    util/compat.h
     util/config.h
     util/config.cpp
-    util/bufferutil.h
-    util/bufferutil.cpp
     util/mousetap/mousetap.h
     util/mousetap/mousetap.cpp
 )
@@ -217,9 +164,6 @@ set(QC_QRC_SOURCES "res/res.qrc")
 # main
 set(QC_MAIN_SOURCES
     main.cpp
-    dialog.cpp
-    dialog.h
-    dialog.ui
     ${QC_QRC_SOURCES}
 )
 
@@ -243,25 +187,17 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 endif()
 
-# 使用qt5_add_translation 根据已有ts文件生成qm文件，不用qt5_create_translation
-# 感兴趣可以了解下qt5_create_translation用法 https://www.cnblogs.com/apocelipes/p/14355460.html
-set(QC_TS_FILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/zh_CN.ts 
-    ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/en_US.ts
-)
-set_source_files_properties(${QC_TS_FILES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/res/i18n")
-qt5_add_translation(QC_QM_FILES ${QC_TS_FILES})
+# 翻译相关（使用shell脚本替代cmake处理翻译）
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/res/i18n)
 
 # all sources
 set(QC_PROJECT_SOURCES
-    ${QC_ADB_SOURCES}
-    ${QC_COMMON_SOURCES}
-    ${QC_DEVICE_SOURCES}
-    ${QC_DEVICEMANAGE_SOURCES}
     ${QC_FONTAWESOME_SOURCES}
     ${QC_UIBASE_SOURCES}
+    ${QC_UI_SOURCES}
     ${QC_UTIL_SOURCES}
     ${QC_MAIN_SOURCES}
+    ${QC_GROUP_CONTROLLER}
     ${QC_PLANTFORM_SOURCES}
 )
 
@@ -279,35 +215,11 @@ add_executable(${PROJECT_NAME} ${QC_RUNTIME_TYPE} ${QC_PROJECT_SOURCES})
 # Internal include path (todo: remove this, use absolute path include)
 #
 
-target_include_directories(${PROJECT_NAME} PRIVATE adb)
-target_include_directories(${PROJECT_NAME} PRIVATE common)
-target_include_directories(${PROJECT_NAME} PRIVATE device)
-target_include_directories(${PROJECT_NAME} PRIVATE device/filehandler)
-target_include_directories(${PROJECT_NAME} PRIVATE device/android)
-target_include_directories(${PROJECT_NAME} PRIVATE device/decoder)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller/receiver)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller/inputconvert)
-target_include_directories(${PROJECT_NAME} PRIVATE device/controller/inputconvert/keymap)
-target_include_directories(${PROJECT_NAME} PRIVATE device/server)
-target_include_directories(${PROJECT_NAME} PRIVATE device/stream)
-target_include_directories(${PROJECT_NAME} PRIVATE device/render)
-target_include_directories(${PROJECT_NAME} PRIVATE device/ui)
-target_include_directories(${PROJECT_NAME} PRIVATE device/recorder)
-target_include_directories(${PROJECT_NAME} PRIVATE devicemanage)
 target_include_directories(${PROJECT_NAME} PRIVATE fontawesome)
 target_include_directories(${PROJECT_NAME} PRIVATE util)
 target_include_directories(${PROJECT_NAME} PRIVATE uibase)
-
-#
-# common deps
-#
-
-# Qt
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-)
+target_include_directories(${PROJECT_NAME} PRIVATE ui)
+target_include_directories(${PROJECT_NAME} PRIVATE render)
 
 # output dir
 # https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
@@ -328,60 +240,21 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # windows
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    # ffmpeg
-    # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
-    # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/${QC_CPU_ARCH}")
-    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        avformat
-        avcodec
-        avutil
-        swscale
-    )
-    # copy
-    set(FFMPEG_BIN_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/bin/${QC_CPU_ARCH}")
-    get_target_property(FFMPEG_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avcodec-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avformat-58.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/avutil-56.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swscale-5.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FFMPEG_BIN_PATH}/swresample-3.dll" "${FFMPEG_BIN_OUTPUT_PATH}"
-    )
+    get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+    set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
 endif()
 
 # MacOS
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    # ffmpeg
-    # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
-    # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib")
-    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        avformat.58
-        avcodec.58
-        avutil.56
-        swscale.5
-    )
-
     # copy bundle file
     get_target_property(MACOS_BUNDLE_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${PROJECT_NAME}.app/Contents)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-        # dylib,scrcpy-server,adb copy to Contents/MacOS
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavcodec.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavformat.58.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libavutil.56.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswscale.5.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib/libswresample.3.dylib" "${MACOS_BUNDLE_PATH}/MacOS"
 
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/scrcpy-server" "${MACOS_BUNDLE_PATH}/MacOS"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/adb/mac/adb" "${MACOS_BUNDLE_PATH}/MacOS"
+    set(QSC_DEPLOY_PATH ${MACOS_BUNDLE_PATH})
+
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         # config file copy to Contents/MacOS/config
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config/config.ini"
     )
 
     # Step 2. ues MACOSX_PACKAGE_LOCATION copy icns to Resources
@@ -408,20 +281,13 @@ endif()
 
 # Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
+    set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
+
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
 
-    # include
-    target_include_directories(${PROJECT_NAME} PRIVATE ../third_party/ffmpeg/include)
-    # link
-    set(FFMPEG_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/ffmpeg/lib")
-    target_link_directories(${PROJECT_NAME} PRIVATE ${FFMPEG_LIB_PATH})
     target_link_libraries(${PROJECT_NAME} PRIVATE
-        # ffmpeg
-        avformat
-        avcodec
-        avutil
-        swscale
         # qx11
         Qt${QT_VERSION_MAJOR}::X11Extras
         # xcb https://doc.qt.io/qt-5/linux-requirements.html
@@ -432,3 +298,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     # linux set app icon: https://blog.csdn.net/MrNoboday/article/details/82870853
 endif()
+
+#
+# common deps
+#
+
+add_subdirectory(QtScrcpyCore)
+
+# Qt
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Network
+    QtScrcpyCore
+)
