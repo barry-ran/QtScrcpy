@@ -1,0 +1,3 @@
+[submodule "QtScrcpy/QtScrcpyCore"]
+	path = QtScrcpy/QtScrcpyCore
+	url = git@github.com:barry-ran/QtScrcpyCore.git
