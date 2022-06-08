@@ -2,46 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="en_US">
 <context>
-    <name>Device</name>
-    <message>
-        <source>wait current file transfer to complete</source>
-        <translation type="vanished">wait current file transfer to complete</translation>
-    </message>
-    <message>
-        <source>file transfer complete</source>
-        <translation type="vanished">file transfer complete</translation>
-    </message>
-    <message>
-        <source>file transfer failed</source>
-        <translation type="vanished">file transfer failed</translation>
-    </message>
-    <message>
-        <source>install apk</source>
-        <translation>install apk</translation>
-    </message>
-    <message>
-        <source>file transfer</source>
-        <translation>file transfer</translation>
-    </message>
-    <message>
-        <source>wait current %1 to complete</source>
-        <translation>wait current %1 to complete</translation>
-    </message>
-    <message>
-        <source>%1 complete, save in %2</source>
-        <translation>%1 complete, save in %2</translation>
-    </message>
-    <message>
-        <source>%1 complete
- save in %2</source>
-        <translation type="vanished">%1 complete\n save in %2</translation>
-    </message>
-    <message>
-        <source>%1 failed</source>
-        <translation>%1 failed</translation>
-    </message>
-</context>
-<context>
     <name>Dialog</name>
     <message>
         <source>Wireless</source>
@@ -150,10 +110,6 @@
         <translation>reverse connection</translation>
     </message>
     <message>
-        <source>auto enable</source>
-        <translation type="vanished">auto enable</translation>
-    </message>
-    <message>
         <source>background record</source>
         <translation>background record</translation>
     </message>
@@ -198,10 +154,6 @@
         <translation>device serial:</translation>
     </message>
     <message>
-        <source>Config</source>
-        <translation type="vanished">Config</translation>
-    </message>
-    <message>
         <source>bit rate:</source>
         <translation>bit rate:</translation>
     </message>
@@ -232,31 +184,6 @@
         <translation>no lock</translation>
     </message>
     <message>
-        <source>warning</source>
-        <translatorcomment>Warning</translatorcomment>
-        <translation type="vanished">Warning</translation>
-    </message>
-    <message>
-        <source>Quit or set tray?</source>
-        <translatorcomment>Quit or set tray?</translatorcomment>
-        <translation type="vanished">Quit or set tray?</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translatorcomment>Quit</translatorcomment>
-        <translation type="vanished">Quit</translation>
-    </message>
-    <message>
-        <source>Set tray</source>
-        <translatorcomment>Set tray</translatorcomment>
-        <translation type="vanished">Set tray</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translatorcomment>Cancel</translatorcomment>
-        <translation type="vanished">Cancel</translation>
-    </message>
-    <message>
         <source>Notice</source>
         <translatorcomment>Notice</translatorcomment>
         <translation>Notice</translation>
@@ -266,52 +193,12 @@
         <translatorcomment>Hidden here!</translatorcomment>
         <translation>Hidden here!</translation>
     </message>
-    <message>
-        <source>2</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>InputConvertGame</name>
-    <message>
-        <source>current keymap mode: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>custom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>normal</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>KeyMap</name>
-    <message>
-        <source>Script updated, current keymap mode:normal, Press ~ key to switch keymap mode</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QObject</name>
     <message>
-        <source>This software is completely open source and free, you can download it at the following address:</source>
-        <translation type="vanished">This software is completely open source and free, you can download it at the following address:</translation>
-    </message>
-    <message>
-        <source>This software is completely open source and free.
-Strictly used for illegal purposes, or at your own risk.
-You can download it at the following address:</source>
-        <translation type="vanished">This software is completely open source and free.\nStrictly used for illegal purposes, or at your own risk.\nYou can download it at the following address:</translation>
-    </message>
-    <message>
-        <source>This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</source>
-        <translation type="vanished">This software is completely open source and free. Strictly used for illegal purposes, or at your own risk. You can download it at the following address:</translation>
-    </message>
-    <message>
         <source>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</source>
-        <translation type="unfinished"></translation>
+        <translation>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</translation>
     </message>
 </context>
 <context>
@@ -327,14 +214,6 @@ You can download it at the following address:</source>
     <message>
         <source>expand notify</source>
         <translation>expand notify</translation>
-    </message>
-    <message>
-        <source>turn off</source>
-        <translation type="vanished">turn off</translation>
-    </message>
-    <message>
-        <source>turn on</source>
-        <translation type="vanished">turn on</translation>
     </message>
     <message>
         <source>touch switch</source>
@@ -380,31 +259,16 @@ You can download it at the following address:</source>
         <source>open screen</source>
         <translation>open screen</translation>
     </message>
+    <message>
+        <source>group control</source>
+        <translation>group control</translation>
+    </message>
 </context>
 <context>
     <name>VideoForm</name>
     <message>
-        <source>wait current file transfer to complete</source>
-        <translation type="vanished">wait current file transfer to complete</translation>
-    </message>
-    <message>
-        <source>file transfer complete</source>
-        <translation type="vanished">file transfer complete</translation>
-    </message>
-    <message>
-        <source>file transfer failed</source>
-        <translation type="vanished">file transfer failed</translation>
-    </message>
-    <message>
         <source>file does not exist</source>
         <translation>file does not exist</translation>
-    </message>
-</context>
-<context>
-    <name>videoForm</name>
-    <message>
-        <source>qrc:/qml/pinwheel.qml</source>
-        <translation type="vanished">qrc:/qml/pinwheel.qml</translation>
     </message>
 </context>
 </TS>
