@@ -324,7 +324,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>2</string>
+               <string notr="true">2</string>
               </property>
              </widget>
             </item>

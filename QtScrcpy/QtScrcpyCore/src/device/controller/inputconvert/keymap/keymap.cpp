@@ -290,7 +290,7 @@ void KeyMap::loadKeyMap(const QString &json)
     }
     // this must be called after m_keyMapNodes is stable
     makeReverseMap();
-    qInfo() << tr("Script updated, current keymap mode:normal, Press ~ key to switch keymap mode");
+    qInfo() << "Script updated, current keymap mode:normal, Press ~ key to switch keymap mode";
 
 parseError:
     if (!errorString.isEmpty()) {

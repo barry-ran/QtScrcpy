@@ -148,19 +148,19 @@ void Device::initSignals()
         connect(m_fileHandler, &FileHandler::fileHandlerResult, this, [this](FileHandler::FILE_HANDLER_RESULT processResult, bool isApk) {
             QString tipsType = "";
             if (isApk) {
-                tipsType = tr("install apk");
+                tipsType = "install apk";
             } else {
-                tipsType = tr("file transfer");
+                tipsType = "file transfer";
             }
             QString tips;
             if (FileHandler::FAR_IS_RUNNING == processResult) {
-                tips = tr("wait current %1 to complete").arg(tipsType);
+                tips = QString("wait current %1 to complete").arg(tipsType);
             }
             if (FileHandler::FAR_SUCCESS_EXEC == processResult) {
-                tips = tr("%1 complete, save in %2").arg(tipsType).arg(m_params.pushFilePath);
+                tips = QString("%1 complete, save in %2").arg(tipsType).arg(m_params.pushFilePath);
             }
             if (FileHandler::FAR_ERROR_EXEC == processResult) {
-                tips = tr("%1 failed").arg(tipsType);
+                tips = QString("%1 failed").arg(tipsType);
             }
             qInfo() << tips;
         });

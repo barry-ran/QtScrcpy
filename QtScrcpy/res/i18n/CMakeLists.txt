@@ -38,7 +38,10 @@ qt5_create_translation在cmake clean的时候会删除翻译好的ts文件，导
 
 上面3个方案都有一个共同问题：就是翻译文件处理都是和编译绑定在一起的，每次编译都会检测执行，实际的翻译工作是所有
 编程工作都完成以后，统一执行一次lupdate、翻译、lrelease就可以了，不应该和编译绑定在一起
-所以写两个shell脚本lupdate.sh和lrelease.sh来处理比较合适
+所以写两个shell脚本lupdate.sh和lrelease.sh来处理比较合适，其实非常简单：
+1. 更新ts：lupdate -no-obsolete ./QtScrcpy -ts ./QtScrcpy/res/i18n/en_US.ts ./QtScrcpy/res/i18n/zh_CN.ts
+2. 手动翻译ts
+3. 发布：lrelease ./QtScrcpy/res/i18n/en_US.ts ./QtScrcpy/res/i18n/zh_CN.ts
 
 参考文档
 1. qt知道qt5_create_translation的bug，但是不肯解决，只确定了qt6没问题 https://bugreports.qt.io/browse/QTBUG-96549

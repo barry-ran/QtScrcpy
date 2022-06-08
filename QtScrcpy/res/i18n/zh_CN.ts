@@ -2,46 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_CN">
 <context>
-    <name>Device</name>
-    <message>
-        <source>wait current file transfer to complete</source>
-        <translation type="vanished">等待当前文件传输完成</translation>
-    </message>
-    <message>
-        <source>file transfer complete</source>
-        <translation type="vanished">文件传输完成</translation>
-    </message>
-    <message>
-        <source>file transfer failed</source>
-        <translation type="vanished">文件传输失败</translation>
-    </message>
-    <message>
-        <source>install apk</source>
-        <translation>安装apk</translation>
-    </message>
-    <message>
-        <source>file transfer</source>
-        <translation>文件传输</translation>
-    </message>
-    <message>
-        <source>wait current %1 to complete</source>
-        <translation>等待当前%1完成</translation>
-    </message>
-    <message>
-        <source>%1 complete, save in %2</source>
-        <translation>%1完成,保存在%2</translation>
-    </message>
-    <message>
-        <source>%1 complete
- save in %2</source>
-        <translation type="vanished">%1完成\n 保存在 %2</translation>
-    </message>
-    <message>
-        <source>%1 failed</source>
-        <translation>%1 失败</translation>
-    </message>
-</context>
-<context>
     <name>Dialog</name>
     <message>
         <source>Wireless</source>
@@ -150,10 +110,6 @@
         <translation>反向连接</translation>
     </message>
     <message>
-        <source>auto enable</source>
-        <translation type="vanished">自动启用脚本</translation>
-    </message>
-    <message>
         <source>background record</source>
         <translation>后台录制</translation>
     </message>
@@ -198,10 +154,6 @@
         <translation>设备序列号：</translation>
     </message>
     <message>
-        <source>Config</source>
-        <translation type="vanished">配置</translation>
-    </message>
-    <message>
         <source>bit rate:</source>
         <translation>比特率：</translation>
     </message>
@@ -232,31 +184,6 @@
         <translation>不锁定</translation>
     </message>
     <message>
-        <source>warning</source>
-        <translatorcomment>警告</translatorcomment>
-        <translation type="vanished">警告</translation>
-    </message>
-    <message>
-        <source>Quit or set tray?</source>
-        <translatorcomment>退出还是最小化到托盘？</translatorcomment>
-        <translation type="vanished">退出还是最小化到托盘？</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translatorcomment>退出</translatorcomment>
-        <translation type="vanished">退出</translation>
-    </message>
-    <message>
-        <source>Set tray</source>
-        <translatorcomment>最小化到系统托盘</translatorcomment>
-        <translation type="vanished">最小化到系统托盘</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translatorcomment>取消</translatorcomment>
-        <translation type="vanished">取消</translation>
-    </message>
-    <message>
         <source>Notice</source>
         <translatorcomment>提示</translatorcomment>
         <translation>提示</translation>
@@ -265,32 +192,6 @@
         <source>Hidden here!</source>
         <translatorcomment>安卓录屏程序隐藏在这！</translatorcomment>
         <translation>安卓录屏程序隐藏在这！</translation>
-    </message>
-    <message>
-        <source>2</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>InputConvertGame</name>
-    <message>
-        <source>current keymap mode: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>custom</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>normal</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>KeyMap</name>
-    <message>
-        <source>Script updated, current keymap mode:normal, Press ~ key to switch keymap mode</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -313,14 +214,6 @@
     <message>
         <source>expand notify</source>
         <translation>下拉通知</translation>
-    </message>
-    <message>
-        <source>turn off</source>
-        <translation type="vanished">锁屏</translation>
-    </message>
-    <message>
-        <source>turn on</source>
-        <translation type="vanished">解锁</translation>
     </message>
     <message>
         <source>touch switch</source>
@@ -366,31 +259,16 @@
         <source>open screen</source>
         <translation>打开屏幕</translation>
     </message>
+    <message>
+        <source>group control</source>
+        <translation>群控</translation>
+    </message>
 </context>
 <context>
     <name>VideoForm</name>
     <message>
-        <source>wait current file transfer to complete</source>
-        <translation type="vanished">等待当前文件传输完成</translation>
-    </message>
-    <message>
-        <source>file transfer complete</source>
-        <translation type="vanished">文件传输完成</translation>
-    </message>
-    <message>
-        <source>file transfer failed</source>
-        <translation type="vanished">文件传输失败</translation>
-    </message>
-    <message>
         <source>file does not exist</source>
         <translation>文件不存在</translation>
-    </message>
-</context>
-<context>
-    <name>videoForm</name>
-    <message>
-        <source>qrc:/qml/pinwheel.qml</source>
-        <translation type="vanished">qrc:/qml/pinwheel.qml</translation>
     </message>
 </context>
 </TS>

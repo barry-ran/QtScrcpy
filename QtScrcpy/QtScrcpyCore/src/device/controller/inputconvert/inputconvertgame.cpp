@@ -624,7 +624,7 @@ void InputConvertGame::stopMouseMoveTimer()
 bool InputConvertGame::switchGameMap()
 {
     m_gameMap = !m_gameMap;
-    qInfo() << tr("current keymap mode: %1").arg(m_gameMap ? tr("custom") : tr("normal"));
+    qInfo() << QString("current keymap mode: %1").arg(m_gameMap ? "custom" : "normal");
 
     if (!m_keyMap.isValidMouseMoveMap()) {
         return m_gameMap;
