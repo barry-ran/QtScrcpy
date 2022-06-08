@@ -67,6 +67,7 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
+          submodules: 'true'
       # 编译msvc
       - name: Build MSVC
         # shell介绍 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#using-a-specific-shell
