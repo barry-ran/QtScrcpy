@@ -81,6 +81,7 @@ void GroupController::removeDevice(const QString &serial)
 
 void GroupController::mouseEvent(const QMouseEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize);
     for (const auto& serial : m_devices) {
         if (true == isHost(serial)) {
             continue;
@@ -96,6 +97,7 @@ void GroupController::mouseEvent(const QMouseEvent *from, const QSize &frameSize
 
 void GroupController::wheelEvent(const QWheelEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize);
     for (const auto& serial : m_devices) {
         if (true == isHost(serial)) {
             continue;
@@ -111,6 +113,7 @@ void GroupController::wheelEvent(const QWheelEvent *from, const QSize &frameSize
 
 void GroupController::keyEvent(const QKeyEvent *from, const QSize &frameSize, const QSize &showSize)
 {
+    Q_UNUSED(frameSize);
     for (const auto& serial : m_devices) {
         if (true == isHost(serial)) {
             continue;
