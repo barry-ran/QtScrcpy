@@ -246,7 +246,7 @@ All the dependencies are provided and it is easy to compile.
 ### PC client
 1. Set up the Qt development environment on the target platform.
 Qt version>=5.12 (use MSVC 2019 on Windows)
-2. Clone the project
+2. Clone the project (git clone --recursive git@github.com:barry-ran/QtScrcpy.git)
 3. Open the project root directory `CMakeLists.txt` with QtCreator
 4. Compile and run
 
