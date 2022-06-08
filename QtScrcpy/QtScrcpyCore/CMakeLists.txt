@@ -19,8 +19,10 @@ endif()
 message(STATUS "[${PROJECT_NAME}] QSC_CPU_ARCH:${QSC_CPU_ARCH}")
 
 if(NOT DEFINED QSC_DEPLOY_PATH)
-    message(FATAL_ERROR "QtScrcpyCore need QSC_DEPLOY_PATH")
+    message(FATAL_ERROR "-- [QtScrcpyCore] need QSC_DEPLOY_PATH")
 endif()
+
+message("-- [QtScrcpyCore] QSC_DEPLOY_PATH: ${QSC_DEPLOY_PATH}")
 
 #
 # Sources
