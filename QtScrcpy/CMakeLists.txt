@@ -79,8 +79,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network LinguistTools REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network LinguistTools REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
     find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
@@ -187,14 +187,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 endif()
 
-# 使用qt5_add_translation 根据已有ts文件生成qm文件，不用qt5_create_translation
-# 感兴趣可以了解下qt5_create_translation用法 https://www.cnblogs.com/apocelipes/p/14355460.html
-set(QC_TS_FILES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/zh_CN.ts 
-    ${CMAKE_CURRENT_SOURCE_DIR}/res/i18n/en_US.ts
-)
-set_source_files_properties(${QC_TS_FILES} PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/res/i18n")
-qt5_add_translation(QC_QM_FILES ${QC_TS_FILES})
+# 翻译相关（使用shell脚本替代cmake处理翻译）
+# add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/res/i18n)
 
 # all sources
 set(QC_PROJECT_SOURCES
