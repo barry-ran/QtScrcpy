@@ -68,7 +68,7 @@ if (NOT MSVC)
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 
     # disable some warning
-    add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions)
+    add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions -Wno-overloaded-virtual)
 endif()
 
 #
