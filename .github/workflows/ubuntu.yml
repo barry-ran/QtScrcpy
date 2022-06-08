@@ -42,7 +42,7 @@ jobs:
         run: sudo apt-get install -y libglew-dev libglfw3-dev
       - uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 0
           submodules: 'true'
           ssh-key: ${{ secrets.BOT_SSH_KEY }}
       - name: Build Ubuntu
