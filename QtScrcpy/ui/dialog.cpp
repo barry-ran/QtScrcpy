@@ -464,8 +464,11 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
 void Dialog::onDeviceDisconnected(QString serial)
 {
     GroupController::instance().removeDevice(serial);
-
-    auto data = qsc::IDeviceManage::getInstance().getDevice(serial)->getUserData();
+    auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
+    if (!device) {
+        return;
+    }
+    auto data = device->getUserData();
     if (data) {
         VideoForm* vf = static_cast<VideoForm*>(data);
         qsc::IDeviceManage::getInstance().getDevice(serial)->deRegisterDeviceObserver(vf);
