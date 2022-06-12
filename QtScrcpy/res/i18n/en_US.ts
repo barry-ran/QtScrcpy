@@ -4,6 +4,114 @@
 <context>
     <name>Dialog</name>
     <message>
+        <source>show</source>
+        <translation>show</translation>
+    </message>
+    <message>
+        <source>quit</source>
+        <translation>quit</translation>
+    </message>
+    <message>
+        <source>original</source>
+        <translation>original</translation>
+    </message>
+    <message>
+        <source>no lock</source>
+        <translation>no lock</translation>
+    </message>
+    <message>
+        <source>Notice</source>
+        <translation>Notice</translation>
+    </message>
+    <message>
+        <source>Hidden here!</source>
+        <translation>Hidden here!</translation>
+    </message>
+    <message>
+        <source>select path</source>
+        <translation>select path</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</source>
+        <translation>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</translation>
+    </message>
+</context>
+<context>
+    <name>ToolForm</name>
+    <message>
+        <source>Tool</source>
+        <translation>Tool</translation>
+    </message>
+    <message>
+        <source>full screen</source>
+        <translation>full screen</translation>
+    </message>
+    <message>
+        <source>expand notify</source>
+        <translation>expand notify</translation>
+    </message>
+    <message>
+        <source>touch switch</source>
+        <translation>touch switch</translation>
+    </message>
+    <message>
+        <source>close screen</source>
+        <translation>close screen</translation>
+    </message>
+    <message>
+        <source>power</source>
+        <translation>power</translation>
+    </message>
+    <message>
+        <source>volume up</source>
+        <translation>volume up</translation>
+    </message>
+    <message>
+        <source>volume down</source>
+        <translation>volume down</translation>
+    </message>
+    <message>
+        <source>app switch</source>
+        <translation>app switch</translation>
+    </message>
+    <message>
+        <source>menu</source>
+        <translation>menu</translation>
+    </message>
+    <message>
+        <source>home</source>
+        <translation>home</translation>
+    </message>
+    <message>
+        <source>return</source>
+        <translation>return</translation>
+    </message>
+    <message>
+        <source>screen shot</source>
+        <translation>screen shot</translation>
+    </message>
+    <message>
+        <source>open screen</source>
+        <translation>open screen</translation>
+    </message>
+    <message>
+        <source>group control</source>
+        <translation>group control</translation>
+    </message>
+</context>
+<context>
+    <name>VideoForm</name>
+    <message>
+        <source>file does not exist</source>
+        <translation>file does not exist</translation>
+    </message>
+</context>
+<context>
+    <name>Widget</name>
+    <message>
         <source>Wireless</source>
         <translation>Wireless</translation>
     </message>
@@ -164,111 +272,6 @@
     <message>
         <source>refresh devices</source>
         <translation>refresh devices</translation>
-    </message>
-    <message>
-        <source>show</source>
-        <translatorcomment>show</translatorcomment>
-        <translation>show</translation>
-    </message>
-    <message>
-        <source>quit</source>
-        <translatorcomment>quit</translatorcomment>
-        <translation>quit</translation>
-    </message>
-    <message>
-        <source>original</source>
-        <translation>original</translation>
-    </message>
-    <message>
-        <source>no lock</source>
-        <translation>no lock</translation>
-    </message>
-    <message>
-        <source>Notice</source>
-        <translatorcomment>Notice</translatorcomment>
-        <translation>Notice</translation>
-    </message>
-    <message>
-        <source>Hidden here!</source>
-        <translatorcomment>Hidden here!</translatorcomment>
-        <translation>Hidden here!</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</source>
-        <translation>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</translation>
-    </message>
-</context>
-<context>
-    <name>ToolForm</name>
-    <message>
-        <source>Tool</source>
-        <translation>Tool</translation>
-    </message>
-    <message>
-        <source>full screen</source>
-        <translation>full screen</translation>
-    </message>
-    <message>
-        <source>expand notify</source>
-        <translation>expand notify</translation>
-    </message>
-    <message>
-        <source>touch switch</source>
-        <translation>touch switch</translation>
-    </message>
-    <message>
-        <source>close screen</source>
-        <translation>close screen</translation>
-    </message>
-    <message>
-        <source>power</source>
-        <translation>power</translation>
-    </message>
-    <message>
-        <source>volume up</source>
-        <translation>volume up</translation>
-    </message>
-    <message>
-        <source>volume down</source>
-        <translation>volume down</translation>
-    </message>
-    <message>
-        <source>app switch</source>
-        <translation>app switch</translation>
-    </message>
-    <message>
-        <source>menu</source>
-        <translation>menu</translation>
-    </message>
-    <message>
-        <source>home</source>
-        <translation>home</translation>
-    </message>
-    <message>
-        <source>return</source>
-        <translation>return</translation>
-    </message>
-    <message>
-        <source>screen shot</source>
-        <translation>screen shot</translation>
-    </message>
-    <message>
-        <source>open screen</source>
-        <translation>open screen</translation>
-    </message>
-    <message>
-        <source>group control</source>
-        <translation>group control</translation>
-    </message>
-</context>
-<context>
-    <name>VideoForm</name>
-    <message>
-        <source>file does not exist</source>
-        <translation>file does not exist</translation>
     </message>
 </context>
 </TS>

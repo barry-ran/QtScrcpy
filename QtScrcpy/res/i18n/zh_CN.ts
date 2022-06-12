@@ -4,6 +4,114 @@
 <context>
     <name>Dialog</name>
     <message>
+        <source>show</source>
+        <translation>显示</translation>
+    </message>
+    <message>
+        <source>quit</source>
+        <translation>退出</translation>
+    </message>
+    <message>
+        <source>original</source>
+        <translation>原始</translation>
+    </message>
+    <message>
+        <source>no lock</source>
+        <translation>不锁定</translation>
+    </message>
+    <message>
+        <source>Notice</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <source>Hidden here!</source>
+        <translation>安卓录屏程序隐藏在这！</translation>
+    </message>
+    <message>
+        <source>select path</source>
+        <translation>选择路径</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <source>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</source>
+        <translation>本软件完全开源免费，作者不对使用该软件产生的一切后果负责。你可以在以下地址下载：</translation>
+    </message>
+</context>
+<context>
+    <name>ToolForm</name>
+    <message>
+        <source>Tool</source>
+        <translation>工具</translation>
+    </message>
+    <message>
+        <source>full screen</source>
+        <translation>全屏</translation>
+    </message>
+    <message>
+        <source>expand notify</source>
+        <translation>下拉通知</translation>
+    </message>
+    <message>
+        <source>touch switch</source>
+        <translation>触摸显示开关</translation>
+    </message>
+    <message>
+        <source>close screen</source>
+        <translation>关闭屏幕</translation>
+    </message>
+    <message>
+        <source>power</source>
+        <translation>电源</translation>
+    </message>
+    <message>
+        <source>volume up</source>
+        <translation>音量加</translation>
+    </message>
+    <message>
+        <source>volume down</source>
+        <translation>音量减</translation>
+    </message>
+    <message>
+        <source>app switch</source>
+        <translation>切换应用</translation>
+    </message>
+    <message>
+        <source>menu</source>
+        <translation>菜单</translation>
+    </message>
+    <message>
+        <source>home</source>
+        <translation>主界面</translation>
+    </message>
+    <message>
+        <source>return</source>
+        <translation>返回</translation>
+    </message>
+    <message>
+        <source>screen shot</source>
+        <translation>截图</translation>
+    </message>
+    <message>
+        <source>open screen</source>
+        <translation>打开屏幕</translation>
+    </message>
+    <message>
+        <source>group control</source>
+        <translation>群控</translation>
+    </message>
+</context>
+<context>
+    <name>VideoForm</name>
+    <message>
+        <source>file does not exist</source>
+        <translation>文件不存在</translation>
+    </message>
+</context>
+<context>
+    <name>Widget</name>
+    <message>
         <source>Wireless</source>
         <translation>无线</translation>
     </message>
@@ -164,111 +272,6 @@
     <message>
         <source>refresh devices</source>
         <translation>刷新设备列表</translation>
-    </message>
-    <message>
-        <source>show</source>
-        <translatorcomment>显示</translatorcomment>
-        <translation>显示</translation>
-    </message>
-    <message>
-        <source>quit</source>
-        <translatorcomment>退出</translatorcomment>
-        <translation>退出</translation>
-    </message>
-    <message>
-        <source>original</source>
-        <translation>原始</translation>
-    </message>
-    <message>
-        <source>no lock</source>
-        <translation>不锁定</translation>
-    </message>
-    <message>
-        <source>Notice</source>
-        <translatorcomment>提示</translatorcomment>
-        <translation>提示</translation>
-    </message>
-    <message>
-        <source>Hidden here!</source>
-        <translatorcomment>安卓录屏程序隐藏在这！</translatorcomment>
-        <translation>安卓录屏程序隐藏在这！</translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <source>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</source>
-        <translation>本软件完全开源免费，作者不对使用该软件产生的一切后果负责。你可以在以下地址下载：</translation>
-    </message>
-</context>
-<context>
-    <name>ToolForm</name>
-    <message>
-        <source>Tool</source>
-        <translation>工具</translation>
-    </message>
-    <message>
-        <source>full screen</source>
-        <translation>全屏</translation>
-    </message>
-    <message>
-        <source>expand notify</source>
-        <translation>下拉通知</translation>
-    </message>
-    <message>
-        <source>touch switch</source>
-        <translation>触摸显示开关</translation>
-    </message>
-    <message>
-        <source>close screen</source>
-        <translation>关闭屏幕</translation>
-    </message>
-    <message>
-        <source>power</source>
-        <translation>电源</translation>
-    </message>
-    <message>
-        <source>volume up</source>
-        <translation>音量加</translation>
-    </message>
-    <message>
-        <source>volume down</source>
-        <translation>音量减</translation>
-    </message>
-    <message>
-        <source>app switch</source>
-        <translation>切换应用</translation>
-    </message>
-    <message>
-        <source>menu</source>
-        <translation>菜单</translation>
-    </message>
-    <message>
-        <source>home</source>
-        <translation>主界面</translation>
-    </message>
-    <message>
-        <source>return</source>
-        <translation>返回</translation>
-    </message>
-    <message>
-        <source>screen shot</source>
-        <translation>截图</translation>
-    </message>
-    <message>
-        <source>open screen</source>
-        <translation>打开屏幕</translation>
-    </message>
-    <message>
-        <source>group control</source>
-        <translation>群控</translation>
-    </message>
-</context>
-<context>
-    <name>VideoForm</name>
-    <message>
-        <source>file does not exist</source>
-        <translation>文件不存在</translation>
     </message>
 </context>
 </TS>
