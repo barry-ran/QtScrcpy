@@ -64,7 +64,6 @@ private:
     void execAdbCmd();
     void delayMs(int ms);
     QString getGameScript(const QString &fileName);
-    void slotShow();
     void slotActivated(QSystemTrayIcon::ActivationReason reason);
     int findDeviceFromeSerialBox(bool wifi);
     quint32 getBitRate();
