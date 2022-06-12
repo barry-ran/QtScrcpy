@@ -242,7 +242,9 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
     case QSystemTrayIcon::Trigger:
+#ifdef Q_OS_WIN32
         this->show();
+#endif
         break;
     default:
         break;
