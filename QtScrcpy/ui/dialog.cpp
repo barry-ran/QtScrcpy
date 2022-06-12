@@ -25,7 +25,7 @@ const QString &getKeyMapPath()
     return s_keyMapPath;
 }
 
-Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
+Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
     initUI();
@@ -123,7 +123,7 @@ Dialog::~Dialog()
 void Dialog::initUI()
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+    //setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
     setWindowTitle(Config::getInstance().getTitle());
 

@@ -1,7 +1,7 @@
 ﻿#ifndef DIALOG_H
 #define DIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QPointer>
 #include <QMessageBox>
 #include <QMenu>
@@ -14,11 +14,11 @@
 
 namespace Ui
 {
-    class Dialog;
+    class Widget;
 }
 
 class QYUVOpenGLWidget;
-class Dialog : public QDialog
+class Dialog : public QWidget
 {
     Q_OBJECT
 
@@ -73,7 +73,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-    Ui::Dialog *ui;
+    Ui::Widget *ui;
     qsc::AdbProcess m_adb;
     QSystemTrayIcon *m_hideIcon;
     QMenu *m_menu;
