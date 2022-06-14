@@ -59,10 +59,10 @@ void AudioOutput::stop()
 
 void AudioOutput::installonly(const QString &serial, int port)
 {
-    runSndcpyProcess(serial, port);
+    runSndcpyProcess(serial, port, false);
 }
 
-bool AudioOutput::runSndcpyProcess(const QString &serial, int port)
+bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
 {
     if (QProcess::NotRunning != m_sndcpy.state()) {
         m_sndcpy.kill();
@@ -80,6 +80,10 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port)
     params << QString("%1").arg(port);
     m_sndcpy.start("bash", params);
 #endif
+
+    if (!wait) {
+        return true;
+    }
 
     if (!m_sndcpy.waitForStarted()) {
         qWarning() << "AudioOutput::start sndcpy.bat failed";

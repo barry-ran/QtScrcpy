@@ -20,7 +20,7 @@ public:
     void installonly(const QString& serial, int port);
 
 private:
-    bool runSndcpyProcess(const QString& serial, int port);
+    bool runSndcpyProcess(const QString& serial, int port, bool wait = true);
     void startAudioOutput();
     void stopAudioOutput();
     void startRecvData(int port);
