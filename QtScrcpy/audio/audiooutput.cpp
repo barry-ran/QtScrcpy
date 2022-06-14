@@ -80,7 +80,7 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port)
     params << QString("%1").arg(port);
     m_sndcpy.start("bash", params);
 #endif
-/*
+
     if (!m_sndcpy.waitForStarted()) {
         qWarning() << "AudioOutput::start sndcpy.bat failed";
         return false;
@@ -89,7 +89,7 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port)
         qWarning() << "AudioOutput::sndcpy.bat crashed";
         return false;
     }
-*/
+
     return true;
 }
 
