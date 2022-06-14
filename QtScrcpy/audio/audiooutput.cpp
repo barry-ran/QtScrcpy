@@ -2,6 +2,7 @@
 #include <QHostAddress>
 #include <QAudioOutput>
 #include <QTime>
+#include <QElapsedTimer>
 
 #include "audiooutput.h"
 
@@ -67,10 +68,18 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port)
         m_sndcpy.kill();
     }
 
+#ifdef Q_OS_WIN32
     QStringList params;
     params << serial;
     params << QString("%1").arg(port);
     m_sndcpy.start("sndcpy.bat", params);
+#else
+    QStringList params;
+    params << "sndcpy.sh";
+    params << serial;
+    params << QString("%1").arg(port);
+    m_sndcpy.start("bash", params);
+#endif
 /*
     if (!m_sndcpy.waitForStarted()) {
         qWarning() << "AudioOutput::start sndcpy.bat failed";
@@ -159,9 +168,15 @@ void AudioOutput::startRecvData(int port)
         qInfo() << "AudioOutput::audio socket state changed:" << state;
 
     });
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
     connect(audioSocket, &QTcpSocket::errorOccurred, audioSocket, [](QAbstractSocket::SocketError error) {
         qInfo() << "AudioOutput::audio socket error occurred:" << error;
     });
+#else
+    connect(audioSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), audioSocket, [](QAbstractSocket::SocketError error) {
+        qInfo() << "AudioOutput::audio socket error occurred:" << error;
+    });
+#endif
 
     m_workerThread.start();
     emit connectTo(port);
