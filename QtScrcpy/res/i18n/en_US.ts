@@ -273,5 +273,17 @@
         <source>refresh devices</source>
         <translation>refresh devices</translation>
     </message>
+    <message>
+        <source>install sndcpy</source>
+        <translation>install sndcpy</translation>
+    </message>
+    <message>
+        <source>start audio</source>
+        <translation>start audio</translation>
+    </message>
+    <message>
+        <source>stop audio</source>
+        <translation>stop audio</translation>
+    </message>
 </context>
 </TS>

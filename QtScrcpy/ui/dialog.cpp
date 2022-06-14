@@ -687,3 +687,27 @@ const QString &Dialog::getServerPath()
     }
     return serverPath;
 }
+
+void Dialog::on_startAudioBtn_clicked()
+{
+    if (ui->serialBox->count() == 0) {
+        qWarning() << "No device is connected!";
+        return;
+    }
+
+    m_audioOutput.start(ui->serialBox->currentText(), 28200);
+}
+
+void Dialog::on_stopAudioBtn_clicked()
+{
+    m_audioOutput.stop();
+}
+
+void Dialog::on_installSndcpyBtn_clicked()
+{
+    if (ui->serialBox->count() == 0) {
+        qWarning() << "No device is connected!";
+        return;
+    }
+    m_audioOutput.installonly(ui->serialBox->currentText(), 28200);
+}

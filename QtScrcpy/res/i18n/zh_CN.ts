@@ -273,5 +273,17 @@
         <source>refresh devices</source>
         <translation>刷新设备列表</translation>
     </message>
+    <message>
+        <source>install sndcpy</source>
+        <translation>安装sndcpy</translation>
+    </message>
+    <message>
+        <source>start audio</source>
+        <translation>开始音频</translation>
+    </message>
+    <message>
+        <source>stop audio</source>
+        <translation>停止音频</translation>
+    </message>
 </context>
 </TS>
