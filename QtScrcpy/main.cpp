@@ -36,10 +36,10 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef Q_OS_LINUX
-    qputenv("QTSCRCPY_ADB_PATH", "../../QtScrcpy/QtScrcpyCore/src/third_party/adb/linux/adb");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
-    qputenv("QTSCRCPY_CONFIG_PATH", "../../config");
-    qputenv("QTSCRCPY_KEYMAP_PATH", "../../keymap");
+    qputenv("QTSCRCPY_ADB_PATH", "../../../QtScrcpy/QtScrcpyCore/src/third_party/adb/linux/adb");
+    qputenv("QTSCRCPY_SERVER_PATH", "../../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
+    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
+    qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
 #endif
 
     g_msgType = covertLogLevel(Config::getInstance().getLogLevel());
