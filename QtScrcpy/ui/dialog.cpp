@@ -25,10 +25,20 @@ const QString &getKeyMapPath()
     return s_keyMapPath;
 }
 
-Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
+Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
     initUI();
+
+    updateBootConfig(true);
+
+    on_useSingleModeCheck_clicked();
+    on_updateDevice_clicked();
+
+    connect(&m_autoUpdatetimer, &QTimer::timeout, this, &Dialog::on_updateDevice_clicked);
+    if (ui->autoUpdatecheckBox->isChecked()) {
+        m_autoUpdatetimer.start(5000);
+    }
 
     connect(&m_adb, &qsc::AdbProcess::adbProcessResult, this, [this](qsc::AdbProcess::ADB_EXEC_RESULT processResult) {
         QString log = "";
@@ -101,7 +111,7 @@ Dialog::Dialog(QWidget *parent) : QDialog(parent), ui(new Ui::Dialog)
     m_menu->addAction(m_quit);
     m_hideIcon->setContextMenu(m_menu);
     m_hideIcon->show();
-    connect(m_showWindow, &QAction::triggered, this, &Dialog::slotShow);
+    connect(m_showWindow, &QAction::triggered, this, &Dialog::show);
     connect(m_quit, &QAction::triggered, this, [this]() {
         m_hideIcon->hide();
         qApp->quit();
@@ -123,7 +133,7 @@ Dialog::~Dialog()
 void Dialog::initUI()
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
+    //setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
     setWindowTitle(Config::getInstance().getTitle());
 
@@ -145,12 +155,6 @@ void Dialog::initUI()
     ui->lockOrientationBox->addItem("180");
     ui->lockOrientationBox->addItem("270");
     ui->lockOrientationBox->setCurrentIndex(0);
-
-    updateBootConfig(true);
-
-    on_useSingleModeCheck_clicked();
-
-    on_updateDevice_clicked();
 }
 
 void Dialog::updateBootConfig(bool toView)
@@ -181,6 +185,7 @@ void Dialog::updateBootConfig(bool toView)
         ui->closeScreenCheck->setChecked(config.autoOffScreen);
         ui->stayAwakeCheck->setChecked(config.keepAlive);
         ui->useSingleModeCheck->setChecked(config.simpleMode);
+        ui->autoUpdatecheckBox->setChecked(config.autoUpdateDevice);
     } else {
         UserBootConfig config;
 
@@ -198,6 +203,7 @@ void Dialog::updateBootConfig(bool toView)
         config.framelessWindow = ui->framelessCheck->isChecked();
         config.keepAlive = ui->stayAwakeCheck->isChecked();
         config.simpleMode = ui->useSingleModeCheck->isChecked();
+        config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
         Config::getInstance().setUserBootConfig(config);
     }
 }
@@ -238,17 +244,13 @@ QString Dialog::getGameScript(const QString &fileName)
     return ret;
 }
 
-void Dialog::slotShow()
-{
-    this->show();
-    m_hideIcon->hide();
-}
-
 void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
     case QSystemTrayIcon::Trigger:
+#ifdef Q_OS_WIN32
         this->show();
+#endif
         break;
     default:
         break;
@@ -464,8 +466,11 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
 void Dialog::onDeviceDisconnected(QString serial)
 {
     GroupController::instance().removeDevice(serial);
-
-    auto data = qsc::IDeviceManage::getInstance().getDevice(serial)->getUserData();
+    auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
+    if (!device) {
+        return;
+    }
+    auto data = device->getUserData();
     if (data) {
         VideoForm* vf = static_cast<VideoForm*>(data);
         qsc::IDeviceManage::getInstance().getDevice(serial)->deRegisterDeviceObserver(vf);
@@ -687,4 +692,37 @@ const QString &Dialog::getServerPath()
         }
     }
     return serverPath;
+}
+
+void Dialog::on_startAudioBtn_clicked()
+{
+    if (ui->serialBox->count() == 0) {
+        qWarning() << "No device is connected!";
+        return;
+    }
+
+    m_audioOutput.start(ui->serialBox->currentText(), 28200);
+}
+
+void Dialog::on_stopAudioBtn_clicked()
+{
+    m_audioOutput.stop();
+}
+
+void Dialog::on_installSndcpyBtn_clicked()
+{
+    if (ui->serialBox->count() == 0) {
+        qWarning() << "No device is connected!";
+        return;
+    }
+    m_audioOutput.installonly(ui->serialBox->currentText(), 28200);
+}
+
+void Dialog::on_autoUpdatecheckBox_toggled(bool checked)
+{
+    if (checked) {
+        m_autoUpdatetimer.start(5000);
+    } else {
+        m_autoUpdatetimer.stop();
+    }
 }

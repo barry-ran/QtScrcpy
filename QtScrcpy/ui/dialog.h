@@ -1,24 +1,26 @@
 ﻿#ifndef DIALOG_H
 #define DIALOG_H
 
-#include <QDialog>
+#include <QWidget>
 #include <QPointer>
 #include <QMessageBox>
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QListWidget>
+#include <QTimer>
 
 
 #include "adbprocess.h"
 #include "../QtScrcpyCore/include/QtScrcpyCore.h"
+#include "audio/audiooutput.h"
 
 namespace Ui
 {
-    class Dialog;
+    class Widget;
 }
 
 class QYUVOpenGLWidget;
-class Dialog : public QDialog
+class Dialog : public QWidget
 {
     Q_OBJECT
 
@@ -57,6 +59,14 @@ private slots:
     void on_useSingleModeCheck_clicked();
     void on_serialBox_currentIndexChanged(const QString &arg1);
 
+    void on_startAudioBtn_clicked();
+
+    void on_stopAudioBtn_clicked();
+
+    void on_installSndcpyBtn_clicked();
+
+    void on_autoUpdatecheckBox_toggled(bool checked);
+
 private:
     bool checkAdbRun();
     void initUI();
@@ -64,7 +74,6 @@ private:
     void execAdbCmd();
     void delayMs(int ms);
     QString getGameScript(const QString &fileName);
-    void slotShow();
     void slotActivated(QSystemTrayIcon::ActivationReason reason);
     int findDeviceFromeSerialBox(bool wifi);
     quint32 getBitRate();
@@ -74,12 +83,14 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private:
-    Ui::Dialog *ui;
+    Ui::Widget *ui;
     qsc::AdbProcess m_adb;
     QSystemTrayIcon *m_hideIcon;
     QMenu *m_menu;
     QAction *m_showWindow;
     QAction *m_quit;
+    AudioOutput m_audioOutput;
+    QTimer m_autoUpdatetimer;
 };
 
 #endif // DIALOG_H

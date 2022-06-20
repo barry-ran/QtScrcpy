@@ -25,11 +25,11 @@ It focuses on:
 
 [lowlatency]: https://github.com/Genymobile/scrcpy/pull/646
 
-![win](screenshot/win.png)
+![win](screenshot/win-en.png)
 
-![mac](screenshot/mac.jpg)
+![mac](screenshot/mac-en.png)
 
-![linux](screenshot/ubuntu.png)
+![linux](screenshot/linux-en.png)
 
 ## Customized key mapping
 You can write your own script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/KeyMapDes.md) are the rules.
@@ -122,12 +122,7 @@ you can [build it by yourself](##Build)(just ubuntu test)
 
 
 ## Run
-### Simple Mode
 Connect to your Android device on your computer, then run the program and click `USB connect` or `WiFi connect`
-### Not Simple Mode
-Connect to your Android device on your computer, then run the program and click the button below to connect to the Android device.
-
-![run](screenshot/run.png)
 
 ### Wireless connection steps (ensure that the mobile phone and PC are in the same LAN):
 1. Enable USB debugging in developer options on the Android device
@@ -139,7 +134,6 @@ Connect to your Android device on your computer, then run the program and click 
 7. Click update device again, and another device with IP address will be found. Select this device.
 8. Click start service
 
-​	
 
 Note: it is not necessary to keep you Android device connected via USB after you start adbd.
 
@@ -187,6 +181,7 @@ Note: it is not necessary to keep you Android device connected via USB after you
     - `Ctrl`+`v` _pastes_ the computer clipboard as a sequence of text events (but
     breaks non-ASCII characters).
 - Group control
+- Sync device speaker sound to the computer (based on [sndcpy](https://github.com/rom1v/sndcpy), Android 10+ only)
 
 ## Shortcuts
 

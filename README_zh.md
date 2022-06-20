@@ -24,12 +24,11 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 [低延迟]: https://github.com/Genymobile/scrcpy/pull/646
 
+![win](screenshot/win-zh.png)
 
-![win](screenshot/win.png)
+![mac](screenshot/mac-zh.png)
 
-![mac](screenshot/mac.jpg)
-
-![linux](screenshot/ubuntu.png)
+![linux](screenshot/linux-zh.png)
 
 ## 自定义按键映射
 可以根据需要，自己编写脚本将PC键盘按键映射为手机的触摸点击，编写规则在[这里](docs/KeyMapDes_zh.md)。
@@ -126,12 +125,7 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 目前只在ubuntu上测试过
 
 ## 运行
-### 精简模式
 在你的电脑上接入Android设备，然后运行程序，点击`一键USB连接`或者`一键WIFI连接`
-### 非精简模式
-在你的电脑上接入Android设备，然后运行程序，按顺序点击如下按钮即可连接到Android设备
-
-![运行](screenshot/run.png)
 
 ### 无线连接步骤（保证手机和电脑在同一个局域网）：
 1. 安卓手机端在开发者选项中打开usb调试
@@ -186,6 +180,7 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
     - `Ctrl` + `Shift` + `v`将计算机剪贴板复制到设备剪贴板；
     - `Ctrl` +`v` 将计算机剪贴板作为一系列文本事件发送到设备（不支持非ASCII字符）。
 - 群控
+- 同步设备扬声器声音到电脑（基于[sndcpy](https://github.com/rom1v/sndcpy)，仅支持安卓10+）
 
 ## 快捷键
 
