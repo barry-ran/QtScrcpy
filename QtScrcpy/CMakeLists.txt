@@ -79,8 +79,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia REQUIRED)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
     find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
@@ -107,6 +107,13 @@ set(QC_UIBASE_SOURCES
     uibase/magneticwidget.cpp
 )
 source_group(uibase FILES ${QC_UIBASE_SOURCES})
+
+# audio
+set(QC_AUDIO_SOURCES
+    audio/audiooutput.h
+    audio/audiooutput.cpp
+)
+source_group(audio FILES ${QC_AUDIO_SOURCES})
 
 # ui
 set(QC_UI_SOURCES
@@ -199,6 +206,7 @@ set(QC_PROJECT_SOURCES
     ${QC_MAIN_SOURCES}
     ${QC_GROUP_CONTROLLER}
     ${QC_PLANTFORM_SOURCES}
+    ${QC_AUDIO_SOURCES}
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -242,6 +250,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
+
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/sndcpy/sndcpy.bat" "${QSC_BIN_OUTPUT_PATH}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/sndcpy/sndcpy.apk" "${QSC_BIN_OUTPUT_PATH}"
+    )
 endif()
 
 # MacOS
@@ -255,6 +268,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         # config file copy to Contents/MacOS/config
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/../config/config.ini" "${MACOS_BUNDLE_PATH}/MacOS/config/config.ini"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/sndcpy/sndcpy.sh" "${MACOS_BUNDLE_PATH}/MacOS"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/sndcpy/sndcpy.apk" "${MACOS_BUNDLE_PATH}/MacOS"
     )
 
     # Step 2. ues MACOSX_PACKAGE_LOCATION copy icns to Resources
@@ -284,6 +299,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
 
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/sndcpy/sndcpy.sh" "${QSC_BIN_OUTPUT_PATH}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/sndcpy/sndcpy.apk" "${QSC_BIN_OUTPUT_PATH}"
+    )
+
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
 
@@ -309,5 +329,6 @@ add_subdirectory(QtScrcpyCore)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Multimedia
     QtScrcpyCore
 )
