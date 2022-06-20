@@ -30,6 +30,16 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
     ui->setupUi(this);
     initUI();
 
+    updateBootConfig(true);
+
+    on_useSingleModeCheck_clicked();
+    on_updateDevice_clicked();
+
+    connect(&m_autoUpdatetimer, &QTimer::timeout, this, &Dialog::on_updateDevice_clicked);
+    if (ui->autoUpdatecheckBox->isChecked()) {
+        m_autoUpdatetimer.start(5000);
+    }
+
     connect(&m_adb, &qsc::AdbProcess::adbProcessResult, this, [this](qsc::AdbProcess::ADB_EXEC_RESULT processResult) {
         QString log = "";
         bool newLine = true;
@@ -145,12 +155,6 @@ void Dialog::initUI()
     ui->lockOrientationBox->addItem("180");
     ui->lockOrientationBox->addItem("270");
     ui->lockOrientationBox->setCurrentIndex(0);
-
-    updateBootConfig(true);
-
-    on_useSingleModeCheck_clicked();
-
-    on_updateDevice_clicked();
 }
 
 void Dialog::updateBootConfig(bool toView)
@@ -181,6 +185,7 @@ void Dialog::updateBootConfig(bool toView)
         ui->closeScreenCheck->setChecked(config.autoOffScreen);
         ui->stayAwakeCheck->setChecked(config.keepAlive);
         ui->useSingleModeCheck->setChecked(config.simpleMode);
+        ui->autoUpdatecheckBox->setChecked(config.autoUpdateDevice);
     } else {
         UserBootConfig config;
 
@@ -198,6 +203,7 @@ void Dialog::updateBootConfig(bool toView)
         config.framelessWindow = ui->framelessCheck->isChecked();
         config.keepAlive = ui->stayAwakeCheck->isChecked();
         config.simpleMode = ui->useSingleModeCheck->isChecked();
+        config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
         Config::getInstance().setUserBootConfig(config);
     }
 }
@@ -710,4 +716,13 @@ void Dialog::on_installSndcpyBtn_clicked()
         return;
     }
     m_audioOutput.installonly(ui->serialBox->currentText(), 28200);
+}
+
+void Dialog::on_autoUpdatecheckBox_toggled(bool checked)
+{
+    if (checked) {
+        m_autoUpdatetimer.start(5000);
+    } else {
+        m_autoUpdatetimer.stop();
+    }
 }

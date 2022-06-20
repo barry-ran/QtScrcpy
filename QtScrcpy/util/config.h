@@ -21,6 +21,7 @@ struct UserBootConfig
     bool framelessWindow  = false;
     bool keepAlive        = false;
     bool simpleMode       = false;
+    bool autoUpdateDevice = true;
 };
 
 class QSettings;

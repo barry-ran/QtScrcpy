@@ -285,5 +285,9 @@
         <source>stop audio</source>
         <translation>stop audio</translation>
     </message>
+    <message>
+        <source>auto update</source>
+        <translation>autp update</translation>
+    </message>
 </context>
 </TS>

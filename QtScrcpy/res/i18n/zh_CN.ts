@@ -285,5 +285,9 @@
         <source>stop audio</source>
         <translation>停止音频</translation>
     </message>
+    <message>
+        <source>auto update</source>
+        <translation>自动刷新</translation>
+    </message>
 </context>
 </TS>

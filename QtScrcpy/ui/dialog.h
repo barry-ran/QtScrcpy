@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QListWidget>
+#include <QTimer>
 
 
 #include "adbprocess.h"
@@ -64,6 +65,8 @@ private slots:
 
     void on_installSndcpyBtn_clicked();
 
+    void on_autoUpdatecheckBox_toggled(bool checked);
+
 private:
     bool checkAdbRun();
     void initUI();
@@ -87,6 +90,7 @@ private:
     QAction *m_showWindow;
     QAction *m_quit;
     AudioOutput m_audioOutput;
+    QTimer m_autoUpdatetimer;
 };
 
 #endif // DIALOG_H
