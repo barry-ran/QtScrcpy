@@ -233,6 +233,10 @@ void Dialog::delayMs(int ms)
 
 QString Dialog::getGameScript(const QString &fileName)
 {
+    if (fileName.isEmpty()) {
+        return "";
+    }
+
     QFile loadFile(getKeyMapPath() + "/" + fileName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
         outLog("open file failed:" + fileName, true);
