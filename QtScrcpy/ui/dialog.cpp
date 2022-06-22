@@ -671,7 +671,7 @@ void Dialog::on_useSingleModeCheck_clicked()
         ui->rightWidget->show();
     }
 
-    resize(layout()->sizeHint().width(), height());
+    adjustSize();
 }
 
 void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
