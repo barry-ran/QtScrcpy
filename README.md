@@ -108,17 +108,17 @@ For Windows, for simplicity, prebuilt archives with all the dependencies (includ
 
  - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#build)
+or you can [build it by yourself](##Build)
 
 ### Mac OS
 For Mac OS, for simplicity, prebuilt archives with all the dependencies (including adb) are available:
 
 - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#build)
+or you can [build it by yourself](##Build)
 
 ### Linux
-you can [build it by yourself](#build)(just ubuntu test)
+you can [build it by yourself](##Build)(just ubuntu test)
 
 
 ## Run
