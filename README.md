@@ -1,6 +1,6 @@
 # QtScrcpy 
 
-[![Financial Contributors on Open Collective](https://opencollective.com/QtScrcpy/all/badge.svg?label=financial+contributors)](https://opencollective.com/QtScrcpy)
+[![Financial Contributors to Open Collective](https://opencollective.com/QtScrcpy/all/badge.svg?label=financial+contributors)](https://opencollective.com/QtScrcpy)
 ![Windows](https://github.com/barry-ran/QtScrcpy/workflows/Windows/badge.svg)
 ![MacOS](https://github.com/barry-ran/QtScrcpy/workflows/MacOS/badge.svg)
 ![Ubuntu](https://github.com/barry-ran/QtScrcpy/workflows/Ubuntu/badge.svg)
@@ -10,9 +10,9 @@
 
 [中文介绍](README_zh.md)
 
-QtScrcpy connects to Android devices via USB (or via TCP/IP) for display and control. It does NOT require the root privileges.
+QtScrcpy connects to Android devices via USB (or via TCP/IP) for display and control. It does NOT require root privileges.
 
-It supports three major platforms: GNU/Linux, Windows and MacOS.
+It supports three major platforms: GNU/Linux, Windows and macOS.
 
 It focuses on:
 
@@ -32,15 +32,15 @@ It focuses on:
 ![linux](screenshot/linux-en.png)
 
 ## Customized key mapping
-You can write your own script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/KeyMapDes.md) are the rules.
+You can write your script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/KeyMapDes.md) are the rules.
 
-A script for "PUBG mobile" and TikTok mapping is provided by default. Once enabled, you can play the game with your keyboard and mouse as the PC version. or you can use up/down/left/right direction keys to simulate up/down/left/right sliding. You can also write your own mapping files for other games according to [writing rules](docs/KeyMapDes.md). The default key mapping is as follows:
+A script for "PUBG mobile" and TikTok mapping is provided by default. Once enabled, you can play the game with your keyboard and mouse as the PC version. or you can use up/down/left/right direction keys to simulate up/down/left/right sliding. You can also write your mapping files for other games according to [the writing rules](docs/KeyMapDes.md). The default key mapping is as follows:
 
 ![game](screenshot/game.jpg)
 
 [Here is a video demonstration of playing "PUBG mobile"](http://mp.weixin.qq.com/mp/video?__biz=MzU1NTg5MjYyNw==&mid=100000015&sn=3e301fdc5a364bd16d6207fa674bc8b3&vid=wxv_968792362971430913&idx=1&vidsn=eec329cc13c3e24c187dc9b4d5eb8760&fromid=1&scene=20&xtrack=1&clicktime=1567346543&sessionid=1567346375&subscene=92&ascene=0&fasttmpl_type=0&fasttmpl_fullversion=4730859-zh_CN-zip&fasttmpl_flag=0&realreporttime=1567346543910#wechat_redirect)
 
-Here is the instruction of adding new customized mapping files.
+Here is the instruction for adding new customized mapping files.
 
 - Write a customized script and put it in the `keymap` directory
 - Click `refresh script` to check whether it can be found
@@ -81,7 +81,7 @@ build|meson+gradle|qmake or CMake
 ## Learn
 
 If you are interested in it and want to learn how it works but do not know how to get started, you can choose to purchase my recorded video lessons.
-It details the development architecture and the development process of the entire software, and help you develop QtScrcpy from scratch.
+It details the development architecture and the development process of the entire software and helps you develop QtScrcpy from scratch.
 
 Course introduction：[https://blog.csdn.net/rankun1/article/details/87970523](https://blog.csdn.net/rankun1/article/details/87970523)
 
@@ -93,7 +93,7 @@ QQ Group number：901736468
 ## Requirements
 Android API >= 21 (Android 5.0).
 
-Make sure you enabled [adb debugging][enable-adb] on your device(s).
+Make sure you have enabled [ADB debugging][enable-adb] on your device(s).
 
 [enable-adb]: https://developer.android.com/studio/command-line/adb.html#Enabling
 
@@ -104,63 +104,63 @@ Make sure you enabled [adb debugging][enable-adb] on your device(s).
 [github-download]: https://github.com/barry-ran/QtScrcpy/releases
 
 ### Windows
-For Windows, for simplicity, prebuilt archives with all the dependencies (including adb) are available:
+For Windows, for simplicity, prebuilt archives with all the dependencies (including ADB) are available:
 
  - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#build)
+or you can [build it by yourself](#Build)
 
 ### Mac OS
-For Mac OS, for simplicity, prebuilt archives with all the dependencies (including adb) are available:
+For Mac OS, for simplicity, prebuilt archives with all the dependencies (including ADB) are available:
 
 - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#build)
+or you can [build it by yourself](#Build)
 
 ### Linux
-you can [build it by yourself](#build)(just ubuntu test)
+you can [build it by yourself](#Build)(just ubuntu test)
 
 
 ## Run
 Connect to your Android device on your computer, then run the program and click `USB connect` or `WiFi connect`
 
-### Wireless connection steps (ensure that the mobile phone and PC are in the same LAN):
+### Wireless connection steps (ensure that the mobile phone and PC are on the same LAN):
 1. Enable USB debugging in developer options on the Android device
-2. Connect the Android device to computer via USB
+2. Connect the Android device to the computer via USB
 3. Click update device, and you will see that the device number is updated
 4. Click get device IP
 5. Click start adbd
 6. Click wireless connect
-7. Click update device again, and another device with IP address will be found. Select this device.
+7. Click update device again, and another device with an IP address will be found. Select this device.
 8. Click start service
 
 
-Note: it is not necessary to keep you Android device connected via USB after you start adbd.
+Note: it is not necessary to keep your Android device connected via USB after you start adbd.
 
 ## Interface button introduction：
 
 - Start config: function parameter settings before starting the service    
 
-    You can set the bit rate, resolution, recording format, and video save path of the local recorded video.
+    You can set the bit rate, resolution, recording format, and video save path of the locally recorded video.
 
-    - Background record: the Android device screen is not displayed after starting the service. It is recorded in background.
-    - Always on top: the video window for Android device will be kept on the top
+    - Background record: the Android device screen is not displayed after starting the service. It is recorded in the background.
+    - Always on top: the video window for Android devices will be kept on the top
     - Close screen: automatically turn off the Android device screen to save power after starting the service
-    - Reverse connection: service startup mode. You can uncheck it if you experience connection failure with message `more than one device`
+    - Reverse connection: service startup mode. You can uncheck it if you experience connection failure with a message `more than one device`
     
 - Refresh devices: Refresh the currently connected device
 - Start service: connect to the Android device
-- Stop service: disconnect from Android device
+- Stop service: disconnect from the Android device
 - Stop all services: disconnect all connected Android devices
 - Get device IP: Get the IP address of the Android device and update it to the "Wireless" area for the ease of wireless connection setting.
 - Start adbd: Start the adbd service of the Android device. You must start it before the wireless connection.
 - Wireless connect: Connect to Android devices wirelessly
 - Wireless disconnect: Disconnect wirelessly connected Android devices
-- adb command: execute customized adb commands (blocking commands are not supported now, such as shell)
+- adb command: execute customized ADB commands (blocking commands are not supported now, such as a shell)
 
 
 ## The main function
-- Display Android device screens in real time
+- Display Android device screens in real-time
 - Real-time mouse and keyboard control of Android devices
 - Screen recording
 - Screenshot to png
@@ -228,11 +228,11 @@ Everyone is welcome to maintain this project and contribute your own code, but p
 4. Please keep the code style consistent with the existing style
 
 ## Why develop QtScrcpy?
-There are several reasons listed as below according to importance (high to low).
+There are several reasons listed below according to importance (high to low).
 1. In the process of learning Qt, I need a real project to try
-2. I have some background skill about audio and video and I am interested at them
+2. I have some background skills in audio and video and I am interested in them
 3. I have some Android development skills. But I have used it for a long time. I want to consolidate it.
-4. I found scrcpy and decided to re-make it with the new technology stack (C++ + Qt + Opengl + ffmpeg)
+4. I found scrcpy and decided to re-make it with the new technology stack (C++ + Qt + Opengl + FFmpeg)
 
 
 ## Build
@@ -249,8 +249,8 @@ Qt version>=5.12 (use MSVC 2019 on Windows)
 
 1. Set up an Android development environment on the target platform
 2. Open server project in project root with Android Studio
-3. The first time you open it, if you do not have the corresponding version of gradle, you will be prompted to find gradle, whether to upgrade gradle and create it. Select Cancel. After canceling, you will be prompted to select the location of the existing gradle. You can also cancel it (it will download automatically).
-4. Edit the code as needed, but of course you do n’t need to.
+3. The first time you open it, if you do not have the corresponding version of Gradle, you will be prompted to find Gradle, whether to upgrade Gradle or create it. Select Cancel. After canceling, you will be prompted to select the location of the existing Gradle. You can also cancel it (it will download automatically).
+4. Edit the code as needed, but of course, you don’t need to.
 4. After compiling the apk, rename it to scrcpy-server and replace QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server.
 
 ## Licence
@@ -274,7 +274,7 @@ Since it is based on scrcpy, respect its Licence
 
 [Barry CSDN](https://blog.csdn.net/rankun1)
 
-An ordinary programmer, working mainly in C++ for desktop client development, graduated from Shandong for more than a year of steel simulation education software, and later moved to Shanghai to work in security, online education related fields, familiar with audio and video. I have an understanding of audio and video fields such as voice calls, live education, video conferencing and other related solutions. I also have experience in Android, Linux server and other kinds of development.
+An ordinary programmer, working mainly in C++ for desktop client development, graduated from Shandong for more than a year of steel simulation education software, and later moved to Shanghai to work in security, online education-related fields, familiar with audio and video. I have an understanding of audio and video fields such as voice calls, live education, video conferencing and other related solutions. I also have experience in Android, Linux servers and other kinds of development.
 
 ## Contributors
 
