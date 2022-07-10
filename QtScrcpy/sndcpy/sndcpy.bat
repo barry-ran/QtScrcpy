@@ -19,7 +19,7 @@ echo Find device %1
 for /f "delims=" %%i in ('%ADB% %serial% shell pm path com.rom1v.sndcpy') do set sndcpy_installed=%%i
 if "%sndcpy_installed%"=="" (
     echo Install %SNDCPY_APK%... 
-    %ADB% %serial% uninstall com.rom1v.sndcpy || goto :error
+    %ADB% %serial% uninstall com.rom1v.sndcpy || echo uninstall failed
     %ADB% %serial% install -t -r -g %SNDCPY_APK% || goto :error
     echo Install %SNDCPY_APK% success
 )

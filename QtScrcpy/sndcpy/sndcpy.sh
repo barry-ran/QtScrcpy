@@ -19,7 +19,7 @@ echo "Find device $1"
 sndcpy_installed=$($ADB $serial shell pm path com.rom1v.sndcpy)
 if [[ $sndcpy_installed == "" ]]; then
     echo Install $SNDCPY_APK... 
-    $ADB $serial uninstall com.rom1v.sndcpy
+    $ADB $serial uninstall com.rom1v.sndcpy || echo uninstall failed
     $ADB $serial install -t -r -g $SNDCPY_APK
     echo Install $SNDCPY_APK success
 fi
