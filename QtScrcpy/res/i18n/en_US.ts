@@ -287,7 +287,7 @@
     </message>
     <message>
         <source>auto update</source>
-        <translation>autp update</translation>
+        <translation>auto update</translation>
     </message>
 </context>
 </TS>

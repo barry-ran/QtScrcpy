@@ -233,6 +233,10 @@ void Dialog::delayMs(int ms)
 
 QString Dialog::getGameScript(const QString &fileName)
 {
+    if (fileName.isEmpty()) {
+        return "";
+    }
+
     QFile loadFile(getKeyMapPath() + "/" + fileName);
     if (!loadFile.open(QIODevice::ReadOnly)) {
         outLog("open file failed:" + fileName, true);
@@ -667,7 +671,7 @@ void Dialog::on_useSingleModeCheck_clicked()
         ui->rightWidget->show();
     }
 
-    resize(layout()->sizeHint().width(), height());
+    adjustSize();
 }
 
 void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
