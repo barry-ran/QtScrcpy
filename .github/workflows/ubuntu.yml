@@ -26,17 +26,17 @@ jobs:
       qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
       plantform-des: ubuntu
     steps:
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v1
-        with:
-          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
-          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt
         uses: jurplel/install-qt-action@v2.13.0
         with:
           version: ${{ matrix.qt-ver }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v3.0.6
+        with:
+          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
+          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install GL library
         run: sudo apt-get install -y libglew-dev libglfw3-dev
       - uses: actions/checkout@v2
@@ -62,9 +62,11 @@ jobs:
         run: |
           zip -r QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip output/x64/RelWithDebInfo
       - name: Upload to Releases
+        if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@2.3.0
         with:
           file: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
           asset_name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
           repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
           overwrite: true
