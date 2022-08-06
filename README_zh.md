@@ -86,7 +86,7 @@ QQ群号：901736468
 
 
 ## 要求
-Android部分至少需要API 21（Android 5.0）。
+Android 部分至少需要 API 21（Android 5.0）。
 
 您要确保在Android设备上[启用adb调试][enable-adb]。
 
@@ -100,7 +100,7 @@ Android部分至少需要API 21（Android 5.0）。
 
 ### Windows
 
-Windows平台，你可以直接使用我编译好的可执行程序:
+Windows 平台，你可以直接使用我编译好的可执行程序:
 
  - [国内下载][gitee-download]
  - [国外下载][github-download]
@@ -109,7 +109,7 @@ Windows平台，你可以直接使用我编译好的可执行程序:
 
 ### Mac OS
 
-Mac OS平台，你可以直接使用我编译好的可执行程序:
+Mac OS 平台，你可以直接使用我编译好的可执行程序:
 
 - [国内下载][gitee-download]
 - [国外下载][github-download]
@@ -118,11 +118,17 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 
 ### Linux
 
-目前只提供了windows和mac平台的可执行程序，如果需要linux平台的可执行程序，
+对于 Arch Linux 用户，可以使用 AUR 安装：`yay -S qtscrcpy`（可能版本并非最新；维护者：[yochananmarqos](https://aur.archlinux.org/account/yochananmarqos)）
 
-您通常需要[自己编译](##如何编译)。别担心，这并不难。
+其他发行版的用户可以直接使用我编译好的可执行程序:
 
-目前只在ubuntu上测试过
+- [国外下载][github-download]
+
+你也可以从 [GitHub Actions](https://github.com/UjhhgtgTeams/QtScrcpy/actions/workflows/ubuntu.yml) 获取最新的自动编译好的软件
+
+当然，你也可以[自己编译](##如何编译)（不推荐，需要准备不少的环境）
+
+目前只在 Ubuntu 上测试过编译过程（Arch Linux 也测试过，如果AUR也算的话）
 
 ## 运行
 在你的电脑上接入Android设备，然后运行程序，点击`一键USB连接`或者`一键WIFI连接`
