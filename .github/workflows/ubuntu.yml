@@ -38,7 +38,7 @@ jobs:
         with:
           version: ${{ matrix.qt-ver }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-      - name: Ubuntu install GL library
+      - name: Install GL library
         run: sudo apt-get install -y libglew-dev libglfw3-dev
       - uses: actions/checkout@v2
         with:
@@ -51,3 +51,8 @@ jobs:
         run: |
           python ci/generate-version.py
           ci/linux/build_for_ubuntu.sh RelWithDebInfo
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: QtScrcpy
+          path: output/x64/RelWithDebInfo/*
