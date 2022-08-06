@@ -1,5 +1,4 @@
 name: Ubuntu
-# Qt官方没有linux平台的x86包
 on: 
   push:
     paths:
@@ -19,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        qt-ver: [5.15.1]
+        qt-ver: [5.15.2]
         qt-arch-install: [gcc_64]
         gcc-arch: [x64]
     env:
