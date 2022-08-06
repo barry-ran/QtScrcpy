@@ -50,8 +50,21 @@ jobs:
         run: |
           python ci/generate-version.py
           ci/linux/build_for_ubuntu.sh RelWithDebInfo
-      - name: Upload a Build Artifact
+      - name: Upload the Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
           name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}
           path: output/x64/RelWithDebInfo/*
+      - name: Install the zip utility
+        run: |
+          sudo apt install zip -y
+      - name: Zip the Artifacts
+        run: |
+          zip -r QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip output/x64/RelWithDebInfo
+      - name: Upload to Releases
+        uses: svenstaro/upload-release-action@2.3.0
+        with:
+          file: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
+          asset_name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          overwrite: true
