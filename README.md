@@ -104,22 +104,27 @@ Make sure you have enabled [ADB debugging][enable-adb] on your device(s).
 [github-download]: https://github.com/barry-ran/QtScrcpy/releases
 
 ### Windows
-For Windows, for simplicity, prebuilt archives with all the dependencies (including ADB) are available:
+On Windows, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
 
  - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it yourself](#Build)
 
 ### Mac OS
-For Mac OS, for simplicity, prebuilt archives with all the dependencies (including ADB) are available:
+For Mac OS, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
 
 - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it yourself](#Build)
 
 ### Linux
-you can [build it by yourself](#Build)(just ubuntu test)
+For Linux, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
 
+- [`QtScrcpy`][github-download]
+
+or you can get it at [GitHub Actions](https://github.com/UjhhgtgTeams/QtScrcpy/actions/workflows/ubuntu.yml), in branch `dev` and download the latest artifact.
+
+or you can [build it yourself](#Build) (not recommended, get it at Actions if you can)
 
 ## Run
 Connect to your Android device on your computer, then run the program and click `USB connect` or `WiFi connect`
