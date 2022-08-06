@@ -111,20 +111,22 @@ On Windows, for simplicity, prebuilt archives with all the dependencies (includi
 or you can [build it yourself](#Build)
 
 ### Mac OS
-For Mac OS, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
+On Mac OS, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
 
 - [`QtScrcpy`][github-download]
 
 or you can [build it yourself](#Build)
 
 ### Linux
-For Linux, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
+For Arch Linux Users, you can use AUR to install: `yay -S qtscrcpy` (may be outdated; maintainer: [yochananmarqos](https://aur.archlinux.org/account/yochananmarqos))
+
+For users in other distros, you can use the prebuilt archives from Releases:
 
 - [`QtScrcpy`][github-download]
 
 or you can get it at [GitHub Actions](https://github.com/UjhhgtgTeams/QtScrcpy/actions/workflows/ubuntu.yml), in branch `dev` and download the latest artifact.
 
-or you can [build it yourself](#Build) (not recommended, get it at Actions if you can)
+or you can [build it yourself](#Build) (not recommended, get it in Actions if you can)
 
 ## Run
 Connect to your Android device on your computer, then run the program and click `USB connect` or `WiFi connect`
