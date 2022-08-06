@@ -53,5 +53,5 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: QtScrcpy-${{ matrix.os }}-${{ qt-arch-install }}
+          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}
           path: output/x64/RelWithDebInfo/*
