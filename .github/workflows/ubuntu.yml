@@ -44,23 +44,34 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
           ssh-key: ${{ secrets.BOT_SSH_KEY }}
-      - name: Build Ubuntu
+      - name: Build RelWithDebInfo
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           python ci/generate-version.py
           ci/linux/build_for_ubuntu.sh RelWithDebInfo
-      - name: Upload the Build Artifact
+      - name: Upload RelWithDebInfo
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}
+          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-RelWithDebInfo
           path: output/x64/RelWithDebInfo/*
+      - name: Build Release
+        env:
+          ENV_QT_PATH: ${{ env.qt-install-path }}
+        run: |
+          python ci/generate-version.py
+          ci/linux/build_for_ubuntu.sh Release
+      - name: Upload Release
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-Release
+          path: output/x64/Release/*
       - name: Install the zip utility
         run: |
           sudo apt install zip -y
       - name: Zip the Artifacts
         run: |
-          zip -r QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip output/x64/RelWithDebInfo
+          zip -r QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip output/x64/Release
       - name: Upload to Releases
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@2.3.0
