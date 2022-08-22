@@ -12,7 +12,6 @@ public class Options {
     private int lockVideoOrientation = -1;
     private boolean tunnelForward;
     private Rect crop;
-    private boolean sendFrameMeta = true; // send PTS so that the client may record properly
     private boolean control = true;
     private int displayId;
     private boolean showTouches;
@@ -21,6 +20,14 @@ public class Options {
     private String encoderName;
     private boolean powerOffScreenOnClose;
     private boolean clipboardAutosync = true;
+    private boolean downsizeOnError = true;
+    private boolean cleanup = true;
+    private boolean powerOn = true;
+
+    // Options not used by the scrcpy client, but useful to use scrcpy-server directly
+    private boolean sendDeviceMeta = true; // send device name and size
+    private boolean sendFrameMeta = true; // send PTS so that the client may record properly
+    private boolean sendDummyByte = true; // write a byte on start to detect connection issues
 
     public Ln.Level getLogLevel() {
         return logLevel;
@@ -76,14 +83,6 @@ public class Options {
 
     public void setCrop(Rect crop) {
         this.crop = crop;
-    }
-
-    public boolean getSendFrameMeta() {
-        return sendFrameMeta;
-    }
-
-    public void setSendFrameMeta(boolean sendFrameMeta) {
-        this.sendFrameMeta = sendFrameMeta;
     }
 
     public boolean getControl() {
@@ -148,5 +147,53 @@ public class Options {
 
     public void setClipboardAutosync(boolean clipboardAutosync) {
         this.clipboardAutosync = clipboardAutosync;
+    }
+
+    public boolean getDownsizeOnError() {
+        return downsizeOnError;
+    }
+
+    public void setDownsizeOnError(boolean downsizeOnError) {
+        this.downsizeOnError = downsizeOnError;
+    }
+
+    public boolean getCleanup() {
+        return cleanup;
+    }
+
+    public void setCleanup(boolean cleanup) {
+        this.cleanup = cleanup;
+    }
+
+    public boolean getPowerOn() {
+        return powerOn;
+    }
+
+    public void setPowerOn(boolean powerOn) {
+        this.powerOn = powerOn;
+    }
+
+    public boolean getSendDeviceMeta() {
+        return sendDeviceMeta;
+    }
+
+    public void setSendDeviceMeta(boolean sendDeviceMeta) {
+        this.sendDeviceMeta = sendDeviceMeta;
+    }
+
+    public boolean getSendFrameMeta() {
+        return sendFrameMeta;
+    }
+
+    public void setSendFrameMeta(boolean sendFrameMeta) {
+        this.sendFrameMeta = sendFrameMeta;
+    }
+
+    public boolean getSendDummyByte() {
+        return sendDummyByte;
+    }
+
+    public void setSendDummyByte(boolean sendDummyByte) {
+        this.sendDummyByte = sendDummyByte;
     }
 }
