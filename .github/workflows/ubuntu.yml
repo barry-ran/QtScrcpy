@@ -48,7 +48,6 @@ jobs:
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
-          python ci/generate-version.py
           ci/linux/build_for_linux.sh "RelWithDebInfo"
       - name: Upload RelWithDebInfo
         uses: actions/upload-artifact@v3.1.0
@@ -59,7 +58,6 @@ jobs:
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
-          python ci/generate-version.py
           ci/linux/build_for_linux.sh "Release"
       - name: Upload Release
         uses: actions/upload-artifact@v3.1.0
