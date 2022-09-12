@@ -1,5 +1,4 @@
 name: Ubuntu
-# Qt官方没有linux平台的x86包
 on: 
   push:
     paths:
@@ -19,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        qt-ver: [5.15.1]
+        qt-ver: [5.15.2]
         qt-arch-install: [gcc_64]
         gcc-arch: [x64]
     env:
@@ -27,27 +26,56 @@ jobs:
       qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
       plantform-des: ubuntu
     steps:
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v1
-        with:
-          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
-          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt
         uses: jurplel/install-qt-action@v2.13.0
         with:
           version: ${{ matrix.qt-ver }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-      - name: Ubuntu install GL library
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v3.0.6
+        with:
+          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
+          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
+      - name: Install GL library
         run: sudo apt-get install -y libglew-dev libglfw3-dev
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
           submodules: 'true'
           ssh-key: ${{ secrets.BOT_SSH_KEY }}
-      - name: Build Ubuntu
+      - name: Build RelWithDebInfo
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
-          python ci/generate-version.py
-          ci/linux/build_for_ubuntu.sh RelWithDebInfo
+          ci/linux/build_for_linux.sh "RelWithDebInfo"
+      - name: Upload RelWithDebInfo
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-RelWithDebInfo
+          path: output/x64/RelWithDebInfo/*
+      - name: Build Release
+        env:
+          ENV_QT_PATH: ${{ env.qt-install-path }}
+        run: |
+          ci/linux/build_for_linux.sh "Release"
+      - name: Upload Release
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-Release
+          path: output/x64/Release/*
+      - name: Install the zip utility
+        run: |
+          sudo apt install zip -y
+      - name: Zip the Artifacts
+        run: |
+          zip -r QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip output/x64/Release
+      - name: Upload to Releases
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@2.3.0
+        with:
+          file: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
+          asset_name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref }}
+          overwrite: true

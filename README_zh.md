@@ -7,11 +7,11 @@
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
 ![release](https://img.shields.io/github/v/release/barry-ran/QtScrcpy.svg)
 
-[English introduction](README.md)
+[Speaks English? Click me for English introduction.](README.md)
 
-QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和控制。不需要root权限。
+QtScrcpy 可以通过 USB / 网络连接Android设备，并进行显示和控制。无需root权限。
 
-同时支持GNU/Linux，Windows和MacOS三大主流桌面平台
+同时支持 GNU/Linux ，Windows 和 MacOS 三大主流桌面平台。
 
 它专注于:
 
@@ -19,7 +19,7 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
  - **性能** (30~60fps)
  - **质量** (1920×1080以上)
  - **低延迟** ([35~70ms][低延迟])
- - **快速启动** (1s内就可以看到第一帧图像)
+ - **快速启动** (1s 内就可以看到第一帧图像)
  - **非侵入性** (不在设备上安装任何软件)
 
 [低延迟]: https://github.com/Genymobile/scrcpy/pull/646
@@ -31,7 +31,7 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 ![linux](screenshot/linux-zh.png)
 
 ## 自定义按键映射
-可以根据需要，自己编写脚本将PC键盘按键映射为手机的触摸点击，编写规则在[这里](docs/KeyMapDes_zh.md)。
+可以根据需要，自己编写脚本将键盘按键映射为手机的触摸点击，编写规则在[这里](docs/KeyMapDes_zh.md)。
 
 默认自带了针对和平精英手游和抖音进行键鼠映射的映射脚本，开启平精英手游后可以用键鼠像玩端游一样玩和平精英手游，开启抖音映射以后可以使用上下左右方向键模拟上下左右滑动，你也可以按照[编写规则](docs/KeyMapDes_zh.md)编写其他游戏的映射文件，默认按键映射如下：
 
@@ -40,13 +40,13 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 [这里有玩和平精英的视频演示](http://mp.weixin.qq.com/mp/video?__biz=MzU1NTg5MjYyNw==&mid=100000015&sn=3e301fdc5a364bd16d6207fa674bc8b3&vid=wxv_968792362971430913&idx=1&vidsn=eec329cc13c3e24c187dc9b4d5eb8760&fromid=1&scene=20&xtrack=1&clicktime=1567346543&sessionid=1567346375&subscene=92&ascene=0&fasttmpl_type=0&fasttmpl_fullversion=4730859-zh_CN-zip&fasttmpl_flag=0&realreporttime=1567346543910#wechat_redirect)
 
 自定义按键映射操作方法如下：
-- 编写自定义脚本放入keymap目录
+- 编写自定义脚本放入 keymap 目录
 - 点击刷新脚本，确保脚本可以被检测到
 - 选择需要的脚本
 - 连接手机并启动服务之后，点击应用脚本
-- 按~键（数字键1左边）切换为自定义映射模式即可体验（具体按什么键要看你按键脚本定义的switchKey）
+- 按`~`（即脚本中定义的 SwitchKey）键切换为自定义映射模式即可启用
 - 再次按~键切换为正常控制模式
-- 要想wasd控制开车记得在载具设置中设置为单摇杆模式
+- （对于和平精英等游戏）若想使用方向盘控制载具，记得在载具设置中设置为单摇杆模式
 
 ## 群控
 你可以同时控制所有的手机
@@ -55,18 +55,20 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 ## 感谢
 
-基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢。QtScrcpy和原版scrcpy区别如下：
+基于[Genymobile](https://github.com/Genymobile)的[scrcpy](https://github.com/Genymobile/scrcpy)项目进行复刻，重构，非常感谢。
 
+## 比较
+QtScrcpy 和 Scrcpy 区别如下：
 关键点|scrcpy|QtScrcpy
 --|:--:|:--:
 界面|sdl|qt
 视频解码|ffmpeg|ffmpeg
 视频渲染|sdl|opengl
-跨平台基础设施|自己封装|Qt提供
+跨平台基础设施|自己封装|Qt
 编程语言|C|C++
 编程方式|同步|异步
 按键映射|不支持自定义|支持自定义按键映射
-编译方式|meson+gradle|qmake or CMake
+编译方式|Meson+Gradle|CMake
 
 - 使用Qt可以非常容易的定制自己的界面
 - 基于Qt的信号槽机制的异步编程提高性能
@@ -76,111 +78,116 @@ QtScrcpy可以通过USB(或通过TCP/IP)连接Android设备，并进行显示和
 
 ## 学习它
 如果你对它感兴趣，想学习它的实现原理而又感觉无从下手，可以选择购买我录制的视频课程，
-里面详细介绍了整个软件的开发架构以及开发流程，带你从无到有的开发QtScrcpy：
+里面详细介绍了整个软件的开发架构以及开发流程，带你从无到有的开发 QtScrcpy：
 
 课程介绍：[https://blog.csdn.net/rankun1/article/details/87970523](https://blog.csdn.net/rankun1/article/details/87970523)
 
-或者你也可以加入我的QtScrcpy QQ群，和志同道合的朋友一块互相交流技术：
+或者你也可以加入我的 QtScrcpy QQ 群，和志同道合的朋友一块互相交流技术：
 
 QQ群号：901736468
 
 
 ## 要求
-Android部分至少需要API 21（Android 5.0）。
+Android 部分至少需要 API 21（Android 5.0）。
 
-您要确保在Android设备上[启用adb调试][enable-adb]。
+您要确保在 Android 设备上[启用adb调试][enable-adb]。
 
 [enable-adb]: https://developer.android.com/studio/command-line/adb.html#Enabling
 
 
-## 下载这个软件
+## 下载
 
 [gitee-download]: https://gitee.com/Barryda/QtScrcpy/releases
 [github-download]: https://github.com/barry-ran/QtScrcpy/releases
 
 ### Windows
 
-Windows平台，你可以直接使用我编译好的可执行程序:
+Windows 平台，你可以直接使用我编译好的可执行程序:
 
  - [国内下载][gitee-download]
  - [国外下载][github-download]
 
-你也可以[自己编译](##如何编译)
+你也可以[自己编译](##编译)
 
 ### Mac OS
 
-Mac OS平台，你可以直接使用我编译好的可执行程序:
+Mac OS 平台，你可以直接使用我编译好的可执行程序:
 
 - [国内下载][gitee-download]
 - [国外下载][github-download]
 
-你也可以[自己编译](##如何编译)
+你也可以[自己编译](##编译)
 
 ### Linux
 
-目前只提供了windows和mac平台的可执行程序，如果需要linux平台的可执行程序，
+对于 Arch Linux 用户，可以使用 AUR 安装：`yay -Syu qtscrcpy`（可能版本并非最新；维护者：[yochananmarqos](https://aur.archlinux.org/account/yochananmarqos)）
 
-您通常需要[自己编译](##如何编译)。别担心，这并不难。
+其他发行版的用户可以直接使用我编译好的可执行程序:
 
-目前只在ubuntu上测试过
+- [国外下载][github-download]
+
+你也可以从 [GitHub Actions](https://github.com/UjhhgtgTeams/QtScrcpy/actions/workflows/ubuntu.yml) 获取最新的自动编译好的软件
+
+当然，你也可以[自己编译](##编译)（不推荐，需要准备环境）
+
+目前只在 Ubuntu 和 Arch Linux 上测试过编译过程
 
 ## 运行
-在你的电脑上接入Android设备，然后运行程序，点击`一键USB连接`或者`一键WIFI连接`
+在你的电脑上接入Android设备，然后运行程序，点击 `一键USB连接` 或者 `一键WIFI连接`
 
-### 无线连接步骤（保证手机和电脑在同一个局域网）：
-1. 安卓手机端在开发者选项中打开usb调试
-2. 通过usb连接安卓手机到电脑
-3. 点击刷新设备，会看到有设备号更新出来
-4. 点击获取设备IP
-5. 点击启动adbd
-6. 无线连接
-7. 再次点击刷新设备，发现多出了一个IP地址开头的设备，选择这个设备
-8. 启动服务
+### 无线连接步骤
+1. 将手机和电脑连接到同一局域网
+2. 安卓手机端在开发者选项中打开 USB 调试
+3. 通过 USB 连接安卓手机到电脑
+4. 点击刷新设备，会看到有设备号更新出来
+5. 点击获取设备 IP
+6. 点击启动 adbd
+7. 无线连接
+8. 再次点击刷新设备，发现多出了一个 IP 地址开头的设备，选择这个设备
+9. 启动服务
 
-备注：启动adbd以后不用再连着usb线了，以后连接断开都不再需要，除非安卓adbd停了需要重新启动
+备注：启动 adbd 以后无需继续连接 USB 线，以后连接断开都不再需要，除非 adbd 停止运行
 
-## 界面按钮介绍：
+## 界面解释
 
 - 启动配置：启动服务前的功能参数设置    
 
     分别可以设置本地录制视频的比特率、分辨率、录制格式、录像保存路径等。
 
-    - 仅后台录制：启动服务不现实界面，只是录制Android设备屏幕
-    - 窗口置顶：Android设备视频窗口置顶显示
-    - 自动息屏：启动服务以后，自动关闭Android设备屏幕节省电量
-    - 使用reverse：服务启动模式，出现服务启动失败报错more than one device可以去掉这个勾选尝试连接
+    - 仅后台录制：启动服务不显示界面，只录制 Android 设备屏幕
+    - 窗口置顶：Android 设备显示窗口置顶
+    - 自动息屏：启动服务以后，自动关闭 Android 设备屏幕以节省电量
+    - 使用 Reverse：服务启动模式，出现服务启动失败报错 "more than one device" 可以去掉这个勾选尝试连接
     
 - 刷新设备列表：刷新当前连接的设备
-- 启动服务：连接到Android设备
-- 停止服务：断开与Android设备的连接
-- 停止所有服务：断开所有已连接的Android设备
-- 获取设备ip：获取到Android设备的ip地址，更新到“无线”区域中，方便进行无线连接
-- 启动adbd：启动Android设备的adbd服务，无线连接之前，必须要启动。
-- 无线连接：使用无线方式连接Android设备
-- 无线断开：断开无线方式连接的Android设备
-- adb命令行：方便执行自定义adb命令（目前不支持阻塞命令，例如shell）
+- 启动服务：连接到 Android 设备
+- 停止服务：断开与 Android 设备的连接
+- 停止所有服务：断开所有已连接的 Android 设备
+- 获取设备ip：获取到 Android 设备的 IP 地址，更新到无线区域中，方便进行无线连接
+- 启动adbd：启动 Android 设备的 adbd 服务，无线连接之前，必须要启动
+- 无线连接：使用无线方式连接 Android 设备
+- 无线断开：断开无线方式连接的 Android 设备
+- 命令行：执行自定义 adb 命令（目前不支持阻塞命令，例如shell）
 
 
-## 主要功能
-- 实时显示Android设备屏幕
+## 功能
+- 实时显示 Android 设备屏幕
 - 实时键鼠控制Android设备
 - 屏幕录制
-- 截图为png
+- 截图
 - 无线连接
-- 支持多台设备连接
+- 多设备连接与群控
 - 全屏显示
 - 窗口置顶
-- 安装apk：拖拽apk到视频窗口即可安装
-- 传输文件：拖拽文件到视频窗口即可发送文件到Android设备
-- 后台录制：只录制，不显示界面
-- 复制粘贴
-
-    在计算机和设备之间双向同步剪贴板：
-    - `Ctrl` + `c`将设备剪贴板复制到计算机剪贴板；
-    - `Ctrl` + `Shift` + `v`将计算机剪贴板复制到设备剪贴板；
-    - `Ctrl` +`v` 将计算机剪贴板作为一系列文本事件发送到设备（不支持非ASCII字符）。
-- 群控
-- 同步设备扬声器声音到电脑（基于[sndcpy](https://github.com/rom1v/sndcpy)，仅支持安卓10+）
+- 安装 apk：拖拽apk到显示窗口即可安装
+- 传输文件：拖拽文件到显示窗口即可发送文件到 Android 设备
+- 后台录制：只录制屏幕，不显示界面
+- 剪贴板同步:
+    在计算机和设备之间同步剪贴板：
+    - `Ctrl + c`将设备剪贴板复制到计算机剪贴板；
+    - `Ctrl + Shift + v`将计算机剪贴板复制到设备剪贴板；
+    - `Ctrl + v` 将计算机剪贴板作为一系列文本事件发送到设备（不支持非ASCII字符）
+- 同步设备扬声器声音到电脑（基于[sndcpy](https://github.com/rom1v/sndcpy)，仅支持安卓10级以上，目前不推荐使用，可使用蓝牙连接替代）
 
 ## 快捷键
 
@@ -216,41 +223,49 @@ Mac OS平台，你可以直接使用我编译好的可执行程序:
 [常见问题说明](docs/FAQ.md)
 
 ## 开发者
-[开发者相关](docs/DEVELOP.md)
+[开发相关](docs/DEVELOP.md)
 
-欢迎大家一起维护这个项目，贡献自己的代码，不过请遵循一下几点要求：
-1. pr请提到dev分支，不要提到master分支
-2. 提pr之前请先rebase dev
-3. pr请以少量多次的原则提交（建议一个小的功能点提一个pr）
-4. 代码风格请保持和已有风格一致
+欢迎大家一起维护这个项目，贡献自己的代码，不过请遵循以下几点要求：
+1. PR 请推向 dev 分支，不要推向 master 分支
+2. 提交 PR 之前请先变基原项目
+3. PR 请以少量多次的原则提交（即一个功能点提交一个 PR）
+4. 代码风格请保持和原有风格一致
 
-## 为什么开发QtScrcpy？
+## 为什么开发 QtScrcpy？
 综合起来有以下几个原因，比重从大到小排列：
 1. 学习Qt的过程中需要一个项目实战一下
 2. 本身具有音视频相关技能，对音视频很感兴趣
-3. 本身具有Android开发技能，好久没用有点生疏，需要巩固一下
-4. 发现了scrcpy，决定用新的技术栈（C++ + Qt + Opengl + ffmpeg）复刻一下
+3. 本身具有 Android 开发技能，好久没用有点生疏，需要巩固一下
+4. 发现了 Scrcpy，决定用新的技术栈（C++ + Qt + Opengl + FFmpeg）进行复刻
 
 
-## 如何编译
+## 编译
 尽量提供了所有依赖资源，方便傻瓜式编译。
 
-### PC端
-1. 在目标平台上搭建Qt开发环境
-Qt版本>=5.12（在Windows上使用MSVC 2019）
-2. 克隆该项目（git clone --recursive git@github.com:barry-ran/QtScrcpy.git）
-3. 使用QtCreator打开项目根目录`CMakeLists.txt`
-4. 编译，运行
+### QtScrcpy
+#### 非  Arch Linux
+1. 使用官方 Qt Installer 或非官方工具（如 [aqt](https://github.com/miurahr/aqtinstall)）在目标平台上搭建Qt开发环境。
+需要 5.12 以上版本 Qt（在 Windows 上使用 MSVC 2019）
+2. 克隆该项目：`git clone --recurse-submodules https://github.com/barry-ran/QtScrcpy.git`
+3. Windows 使用 QtCreator 打开项目下 CMakeLists.txt 并编译 Release
+4. Linux 用终端执行  `./ci/linux/build_for_linux.sh "Release"`
+注：编译结果位于 `output/x64/Release` 中
 
-### Android端 （没有修改需求的话直接使用自带的scrcpy-server即可）
-1. 目标平台上搭建Android开发环境
-2. 使用Android Studio打开项目根目录中的server项目
-3. 第一次打开如果你没有对应版本的gradle会提示找不到gradle，是否升级gradle并创建，选择取消，取消后会弹出选择已有gradle的位置，同样取消即可（会自动下载）
-4. 按需编辑代码即可，当然也可以不编辑
-4. 编译出apk以后改名为scrcpy-server并替换third_party/scrcpy-server即可
+#### Arch Linux
+1. 安装以下包：`qt5-base qt5-multimedia qt5-x11extras`（推荐安装 `qtcreator`）
+2. 克隆该项目：`git clone --recurse-submodules https://github.com/barry-ran/QtScrcpy.git`
+3. 用终端执行  `./ci/linux/build_for_linux.sh "Release"`
+注：编译结果位于 `output/x64/Release` 中
+
+### Scrcpy-Server
+1. 目标平台上搭建 Android 开发环境
+2. 使用 Android Studio 打开项目根目录中的 server
+3. 第一次打开时，如果你没有对应版本的 Gradle，Studio 会提示找不到 Gradle，是否升级 Gradle 并创建，选择取消，取消后会提示选择 Gradle 的位置，同样取消即可。Studio 会随后自动下载。
+4. 按需编辑代码
+5. 编译出 apk 以后改名为 scrcpy-server 并替换 `third_party/scrcpy-server` 即可
 
 ## Licence
-由于是复刻的scrcpy，尊重它的Licence
+由于是复刻的 Scrcpy，尊重它的 Licence
 
     Copyright (C) 2025 Rankun
     
@@ -268,6 +283,6 @@ Qt版本>=5.12（在Windows上使用MSVC 2019）
 
 ## 关于作者
 
-[Barry的CSDN](https://blog.csdn.net/rankun1)
+[Barry 的 CSDN](https://blog.csdn.net/rankun1)
 
-一枚普通的程序员，工作中主要使用C++进行桌面客户端开发，一毕业在山东做过一年多钢铁仿真教育软件，后来转战上海先后从事安防，在线教育相关领域工作，对音视频比较熟悉，对音视频领域如语音通话，直播教育，视频会议等相关解决方案有所了解。同时具有Android，Linux服务器等开发经验。
+一枚普通的程序员，工作中主要使用 C++ 进行桌面客户端开发，一毕业在山东做过一年多钢铁仿真教育软件，后来转战上海先后从事安防，在线教育相关领域工作，对音视频比较熟悉，对音视频领域如语音通话，直播教育，视频会议等相关解决方案有所了解。同时具有Android，Linux服务器等开发经验。
