@@ -12,10 +12,9 @@
 set -e
 
 SCRCPY_DEBUG=false
-SCRCPY_VERSION_NAME=1.21
+SCRCPY_VERSION_NAME=1.24
 
-PLATFORM_VERSION=31
-PLATFORM=${ANDROID_PLATFORM:-$PLATFORM_VERSION}
+PLATFORM=${ANDROID_PLATFORM:-31}
 BUILD_TOOLS=${ANDROID_BUILD_TOOLS:-31.0.0}
 
 BUILD_DIR="$(realpath ${BUILD_DIR:-build_manual})"
@@ -57,7 +56,7 @@ javac -bootclasspath "$ANDROID_JAR" -cp "$CLASSES_DIR" -d "$CLASSES_DIR" \
 echo "Dexing..."
 cd "$CLASSES_DIR"
 
-if [[ $PLATFORM_VERSION -lt 31 ]]
+if [[ $PLATFORM -lt 31 ]]
 then
     # use dx
     "$ANDROID_HOME/build-tools/$BUILD_TOOLS/dx" --dex \
