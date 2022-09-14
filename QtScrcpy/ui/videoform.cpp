@@ -467,6 +467,8 @@ void VideoForm::switchFullScreen()
         }
 
         showNormal();
+        // back to normal size.
+        resize(m_normalSize);
         // fullscreen window will move (0,0). qt bug?
         move(m_fullScreenBeforePos);
 
@@ -486,6 +488,9 @@ void VideoForm::switchFullScreen()
         if (m_widthHeightRatio > 1.0f) {
             ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
         }
+
+        // record current size before fullscreen, it will be used to rollback size after exit fullscreen.
+        m_normalSize = size();
 
         m_fullScreenBeforePos = pos();
         // 这种临时增加标题栏再全屏的方案会导致收不到mousemove事件，导致setmousetrack失效
