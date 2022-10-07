@@ -149,6 +149,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES} 
         util/mousetap/winmousetap.h
         util/mousetap/winmousetap.cpp
+        util/winutils.h
+        util/winutils.cpp
     )
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
