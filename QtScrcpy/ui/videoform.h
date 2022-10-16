@@ -79,6 +79,7 @@ private:
 
     //inside member
     QSize m_frameSize;
+    QSize m_normalSize;
     QPoint m_dragPosition;
     float m_widthHeightRatio = 0.5f;
     bool m_skin = true;
