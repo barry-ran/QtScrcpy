@@ -22,6 +22,7 @@ public class Controller {
     private final DesktopConnection connection;
     private final DeviceMessageSender sender;
     private final boolean clipboardAutosync;
+    private final boolean powerOn;
 
     private final KeyCharacterMap charMap = KeyCharacterMap.load(KeyCharacterMap.VIRTUAL_KEYBOARD);
 
@@ -32,10 +33,11 @@ public class Controller {
 
     private boolean keepPowerModeOff;
 
-    public Controller(Device device, DesktopConnection connection, boolean clipboardAutosync) {
+    public Controller(Device device, DesktopConnection connection, boolean clipboardAutosync, boolean powerOn) {
         this.device = device;
         this.connection = connection;
         this.clipboardAutosync = clipboardAutosync;
+        this.powerOn = powerOn;
         initPointers();
         sender = new DeviceMessageSender(connection);
     }
@@ -56,7 +58,7 @@ public class Controller {
 
     public void control() throws IOException {
         // on start, power on the device
-        if (!Device.isScreenOn()) {
+        if (powerOn && !Device.isScreenOn()) {
             device.pressReleaseKeycode(KeyEvent.KEYCODE_POWER, Device.INJECT_MODE_ASYNC);
 
             // dirty hack
@@ -98,7 +100,7 @@ public class Controller {
                 break;
             case ControlMessage.TYPE_INJECT_SCROLL_EVENT:
                 if (device.supportsInputEvents()) {
-                    injectScroll(msg.getPosition(), msg.getHScroll(), msg.getVScroll());
+                    injectScroll(msg.getPosition(), msg.getHScroll(), msg.getVScroll(), msg.getButtons());
                 }
                 break;
             case ControlMessage.TYPE_BACK_OR_SCREEN_ON:
@@ -221,7 +223,7 @@ public class Controller {
         return device.injectEvent(event, Device.INJECT_MODE_ASYNC);
     }
 
-    private boolean injectScroll(Position position, int hScroll, int vScroll) {
+    private boolean injectScroll(Position position, int hScroll, int vScroll, int buttons) {
         long now = SystemClock.uptimeMillis();
         Point point = device.getPhysicalPoint(position);
         if (point == null) {
@@ -239,7 +241,7 @@ public class Controller {
         coords.setAxisValue(MotionEvent.AXIS_VSCROLL, vScroll);
 
         MotionEvent event = MotionEvent
-                .obtain(lastTouchDown, now, MotionEvent.ACTION_SCROLL, 1, pointerProperties, pointerCoords, 0, 0, 1f, 1f, DEFAULT_DEVICE_ID, 0,
+                .obtain(lastTouchDown, now, MotionEvent.ACTION_SCROLL, 1, pointerProperties, pointerCoords, 0, buttons, 1f, 1f, DEFAULT_DEVICE_ID, 0,
                         InputDevice.SOURCE_MOUSE, 0);
         return device.injectEvent(event, Device.INJECT_MODE_ASYNC);
     }

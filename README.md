@@ -8,20 +8,20 @@
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
 ![release](https://img.shields.io/github/v/release/barry-ran/QtScrcpy.svg)
 
-[中文介绍](README_zh.md)
+[中文用户？点我查看中文介绍](README_zh.md)
 
-QtScrcpy connects to Android devices via USB (or via TCP/IP) for display and control. It does NOT require root privileges.
+QtScrcpy supports displaying and controlling Android devices via USB or over network. It does NOT require root privileges.
 
 It supports three major platforms: GNU/Linux, Windows and macOS.
 
 It focuses on:
 
- - **lightness** (native, displays only the device screen)
- - **performance** (30~60fps)
+ - **lightness** (displays only the device screen)
+ - **performance** (30~60 fps)
  - **quality** (1920×1080 or above)
  - **low latency** ([35~70ms][lowlatency])
- - **low startup time** (~1 second to display the first image)
- - **non-intrusiveness** (nothing is left installed on the device)
+ - **low startup time** (only about 1 second to display the first frame)
+ - **non-intrusiveness** (nothing will be installed on the device)
 
 [lowlatency]: https://github.com/Genymobile/scrcpy/pull/646
 
@@ -31,37 +31,37 @@ It focuses on:
 
 ![linux](screenshot/linux-en.png)
 
-## Customized key mapping
-You can write your script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/KeyMapDes.md) are the rules.
+## Mapping Keys
+You can write your script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/KeyMapDes.md) are the script writing rules.
 
-A script for "PUBG mobile" and TikTok mapping is provided by default. Once enabled, you can play the game with your keyboard and mouse as the PC version. or you can use up/down/left/right direction keys to simulate up/down/left/right sliding. You can also write your mapping files for other games according to [the writing rules](docs/KeyMapDes.md). The default key mapping is as follows:
+Script for TikTok and some other games are provided by default. Once enabled, you can play the game with your keyboard and mouse. The default key mapping for PUBG Mobile is as follows:
 
 ![game](screenshot/game.jpg)
 
-[Here is a video demonstration of playing "PUBG mobile"](http://mp.weixin.qq.com/mp/video?__biz=MzU1NTg5MjYyNw==&mid=100000015&sn=3e301fdc5a364bd16d6207fa674bc8b3&vid=wxv_968792362971430913&idx=1&vidsn=eec329cc13c3e24c187dc9b4d5eb8760&fromid=1&scene=20&xtrack=1&clicktime=1567346543&sessionid=1567346375&subscene=92&ascene=0&fasttmpl_type=0&fasttmpl_fullversion=4730859-zh_CN-zip&fasttmpl_flag=0&realreporttime=1567346543910#wechat_redirect)
+[Here is a video demonstration playing PUBG Mobile.](http://mp.weixin.qq.com/mp/video?__biz=MzU1NTg5MjYyNw==&mid=100000015&sn=3e301fdc5a364bd16d6207fa674bc8b3&vid=wxv_968792362971430913)
 
-Here is the instruction for adding new customized mapping files.
+Instruction for adding new customized mapping files.
 
 - Write a customized script and put it in the `keymap` directory
-- Click `refresh script` to check whether it can be found
+- Click `refresh script` to show it
 - Select your script
-- Connect your phone, start service and click `apply`
-- Press `~` key (left side of the number key 1) to switch to the custom mapping mode (It can be changed in the script as `switchkey`)
+- Connect to your phone, start service and click `apply`
+- Press `~` key (the SwitchKey in the key map script) to switch to custom mapping mode
 - Press the ~ key again to switch back to normal mode
-- (For PUBG and similar games) If you want to drive cars with WASD, you need to check the `single rocker mode` in the game setting.
+- (For games such as PUBG Mobile) If you want to move vehicles with the STEER_WHEEL keys, you need to set the move mode to `single rocker mode`.
 
 ## Group control
 You can control all your phones at the same time.
 
-![](docs/image/group-control.gif)
+![group-control-demo](docs/image/group-control.gif)
 
 ## Thanks
 
-QtScrcpy is based on [Genymobile's](https://github.com/Genymobile) [scrcpy](https://github.com/Genymobile/scrcpy) project. Thanks
+QtScrcpy is based on [Genymobile](https://github.com/Genymobile)'s [scrcpy](https://github.com/Genymobile/scrcpy) project. Thanks a lot!
 
 The difference between QtScrcpy and the original scrcpy is as follows:
 
-keys|scrcpy|QtScrcpy
+key points|scrcpy|QtScrcpy
 --|:--:|:--:
 ui|sdl|qt
 video encode|ffmpeg|ffmpeg
@@ -104,22 +104,29 @@ Make sure you have enabled [ADB debugging][enable-adb] on your device(s).
 [github-download]: https://github.com/barry-ran/QtScrcpy/releases
 
 ### Windows
-For Windows, for simplicity, prebuilt archives with all the dependencies (including ADB) are available:
+On Windows, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
 
  - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it yourself](#Build)
 
 ### Mac OS
-For Mac OS, for simplicity, prebuilt archives with all the dependencies (including ADB) are available:
+On Mac OS, for simplicity, prebuilt archives with all the dependencies (including ADB) are available at Releases:
 
 - [`QtScrcpy`][github-download]
 
-or you can [build it by yourself](#Build)
+or you can [build it yourself](#Build)
 
 ### Linux
-you can [build it by yourself](#Build)(just ubuntu test)
+For Arch Linux Users, you can use AUR to install: `yay -Syu qtscrcpy` (may be outdated; maintainer: [yochananmarqos](https://aur.archlinux.org/account/yochananmarqos))
 
+For users in other distros, you can use the prebuilt archives from Releases:
+
+- [`QtScrcpy`][github-download]
+
+or you can get it at [GitHub Actions](https://github.com/UjhhgtgTeams/QtScrcpy/actions/workflows/ubuntu.yml), in branch `dev` and download the latest artifact.
+
+or you can [build it yourself](#Build) (not recommended, get it in Actions if you can)
 
 ## Run
 Connect to your Android device on your computer, then run the program and click `USB connect` or `WiFi connect`
@@ -176,10 +183,9 @@ Note: it is not necessary to keep your Android device connected via USB after yo
     It is possible to synchronize clipboards between the computer and the device, in
     both directions:
 
-    - `Ctrl`+`c` copies the device clipboard to the computer clipboard;
-    - `Ctrl`+`Shift`+`v` copies the computer clipboard to the device clipboard;
-    - `Ctrl`+`v` _pastes_ the computer clipboard as a sequence of text events (but
-    breaks non-ASCII characters).
+    - `Ctrl + c` copies the device clipboard to the computer clipboard;
+    - `Ctrl + Shift + v` copies the computer clipboard to the device clipboard;
+    - `Ctrl + v` _pastes_ the computer clipboard as a sequence of text events (non-ASCII characters does not yet work).
 - Group control
 - Sync device speaker sound to the computer (based on [sndcpy](https://github.com/rom1v/sndcpy), Android 10+ only)
 
@@ -222,39 +228,44 @@ _³Only on Android >= 7._
 [DEVELOP](docs/DEVELOP.md)
 
 Everyone is welcome to maintain this project and contribute your own code, but please follow these requirements:
-1. pr please mention the dev branch, not the master branch
-2. Please rebase dev before mentioning pr
-3. pr please submit on the principle of a small number of times (a small function point is recommended to mention a pr)
-4. Please keep the code style consistent with the existing style
+1. Please open PRs to the dev branch instead of the master branch
+2. Please rebase the original project before opening PRs
+3. Please submit PRs on the principle of "small amounts, many times" (one PR for a change is recommended)
+4. Please keep the code style consistent with the existing style.
 
 ## Why develop QtScrcpy?
 There are several reasons listed below according to importance (high to low).
-1. In the process of learning Qt, I need a real project to try
-2. I have some background skills in audio and video and I am interested in them
+1. In the process of learning Qt, I need a real project to try.
+2. I have some background skills in audio and video and I am interested in them.
 3. I have some Android development skills. But I have used it for a long time. I want to consolidate it.
-4. I found scrcpy and decided to re-make it with the new technology stack (C++ + Qt + Opengl + FFmpeg)
+4. I found scrcpy and decided to re-make it with the new technology stack (C++ + Qt + Opengl + FFmpeg).
 
 
 ## Build
 All the dependencies are provided and it is easy to compile.
 
-### PC client
-1. Set up the Qt development environment on the target platform.
-Qt version>=5.12 (use MSVC 2019 on Windows)
-2. Clone the project (git clone --recursive git@github.com:barry-ran/QtScrcpy.git)
-3. Open the project root directory `CMakeLists.txt` with QtCreator
-4. Compile and run
+### QtScrcpy
+#### Non-Arch Linux Users
+1. Set up the Qt development environment with the official Qt installer or third-party tools such as [aqt](https://github.com/miurahr/aqtinstall) on the target platform.
+   Qt version bigger than 5.12 is required. (use MSVC 2019 on Windows)
+2. Clone the project with `git clone --recurse-submodules https://barry-ran/QtScrcpy.git`
+3. For Windows, open CMakeLists.txt with QtCreator and compile Release
+4. For Linux, directly run `./ci/linux/build_for_linux.sh "Release"`
+Note: compiled artifacts are located at `output/x64/Release`
 
-### Android (If you do not have special requirements, you can directly use the built-in scrcpy-server.jar)
+#### Arch Linux Users
+1. Install packages: `base-devel cmake qt5-base qt5-multimedia qt5-x11extras` (`qtcreator` is recommended)
+2. Clone the project with `git clone --recurse-submodules https://barry-ran/QtScrcpy.git`
+3. Run `./ci/linux/build_for_linux.sh "Release"`
 
-1. Set up an Android development environment on the target platform
+### Scrcpy-Server
+1. Set up Android development environment on the target platform
 2. Open server project in project root with Android Studio
-3. The first time you open it, if you do not have the corresponding version of Gradle, you will be prompted to find Gradle, whether to upgrade Gradle or create it. Select Cancel. After canceling, you will be prompted to select the location of the existing Gradle. You can also cancel it (it will download automatically).
-4. Edit the code as needed, but of course, you don’t need to.
+3. The first time you open it, if you do not have the corresponding version of Gradle, you will be prompted to find Gradle, whether to upgrade Gradle or create it. Select Cancel. After cancelling, you will be prompted to select the location of existing Gradle. Cancel it too and it will download automatically.
 4. After compiling the apk, rename it to scrcpy-server and replace QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server.
 
 ## Licence
-Since it is based on scrcpy, respect its Licence
+Since it is based on scrcpy, it uses the same license as scrcpy
 
     Copyright (C) 2025 Rankun
     
