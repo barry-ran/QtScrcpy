@@ -141,7 +141,9 @@ void Dialog::initUI()
 
     setWindowTitle(Config::getInstance().getTitle());
 
+#ifdef Q_OS_WIN32
     WinUtils::setDarkBorderToWindow((HWND)this->winId(), true);
+#endif
 
     ui->bitRateEdit->setValidator(new QIntValidator(1, 99999, this));
 
