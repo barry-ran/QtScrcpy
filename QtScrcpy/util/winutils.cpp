@@ -11,6 +11,10 @@ enum : WORD
     DwmwaUseImmersiveDarkModeBefore20h1 = 19
 };
 
+WinUtils::WinUtils(){};
+
+WinUtils::~WinUtils(){};
+
 // Set dark border to window
 // Reference: qt/qtbase.git/tree/src/plugins/platforms/windows/qwindowswindow.cpp
 bool WinUtils::setDarkBorderToWindow(const HWND &hwnd, const bool &d)
