@@ -11,6 +11,10 @@
 #include "videoform.h"
 #include "../groupcontroller/groupcontroller.h"
 
+#ifdef Q_OS_WIN32
+#include "../util/winutils.h"
+#endif
+
 QString s_keyMapPath = "";
 
 const QString &getKeyMapPath()
@@ -136,6 +140,10 @@ void Dialog::initUI()
     //setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
     setWindowTitle(Config::getInstance().getTitle());
+
+#ifdef Q_OS_WIN32
+    WinUtils::setDarkBorderToWindow((HWND)this->winId(), true);
+#endif
 
     ui->bitRateEdit->setValidator(new QIntValidator(1, 99999, this));
 
