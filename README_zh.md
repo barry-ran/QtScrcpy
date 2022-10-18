@@ -246,14 +246,14 @@ Mac OS 平台，你可以直接使用我编译好的可执行程序:
 #### 非  Arch Linux
 1. 使用官方 Qt Installer 或非官方工具（如 [aqt](https://github.com/miurahr/aqtinstall)）在目标平台上搭建Qt开发环境。
 需要 5.12 以上版本 Qt（在 Windows 上使用 MSVC 2019）
-2. 克隆该项目：`git clone --recurse-submodules https://github.com/barry-ran/QtScrcpy.git`
+2. 克隆该项目：`git clone --recurse-submodules git@github.com:barry-ran/QtScrcpy.git`
 3. Windows 使用 QtCreator 打开项目下 CMakeLists.txt 并编译 Release
 4. Linux 用终端执行  `./ci/linux/build_for_linux.sh "Release"`
 注：编译结果位于 `output/x64/Release` 中
 
 #### Arch Linux
 1. 安装以下包：`qt5-base qt5-multimedia qt5-x11extras`（推荐安装 `qtcreator`）
-2. 克隆该项目：`git clone --recurse-submodules https://github.com/barry-ran/QtScrcpy.git`
+2. 克隆该项目：`git clone --recurse-submodules git@github.com:barry-ran/QtScrcpy.git`
 3. 用终端执行  `./ci/linux/build_for_linux.sh "Release"`
 注：编译结果位于 `output/x64/Release` 中
 
