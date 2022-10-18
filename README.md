@@ -248,14 +248,14 @@ All the dependencies are provided and it is easy to compile.
 #### Non-Arch Linux Users
 1. Set up the Qt development environment with the official Qt installer or third-party tools such as [aqt](https://github.com/miurahr/aqtinstall) on the target platform.
    Qt version bigger than 5.12 is required. (use MSVC 2019 on Windows)
-2. Clone the project with `git clone --recurse-submodules https://barry-ran/QtScrcpy.git`
+2. Clone the project with `git clone --recurse-submodules git@github.com:barry-ran/QtScrcpy.git`
 3. For Windows, open CMakeLists.txt with QtCreator and compile Release
 4. For Linux, directly run `./ci/linux/build_for_linux.sh "Release"`
 Note: compiled artifacts are located at `output/x64/Release`
 
 #### Arch Linux Users
 1. Install packages: `base-devel cmake qt5-base qt5-multimedia qt5-x11extras` (`qtcreator` is recommended)
-2. Clone the project with `git clone --recurse-submodules https://barry-ran/QtScrcpy.git`
+2. Clone the project with `git clone --recurse-submodules git@github.com:barry-ran/QtScrcpy.git`
 3. Run `./ci/linux/build_for_linux.sh "Release"`
 
 ### Scrcpy-Server
