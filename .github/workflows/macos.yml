@@ -68,7 +68,7 @@ jobs:
       - uses: actions/upload-artifact@v1
         with:
           name: ${{ steps.package.outputs.package-name }}.zip
-          path: ci/build/${{ steps.package.outputs.package-name }}.app
+          path: ci/build/${{ steps.package.outputs.package-name }}.dmg
       # Upload to release
       - name: Upload Release
         if: startsWith(github.ref, 'refs/tags/')

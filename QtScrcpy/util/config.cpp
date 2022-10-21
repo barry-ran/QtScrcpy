@@ -21,7 +21,7 @@
 #define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
 
 #define COMMON_MAX_FPS_KEY "MaxFps"
-#define COMMON_MAX_FPS_DEF 60
+#define COMMON_MAX_FPS_DEF 0
 
 #define COMMON_DESKTOP_OPENGL_KEY "UseDesktopOpenGL"
 #define COMMON_DESKTOP_OPENGL_DEF -1
@@ -227,7 +227,7 @@ QString Config::getServerVersion()
 
 int Config::getMaxFps()
 {
-    int fps = 60;
+    int fps = 0;
     m_settings->beginGroup(GROUP_COMMON);
     fps = m_settings->value(COMMON_MAX_FPS_KEY, COMMON_MAX_FPS_DEF).toInt();
     m_settings->endGroup();
