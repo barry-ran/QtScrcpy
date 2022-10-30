@@ -4,6 +4,9 @@
 #include <QDebug>
 
 #include "config.h"
+#ifdef Q_OS_OSX
+#include "path.h"
+#endif
 
 #define GROUP_COMMON "common"
 
@@ -125,7 +128,15 @@ const QString &Config::getConfigPath()
         QFileInfo fileInfo(s_configPath);
         if (s_configPath.isEmpty() || !fileInfo.isDir()) {
             // default application dir
+            // mac系统当从finder打开app时，默认工作目录不再是可执行程序的目录了，而是"/"
+            // 而Qt的获取工作目录的api都依赖QCoreApplication的初始化，所以使用mac api获取当前目录
+#ifdef Q_OS_OSX
+            // get */QtScrcpy.app path
+            s_configPath = Path::GetCurrentPath();
+            s_configPath += "/Contents/MacOS/config";
+#else
             s_configPath = "config";
+#endif
         }
     }
     return s_configPath;
