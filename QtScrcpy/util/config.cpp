@@ -4,6 +4,9 @@
 #include <QDebug>
 
 #include "config.h"
+#ifdef Q_OS_OSX
+#include "path.h"
+#endif
 
 #define GROUP_COMMON "common"
 
@@ -21,7 +24,7 @@
 #define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
 
 #define COMMON_MAX_FPS_KEY "MaxFps"
-#define COMMON_MAX_FPS_DEF 60
+#define COMMON_MAX_FPS_DEF 0
 
 #define COMMON_DESKTOP_OPENGL_KEY "UseDesktopOpenGL"
 #define COMMON_DESKTOP_OPENGL_DEF -1
@@ -125,7 +128,15 @@ const QString &Config::getConfigPath()
         QFileInfo fileInfo(s_configPath);
         if (s_configPath.isEmpty() || !fileInfo.isDir()) {
             // default application dir
+            // mac系统当从finder打开app时，默认工作目录不再是可执行程序的目录了，而是"/"
+            // 而Qt的获取工作目录的api都依赖QCoreApplication的初始化，所以使用mac api获取当前目录
+#ifdef Q_OS_OSX
+            // get */QtScrcpy.app path
+            s_configPath = Path::GetCurrentPath();
+            s_configPath += "/Contents/MacOS/config";
+#else
             s_configPath = "config";
+#endif
         }
     }
     return s_configPath;
@@ -227,7 +238,7 @@ QString Config::getServerVersion()
 
 int Config::getMaxFps()
 {
-    int fps = 60;
+    int fps = 0;
     m_settings->beginGroup(GROUP_COMMON);
     fps = m_settings->value(COMMON_MAX_FPS_KEY, COMMON_MAX_FPS_DEF).toInt();
     m_settings->endGroup();
