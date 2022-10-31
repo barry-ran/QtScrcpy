@@ -163,6 +163,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES} 
         util/mousetap/cocoamousetap.h
         util/mousetap/cocoamousetap.mm
+        util/path.h
+        util/path.mm
     )
 endif()
 source_group(util FILES ${QC_UTIL_SOURCES})
