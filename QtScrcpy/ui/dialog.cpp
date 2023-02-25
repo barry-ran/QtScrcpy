@@ -279,7 +279,6 @@ void Dialog::closeEvent(QCloseEvent *event)
                                 QSystemTrayIcon::Information,
                                 3000);
     }
-    Config::getInstance().setUserBootConfig(config);
     event->ignore();
 }
 
