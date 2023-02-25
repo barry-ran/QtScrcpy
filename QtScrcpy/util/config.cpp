@@ -163,7 +163,6 @@ void Config::setUserBootConfig(const UserBootConfig &config)
     m_userData->setValue(COMMON_KEEP_ALIVE_KEY, config.keepAlive);
     m_userData->setValue(COMMON_SIMPLE_MODE_KEY, config.simpleMode);
     m_userData->setValue(COMMON_AUTO_UPDATE_DEVICE_KEY, config.autoUpdateDevice);
-    m_userData->setValue(COMMON_TRAY_MESSAGE_SHOWN_KEY, config.trayMessageShown);
     m_userData->endGroup();
     m_userData->sync();
 }
@@ -187,9 +186,25 @@ UserBootConfig Config::getUserBootConfig()
     config.keepAlive = m_userData->value(COMMON_KEEP_ALIVE_KEY, COMMON_KEEP_ALIVE_DEF).toBool();
     config.simpleMode = m_userData->value(COMMON_SIMPLE_MODE_KEY, COMMON_SIMPLE_MODE_DEF).toBool();
     config.autoUpdateDevice = m_userData->value(COMMON_AUTO_UPDATE_DEVICE_KEY, COMMON_AUTO_UPDATE_DEVICE_DEF).toBool();
-    config.trayMessageShown = m_userData->value(COMMON_TRAY_MESSAGE_SHOWN_KEY, COMMON_TRAY_MESSAGE_SHOWN_DEF).toBool();
     m_userData->endGroup();
     return config;
+}
+
+void Config::setTrayMessageShown(bool shown)
+{
+    m_userData->beginGroup(GROUP_COMMON);
+    m_userData->setValue(COMMON_TRAY_MESSAGE_SHOWN_KEY, shown);
+    m_userData->endGroup();
+    m_userData->sync();
+}
+
+bool Config::getTrayMessageShown()
+{
+    bool shown;
+    m_userData->beginGroup(GROUP_COMMON);
+    shown = m_userData->value(COMMON_TRAY_MESSAGE_SHOWN_KEY, COMMON_TRAY_MESSAGE_SHOWN_DEF).toBool();
+    m_userData->endGroup();
+    return shown;
 }
 
 void Config::setRect(const QString &serial, const QRect &rc)

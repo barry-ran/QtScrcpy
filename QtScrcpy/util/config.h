@@ -22,7 +22,6 @@ struct UserBootConfig
     bool keepAlive        = false;
     bool simpleMode       = false;
     bool autoUpdateDevice = true;
-    bool trayMessageShown = false;
 };
 
 class QSettings;
@@ -51,6 +50,8 @@ public:
     // user data:common
     void setUserBootConfig(const UserBootConfig &config);
     UserBootConfig getUserBootConfig();
+    void setTrayMessageShown(bool shown);
+    bool getTrayMessageShown();
 
     // user data:device
     void setNickName(const QString &serial, const QString &name);

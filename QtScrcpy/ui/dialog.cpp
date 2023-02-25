@@ -272,9 +272,8 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 void Dialog::closeEvent(QCloseEvent *event)
 {
     this->hide();
-    UserBootConfig config = Config::getInstance().getUserBootConfig();
-    if (!config.trayMessageShown) {
-        config.trayMessageShown = true;
+    if (!Config::getInstance().getTrayMessageShown()) {
+        Config::getInstance().setTrayMessageShown(true);
         m_hideIcon->showMessage(tr("Notice"),
                                 tr("Hidden here!"),
                                 QSystemTrayIcon::Information,
