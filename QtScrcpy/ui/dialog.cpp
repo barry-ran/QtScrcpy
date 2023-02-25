@@ -272,10 +272,15 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 void Dialog::closeEvent(QCloseEvent *event)
 {
     this->hide();
-    m_hideIcon->showMessage(tr("Notice"),
-                            tr("Hidden here!"),
-                            QSystemTrayIcon::Information,
-                            3000);
+    UserBootConfig config = Config::getInstance().getUserBootConfig();
+    if (!config.trayMessageShown) {
+        config.trayMessageShown = true;
+        m_hideIcon->showMessage(tr("Notice"),
+                                tr("Hidden here!"),
+                                QSystemTrayIcon::Information,
+                                3000);
+    }
+    Config::getInstance().setUserBootConfig(config);
     event->ignore();
 }
 
