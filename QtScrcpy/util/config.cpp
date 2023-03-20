@@ -93,6 +93,9 @@
 #define COMMON_AUTO_UPDATE_DEVICE_KEY "AutoUpdateDevice"
 #define COMMON_AUTO_UPDATE_DEVICE_DEF true
 
+#define COMMON_TRAY_MESSAGE_SHOWN_KEY "TrayMessageShown"
+#define COMMON_TRAY_MESSAGE_SHOWN_DEF false
+
 // device config
 #define SERIAL_WINDOW_RECT_KEY_X "WindowRectX"
 #define SERIAL_WINDOW_RECT_KEY_Y "WindowRectY"
@@ -185,6 +188,23 @@ UserBootConfig Config::getUserBootConfig()
     config.autoUpdateDevice = m_userData->value(COMMON_AUTO_UPDATE_DEVICE_KEY, COMMON_AUTO_UPDATE_DEVICE_DEF).toBool();
     m_userData->endGroup();
     return config;
+}
+
+void Config::setTrayMessageShown(bool shown)
+{
+    m_userData->beginGroup(GROUP_COMMON);
+    m_userData->setValue(COMMON_TRAY_MESSAGE_SHOWN_KEY, shown);
+    m_userData->endGroup();
+    m_userData->sync();
+}
+
+bool Config::getTrayMessageShown()
+{
+    bool shown;
+    m_userData->beginGroup(GROUP_COMMON);
+    shown = m_userData->value(COMMON_TRAY_MESSAGE_SHOWN_KEY, COMMON_TRAY_MESSAGE_SHOWN_DEF).toBool();
+    m_userData->endGroup();
+    return shown;
 }
 
 void Config::setRect(const QString &serial, const QRect &rc)
