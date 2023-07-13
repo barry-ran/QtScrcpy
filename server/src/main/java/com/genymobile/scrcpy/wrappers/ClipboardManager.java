@@ -11,7 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class ClipboardManager {
-    private final Object manager;
+    private final IInterface manager;
     private Method getPrimaryClipMethod;
     private Method setPrimaryClipMethod;
     private Method addPrimaryClipChangedListener;
