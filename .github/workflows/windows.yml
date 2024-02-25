@@ -24,7 +24,7 @@ jobs:
     # 矩阵配置 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
     strategy:
       matrix:
-        qt-ver: [5.15.1]
+        qt-ver: [5.15.2]
         qt-arch: [win64_msvc2019_64, win32_msvc2019]
         # 配置qt-arch的额外设置msvc-arch，qt-arch-install
         include:
