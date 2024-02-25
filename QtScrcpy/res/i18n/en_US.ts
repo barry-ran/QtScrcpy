@@ -38,6 +38,14 @@
         <source>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</source>
         <translation>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</translation>
     </message>
+    <message>
+        <source>If you need more professional screen projection control software, you can try the following software:</source>
+        <translation>If you need more professional screen projection control software, you can try the following software:</translation>
+    </message>
+    <message>
+        <source>QuickMirror</source>
+        <translation>QuickMirror</translation>
+    </message>
 </context>
 <context>
     <name>ToolForm</name>

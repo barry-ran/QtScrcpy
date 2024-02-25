@@ -13,10 +13,10 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macos-10.15
+    runs-on: macos-11
     strategy:
       matrix:
-        qt-ver: [5.15.1]
+        qt-ver: [5.15.2]
         qt-arch-install: [clang_64]
         clang-arch: [x64]
     env:

@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QKeyEvent>
+#include <QRandomGenerator>
 #include <QTime>
 #include <QTimer>
 
@@ -272,10 +273,13 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 void Dialog::closeEvent(QCloseEvent *event)
 {
     this->hide();
-    m_hideIcon->showMessage(tr("Notice"),
-                            tr("Hidden here!"),
-                            QSystemTrayIcon::Information,
-                            3000);
+    if (!Config::getInstance().getTrayMessageShown()) {
+        Config::getInstance().setTrayMessageShown(true);
+        m_hideIcon->showMessage(tr("Notice"),
+                                tr("Hidden here!"),
+                                QSystemTrayIcon::Information,
+                                3000);
+    }
     event->ignore();
 }
 
@@ -317,6 +321,7 @@ void Dialog::on_startServerBtn_clicked()
     params.logLevel = Config::getInstance().getLogLevel();
     params.codecOptions = Config::getInstance().getCodecOptions();
     params.codecName = Config::getInstance().getCodecName();
+    params.scid = QRandomGenerator::global()->bounded(1, 10000) & 0x7FFFFFFF;
 
     qsc::IDeviceManage::getInstance().connectDevice(params);
 }
@@ -454,8 +459,10 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
         videoForm->staysOnTop();
     }
 
+#ifndef Q_OS_WIN32
     // must be show before updateShowSize
     videoForm->show();
+#endif
     QString name = Config::getInstance().getNickName(serial);
     if (name.isEmpty()) {
         name = Config::getInstance().getTitle();
@@ -472,6 +479,11 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
         videoForm->resize(rc.size());
         videoForm->setGeometry(rc);
     }
+
+#ifdef Q_OS_WIN32
+    // windows是show太早可以看到resize的过程
+    QTimer::singleShot(200, videoForm, [videoForm](){videoForm->show();});
+#endif
 
     GroupController::instance().addDevice(serial);
 }
