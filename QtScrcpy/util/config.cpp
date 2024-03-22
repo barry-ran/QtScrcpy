@@ -105,7 +105,7 @@
 #define SERIAL_NICK_NAME_KEY "NickName"
 #define SERIAL_NICK_NAME_DEF "Phone"
 
-QString Config::s_configPath = "";
+QString Config::s_configPath = "~/.config/qtscrcpy";
 
 Config::Config(QObject *parent) : QObject(parent)
 {
