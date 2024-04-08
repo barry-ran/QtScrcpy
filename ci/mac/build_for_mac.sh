@@ -58,7 +58,7 @@ fi
 mkdir $build_path
 cd $build_path
 
-cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path -DCMAKE_BUILD_TYPE=$build_mode -G Xcode"
+cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path -DCMAKE_BUILD_TYPE=$build_mode -DCMAKE_OSX_ARCHITECTURES=x86_64"
 cmake $cmake_params ../..
 if [ $? -ne 0 ] ;then
     echo "cmake failed"
