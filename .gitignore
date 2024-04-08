@@ -14,3 +14,4 @@ build-*
 *.DS_Store
 userdata.ini
 Info_Mac.plist
+/ci/build_temp
