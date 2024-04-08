@@ -13,7 +13,7 @@ if __name__ == '__main__':
     # print('get tag:', tag)
 
     version = str(tag[1:])
-    version_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../QtScrcpy/version"))
+    version_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../QtScrcpy/appversion"))
     file=open(version_file, 'w')
     file.write(version)
     file.close()
