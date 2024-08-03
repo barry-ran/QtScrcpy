@@ -124,7 +124,7 @@ For users in other distros, you can use the prebuilt archives from Releases:
 
 - [`QtScrcpy`][github-download]
 
-or you can get it at [GitHub Actions](https://github.com/UjhhgtgTeams/QtScrcpy/actions/workflows/ubuntu.yml), in branch `dev` and download the latest artifact.
+or you can get it at [GitHub Actions](https://github.com/barry-ran/QtScrcpy/actions/workflows/ubuntu.yml), in branch `dev` and download the latest artifact.
 
 or you can [build it yourself](#Build) (not recommended, get it in Actions if you can)
 
