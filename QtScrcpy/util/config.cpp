@@ -96,6 +96,9 @@
 #define COMMON_TRAY_MESSAGE_SHOWN_KEY "TrayMessageShown"
 #define COMMON_TRAY_MESSAGE_SHOWN_DEF false
 
+#define COMMON_SHOW_TOOLBAR_KEY "showToolbar"
+#define COMMON_SHOW_TOOLBAR_DEF true
+
 // device config
 #define SERIAL_WINDOW_RECT_KEY_X "WindowRectX"
 #define SERIAL_WINDOW_RECT_KEY_Y "WindowRectY"
@@ -163,6 +166,7 @@ void Config::setUserBootConfig(const UserBootConfig &config)
     m_userData->setValue(COMMON_KEEP_ALIVE_KEY, config.keepAlive);
     m_userData->setValue(COMMON_SIMPLE_MODE_KEY, config.simpleMode);
     m_userData->setValue(COMMON_AUTO_UPDATE_DEVICE_KEY, config.autoUpdateDevice);
+    m_userData->setValue(COMMON_SHOW_TOOLBAR_KEY,config.showToolbar);
     m_userData->endGroup();
     m_userData->sync();
 }
@@ -186,6 +190,7 @@ UserBootConfig Config::getUserBootConfig()
     config.keepAlive = m_userData->value(COMMON_KEEP_ALIVE_KEY, COMMON_KEEP_ALIVE_DEF).toBool();
     config.simpleMode = m_userData->value(COMMON_SIMPLE_MODE_KEY, COMMON_SIMPLE_MODE_DEF).toBool();
     config.autoUpdateDevice = m_userData->value(COMMON_AUTO_UPDATE_DEVICE_KEY, COMMON_AUTO_UPDATE_DEVICE_DEF).toBool();
+    config.showToolbar =m_userData->value(COMMON_SHOW_TOOLBAR_KEY,COMMON_SHOW_TOOLBAR_DEF).toBool();
     m_userData->endGroup();
     return config;
 }

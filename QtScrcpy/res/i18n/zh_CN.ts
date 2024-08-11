@@ -136,10 +136,6 @@
         <translation>启动配置</translation>
     </message>
     <message>
-        <source>record save path:</source>
-        <translation>录像保存路径：</translation>
-    </message>
-    <message>
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
@@ -296,6 +292,14 @@
     <message>
         <source>auto update</source>
         <translation>自动刷新</translation>
+    </message>
+    <message>
+        <source>show toolbar</source>
+        <translation>显示工具栏</translation>
+    </message>
+    <message>
+        <source>record save path:</source>
+        <translation>录像保存路径</translation>
     </message>
 </context>
 </TS>

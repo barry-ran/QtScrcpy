@@ -21,13 +21,14 @@
 #include "ui_videoform.h"
 #include "videoform.h"
 
-VideoForm::VideoForm(bool framelessWindow, bool skin, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin)
+VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar,QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin)
 {
     ui->setupUi(this);
     initUI();
     installShortcut();
     updateShowSize(size());
     bool vertical = size().height() > size().width();
+    this->show_toolbar = showToolbar;
     if (m_skin) {
         updateStyleSheet(vertical);
     }
@@ -723,7 +724,7 @@ void VideoForm::showEvent(QShowEvent *event)
     Q_UNUSED(event)
     if (!isFullScreen()) {
         QTimer::singleShot(500, this, [this](){
-            showToolForm();
+            showToolForm(this->show_toolbar);
         });
     }
 }
