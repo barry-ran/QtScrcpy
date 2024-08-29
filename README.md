@@ -264,7 +264,7 @@ Note: compiled artifacts are located at `output/x64/Release`
 3. The first time you open it, if you do not have the corresponding version of Gradle, you will be prompted to find Gradle, whether to upgrade Gradle or create it. Select Cancel. After cancelling, you will be prompted to select the location of existing Gradle. Cancel it too and it will download automatically.
 4. After compiling the apk, rename it to scrcpy-server and replace QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server.
 
-## Licence
+## License
 Since it is based on scrcpy, it uses the same license as scrcpy
 
     Copyright (C) 2025 Rankun
