@@ -1,0 +1,12 @@
+/home/fanxing/fanxingApplication/QtScrcpy/CMakeFiles/edit_cache.dir
+/home/fanxing/fanxingApplication/QtScrcpy/CMakeFiles/rebuild_cache.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeFiles/QtScrcpy.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeFiles/edit_cache.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeFiles/rebuild_cache.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeFiles/QtScrcpy_autogen_timestamp_deps.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeFiles/QtScrcpy_autogen.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpyCore/CMakeFiles/QtScrcpyCore.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpyCore/CMakeFiles/edit_cache.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpyCore/CMakeFiles/rebuild_cache.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpyCore/CMakeFiles/QtScrcpyCore_autogen_timestamp_deps.dir
+/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpyCore/CMakeFiles/QtScrcpyCore_autogen.dir

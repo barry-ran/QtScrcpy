@@ -1,0 +1,321 @@
+{
+	"BUILD_DIR" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpy_autogen",
+	"CMAKE_BINARY_DIR" : "/home/fanxing/fanxingApplication/QtScrcpy",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeLists.txt",
+		"/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/lib/cmake/Qt5/Qt5Config.cmake",
+		"/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/lib/cmake/Qt5/Qt5Config.cmake",
+		"/lib/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/lib/cmake/Qt5Widgets/Qt5WidgetsConfigVersion.cmake",
+		"/lib/cmake/Qt5Widgets/Qt5WidgetsConfig.cmake",
+		"/lib/cmake/Qt5Gui/Qt5GuiConfigVersion.cmake",
+		"/lib/cmake/Qt5Gui/Qt5GuiConfig.cmake",
+		"/lib/cmake/Qt5Core/Qt5CoreConfigVersion.cmake",
+		"/lib/cmake/Qt5Core/Qt5CoreConfig.cmake",
+		"/lib/cmake/Qt5Core/Qt5CoreConfigExtras.cmake",
+		"/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake",
+		"/lib/cmake/Qt5Core/Qt5CoreMacros.cmake",
+		"/usr/share/cmake/Modules/CMakeParseArguments.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QComposePlatformInputContextPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEglFSEmulatorIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEglFSIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEglFSKmsEglDeviceIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEglFSKmsGbmIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEglFSX11IntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEvdevKeyboardPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEvdevMousePlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEvdevTabletPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QEvdevTouchScreenPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QGifPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QGtk3ThemePlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QICNSPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QICOPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QIbusPlatformInputContextPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QJp2Plugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QJpegPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QLibInputPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QLinuxFbIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QMinimalEglIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QMinimalIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QMngPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QOffscreenIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QPdfPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QSvgIconPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QSvgPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QTgaPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QTiffPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QTsLibPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QTuioTouchPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QVncIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QWaylandEglPlatformIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QWaylandIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QWaylandXCompositeEglPlatformIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QWaylandXCompositeGlxPlatformIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QWbmpPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QWebpPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QXcbEglIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QXcbGlxIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QXcbIntegrationPlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5Gui_QXdgDesktopPortalThemePlugin.cmake",
+		"/lib/cmake/Qt5Gui/Qt5GuiConfigExtras.cmake",
+		"/lib/cmake/Qt5Widgets/Qt5WidgetsConfigExtras.cmake",
+		"/lib/cmake/Qt5Widgets/Qt5WidgetsMacros.cmake",
+		"/usr/share/cmake/Modules/CMakeParseArguments.cmake",
+		"/lib/cmake/Qt5Network/Qt5NetworkConfigVersion.cmake",
+		"/lib/cmake/Qt5Network/Qt5NetworkConfig.cmake",
+		"/lib/cmake/Qt5Network/Qt5Network_QConnmanEnginePlugin.cmake",
+		"/lib/cmake/Qt5Network/Qt5Network_QGenericEnginePlugin.cmake",
+		"/lib/cmake/Qt5Network/Qt5Network_QNetworkManagerEnginePlugin.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5MultimediaConfigVersion.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5MultimediaConfig.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5Multimedia_CameraBinServicePlugin.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5Multimedia_QAlsaPlugin.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5Multimedia_QGstreamerAudioDecoderServicePlugin.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5Multimedia_QGstreamerCaptureServicePlugin.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5Multimedia_QGstreamerPlayerServicePlugin.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5Multimedia_QM3uPlaylistPlugin.cmake",
+		"/lib/cmake/Qt5Multimedia/Qt5Multimedia_QPulseAudioPlugin.cmake",
+		"/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/lib/cmake/Qt5/Qt5Config.cmake",
+		"/lib/cmake/Qt5/Qt5ConfigVersion.cmake",
+		"/lib/cmake/Qt5/Qt5Config.cmake",
+		"/lib/cmake/Qt5/Qt5ModuleLocation.cmake",
+		"/lib/cmake/Qt5X11Extras/Qt5X11ExtrasConfigVersion.cmake",
+		"/lib/cmake/Qt5X11Extras/Qt5X11ExtrasConfig.cmake",
+		"/usr/share/cmake/Modules/FindThreads.cmake",
+		"/usr/share/cmake/Modules/CheckLibraryExists.cmake",
+		"/usr/share/cmake/Modules/CheckIncludeFile.cmake",
+		"/usr/share/cmake/Modules/CheckCSourceCompiles.cmake",
+		"/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake",
+		"/usr/share/cmake/Modules/FindPackageHandleStandardArgs.cmake",
+		"/usr/share/cmake/Modules/FindPackageMessage.cmake",
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/res/res.qrc"
+	],
+	"CMAKE_SOURCE_DIR" : "/home/fanxing/fanxingApplication/QtScrcpy",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpy_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "QtScrcpy_autogen/timestamp",
+	"HEADERS" : 
+	[
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/audio/audiooutput.h",
+			"MU",
+			"PZONOMFGYT/moc_audiooutput.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/fontawesome/iconhelper.h",
+			"MU",
+			"7653U4RL2C/moc_iconhelper.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/groupcontroller/groupcontroller.h",
+			"MU",
+			"7WSARK52GL/moc_groupcontroller.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/render/qyuvopenglwidget.h",
+			"MU",
+			"RZRAGMB46M/moc_qyuvopenglwidget.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/ui/dialog.h",
+			"MU",
+			"UYX5XTB5RZ/moc_dialog.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/ui/toolform.h",
+			"MU",
+			"UYX5XTB5RZ/moc_toolform.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/ui/videoform.h",
+			"MU",
+			"UYX5XTB5RZ/moc_videoform.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/uibase/keepratiowidget.h",
+			"MU",
+			"B2KWJJ5A6K/moc_keepratiowidget.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/uibase/magneticwidget.h",
+			"MU",
+			"B2KWJJ5A6K/moc_magneticwidget.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/util/config.h",
+			"MU",
+			"KH43KSYMFX/moc_config.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/util/mousetap/mousetap.h",
+			"MU",
+			"A6WZYQ7OMG/moc_mousetap.cpp",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/util/mousetap/xmousetap.h",
+			"MU",
+			"A6WZYQ7OMG/moc_xmousetap.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpy_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpy_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_MULTIMEDIA_LIB",
+		"QT_NETWORK_LIB",
+		"QT_NO_DEBUG",
+		"QT_WIDGETS_LIB",
+		"QT_X11EXTRAS_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy",
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/fontawesome",
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/util",
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/uibase",
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/ui",
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/render",
+		"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpyCore/include",
+		"/usr/include/qt",
+		"/usr/include/qt/QtX11Extras",
+		"/usr/include/qt/QtGui",
+		"/usr/include/qt/QtCore",
+		"/usr/lib/qt/mkspecs/linux-g++",
+		"/usr/include/qt/QtWidgets",
+		"/usr/include/qt/QtNetwork",
+		"/usr/include/qt/QtMultimedia",
+		"/usr/include/c++/14.2.1",
+		"/usr/include/c++/14.2.1/x86_64-pc-linux-gnu",
+		"/usr/include/c++/14.2.1/backward",
+		"/usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/include",
+		"/usr/local/include",
+		"/usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/include-fixed",
+		"/usr/include"
+	],
+	"MOC_MACRO_NAMES" : [ "Q_OBJECT", "Q_GADGET", "Q_NAMESPACE", "Q_NAMESPACE_EXPORT" ],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/bin/c++",
+		"-std=gnu++11",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/QtScrcpy_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeFiles/QtScrcpy_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/bin/moc",
+	"QT_UIC_EXECUTABLE" : "/usr/bin/uic",
+	"QT_VERSION_MAJOR" : 5,
+	"QT_VERSION_MINOR" : 15,
+	"SETTINGS_FILE" : "/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/CMakeFiles/QtScrcpy_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/audio/audiooutput.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/fontawesome/iconhelper.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/groupcontroller/groupcontroller.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/main.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/render/qyuvopenglwidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/ui/dialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/ui/toolform.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/ui/videoform.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/uibase/keepratiowidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/uibase/magneticwidget.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/util/config.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/util/mousetap/mousetap.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/fanxing/fanxingApplication/QtScrcpy/QtScrcpy/util/mousetap/xmousetap.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}
