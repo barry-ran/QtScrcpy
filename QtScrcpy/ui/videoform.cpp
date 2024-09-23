@@ -21,7 +21,7 @@
 #include "ui_videoform.h"
 #include "videoform.h"
 
-VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar,QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin)
+VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin)
 {
     ui->setupUi(this);
     initUI();
@@ -480,7 +480,7 @@ void VideoForm::switchFullScreen()
         if (m_skin) {
             updateStyleSheet(m_frameSize.height() > m_frameSize.width());
         }
-        showToolForm(true);
+        showToolForm(this->show_toolbar);
 #ifdef Q_OS_WIN32
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
@@ -722,7 +722,7 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 void VideoForm::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
-    if (!isFullScreen()) {
+    if (!isFullScreen() && this->show_toolbar) {
         QTimer::singleShot(500, this, [this](){
             showToolForm(this->show_toolbar);
         });
