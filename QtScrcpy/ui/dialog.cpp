@@ -311,7 +311,10 @@ void Dialog::on_startServerBtn_clicked()
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
     params.renderExpiredFrames = Config::getInstance().getRenderExpiredFrames();
-    params.lockVideoOrientation = ui->lockOrientationBox->currentIndex() - 1;
+    if (ui->lockOrientationBox->currentIndex() > 0) {
+        params.captureOrientationLock = 1;
+        params.captureOrientation = (ui->lockOrientationBox->currentIndex() - 1) * 90;
+    }
     params.stayAwake = ui->stayAwakeCheck->isChecked();
     params.recordFile = ui->recordScreenCheck->isChecked();
     params.recordPath = ui->recordPathEdt->text().trimmed();
