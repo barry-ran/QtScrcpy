@@ -136,10 +136,6 @@
         <translation>Start Config</translation>
     </message>
     <message>
-        <source>record save path:</source>
-        <translation>record save path:</translation>
-    </message>
-    <message>
         <source>select path</source>
         <translation>select path</translation>
     </message>
@@ -296,6 +292,14 @@
     <message>
         <source>auto update</source>
         <translation>auto update</translation>
+    </message>
+    <message>
+        <source>show toolbar</source>
+        <translation>show toolbar</translation>
+    </message>
+    <message>
+        <source>record save path:</source>
+        <translation>record save path:</translation>
     </message>
 </context>
 </TS>
