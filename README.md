@@ -55,6 +55,10 @@ You can control all your phones at the same time.
 
 ![group-control-demo](docs/image/group-control.gif)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=barry-ran/QtScrcpy&type=Date)](https://star-history.com/#barry-ran/QtScrcpy&Date)
+
 ## Thanks
 
 QtScrcpy is based on [Genymobile](https://github.com/Genymobile)'s [scrcpy](https://github.com/Genymobile/scrcpy) project. Thanks a lot!
