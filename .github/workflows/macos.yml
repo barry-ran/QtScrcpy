@@ -65,7 +65,7 @@ jobs:
           mv ci/build/QtScrcpy.app ci/build/${{ env.publish_name }}.app
           mv ci/build/QtScrcpy.dmg ci/build/${{ env.publish_name }}.dmg
           echo "::set-output name=package-name::${{ env.publish_name }}"
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.package.outputs.package-name }}.zip
           path: ci/build/${{ steps.package.outputs.package-name }}.dmg
