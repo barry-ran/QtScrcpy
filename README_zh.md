@@ -42,7 +42,7 @@ QtScrcpy 可以通过 USB / 网络连接Android设备，并进行显示和控制
 - cpu占用率低：纯C++开发，高性能GPU视频渲染
 - 高分辨率：可调节，最大支持安卓终端的原生分辨率
 - 完美中文输入：支持闲鱼app，支持三星手机
-- 免费版最多投屏20台，功能无限制(除了自动重新投屏)
+- 免费版最多投屏10台，功能无限制(除了自动重新投屏)
 - 极限投屏使用教程：https://lrbnfell4p.feishu.cn/docx/QRMhd9nImorAGgxVLlmczxSdnYf
 - 极限投屏qq交流群：822464342
 - 极限投屏界面预览：
@@ -68,6 +68,10 @@ QtScrcpy 可以通过 USB / 网络连接Android设备，并进行显示和控制
 
 ## 批量操作
 你可以同时控制所有的手机
+
+## Star历史
+
+[![Star History Chart](https://api.star-history.com/svg?repos=barry-ran/QtScrcpy&type=Date)](https://star-history.com/#barry-ran/QtScrcpy&Date)
 
 ![gc](docs/image/group-control.gif)
 

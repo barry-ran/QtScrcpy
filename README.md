@@ -55,6 +55,10 @@ You can control all your phones at the same time.
 
 ![group-control-demo](docs/image/group-control.gif)
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=barry-ran/QtScrcpy&type=Date)](https://star-history.com/#barry-ran/QtScrcpy&Date)
+
 ## Thanks
 
 QtScrcpy is based on [Genymobile](https://github.com/Genymobile)'s [scrcpy](https://github.com/Genymobile/scrcpy) project. Thanks a lot!
@@ -124,7 +128,7 @@ For users in other distros, you can use the prebuilt archives from Releases:
 
 - [`QtScrcpy`][github-download]
 
-or you can get it at [GitHub Actions](https://github.com/UjhhgtgTeams/QtScrcpy/actions/workflows/ubuntu.yml), in branch `dev` and download the latest artifact.
+or you can get it at [GitHub Actions](https://github.com/barry-ran/QtScrcpy/actions/workflows/ubuntu.yml), in branch `dev` and download the latest artifact.
 
 or you can [build it yourself](#Build) (not recommended, get it in Actions if you can)
 

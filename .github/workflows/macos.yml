@@ -13,7 +13,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macos-11
+    runs-on: macos-14
     strategy:
       matrix:
         qt-ver: [5.15.2]
@@ -26,12 +26,12 @@ jobs:
     steps:
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
           key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2.13.0
+        uses: jurplel/install-qt-action@v4.1.1
         with:
           version: ${{ matrix.qt-ver }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
@@ -65,7 +65,7 @@ jobs:
           mv ci/build/QtScrcpy.app ci/build/${{ env.publish_name }}.app
           mv ci/build/QtScrcpy.dmg ci/build/${{ env.publish_name }}.dmg
           echo "::set-output name=package-name::${{ env.publish_name }}"
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.package.outputs.package-name }}.zip
           path: ci/build/${{ steps.package.outputs.package-name }}.dmg

@@ -47,14 +47,14 @@ jobs:
     steps:
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
           key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch }}        
       # 安装Qt
       - name: Install Qt
         # 使用外部action。这个action专门用来安装Qt
-        uses: jurplel/install-qt-action@v2.13.0
+        uses: jurplel/install-qt-action@v4.1.1
         with:
           # Version of Qt to install
           version: ${{ matrix.qt-ver }}
@@ -100,7 +100,7 @@ jobs:
           echo "::set-output name=package-name::${{ env.publish_name }}"
       # 上传artifacts
       # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.package.outputs.package-name }}.zip
           path: ci\build\${{ steps.package.outputs.package-name }}

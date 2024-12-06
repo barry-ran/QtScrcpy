@@ -19,7 +19,7 @@ class VideoForm : public QWidget, public qsc::DeviceObserver
 {
     Q_OBJECT
 public:
-    explicit VideoForm(bool framelessWindow = false, bool skin = true, QWidget *parent = 0);
+    explicit VideoForm(bool framelessWindow = false, bool skin = true, bool showToolBar = true, QWidget *parent = 0);
     ~VideoForm();
 
     void staysOnTop(bool top = true);
@@ -32,7 +32,6 @@ public:
     void removeBlackRect();
     void showFPS(bool show);
     void switchFullScreen();
-
     bool isHost();
 
 private:
@@ -85,6 +84,9 @@ private:
     bool m_skin = true;
     QPoint m_fullScreenBeforePos;
     QString m_serial;
+
+    //Whether to display the toolbar when connecting a device.
+    bool show_toolbar = true;
 };
 
 #endif // VIDEOFORM_H

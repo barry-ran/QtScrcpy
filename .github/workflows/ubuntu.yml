@@ -27,13 +27,13 @@ jobs:
       plantform-des: ubuntu
     steps:
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2.13.0
+        uses: jurplel/install-qt-action@v4.1.1
         with:
           version: ${{ matrix.qt-ver }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v3.0.6
+        uses: actions/cache@v4
         with:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
           key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
@@ -50,7 +50,7 @@ jobs:
         run: |
           ci/linux/build_for_linux.sh "RelWithDebInfo"
       - name: Upload RelWithDebInfo
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v4
         with:
           name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-RelWithDebInfo
           path: output/x64/RelWithDebInfo/*
@@ -60,7 +60,7 @@ jobs:
         run: |
           ci/linux/build_for_linux.sh "Release"
       - name: Upload Release
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v4
         with:
           name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-Release
           path: output/x64/Release/*

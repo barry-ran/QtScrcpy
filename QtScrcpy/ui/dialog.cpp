@@ -195,6 +195,7 @@ void Dialog::updateBootConfig(bool toView)
         ui->stayAwakeCheck->setChecked(config.keepAlive);
         ui->useSingleModeCheck->setChecked(config.simpleMode);
         ui->autoUpdatecheckBox->setChecked(config.autoUpdateDevice);
+        ui->showToolbar->setChecked(config.showToolbar);
     } else {
         UserBootConfig config;
 
@@ -213,6 +214,8 @@ void Dialog::updateBootConfig(bool toView)
         config.keepAlive = ui->stayAwakeCheck->isChecked();
         config.simpleMode = ui->useSingleModeCheck->isChecked();
         config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
+        config.showToolbar = ui->showToolbar->isChecked();
+
         Config::getInstance().setUserBootConfig(config);
     }
 }
@@ -308,7 +311,10 @@ void Dialog::on_startServerBtn_clicked()
     params.useReverse = ui->useReverseCheck->isChecked();
     params.display = !ui->notDisplayCheck->isChecked();
     params.renderExpiredFrames = Config::getInstance().getRenderExpiredFrames();
-    params.lockVideoOrientation = ui->lockOrientationBox->currentIndex() - 1;
+    if (ui->lockOrientationBox->currentIndex() > 0) {
+        params.captureOrientationLock = 1;
+        params.captureOrientation = (ui->lockOrientationBox->currentIndex() - 1) * 90;
+    }
     params.stayAwake = ui->stayAwakeCheck->isChecked();
     params.recordFile = ui->recordScreenCheck->isChecked();
     params.recordPath = ui->recordPathEdt->text().trimmed();
@@ -447,14 +453,15 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
     if (!success) {
         return;
     }
-
-    auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin());
+    auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin(), ui->showToolbar->isChecked());
     videoForm->setSerial(serial);
 
     qsc::IDeviceManage::getInstance().getDevice(serial)->setUserData(static_cast<void*>(videoForm));
     qsc::IDeviceManage::getInstance().getDevice(serial)->registerDeviceObserver(videoForm);
 
+
     videoForm->showFPS(ui->fpsCheck->isChecked());
+
     if (ui->alwaysTopCheck->isChecked()) {
         videoForm->staysOnTop();
     }
