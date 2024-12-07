@@ -186,7 +186,7 @@ void ToolForm::on_closeScreenBtn_clicked()
     if (!device) {
         return;
     }
-    device->setScreenPowerMode(false);
+    device->setDisplayPower(false);
 }
 
 void ToolForm::on_expandNotifyBtn_clicked()
@@ -221,5 +221,5 @@ void ToolForm::on_openScreenBtn_clicked()
     if (!device) {
         return;
     }
-    device->setScreenPowerMode(true);
+    device->setDisplayPower(true);
 }

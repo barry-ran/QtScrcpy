@@ -290,7 +290,7 @@ void VideoForm::installShortcut()
         if (!device) {
             return;
         }
-        emit device->setScreenPowerMode(false);
+        emit device->setDisplayPower(false);
     });
 
     // expandNotificationPanel
