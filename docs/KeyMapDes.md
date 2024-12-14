@@ -60,6 +60,8 @@ Description of the unique attributes of different key mapping types:
     -key The key code to be mapped
     -startPos Simulate the start position of touch drag
     -endPos Simulate the end position of touch drag
+    -dragSpeed Speed of the drag movement (range 0-1, default 1.0). Higher values result in faster movements
+    -startDelay Optional delay in milliseconds to wait after the initial touch before starting the drag movement
 
 -KMT_STEER_WHEEL
     -centerPos steering wheel center point
