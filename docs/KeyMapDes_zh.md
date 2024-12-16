@@ -60,6 +60,8 @@
     - key 要映射的按键码
     - startPos 模拟触摸拖动的开始位置
     - endPos 模拟触摸拖动的结束位置
+    - dragSpeed 拖动移动的速度（范围0-1，默认1.0）。数值越大，移动越快
+    - startDelay 可选的延迟时间（毫秒），在开始拖动移动之前等待指定的时间
 
 - KMT_STEER_WHEEL
     - centerPos 方向盘中心点
@@ -71,6 +73,4 @@
     - rightOffset 按下右方向键后模拟拖动到相对centerPos位置水平偏右rightOffset处
     - upOffset 按下上方向键后模拟拖动到相对centerPos位置水平偏上upOffset处
     - downOffset 按下下方向键后模拟拖动到相对centerPos位置水平偏下downOffset处
-    
-
     
