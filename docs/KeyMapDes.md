@@ -73,3 +73,18 @@ Description of the unique attributes of different key mapping types:
     -rightOffset After pressing the right direction key, drag it to the right offset of the center to the right of the centerPos position
     -upOffset After pressing the up arrow key, drag it to the upper offset position horizontally relative to the centerPos position
     -downOffset Press the down arrow key and drag it to the downOffset position horizontally relative to the centerPos position
+
+## Visual Key Mapping Tool
+
+A web-based GUI tool is available to help you create and manage key mappings visually: [ScrcpyKeyMapper](https://github.com/w4po/ScrcpyKeyMapper)
+
+![ScrcpyKeyMapper Screenshot](https://raw.githubusercontent.com/w4po/ScrcpyKeyMapper/main/assets/screenshot.png)
+
+You can use this tool to:
+- Create key mappings visually
+- Test your mappings in real-time
+- Export mappings as JSON files
+- Import existing mappings for editing
+
+Try it online: [ScrcpyKeyMapper Web App](https://w4po.github.io/ScrcpyKeyMapper)
+
