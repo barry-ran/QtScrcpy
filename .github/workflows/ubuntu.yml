@@ -20,7 +20,7 @@ jobs:
         os: [ubuntu-22.04]
         qt-ver: [5.15.2]
         qt-arch-install: [gcc_64]
-        gcc-arch: [x64]
+        gcc-arch: [aarch64]
     env:
       target-name: QtScrcpy
       qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-RelWithDebInfo
-          path: output/x64/RelWithDebInfo/*
+          path: output/aarch64/RelWithDebInfo/*
       - name: Build Release
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
@@ -63,7 +63,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-Release
-          path: output/x64/Release/*
+          path: output/aarch64/Release/*
       - name: Install the zip utility
         run: |
           sudo apt install zip -y
