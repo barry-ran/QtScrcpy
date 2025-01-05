@@ -6,6 +6,7 @@
 #include <QPointer>
 #include <QVector>
 
+class QAudioSink;
 class QAudioOutput;
 class QIODevice;
 class AudioOutput : public QObject
@@ -36,6 +37,7 @@ private:
     QProcess m_sndcpy;
     QVector<char> m_buffer;
     bool m_running = false;
+    QAudioSink *m_audioSink = nullptr;
 };
 
 #endif // AUDIOOUTPUT_H
