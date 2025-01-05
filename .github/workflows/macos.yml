@@ -16,7 +16,7 @@ jobs:
     runs-on: macos-14
     strategy:
       matrix:
-        qt-ver: [5.15.2]
+        qt-ver: [6.5.3]
         qt-arch-install: [clang_64]
         clang-arch: [x64]
     env:
@@ -34,6 +34,7 @@ jobs:
         uses: jurplel/install-qt-action@v4.1.1
         with:
           version: ${{ matrix.qt-ver }}
+          modules: qtmultimedia
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
       - uses: actions/checkout@v2
         with:

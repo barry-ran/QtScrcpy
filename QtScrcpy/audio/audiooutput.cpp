@@ -1,31 +1,37 @@
 #include <QTcpSocket>
 #include <QHostAddress>
-#include <QAudioOutput>
-#include <QTime>
+#include <QAudioSink>
+#include <QMediaDevices>
 #include <QElapsedTimer>
-
+#include <QProcess>
+#include <QThread>
+#include <QDebug>
+#include <QByteArray>
 #include "audiooutput.h"
 
 AudioOutput::AudioOutput(QObject *parent)
     : QObject(parent)
+    , m_outputDevice(nullptr)
+    , m_running(false)
+    , m_audioSink(nullptr)
 {
     connect(&m_sndcpy, &QProcess::readyReadStandardOutput, this, [this]() {
-        qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardOutput());
+        qInfo() << QString("AudioOutput::") << m_sndcpy.readAllStandardOutput();
     });
     connect(&m_sndcpy, &QProcess::readyReadStandardError, this, [this]() {
-        qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardError());
+        qInfo() << QString("AudioOutput::") << m_sndcpy.readAllStandardError();
     });
 }
 
 AudioOutput::~AudioOutput()
 {
-    if (QProcess::NotRunning != m_sndcpy.state()) {
+    if (m_sndcpy.state() != QProcess::NotRunning) {
         m_sndcpy.kill();
     }
     stop();
 }
 
-bool AudioOutput::start(const QString& serial, int port)
+bool AudioOutput::start(const QString &serial, int port)
 {
     if (m_running) {
         stop();
@@ -36,7 +42,7 @@ bool AudioOutput::start(const QString& serial, int port)
     bool ret = runSndcpyProcess(serial, port);
     qInfo() << "AudioOutput::run sndcpy cost:" << timeConsumeCount.elapsed() << "milliseconds";
     if (!ret) {
-        return ret;
+        return false;
     }
 
     startAudioOutput();
@@ -64,20 +70,15 @@ void AudioOutput::installonly(const QString &serial, int port)
 
 bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
 {
-    if (QProcess::NotRunning != m_sndcpy.state()) {
+    if (m_sndcpy.state() != QProcess::NotRunning) {
         m_sndcpy.kill();
     }
 
 #ifdef Q_OS_WIN32
-    QStringList params;
-    params << serial;
-    params << QString("%1").arg(port);
+    QStringList params{serial, QString::number(port)};
     m_sndcpy.start("sndcpy.bat", params);
 #else
-    QStringList params;
-    params << "sndcpy.sh";
-    params << serial;
-    params << QString("%1").arg(port);
+    QStringList params{"sndcpy.sh", serial, QString::number(port)};
     m_sndcpy.start("bash", params);
 #endif
 
@@ -86,11 +87,11 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
     }
 
     if (!m_sndcpy.waitForStarted()) {
-        qWarning() << "AudioOutput::start sndcpy.bat failed";
+        qWarning() << "AudioOutput::start sndcpy process failed";
         return false;
     }
     if (!m_sndcpy.waitForFinished()) {
-        qWarning() << "AudioOutput::sndcpy.bat crashed";
+        qWarning() << "AudioOutput::sndcpy process crashed";
         return false;
     }
 
@@ -99,41 +100,39 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
 
 void AudioOutput::startAudioOutput()
 {
-    if (m_audioOutput) {
+    if (m_audioSink) {
         return;
     }
 
     QAudioFormat format;
     format.setSampleRate(48000);
     format.setChannelCount(2);
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
+    format.setSampleFormat(QAudioFormat::Int16); // 16-bit signed integer format
 
-    QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
-    if (!info.isFormatSupported(format)) {
+    QAudioDevice defaultDevice = QMediaDevices::defaultAudioOutput();
+    if (!defaultDevice.isFormatSupported(format)) {
         qWarning() << "AudioOutput::audio format not supported, cannot play audio.";
         return;
     }
 
-    m_audioOutput = new QAudioOutput(format, this);
-    connect(m_audioOutput, &QAudioOutput::stateChanged, this, [](QAudio::State state) {
-        qInfo() << "AudioOutput::audio state changed:" << state;
-    });
-    m_audioOutput->setBufferSize(48000*2*15/1000 * 20);
-    m_outputDevice = m_audioOutput->start();
+    m_audioSink = new QAudioSink(defaultDevice, format, this);
+    m_outputDevice = m_audioSink->start();
+    if (!m_outputDevice) {
+        qWarning() << "AudioOutput::failed to start audio sink.";
+        delete m_audioSink;
+        m_audioSink = nullptr;
+        return;
+    }
 }
 
 void AudioOutput::stopAudioOutput()
 {
-    if (!m_audioOutput) {
-        return;
+    if (m_audioSink) {
+        m_audioSink->stop();
+        delete m_audioSink;
+        m_audioSink = nullptr;
     }
-
-    m_audioOutput->stop();
-    delete m_audioOutput;
-    m_audioOutput = nullptr;
+    m_outputDevice = nullptr;
 }
 
 void AudioOutput::startRecvData(int port)
@@ -156,7 +155,6 @@ void AudioOutput::startRecvData(int port)
     });
     connect(audioSocket, &QIODevice::readyRead, audioSocket, [this, audioSocket]() {
         qint64 recv = audioSocket->bytesAvailable();
-        //qDebug() << "AudioOutput::recv data:" << recv;
 
         if (!m_outputDevice) {
             return;
@@ -165,22 +163,16 @@ void AudioOutput::startRecvData(int port)
             m_buffer.reserve(recv);
         }
 
-        qint64 count = audioSocket->read(m_buffer.data(), audioSocket->bytesAvailable());
+        qint64 count = audioSocket->read(m_buffer.data(), recv);
         m_outputDevice->write(m_buffer.data(), count);
     });
     connect(audioSocket, &QTcpSocket::stateChanged, audioSocket, [](QAbstractSocket::SocketState state) {
         qInfo() << "AudioOutput::audio socket state changed:" << state;
-
     });
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+
     connect(audioSocket, &QTcpSocket::errorOccurred, audioSocket, [](QAbstractSocket::SocketError error) {
         qInfo() << "AudioOutput::audio socket error occurred:" << error;
     });
-#else
-    connect(audioSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), audioSocket, [](QAbstractSocket::SocketError error) {
-        qInfo() << "AudioOutput::audio socket error occurred:" << error;
-    });
-#endif
 
     m_workerThread.start();
     emit connectTo(port);

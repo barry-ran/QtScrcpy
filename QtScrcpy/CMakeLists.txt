@@ -11,7 +11,9 @@ cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 # QC Custom config
 set(QC_PROJECT_NAME "QtScrcpy")
 # Read version numbers from file
-file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/appversion QC_FILE_VERSION)
+file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/appversion QC_FILE_VERSION_UNSTRIPPED)
+string(STRIP "${QC_FILE_VERSION_UNSTRIPPED}" QC_FILE_VERSION)
+
 set(QC_PROJECT_VERSION ${QC_FILE_VERSION})
 
 # Project declare
@@ -52,13 +54,13 @@ if (MSVC)
     add_compile_options(/W3 /WX /wd4566)
 
     # avoid warning C4819
-    add_compile_options(-source-charset:utf-8)
+    #add_compile_options(-source-charset:utf-8)
     #add_compile_options(/utf-8)
 
     # ensure we use minimal "windows.h" lib without the crazy min max macros
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
-    
-    # disable SAFESEH - avoid "LNK2026: module unsafe"(Qt5.15&&vs2019)     
+
+    # disable SAFESEH - avoid "LNK2026: module unsafe"(Qt5.15&&vs2019)
     add_link_options(/SAFESEH:NO)
 endif()
 
@@ -79,11 +81,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets REQUIRED)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
-    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
+    find_package(X11 REQUIRED)
 endif()
 
 message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}")
@@ -146,7 +147,7 @@ set(QC_UTIL_SOURCES
     util/mousetap/mousetap.cpp
 )
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES} 
+    set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES}
         util/mousetap/winmousetap.h
         util/mousetap/winmousetap.cpp
         util/winutils.h
@@ -154,13 +155,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     )
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES} 
+    set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES}
         util/mousetap/xmousetap.h
         util/mousetap/xmousetap.cpp
     )
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES} 
+    set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES}
         util/mousetap/cocoamousetap.h
         util/mousetap/cocoamousetap.mm
         util/path.h
@@ -263,6 +264,8 @@ endif()
 
 # MacOS
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+
     # copy bundle file
     get_target_property(MACOS_BUNDLE_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${PROJECT_NAME}.app/Contents)
@@ -310,13 +313,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
+    include_directories(${X11_INCLUDE_DIR})
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
         # qx11
-        Qt${QT_VERSION_MAJOR}::X11Extras
+        Qt${QT_VERSION_MAJOR}::CorePrivate
         # xcb https://doc.qt.io/qt-5/linux-requirements.html
         xcb
         # pthread
+        ${X11_LIBRARIES}
         Threads::Threads
     )
 
@@ -334,5 +339,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     QtScrcpyCore
 )
