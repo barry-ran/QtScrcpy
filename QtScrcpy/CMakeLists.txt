@@ -79,11 +79,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets REQUIRED)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
-    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
+    find_package(X11 REQUIRED)
 endif()
 
 message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}")
@@ -310,13 +309,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
+    include_directories(${X11_INCLUDE_DIR})
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
         # qx11
-        Qt${QT_VERSION_MAJOR}::X11Extras
+        Qt${QT_VERSION_MAJOR}::CorePrivate
         # xcb https://doc.qt.io/qt-5/linux-requirements.html
         xcb
         # pthread
+        ${X11_LIBRARIES}
         Threads::Threads
     )
 
@@ -334,5 +335,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     QtScrcpyCore
 )

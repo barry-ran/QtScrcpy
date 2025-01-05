@@ -8,7 +8,6 @@
 
 #include "config.h"
 #include "dialog.h"
-#include "mousetap/mousetap.h"
 
 static Dialog *g_mainDlg = Q_NULLPTR;
 static QtMessageHandler g_oldMessageHandler = Q_NULLPTR;
@@ -55,7 +54,6 @@ int main(int argc, char *argv[])
         QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     }
 
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
@@ -142,7 +140,7 @@ void installTranslator()
         break;
     }
 
-    translator.load(languagePath);
+    qInfo() << "Loading translation result =" << translator.load(languagePath);
     qApp->installTranslator(&translator);
 }
 
