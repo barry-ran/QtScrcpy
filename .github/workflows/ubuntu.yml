@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-22.04]
-        qt-ver: [5.15.2]
+        qt-ver: [6.5.3]
         qt-arch-install: [gcc_64]
         gcc-arch: [x64]
     env:
@@ -30,6 +30,7 @@ jobs:
         uses: jurplel/install-qt-action@v4.1.1
         with:
           version: ${{ matrix.qt-ver }}
+          modules: qtmultimedia
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
       - name: Cache Qt
         id: cache-qt
@@ -38,7 +39,7 @@ jobs:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
           key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install GL library
-        run: sudo apt-get install -y libglew-dev libglfw3-dev
+        run: sudo apt-get install -y libglew-dev libglfw3-dev libopengl-dev libx11-dev libxtst-dev
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
