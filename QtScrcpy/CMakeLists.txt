@@ -18,6 +18,8 @@ set(QC_PROJECT_VERSION ${QC_FILE_VERSION})
 project(${QC_PROJECT_NAME} VERSION ${QC_PROJECT_VERSION} LANGUAGES CXX)
 message(STATUS "[${PROJECT_NAME}] Project ${PROJECT_NAME} ${PROJECT_VERSION}")
 
+option(BUILD_QML_DEMO "Build demo QML app" ON)
+
 # QC define
 
 # check arch
@@ -68,7 +70,12 @@ if (NOT MSVC)
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 
     # disable some warning
-    add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions -Wno-overloaded-virtual)
+    set(QSC_COMPILE_DEFINITIONS -Wno-nested-anon-types -Wno-c++17-extensions -Wno-overloaded-virtual)
+    if(BUILD_QML_DEMO)
+        set(QSC_COMPILE_DEFINITIONS ${QSC_COMPILE_DEFINITIONS} -Wno-gnu-zero-variadic-macro-arguments)
+    endif()
+
+    add_compile_options(${QSC_COMPILE_DEFINITIONS})
 endif()
 
 #
@@ -79,8 +86,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets Quick REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia OpenGL OpenGLWidgets Quick REQUIRED)
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(X11 REQUIRED)
 endif()
@@ -297,6 +304,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework AppKit")
 endif()
 
+qt_add_library(QtScrcpyQml STATIC)
+
 # Linux
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
@@ -313,7 +322,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
         # qx11
-        Qt${QT_VERSION_MAJOR}::CorePrivate
         # xcb https://doc.qt.io/qt-5/linux-requirements.html
         xcb
         # pthread
@@ -339,3 +347,26 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::OpenGLWidgets
     QtScrcpyCore
 )
+
+qt_add_qml_module(QtScrcpyQml
+    SOURCES
+    URI "QtScrcpy"
+    VERSION 1.0
+    SOURCES
+    qml/scrcpyitem.h qml/scrcpyitem.cpp
+    qml/scrcpymanager.h qml/scrcpymanager.cpp
+    util/config.h
+    util/config.cpp
+)
+
+target_include_directories(QtScrcpyQml PRIVATE qml)
+
+target_link_libraries(QtScrcpyQml PRIVATE
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::Quick
+    QtScrcpyCore
+)
+
+if(BUILD_QML_DEMO)
+    add_subdirectory(TestQml)
+endif()

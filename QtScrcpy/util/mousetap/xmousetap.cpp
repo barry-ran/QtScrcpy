@@ -23,6 +23,7 @@ void XMouseTap::initMouseEventTap() {}
 void XMouseTap::quitMouseEventTap() {}
 
 void XMouseTap::enableMouseEventTap(QRect rc, bool enabled) {
+#if QT_FEATURE_xcb==1
     if (enabled && rc.isEmpty()) {
         return;
     }
@@ -61,4 +62,8 @@ void XMouseTap::enableMouseEventTap(QRect rc, bool enabled) {
         XUngrabPointer(display, CurrentTime);
     }
     XFlush(display);
+#else
+    Q_UNUSED(rc);
+    Q_UNUSED(enabled);
+#endif
 }
