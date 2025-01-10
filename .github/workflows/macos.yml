@@ -21,9 +21,15 @@ jobs:
     runs-on: macos-13
     strategy:
       matrix:
-        qt-ver: [5.15.2]
-        qt-arch-install: [clang_64]
-        clang-arch: [x64]
+        qt-ver: [5.15.2, 6.5.3]        
+        # 配置qt-ver的额外设置qt-arch-install，build-arch
+        include:
+          - qt-ver: 5.15.2
+            qt-arch-install: clang_64
+            build-arch: x64
+          - qt-ver: 6.5.3
+            qt-arch-install: arm64
+            build-arch: [x64, arm64]
     env:
       target-name: QtScrcpy
       qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
@@ -51,7 +57,7 @@ jobs:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           python ci/generate-version.py
-          ci/mac/build_for_mac.sh RelWithDebInfo
+          ci/mac/build_for_mac.sh RelWithDebInfo ${{ matrix.build-arch }}
       # 获取ref最后一个/后的内容
       - name: Get the version
         shell: bash
@@ -63,9 +69,9 @@ jobs:
         id: package
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
-          publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.clang-arch }}-${{ steps.get-version.outputs.version }}
+          publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.build-arch }}-Qt${{matrix.qt-ver}}-${{ steps.get-version.outputs.version }}
         run: |
-          ci/mac/publish_for_mac.sh ../build
+          ci/mac/publish_for_mac.sh ../build ${{ matrix.build-arch }}
           ci/mac/package_for_mac.sh
           mv ci/build/QtScrcpy.app ci/build/${{ env.publish_name }}.app
           mv ci/build/QtScrcpy.dmg ci/build/${{ env.publish_name }}.dmg

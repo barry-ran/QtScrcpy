@@ -8,7 +8,6 @@ echo ---------------------------------------------------------------
 # 从环境变量获取必要参数
 # 例如 /Users/barry/Qt5.12.5/5.12.5
 echo ENV_QT_PATH $ENV_QT_PATH
-qt_cmake_path=$ENV_QT_PATH/clang_64/lib/cmake/Qt5
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -22,6 +21,7 @@ cd $(dirname "$0")
 
 # 启动参数声明
 build_mode=RelWithDebInfo
+cpu_arch=arm64
 
 echo
 echo
@@ -36,8 +36,30 @@ if [[ $build_mode != "Release" && $build_mode != "Debug" && $build_mode != "MinS
     exit 1
 fi
 
+echo
+echo
+echo ---------------------------------------------------------------
+echo check cpu arch[x64/arm64]
+echo ---------------------------------------------------------------
+
+cpu_arch=$(echo $2)
+if [[ $cpu_arch != "x64" && $cpu_arch != "arm64" ]]; then
+    echo "error: unkonow cpu mode -- $2"
+    exit 1
+fi
+
 # 提示
 echo current build mode: $build_mode
+echo current cpu mode: $cpu_arch
+
+cmake_arch=x86_64
+if [ $cpu_arch == "x64" ]; then
+    qt_cmake_path=$ENV_QT_PATH/clang_64/lib/cmake/Qt5
+    cmake_arch=x86_64
+else
+    qt_cmake_path=$ENV_QT_PATH/macos/lib/cmake/Qt6
+    cmake_arch=arm64
+fi
 
 echo
 echo
@@ -58,7 +80,7 @@ fi
 mkdir $build_path
 cd $build_path
 
-cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path -DCMAKE_BUILD_TYPE=$build_mode -DCMAKE_OSX_ARCHITECTURES=x86_64"
+cmake_params="-DCMAKE_PREFIX_PATH=$qt_cmake_path -DCMAKE_BUILD_TYPE=$build_mode -DCMAKE_OSX_ARCHITECTURES=$cmake_arch"
 cmake $cmake_params ../..
 if [ $? -ne 0 ] ;then
     echo "cmake failed"
