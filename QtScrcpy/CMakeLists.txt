@@ -28,6 +28,19 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8)
 else()
     set(QC_CPU_ARCH x86)
 endif()
+
+# MacOS
+if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # mac default arch arm64
+    if(NOT CMAKE_OSX_ARCHITECTURES)
+        set(CMAKE_OSX_ARCHITECTURES arm64)
+    endif()
+
+    if (CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
+        set(QC_CPU_ARCH arm64)
+    endif()
+endif()
+
 message(STATUS "[${PROJECT_NAME}] CPU_ARCH:${QC_CPU_ARCH}")
 
 # CMake set
