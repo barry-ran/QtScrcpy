@@ -52,8 +52,9 @@ if (MSVC)
     add_compile_options(/W3 /WX /wd4566)
 
     # avoid warning C4819
-    add_compile_options(-source-charset:utf-8)
-    #add_compile_options(/utf-8)
+    #add_compile_options(-source-charset:utf-8)
+    # /utf-8 will set source charset and execution charset to utf-8, so we don't need to set source-charset:utf-8
+    add_compile_options(/utf-8)
 
     # ensure we use minimal "windows.h" lib without the crazy min max macros
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
@@ -294,6 +295,9 @@ endif()
 
 # MacOS
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    # qt6 need 10.15 or later
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+
     # copy bundle file
     get_target_property(MACOS_BUNDLE_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     set(MACOS_BUNDLE_PATH ${MACOS_BUNDLE_PATH}/${PROJECT_NAME}.app/Contents)
