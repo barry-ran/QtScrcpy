@@ -7,7 +7,6 @@ echo ---------------------------------------------------------------
 # 从环境变量获取必要参数
 # 例如 /Users/barry/Qt5.12.5/5.12.5
 echo ENV_QT_PATH $ENV_QT_PATH
-qt_clang_path=$ENV_QT_PATH/clang_64
 
 # 获取绝对路径，保证其他目录执行此脚本依然正确
 {
@@ -21,6 +20,27 @@ cd $(dirname "$0")
 
 # 启动参数声明
 publish_dir=$1
+cpu_arch=$2
+
+echo
+echo
+echo ---------------------------------------------------------------
+echo check cpu arch[x64/arm64]
+echo ---------------------------------------------------------------
+
+if [[ $cpu_arch != "x64" && $cpu_arch != "arm64" ]]; then
+    echo "error: unkonow cpu mode -- $2"
+    exit 1
+fi
+
+# 提示
+echo current cpu mode: $cpu_arch
+
+if [ $cpu_arch == "x64" ]; then
+    qt_clang_path=$ENV_QT_PATH/clang_64
+else
+    qt_clang_path=$ENV_QT_PATH/macos
+fi
 
 # 提示
 echo current publish dir: $publish_dir
@@ -30,7 +50,7 @@ keymap_path=$script_path/../../keymap
 # config_path=$script_path/../../config
 
 publish_path=$script_path/$publish_dir
-release_path=$script_path/../../output/x64/RelWithDebInfo
+release_path=$script_path/../../output/$cpu_arch/RelWithDebInfo
 
 export PATH=$qt_clang_path/bin:$PATH
 
