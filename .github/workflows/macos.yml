@@ -13,7 +13,12 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: macos-14
+    # install-qt-action在arm上执行macdeployqt会报parse otool错误，所以在intel mac上执行:
+    # 用qt6时在arm mac上编译arm和intel都没有问题
+    # qt5+intel mac编译intel没问题
+    # qt5+arm mac编译intel会报错
+    # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
+    runs-on: macos-13
     strategy:
       matrix:
         qt-ver: [5.15.2]
