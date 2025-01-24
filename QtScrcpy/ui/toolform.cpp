@@ -68,7 +68,11 @@ void ToolForm::updateGroupControl()
 void ToolForm::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+#else
+        m_dragPosition = event->globalPosition().toPoint() - frameGeometry().topLeft();
+#endif
         event->accept();
     }
 }
@@ -81,7 +85,11 @@ void ToolForm::mouseReleaseEvent(QMouseEvent *event)
 void ToolForm::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         move(event->globalPos() - m_dragPosition);
+#else
+        move(event->globalPosition().toPoint() - m_dragPosition);
+#endif
         event->accept();
     }
 }
