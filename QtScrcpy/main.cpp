@@ -55,10 +55,12 @@ int main(int argc, char *argv[])
         QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
     }
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
 #endif
 
     QSurfaceFormat varFormat = QSurfaceFormat::defaultFormat();
@@ -142,7 +144,10 @@ void installTranslator()
         break;
     }
 
-    translator.load(languagePath);
+    auto loaded = translator.load(languagePath);
+    if (!loaded) {
+        qWarning() << "Failed to load translation file:" << languagePath;
+    }
     qApp->installTranslator(&translator);
 }
 
