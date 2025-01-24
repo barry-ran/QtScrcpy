@@ -1,4 +1,4 @@
-#include <QDesktopWidget>
+// #include <QDesktopWidget>
 #include <QFileInfo>
 #include <QLabel>
 #include <QMessageBox>
@@ -363,21 +363,18 @@ void VideoForm::installShortcut()
 QRect VideoForm::getScreenRect()
 {
     QRect screenRect;
-    QWidget *win = window();
-    if (!win) {
-        return screenRect;
-    }
-
-    QWindow *winHandle = win->windowHandle();
     QScreen *screen = QGuiApplication::primaryScreen();
-    if (winHandle) {
-        screen = winHandle->screen();
-    }
-    if (!screen) {
-        return screenRect;
+    QWidget *win = window();
+    if (win) {
+        QWindow *winHandle = win->windowHandle();
+        if (winHandle) {
+            screen = winHandle->screen();
+        }
     }
 
-    screenRect = screen->availableGeometry();
+    if (screen) {
+        screenRect = screen->availableGeometry();
+    }
     return screenRect;
 }
 
@@ -572,23 +569,32 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
         }
     }
 
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+        QPointF localPos = event->localPos();
+        QPointF globalPos = event->globalPos();
+#else
+        QPointF localPos = event->position();
+        QPointF globalPos = event->globalPosition();
+#endif
+
     if (m_videoWidget->geometry().contains(event->pos())) {
         if (!device) {
             return;
         }
-        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
-        emit device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        QPointF mappedPos = m_videoWidget->mapFrom(this, localPos.toPoint());
+        QMouseEvent newEvent(event->type(), mappedPos, globalPos, event->button(), event->buttons(), event->modifiers());
+        emit device->mouseEvent(&newEvent, m_videoWidget->frameSize(), m_videoWidget->size());
 
         // debug keymap pos
         if (event->button() == Qt::LeftButton) {
-            qreal x = event->localPos().x() / m_videoWidget->size().width();
-            qreal y = event->localPos().y() / m_videoWidget->size().height();
+            qreal x = localPos.x() / m_videoWidget->size().width();
+            qreal y = localPos.y() / m_videoWidget->size().height();
             QString posTip = QString(R"("pos": {"x": %1, "y": %2})").arg(x).arg(y);
             qInfo() << posTip.toStdString().c_str();
         }
     } else {
         if (event->button() == Qt::LeftButton) {
-            m_dragPosition = event->globalPos() - frameGeometry().topLeft();
+            m_dragPosition = globalPos.toPoint() - frameGeometry().topLeft();
             event->accept();
         }
     }
@@ -601,9 +607,15 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
         if (!device) {
             return;
         }
-        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+        QPointF localPos = event->localPos();
+        QPointF globalPos = event->globalPos();
+#else
+        QPointF localPos = event->position();
+        QPointF globalPos = event->globalPosition();
+#endif
         // local check
-        QPointF local = event->localPos();
+        QPointF local = m_videoWidget->mapFrom(this, localPos.toPoint());
         if (local.x() < 0) {
             local.setX(0);
         }
@@ -616,8 +628,8 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
         if (local.y() > m_videoWidget->height()) {
             local.setY(m_videoWidget->height());
         }
-        event->setLocalPos(local);
-        emit device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        QMouseEvent newEvent(event->type(), local, globalPos, event->button(), event->buttons(), event->modifiers());
+        emit device->mouseEvent(&newEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     } else {
         m_dragPosition = QPoint(0, 0);
     }
@@ -625,16 +637,24 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+        QPointF localPos = event->localPos();
+        QPointF globalPos = event->globalPos();
+#else
+        QPointF localPos = event->position();
+        QPointF globalPos = event->globalPosition();
+#endif
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (m_videoWidget->geometry().contains(event->pos())) {
         if (!device) {
             return;
         }
-        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
-        emit device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+        QPointF mappedPos = m_videoWidget->mapFrom(this, localPos.toPoint());
+        QMouseEvent newEvent(event->type(), mappedPos, globalPos, event->button(), event->buttons(), event->modifiers());
+        emit device->mouseEvent(&newEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     } else if (!m_dragPosition.isNull()) {
         if (event->buttons() & Qt::LeftButton) {
-            move(event->globalPos() - m_dragPosition);
+            move(globalPos.toPoint() - m_dragPosition);
             event->accept();
         }
     }
@@ -657,8 +677,16 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
         if (!device) {
             return;
         }
-        event->setLocalPos(m_videoWidget->mapFrom(this, event->localPos().toPoint()));
-        emit device->mouseEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+        QPointF localPos = event->localPos();
+        QPointF globalPos = event->globalPos();
+#else
+        QPointF localPos = event->position();
+        QPointF globalPos = event->globalPosition();
+#endif
+        QPointF mappedPos = m_videoWidget->mapFrom(this, localPos.toPoint());
+        QMouseEvent newEvent(event->type(), mappedPos, globalPos, event->button(), event->buttons(), event->modifiers());
+        emit device->mouseEvent(&newEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
 }
 
@@ -714,7 +742,11 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 {
     Q_UNUSED(paint)
     QStyleOption opt;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     opt.init(this);
+#else
+    opt.initFrom(this);
+#endif
     QPainter p(this);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }

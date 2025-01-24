@@ -6,6 +6,7 @@
 #include <QPointer>
 #include <QVector>
 
+class QAudioSink;
 class QAudioOutput;
 class QIODevice;
 class AudioOutput : public QObject
@@ -30,12 +31,16 @@ signals:
     void connectTo(int port);
 
 private:
-    QAudioOutput* m_audioOutput = nullptr;
     QPointer<QIODevice> m_outputDevice;
     QThread m_workerThread;
     QProcess m_sndcpy;
     QVector<char> m_buffer;
     bool m_running = false;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    QAudioOutput* m_audioOutput = nullptr;
+#else
+    QAudioSink *m_audioSink = nullptr;
+#endif
 };
 
 #endif // AUDIOOUTPUT_H
