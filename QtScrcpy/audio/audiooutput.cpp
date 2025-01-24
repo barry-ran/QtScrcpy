@@ -4,11 +4,23 @@
 #include <QTime>
 #include <QElapsedTimer>
 
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#include <QAudioSink>
+#include <QAudioDevice>
+#include <QMediaDevices>
+#endif
+
 #include "audiooutput.h"
 
 AudioOutput::AudioOutput(QObject *parent)
     : QObject(parent)
 {
+    m_running = false;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    m_audioOutput = nullptr;
+#else
+    m_audioSink = nullptr;
+#endif
     connect(&m_sndcpy, &QProcess::readyReadStandardOutput, this, [this]() {
         qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardOutput());
     });
@@ -69,15 +81,10 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
     }
 
 #ifdef Q_OS_WIN32
-    QStringList params;
-    params << serial;
-    params << QString("%1").arg(port);
+    QStringList params{serial, QString::number(port)};
     m_sndcpy.start("sndcpy.bat", params);
 #else
-    QStringList params;
-    params << "sndcpy.sh";
-    params << serial;
-    params << QString("%1").arg(port);
+    QStringList params{"sndcpy.sh", serial, QString::number(port)};
     m_sndcpy.start("bash", params);
 #endif
 
@@ -86,11 +93,11 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
     }
 
     if (!m_sndcpy.waitForStarted()) {
-        qWarning() << "AudioOutput::start sndcpy.bat failed";
+        qWarning() << "AudioOutput::start sndcpy process failed";
         return false;
     }
     if (!m_sndcpy.waitForFinished()) {
-        qWarning() << "AudioOutput::sndcpy.bat crashed";
+        qWarning() << "AudioOutput::sndcpy process crashed";
         return false;
     }
 
@@ -99,6 +106,7 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
 
 void AudioOutput::startAudioOutput()
 {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     if (m_audioOutput) {
         return;
     }
@@ -110,8 +118,8 @@ void AudioOutput::startAudioOutput()
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
     format.setSampleType(QAudioFormat::SignedInt);
-
     QAudioDeviceInfo info(QAudioDeviceInfo::defaultOutputDevice());
+
     if (!info.isFormatSupported(format)) {
         qWarning() << "AudioOutput::audio format not supported, cannot play audio.";
         return;
@@ -123,17 +131,47 @@ void AudioOutput::startAudioOutput()
     });
     m_audioOutput->setBufferSize(48000*2*15/1000 * 20);
     m_outputDevice = m_audioOutput->start();
+#else
+    if (m_audioSink) {
+        return;
+    }
+
+    QAudioFormat format;
+    format.setSampleRate(48000);
+    format.setChannelCount(2);
+    format.setSampleFormat(QAudioFormat::Int16);
+    QAudioDevice defaultDevice = QMediaDevices::defaultAudioOutput();
+    if (!defaultDevice.isFormatSupported(format)) {
+        qWarning() << "AudioOutput::audio format not supported, cannot play audio.";
+        return;
+    }
+    m_audioSink = new QAudioSink(defaultDevice, format, this);
+    m_outputDevice = m_audioSink->start();
+    if (!m_outputDevice) {
+        qWarning() << "AudioOutput::audio output device not available, cannot play audio.";
+        delete m_audioSink;
+        m_audioSink = nullptr;
+        return;
+    }
+#endif
 }
 
 void AudioOutput::stopAudioOutput()
 {
-    if (!m_audioOutput) {
-        return;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    if (m_audioOutput) {
+        m_audioOutput->stop();
+        delete m_audioOutput;
+        m_audioOutput = nullptr;
     }
-
-    m_audioOutput->stop();
-    delete m_audioOutput;
-    m_audioOutput = nullptr;
+#else
+    if (m_audioSink) {
+        m_audioSink->stop();
+        delete m_audioSink;
+        m_audioSink = nullptr;
+    }
+#endif
+    m_outputDevice = nullptr;
 }
 
 void AudioOutput::startRecvData(int port)
@@ -165,7 +203,7 @@ void AudioOutput::startRecvData(int port)
             m_buffer.reserve(recv);
         }
 
-        qint64 count = audioSocket->read(m_buffer.data(), audioSocket->bytesAvailable());
+        qint64 count = audioSocket->read(m_buffer.data(), recv);
         m_outputDevice->write(m_buffer.data(), count);
     });
     connect(audioSocket, &QTcpSocket::stateChanged, audioSocket, [](QAbstractSocket::SocketState state) {

@@ -75,18 +75,49 @@ endif()
 # Qt
 #
 
+# Find Qt version
+if (NOT QT_DESIRED_VERSION)
+    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
+    message("   >>> Found Qt version: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
+    set(QT_DESIRED_VERSION ${QT_VERSION_MAJOR})
+endif()
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Network Multimedia REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Network Multimedia REQUIRED)
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    find_package(QT NAMES Qt6 Qt5 COMPONENTS X11Extras REQUIRED)
-    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS X11Extras REQUIRED)
+set(qt_required_components Widgets Network Multimedia)
+
+if (QT_DESIRED_VERSION MATCHES 6)
+    # list(APPEND qt_required_components Core5Compat)
+    list(APPEND qt_required_components OpenGL)
+    list(APPEND qt_required_components OpenGLWidgets)
+else()
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        list(APPEND qt_required_components X11Extras )
+    endif()
 endif()
 
-message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}")
+find_package(Qt${QT_DESIRED_VERSION} REQUIRED COMPONENTS ${qt_required_components})
+
+set(LINK_LIBS
+    Qt${QT_DESIRED_VERSION}::Widgets
+    Qt${QT_DESIRED_VERSION}::Network
+    Qt${QT_DESIRED_VERSION}::Multimedia
+)
+
+if (QT_DESIRED_VERSION MATCHES 6)
+    # list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::Core5Compat)
+    list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::GuiPrivate)
+    list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::OpenGL)
+    list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::OpenGLWidgets)
+else()
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::X11Extras)
+    endif()
+endif()
+
+message(STATUS "[${PROJECT_NAME}] Qt version is: ${QT_DESIRED_VERSION}")
 
 #
 # Sources
@@ -312,8 +343,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(Threads REQUIRED)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE
-        # qx11
-        Qt${QT_VERSION_MAJOR}::X11Extras
         # xcb https://doc.qt.io/qt-5/linux-requirements.html
         xcb
         # pthread
@@ -331,8 +360,6 @@ add_subdirectory(QtScrcpyCore)
 
 # Qt
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Multimedia
+    ${LINK_LIBS}
     QtScrcpyCore
 )
