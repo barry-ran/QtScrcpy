@@ -113,10 +113,11 @@ QString Config::s_configPath = "";
 Config::Config(QObject *parent) : QObject(parent)
 {
     m_settings = new QSettings(getConfigPath() + "/config.ini", QSettings::IniFormat);
-    m_settings->setIniCodec("UTF-8");
-
     m_userData = new QSettings(getConfigPath() + "/userdata.ini", QSettings::IniFormat);
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    m_settings->setIniCodec("UTF-8");
     m_userData->setIniCodec("UTF-8");
+#endif
 
     qDebug()<<m_userData->childGroups();
 }
