@@ -157,6 +157,8 @@ void QYUVOpenGLWidget::initializeGL()
 
 void QYUVOpenGLWidget::paintGL()
 {
+    m_shaderProgram.bind();
+
     if (m_needUpdate) {
         deInitTextures();
         initTextures();
@@ -175,6 +177,8 @@ void QYUVOpenGLWidget::paintGL()
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
+
+    m_shaderProgram.release();
 }
 
 void QYUVOpenGLWidget::resizeGL(int width, int height)
