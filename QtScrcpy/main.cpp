@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion());
 
     qInfo() << QObject::tr("If you need more professional screen projection control software, you can try the following software:");
-    qInfo() << QString(QObject::tr("QuickMirror") + " <https://lrbnfell4p.feishu.cn/docx/QRMhd9nImorAGgxVLlmczxSdnYf>");
+    qInfo() << QString(QObject::tr("QuickMirror") + " <https://lrbnfell4p.feishu.cn/drive/folder/KviYfz5uFlpUT8dXgdjccmfUnse>");
 
     int ret = a.exec();
     delete g_mainDlg;

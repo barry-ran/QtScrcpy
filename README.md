@@ -31,6 +31,24 @@ It focuses on:
 
 ![linux](screenshot/linux-en.png)
 
+## The author has developed a more professional screen casting software called `QuickMirror`
+QuickMirror function&features:
+- Equipment screen casting&control: batch screen casting, individual control, batch control
+- Group management
+- WiFi screen mirroring/OTG screen mirroring
+- Adb shell shortcut command
+- File transfer, apk installation
+- Multiple screen mirroring: In OTG mirroring mode, with low resolution and smoothness settings, a single computer can manage 500+phones simultaneously
+- Low latency: USB screen mirroring 1080p latency is within 30ms, which is lower than all screen mirroring software on the market in terms of latency at the same resolution and smoothness
+- Low CPU usage: pure C++development, high-performance GPU video rendering
+- High resolution: adjustable, maximum support for native resolution of Android terminals
+- Perfect Chinese input: Supports Xianyu app, supports Samsung phones
+- The free version can cast up to 10 screens, with unlimited functionality (except for automatic screen mirroring)
+- QuickMirror tutorial: https://lrbnfell4p.feishu.cn/docx/EMkvdfIvDowy3UxsXUCcpPV8nDh
+- QuickMirror Telegram communication group: https://t.me/+Ylf_5V_rDCMyODQ1
+- Preview of QuickMirror Interface:
+![quickmirror](docs/image/quickmirror.png)
+
 ## Mapping Keys
 You can write your script to map keyboard and mouse actions to touches and clicks of the mobile phone according to your needs. [Here](docs/KeyMapDes.md) are the script writing rules.
 
@@ -89,9 +107,9 @@ It details the development architecture and the development process of the entir
 
 Course introduction：[https://blog.csdn.net/rankun1/article/details/87970523](https://blog.csdn.net/rankun1/article/details/87970523)
 
-You can join my QQ group for QtScrcpy and exchange ideas with like-minded friends.：
+You can join Telegram Group for QtScrcpy and exchange ideas with like-minded friends.：
 
-QQ Group number：901736468
+Telegram Group：https://t.me/+EnQNmb47C_liYmRl
 
 
 ## Requirements
