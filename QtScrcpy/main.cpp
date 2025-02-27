@@ -132,7 +132,7 @@ void installTranslator()
     static QTranslator translator;
     QLocale locale;
     QLocale::Language language = locale.language();
-    //language = QLocale::English;
+    language = QLocale::English;
     QString languagePath = ":/i18n/";
     switch (language) {
     case QLocale::Chinese:
