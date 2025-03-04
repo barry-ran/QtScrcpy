@@ -6,6 +6,8 @@
 
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
 ![release](https://img.shields.io/github/v/release/barry-ran/QtScrcpy.svg)
+![star](https://img.shields.io/github/stars/barry-ran/QtScrcpy.svg)
+![star](https://gitcode.com/barry-ran/QtScrcpy/star/badge.svg)
 
 [Speaks English? Click me for English introduction.](README.md)
 
