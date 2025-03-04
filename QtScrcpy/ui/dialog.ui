@@ -1059,21 +1059,24 @@
           <number>5</number>
          </property>
          <item>
-          <widget class="QLineEdit" name="deviceIpEdt">
+          <widget class="QComboBox" name="deviceIpEdt">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentText">
             <string/>
-           </property>
-           <property name="maxLength">
-            <number>128</number>
-           </property>
-           <property name="placeholderText">
-            <string notr="true">192.168.0.1</string>
            </property>
           </widget>
          </item>

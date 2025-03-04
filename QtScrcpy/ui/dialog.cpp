@@ -82,21 +82,21 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
                     log = "ip not find, connect to wifi?";
                     break;
                 }
-                ui->deviceIpEdt->setText(ip);
+                ui->deviceIpEdt->setEditText(ip);
             } else if (args.contains("ifconfig") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
                 if (ip.isEmpty()) {
                     log = "ip not find, connect to wifi?";
                     break;
                 }
-                ui->deviceIpEdt->setText(ip);
+                ui->deviceIpEdt->setEditText(ip);
             } else if (args.contains("ip -o a")) {
                 QString ip = m_adb.getDeviceIPByIpFromStdOut();
                 if (ip.isEmpty()) {
                     log = "ip not find, connect to wifi?";
                     break;
                 }
-                ui->deviceIpEdt->setText(ip);
+                ui->deviceIpEdt->setEditText(ip);
             }
             break;
         }
@@ -164,6 +164,16 @@ void Dialog::initUI()
     ui->lockOrientationBox->addItem("180");
     ui->lockOrientationBox->addItem("270");
     ui->lockOrientationBox->setCurrentIndex(0);
+
+    // 加载IP历史记录
+    loadIpHistory();
+
+    // 为deviceIpEdt添加右键菜单
+    if (ui->deviceIpEdt->lineEdit()) {
+        ui->deviceIpEdt->lineEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(ui->deviceIpEdt->lineEdit(), &QWidget::customContextMenuRequested,
+                this, &Dialog::showIpEditMenu);
+    }
 }
 
 void Dialog::updateBootConfig(bool toView)
@@ -215,6 +225,12 @@ void Dialog::updateBootConfig(bool toView)
         config.simpleMode = ui->useSingleModeCheck->isChecked();
         config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
         config.showToolbar = ui->showToolbar->isChecked();
+
+        // 保存当前IP到历史记录
+        QString currentIp = ui->deviceIpEdt->currentText().trimmed();
+        if (!currentIp.isEmpty()) {
+            saveIpHistory(currentIp);
+        }
 
         Config::getInstance().setUserBootConfig(config);
     }
@@ -344,7 +360,7 @@ void Dialog::on_wirelessConnectBtn_clicked()
     if (checkAdbRun()) {
         return;
     }
-    QString addr = ui->deviceIpEdt->text().trimmed();
+    QString addr = ui->deviceIpEdt->currentText().trimmed();
     if (!ui->devicePortEdt->text().isEmpty()) {
         addr += ":";
         addr += ui->devicePortEdt->text().trimmed();
@@ -354,6 +370,12 @@ void Dialog::on_wirelessConnectBtn_clicked()
     } else {
         outLog("error: device port is null", false);
         return;
+    }
+
+    // 保存IP历史记录 - 只保存IP部分,不包含端口
+    QString ip = addr.split(":").first();
+    if (!ip.isEmpty()) {
+        saveIpHistory(ip);
     }
 
     outLog("wireless connect...", false);
@@ -516,7 +538,7 @@ void Dialog::on_wirelessDisConnectBtn_clicked()
     if (checkAdbRun()) {
         return;
     }
-    QString addr = ui->deviceIpEdt->text().trimmed();
+    QString addr = ui->deviceIpEdt->currentText().trimmed();
     outLog("wireless disconnect...", false);
     QStringList adbArgs;
     adbArgs << "disconnect";
@@ -766,4 +788,46 @@ void Dialog::on_autoUpdatecheckBox_toggled(bool checked)
     } else {
         m_autoUpdatetimer.stop();
     }
+}
+
+void Dialog::loadIpHistory()
+{
+    QStringList ipList = Config::getInstance().getIpHistory();
+    ui->deviceIpEdt->clear();
+    ui->deviceIpEdt->addItems(ipList);
+    ui->deviceIpEdt->setContentsMargins(0, 0, 0, 0);
+
+    if (ui->deviceIpEdt->lineEdit()) {
+        ui->deviceIpEdt->lineEdit()->setMaxLength(128);
+        ui->deviceIpEdt->lineEdit()->setPlaceholderText("192.168.0.1");
+    }
+}
+
+void Dialog::saveIpHistory(const QString &ip)
+{
+    if (ip.isEmpty()) {
+        return;
+    }
+    
+    Config::getInstance().saveIpHistory(ip);
+    
+    // 更新ComboBox
+    loadIpHistory();
+    ui->deviceIpEdt->setCurrentText(ip);
+}
+
+void Dialog::showIpEditMenu(const QPoint &pos)
+{
+    QMenu *menu = ui->deviceIpEdt->lineEdit()->createStandardContextMenu();
+    menu->addSeparator();
+    
+    QAction *clearHistoryAction = new QAction(tr("Clear History"), menu);
+    connect(clearHistoryAction, &QAction::triggered, this, [this]() {
+        Config::getInstance().clearIpHistory();
+        loadIpHistory();
+    });
+    
+    menu->addAction(clearHistoryAction);
+    menu->exec(ui->deviceIpEdt->lineEdit()->mapToGlobal(pos));
+    delete menu;
 }
