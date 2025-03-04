@@ -7,6 +7,7 @@
 
 ![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)
 ![release](https://img.shields.io/github/v/release/barry-ran/QtScrcpy.svg)
+![star](https://img.shields.io/github/stars/barry-ran/QtScrcpy.svg)
 
 [中文用户？点我查看中文介绍](README_zh.md)
 
