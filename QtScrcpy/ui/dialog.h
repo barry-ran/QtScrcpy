@@ -67,6 +67,8 @@ private slots:
 
     void on_autoUpdatecheckBox_toggled(bool checked);
 
+    void showIpEditMenu(const QPoint &pos);
+
 private:
     bool checkAdbRun();
     void initUI();
@@ -78,6 +80,8 @@ private:
     int findDeviceFromeSerialBox(bool wifi);
     quint32 getBitRate();
     const QString &getServerPath();
+    void loadIpHistory();
+    void saveIpHistory(const QString &ip);
 
 protected:
     void closeEvent(QCloseEvent *event);

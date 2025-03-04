@@ -62,6 +62,11 @@ public:
 
     void deleteGroup(const QString &serial);
 
+    // IP history methods
+    void saveIpHistory(const QString &ip);
+    QStringList getIpHistory(); 
+    void clearIpHistory();
+
 private:
     explicit Config(QObject *parent = nullptr);
     const QString &getConfigPath();
