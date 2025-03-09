@@ -34,6 +34,7 @@ public:
     static Config &getInstance();
 
     // config
+    QString getLanguage();
     QString getTitle();
     QString getServerVersion();
     int getMaxFps();

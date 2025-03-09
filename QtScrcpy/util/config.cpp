@@ -11,6 +11,9 @@
 #define GROUP_COMMON "common"
 
 // config
+#define COMMON_LANGUAGE_KEY "Language"
+#define COMMON_LANGUAGE_DEF "Auto"
+
 #define COMMON_TITLE_KEY "WindowTitle"
 #define COMMON_TITLE_DEF QCoreApplication::applicationName()
 
@@ -367,6 +370,15 @@ QStringList Config::getConnectedGroups()
 void Config::deleteGroup(const QString &serial)
 {
     m_userData->remove(serial);
+}
+
+QString Config::getLanguage()
+{
+    QString language;
+    m_settings->beginGroup(GROUP_COMMON);
+    language = m_settings->value(COMMON_LANGUAGE_KEY, COMMON_LANGUAGE_DEF).toString();
+    m_settings->endGroup();
+    return language;
 }
 
 QString Config::getTitle()
