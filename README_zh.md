@@ -55,9 +55,7 @@ QtScrcpy 可以通过 USB / 网络连接Android设备，并进行显示和控制
 
 默认自带了针对和平精英手游和抖音进行键鼠映射的映射脚本，开启平精英手游后可以用键鼠像玩端游一样玩和平精英手游，开启抖音映射以后可以使用上下左右方向键模拟上下左右滑动，你也可以按照[编写规则](docs/KeyMapDes_zh.md)编写其他游戏的映射文件，默认按键映射如下：
 
-![game](screenshot/game.jpg)
-
-[这里有玩和平精英的视频演示](http://mp.weixin.qq.com/mp/video?__biz=MzU1NTg5MjYyNw==&mid=100000015&sn=3e301fdc5a364bd16d6207fa674bc8b3&vid=wxv_968792362971430913&idx=1&vidsn=eec329cc13c3e24c187dc9b4d5eb8760&fromid=1&scene=20&xtrack=1&clicktime=1567346543&sessionid=1567346375&subscene=92&ascene=0&fasttmpl_type=0&fasttmpl_fullversion=4730859-zh_CN-zip&fasttmpl_flag=0&realreporttime=1567346543910#wechat_redirect)
+![game](screenshot/game.png)
 
 自定义按键映射操作方法如下：
 - 编写自定义脚本放入 keymap 目录
@@ -67,6 +65,22 @@ QtScrcpy 可以通过 USB / 网络连接Android设备，并进行显示和控制
 - 按`~`（即脚本中定义的 SwitchKey）键切换为自定义映射模式即可启用
 - 再次按~键切换为正常控制模式
 - （对于和平精英等游戏）若想使用方向盘控制载具，记得在载具设置中设置为单摇杆模式
+
+如果不会自己手写映射规则，也可以去使用作者开发的`极限手游助手`
+极限手游助手功能&特点：
+- 通过键盘鼠标畅玩安卓手机游戏
+- 按键映射脚本界面化编辑
+- 支持暂停电脑端画面，只使用键鼠操作
+- 截图&录制手机画面
+- 简单批量控制
+- 安卓11+支持电脑播放手机音频（开发中...）
+- 手机端免安装App
+- 极速秒连接
+- 低延迟：usb投屏1080p延迟在30ms以内，在相同分辨率流畅度情况下，比市面上所有投屏软件延迟都低
+- cpu占用率低：纯C++开发，高性能GPU视频渲染
+- 高分辨率：可调节，最大支持安卓终端的原生分辨率
+- [QQ交流群：901736468](https://qm.qq.com/q/wRJJaWLWc8)
+- [极限手游助手说明文档](https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh)
 
 ## 批量操作
 你可以同时控制所有的手机

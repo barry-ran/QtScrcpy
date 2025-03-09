@@ -75,8 +75,11 @@
     - downOffset 按下下方向键后模拟拖动到相对centerPos位置水平偏下downOffset处
     
 ## 可视化按键映射工具
+1. 直接使用[QuickAssistant](https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh)
 
-现在有一个基于Web的GUI工具可以帮助你直观地创建和管理按键映射：[ScrcpyKeyMapper](https://github.com/w4po/ScrcpyKeyMapper)
+![game](../screenshot/game.png)
+
+2. 还有一个基于Web的GUI工具可以帮助你直观地创建和管理按键映射：[ScrcpyKeyMapper](https://github.com/w4po/ScrcpyKeyMapper)
 
 ![ScrcpyKeyMapper截图](https://raw.githubusercontent.com/w4po/ScrcpyKeyMapper/main/assets/screenshot.png)
 
