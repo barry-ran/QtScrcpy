@@ -31,6 +31,10 @@
         <source>select path</source>
         <translation>选择路径</translation>
     </message>
+    <message>
+        <source>Clear History</source>
+        <translation>清理历史</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -39,12 +43,24 @@
         <translation>本软件完全开源免费，作者不对使用该软件产生的一切后果负责。你可以在以下地址下载：</translation>
     </message>
     <message>
-        <source>If you need more professional screen projection control software, you can try the following software:</source>
-        <translation>如果你需要更加专业的投屏控制软件，可以尝试作者开发的商业版：</translation>
-    </message>
-    <message>
         <source>QuickMirror</source>
         <translation>极限投屏</translation>
+    </message>
+    <message>
+        <source>If you need more professional batch control mirror software, you can try the following software:</source>
+        <translation>如果你需要更专业的批量控制投屏软件，你可以尝试下面软件：</translation>
+    </message>
+    <message>
+        <source>If you need more professional game keymap mirror software, you can try the following software:</source>
+        <translation>如果你需要更专业的游戏映射投屏软件，你可以尝试下面软件：</translation>
+    </message>
+    <message>
+        <source>QuickAssistant</source>
+        <translation>极限手游助手</translation>
+    </message>
+    <message>
+        <source>You can contact me with telegram &lt;https://t.me/+Ylf_5V_rDCMyODQ1&gt;</source>
+        <translation>你可以通过QQ群联系我 &lt;901736468&gt;</translation>
     </message>
 </context>
 <context>
