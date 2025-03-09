@@ -76,7 +76,11 @@ Description of the unique attributes of different key mapping types:
 
 ## Visual Key Mapping Tool
 
-A web-based GUI tool is available to help you create and manage key mappings visually: [ScrcpyKeyMapper](https://github.com/w4po/ScrcpyKeyMapper)
+1. Just use [QuickAssistant](https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh)
+
+![game](../screenshot/game.png)
+
+2. A web-based GUI tool is available to help you create and manage key mappings visually: [ScrcpyKeyMapper](https://github.com/w4po/ScrcpyKeyMapper)
 
 ![ScrcpyKeyMapper Screenshot](https://raw.githubusercontent.com/w4po/ScrcpyKeyMapper/main/assets/screenshot.png)
 
