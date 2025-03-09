@@ -31,6 +31,10 @@
         <source>select path</source>
         <translation>select path</translation>
     </message>
+    <message>
+        <source>Clear History</source>
+        <translation>Clear History</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -39,12 +43,24 @@
         <translation>This software is completely open source and free. Use it at your own risk. You can download it at the following address:</translation>
     </message>
     <message>
-        <source>If you need more professional screen projection control software, you can try the following software:</source>
-        <translation>If you need more professional screen projection control software, you can try the following software:</translation>
-    </message>
-    <message>
         <source>QuickMirror</source>
         <translation>QuickMirror</translation>
+    </message>
+    <message>
+        <source>If you need more professional batch control mirror software, you can try the following software:</source>
+        <translation>If you need more professional batch control mirror software, you can try the following software:</translation>
+    </message>
+    <message>
+        <source>If you need more professional game keymap mirror software, you can try the following software:</source>
+        <translation>If you need more professional game keymap mirror software, you can try the following software:</translation>
+    </message>
+    <message>
+        <source>QuickAssistant</source>
+        <translation>QuickAssistant</translation>
+    </message>
+    <message>
+        <source>You can contact me with telegram &lt;https://t.me/+Ylf_5V_rDCMyODQ1&gt;</source>
+        <translation>You can contact me with telegram &lt;https://t.me/+Ylf_5V_rDCMyODQ1&gt;</translation>
     </message>
 </context>
 <context>
