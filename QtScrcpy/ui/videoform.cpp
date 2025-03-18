@@ -13,6 +13,10 @@
 #include <QWindow>
 #include <QtWidgets/QHBoxLayout>
 
+#if defined(Q_OS_WIN32)
+#include <Windows.h>
+#endif
+
 #include "config.h"
 #include "iconhelper.h"
 #include "qyuvopenglwidget.h"
