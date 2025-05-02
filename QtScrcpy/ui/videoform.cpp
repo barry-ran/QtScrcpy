@@ -19,9 +19,9 @@
 
 #include "config.h"
 #include "iconhelper.h"
+#include "mousetap/mousetap.h"
 #include "qyuvopenglwidget.h"
 #include "toolform.h"
-#include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "videoform.h"
 
@@ -54,7 +54,7 @@ void VideoForm::initUI()
             m_widthHeightRatio = 1.0f * phone.width() / phone.height();
         }
 
-#ifndef Q_OS_OSX
+#ifndef Q_OS_MACOS
         // mac下去掉标题栏影响showfullscreen
         // 去掉标题栏
         setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
@@ -96,7 +96,7 @@ QRect VideoForm::getGrabCursorRect()
     rc.setY(rc.y() + 10);
     rc.setWidth(rc.width() - 20);
     rc.setHeight(rc.height() - 20);
-#elif defined(Q_OS_OSX)
+#elif defined(Q_OS_MACOS)
     rc = m_videoWidget->geometry();
     rc.setTopLeft(ui->keepRatioWidget->mapToGlobal(rc.topLeft()));
     rc.setBottomRight(ui->keepRatioWidget->mapToGlobal(rc.bottomRight()));
@@ -147,7 +147,7 @@ void VideoForm::showFPS(bool show)
     m_fpsLabel->setVisible(show);
 }
 
-void VideoForm::updateRender(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV)
+void VideoForm::updateRender(int width, int height, uint8_t *dataY, uint8_t *dataU, uint8_t *dataV, int linesizeY, int linesizeU, int linesizeV)
 {
     if (m_videoWidget->isHidden()) {
         if (m_loadingWidget) {
@@ -474,7 +474,7 @@ void VideoForm::switchFullScreen()
         // fullscreen window will move (0,0). qt bug?
         move(m_fullScreenBeforePos);
 
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
         //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
         //show();
 #endif
@@ -497,7 +497,7 @@ void VideoForm::switchFullScreen()
         m_fullScreenBeforePos = pos();
         // 这种临时增加标题栏再全屏的方案会导致收不到mousemove事件，导致setmousetrack失效
         // mac fullscreen must show title bar
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
         //setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
 #endif
         showToolForm(false);
@@ -574,11 +574,11 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
     }
 
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-        QPointF localPos = event->localPos();
-        QPointF globalPos = event->globalPos();
+    QPointF localPos = event->localPos();
+    QPointF globalPos = event->globalPos();
 #else
-        QPointF localPos = event->position();
-        QPointF globalPos = event->globalPosition();
+    QPointF localPos = event->position();
+    QPointF globalPos = event->globalPosition();
 #endif
 
     if (m_videoWidget->geometry().contains(event->pos())) {
@@ -642,11 +642,11 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-        QPointF localPos = event->localPos();
-        QPointF globalPos = event->globalPos();
+    QPointF localPos = event->localPos();
+    QPointF globalPos = event->globalPos();
 #else
-        QPointF localPos = event->position();
-        QPointF globalPos = event->globalPosition();
+    QPointF localPos = event->position();
+    QPointF globalPos = event->globalPosition();
 #endif
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (m_videoWidget->geometry().contains(event->pos())) {
@@ -713,8 +713,17 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         QPointF pos = m_videoWidget->mapFrom(this, event->pos());
 
         QWheelEvent wheelEvent(
-            pos, event->globalPosF(), event->pixelDelta(), event->angleDelta(), event->delta(), event->orientation(),
-            event->buttons(), event->modifiers(), event->phase(), event->source(), event->inverted());
+            pos,
+            event->globalPosF(),
+            event->pixelDelta(),
+            event->angleDelta(),
+            event->delta(),
+            event->orientation(),
+            event->buttons(),
+            event->modifiers(),
+            event->phase(),
+            event->source(),
+            event->inverted());
 #endif
         emit device->wheelEvent(&wheelEvent, m_videoWidget->frameSize(), m_videoWidget->size());
     }
@@ -759,9 +768,7 @@ void VideoForm::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
     if (!isFullScreen() && this->show_toolbar) {
-        QTimer::singleShot(500, this, [this](){
-            showToolForm(this->show_toolbar);
-        });
+        QTimer::singleShot(500, this, [this]() { showToolForm(this->show_toolbar); });
     }
 }
 

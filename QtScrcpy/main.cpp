@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
 #endif
 
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
     qputenv("QTSCRCPY_ADB_PATH", "../../../../../../QtScrcpy/QtScrcpyCore/src/third_party/adb/mac/adb");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../../../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../../../keymap");
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 #endif
 #endif
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     }
 
     installTranslator();
-#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
+#if defined(Q_OS_WIN32) || defined(Q_OS_MACOS)
     MouseTap::getInstance()->initMouseEventTap();
 #endif
 
@@ -108,11 +108,11 @@ int main(int argc, char *argv[])
 
     qsc::AdbProcess::setAdbPath(Config::getInstance().getAdbPath());
 
-    g_mainDlg = new Dialog {};
+    g_mainDlg = new Dialog{};
     g_mainDlg->show();
 
     qInfo() << QObject::tr("This software is completely open source and free. Use it at your own risk. You can download it at the "
-            "following address:");
+                           "following address:");
     qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion());
 
     qInfo() << QObject::tr("If you need more professional batch control mirror software, you can try the following software:");
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     int ret = a.exec();
     delete g_mainDlg;
 
-#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
+#if defined(Q_OS_WIN32) || defined(Q_OS_MACOS)
     MouseTap::getInstance()->quitMouseEventTap();
 #endif
     return ret;

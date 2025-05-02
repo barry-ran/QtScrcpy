@@ -1,10 +1,10 @@
 ﻿#include <QCoreApplication>
+#include <QDebug>
 #include <QFileInfo>
 #include <QSettings>
-#include <QDebug>
 
 #include "config.h"
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
 #include "path.h"
 #endif
 
@@ -127,7 +127,7 @@ Config::Config(QObject *parent) : QObject(parent)
     m_userData->setIniCodec("UTF-8");
 #endif
 
-    qDebug()<<m_userData->childGroups();
+    qDebug() << m_userData->childGroups();
 }
 
 Config &Config::getInstance()
@@ -145,7 +145,7 @@ const QString &Config::getConfigPath()
             // default application dir
             // mac系统当从finder打开app时，默认工作目录不再是可执行程序的目录了，而是"/"
             // 而Qt的获取工作目录的api都依赖QCoreApplication的初始化，所以使用mac api获取当前目录
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
             // get */QtScrcpy.app path
             s_configPath = Path::GetCurrentPath();
             s_configPath += "/Contents/MacOS/config";
@@ -199,7 +199,7 @@ UserBootConfig Config::getUserBootConfig()
     config.keepAlive = m_userData->value(COMMON_KEEP_ALIVE_KEY, COMMON_KEEP_ALIVE_DEF).toBool();
     config.simpleMode = m_userData->value(COMMON_SIMPLE_MODE_KEY, COMMON_SIMPLE_MODE_DEF).toBool();
     config.autoUpdateDevice = m_userData->value(COMMON_AUTO_UPDATE_DEVICE_KEY, COMMON_AUTO_UPDATE_DEVICE_DEF).toBool();
-    config.showToolbar =m_userData->value(COMMON_SHOW_TOOLBAR_KEY,COMMON_SHOW_TOOLBAR_DEF).toBool();
+    config.showToolbar = m_userData->value(COMMON_SHOW_TOOLBAR_KEY, COMMON_SHOW_TOOLBAR_DEF).toBool();
     m_userData->endGroup();
     return config;
 }
@@ -393,18 +393,18 @@ QString Config::getTitle()
 void Config::saveIpHistory(const QString &ip)
 {
     QStringList ipList = getIpHistory();
-    
+
     // 移除已存在的相同IP（避免重复）
     ipList.removeAll(ip);
-    
+
     // 将新IP添加到开头
     ipList.prepend(ip);
-    
+
     // 限制历史记录数量
     while (ipList.size() > IP_HISTORY_MAX) {
         ipList.removeLast();
     }
-    
+
     m_userData->setValue(IP_HISTORY_KEY, ipList);
     m_userData->sync();
 }

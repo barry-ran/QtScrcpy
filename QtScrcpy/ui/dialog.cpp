@@ -5,6 +5,10 @@
 #include <QRandomGenerator>
 #include <QTime>
 #include <QTimer>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QRadioButton>
+#include <QDialogButtonBox>
 
 #include "config.h"
 #include "dialog.h"
@@ -291,13 +295,32 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 
 void Dialog::closeEvent(QCloseEvent *event)
 {
-    this->hide();
-    if (!Config::getInstance().getTrayMessageShown()) {
-        Config::getInstance().setTrayMessageShown(true);
-        m_hideIcon->showMessage(tr("Notice"),
-                                tr("Hidden here!"),
-                                QSystemTrayIcon::Information,
-                                3000);
+    // 弹出选择对话框
+    QDialog choiceDialog(this);
+    choiceDialog.setWindowTitle(tr("关闭选项"));
+    QVBoxLayout *layout = new QVBoxLayout(&choiceDialog);
+    QRadioButton *minimizeRadio = new QRadioButton(tr("最小化窗口"), &choiceDialog);
+    QRadioButton *exitRadio = new QRadioButton(tr("退出窗口"), &choiceDialog);
+    minimizeRadio->setChecked(true);
+    layout->addWidget(minimizeRadio);
+    layout->addWidget(exitRadio);
+    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &choiceDialog);
+    layout->addWidget(buttonBox);
+    // 设置按钮为“确认”和“取消”
+    buttonBox->button(QDialogButtonBox::Ok)->setText(tr("确认"));
+    buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("取消"));
+    connect(buttonBox, &QDialogButtonBox::accepted, &choiceDialog, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::rejected, &choiceDialog, &QDialog::reject);
+    if (choiceDialog.exec() == QDialog::Accepted) {
+        if (minimizeRadio->isChecked()) {
+            this->hide();
+            if (!Config::getInstance().getTrayMessageShown()) {
+                Config::getInstance().setTrayMessageShown(true);
+                m_hideIcon->showMessage(tr("Notice"), tr("Hidden here!"), QSystemTrayIcon::Information, 3000);
+            }
+        } else {
+            qApp->quit();
+        }
     }
     event->ignore();
 }

@@ -15,3 +15,7 @@ build-*
 userdata.ini
 Info_Mac.plist
 /ci/build_temp
+.vscode/
+.gitignore
+.gitmodules
+.cache/
