@@ -86,7 +86,7 @@ if exist %temp_path% (
 md %temp_path%
 cd %temp_path%
 
-set cmake_params=-DCMAKE_PREFIX_PATH=%qt_cmake_path% -DCMAKE_BUILD_TYPE=%build_mode% -G "Visual Studio 16 2019" -A %cmake_vs_build_mode%
+set cmake_params=-DCMAKE_PREFIX_PATH=%qt_cmake_path% -DCMAKE_BUILD_TYPE=%build_mode% -G "Visual Studio 17 2022" -A %cmake_vs_build_mode%
 echo cmake params: %cmake_params%
 
 cmake %cmake_params% ../..
