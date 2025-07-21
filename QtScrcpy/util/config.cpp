@@ -21,7 +21,7 @@
 #define COMMON_PUSHFILE_DEF "/sdcard/"
 
 #define COMMON_SERVER_VERSION_KEY "ServerVersion"
-#define COMMON_SERVER_VERSION_DEF "3.2"
+#define COMMON_SERVER_VERSION_DEF "3.3.1"
 
 #define COMMON_SERVER_PATH_KEY "ServerPath"
 #define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
