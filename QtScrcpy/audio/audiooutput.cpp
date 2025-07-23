@@ -1,8 +1,9 @@
-#include <QTcpSocket>
-#include <QHostAddress>
 #include <QAudioOutput>
-#include <QTime>
+#include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QHostAddress>
+#include <QTcpSocket>
+#include <QTime>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 #include <QAudioSink>
@@ -85,6 +86,7 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
     m_sndcpy.start("sndcpy.bat", params);
 #else
     QStringList params{"sndcpy.sh", serial, QString::number(port)};
+    m_sndcpy.setWorkingDirectory(QCoreApplication::applicationDirPath());
     m_sndcpy.start("bash", params);
 #endif
 
