@@ -144,6 +144,7 @@ void installTranslator()
         language = QLocale::English;
     } else if (Config::getInstance().getLanguage() == "ja_JP") {
         language = QLocale::Japanese;
+    }
 
     QString languagePath = ":/i18n/";
     switch (language) {
