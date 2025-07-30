@@ -82,6 +82,10 @@ private:
     const QString &getServerPath();
     void loadIpHistory();
     void saveIpHistory(const QString &ip);
+    void loadPortHistory();
+    void savePortHistory(const QString &port);
+
+    void showPortEditMenu(const QPoint &pos);
 
 protected:
     void closeEvent(QCloseEvent *event);

@@ -1094,21 +1094,24 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="devicePortEdt">
+          <widget class="QComboBox" name="devicePortEdt">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentText">
             <string/>
-           </property>
-           <property name="maxLength">
-            <number>6</number>
-           </property>
-           <property name="placeholderText">
-            <string notr="true">5555</string>
            </property>
           </widget>
          </item>

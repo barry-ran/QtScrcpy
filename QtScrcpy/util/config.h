@@ -68,6 +68,11 @@ public:
     QStringList getIpHistory(); 
     void clearIpHistory();
 
+    // Port history methods
+    void savePortHistory(const QString &port);
+    QStringList getPortHistory(); 
+    void clearPortHistory();
+
 private:
     explicit Config(QObject *parent = nullptr);
     const QString &getConfigPath();
