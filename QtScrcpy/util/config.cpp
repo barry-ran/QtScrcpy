@@ -116,6 +116,11 @@
 #define IP_HISTORY_DEF ""
 #define IP_HISTORY_MAX 10
 
+// Port history  
+#define PORT_HISTORY_KEY "PortHistory"
+#define PORT_HISTORY_DEF ""
+#define PORT_HISTORY_MAX 10
+
 QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
@@ -412,11 +417,44 @@ void Config::saveIpHistory(const QString &ip)
 QStringList Config::getIpHistory()
 {
     QStringList ipList = m_userData->value(IP_HISTORY_KEY, IP_HISTORY_DEF).toStringList();
+    ipList.removeAll("");
     return ipList;
 }
 
 void Config::clearIpHistory()
 {
     m_userData->remove(IP_HISTORY_KEY);
+    m_userData->sync();
+}
+
+void Config::savePortHistory(const QString &port)
+{
+    QStringList portList = getPortHistory();
+    
+    // 移除已存在的相同Port（避免重复）
+    portList.removeAll(port);
+    
+    // 将新Port添加到开头
+    portList.prepend(port);
+    
+    // 限制历史记录数量
+    while (portList.size() > PORT_HISTORY_MAX) {
+        portList.removeLast();
+    }
+    
+    m_userData->setValue(PORT_HISTORY_KEY, portList);
+    m_userData->sync();
+}
+
+QStringList Config::getPortHistory()
+{
+    QStringList portList = m_userData->value(PORT_HISTORY_KEY, PORT_HISTORY_DEF).toStringList();
+    portList.removeAll("");
+    return portList;
+}
+
+void Config::clearPortHistory()
+{
+    m_userData->remove(PORT_HISTORY_KEY);
     m_userData->sync();
 }
