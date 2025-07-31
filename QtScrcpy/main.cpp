@@ -5,6 +5,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTranslator>
+#include <QDateTime>
 
 #include "config.h"
 #include "dialog.h"
@@ -194,9 +195,53 @@ QtMsgType covertLogLevel(const QString &logLevel)
 
 void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    if (g_oldMessageHandler) {
-        g_oldMessageHandler(type, context, msg);
+    QString outputMsg;
+    
+#ifdef ENABLE_DETAILED_LOGS
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz");
+    
+    if (context.file && context.line > 0) {
+        QString fileName = QString::fromUtf8(context.file);
+
+        int lastSlash = fileName.lastIndexOf('/');
+        if (lastSlash >= 0) {
+            fileName = fileName.mid(lastSlash + 1);
+        }
+        lastSlash = fileName.lastIndexOf('\\');
+        if (lastSlash >= 0) {
+            fileName = fileName.mid(lastSlash + 1);
+        }
+        
+        outputMsg = QString("[ %1 %2: %3 ] %4").arg(timestamp).arg(fileName).arg(context.line).arg(msg);
+    } else {
+        outputMsg = QString("[%1] %2").arg(timestamp).arg(msg);
     }
+
+    switch (type) {
+    case QtDebugMsg:
+        outputMsg.prepend("[debug] ");
+        break;
+    case QtInfoMsg:
+        outputMsg.prepend("[info] ");
+        break;
+    case QtWarningMsg:
+        outputMsg.prepend("[warring] ");
+        break;
+    case QtCriticalMsg:
+        outputMsg.prepend("[critical] ");
+        break;
+    case QtFatalMsg:
+        outputMsg.prepend("[fatal] ");
+        break;
+    }
+
+    fprintf(stderr, "%s\n", outputMsg.toUtf8().constData());
+#else
+    outputMsg = msg;
+    if (g_oldMessageHandler) {
+        g_oldMessageHandler(type, context, outputMsg);
+    }
+#endif
 
     // Is Qt log level higher than warning?
     float fLogLevel = g_msgType;
@@ -209,8 +254,8 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
     }
 
     if (fLogLevel <= fLogLevel2) {
-        if (g_mainDlg && g_mainDlg->isVisible() && !g_mainDlg->filterLog(msg)) {
-            g_mainDlg->outLog(msg);
+        if (g_mainDlg && g_mainDlg->isVisible() && !g_mainDlg->filterLog(outputMsg)) {
+            g_mainDlg->outLog(outputMsg);
         }
     }
 

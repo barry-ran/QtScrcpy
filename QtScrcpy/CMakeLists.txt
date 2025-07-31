@@ -52,6 +52,14 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message(STATUS "[${PROJECT_NAME}] BUILD_TYPE:${CMAKE_BUILD_TYPE}")
 
+# Log configuration
+option(ENABLE_DETAILED_LOGS "Enable detailed log output with file and line info" OFF)
+if(ENABLE_DETAILED_LOGS)
+    message(STATUS "[${PROJECT_NAME}] Detailed logs enabled")
+else()
+    message(STATUS "[${PROJECT_NAME}] Simple logs enabled")
+endif()
+
 # Compiler set
 message(STATUS "[${PROJECT_NAME}] C++ compiler ID is: ${CMAKE_CXX_COMPILER_ID}")
 if (MSVC)
@@ -267,6 +275,11 @@ endif()
 
 
 add_executable(${PROJECT_NAME} ${QC_RUNTIME_TYPE} ${QC_PROJECT_SOURCES})
+
+# Log compile definitions
+if(ENABLE_DETAILED_LOGS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_DETAILED_LOGS)
+endif()
 
 #
 # Internal include path (todo: remove this, use absolute path include)
