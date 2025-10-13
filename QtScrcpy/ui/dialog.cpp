@@ -301,15 +301,14 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 
 void Dialog::closeEvent(QCloseEvent *event)
 {
-    this->hide();
-    if (!Config::getInstance().getTrayMessageShown()) {
-        Config::getInstance().setTrayMessageShown(true);
+    if (Config::getInstance().getTrayMessageShown()) {
+        this->hide();
         m_hideIcon->showMessage(tr("Notice"),
                                 tr("Hidden here!"),
                                 QSystemTrayIcon::Information,
                                 3000);
+        event->ignore();
     }
-    event->ignore();
 }
 
 void Dialog::on_updateDevice_clicked()
