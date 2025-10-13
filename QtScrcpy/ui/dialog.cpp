@@ -115,7 +115,11 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
     m_menu->addAction(m_showWindow);
     m_menu->addAction(m_quit);
     m_hideIcon->setContextMenu(m_menu);
-    m_hideIcon->show();
+
+    if (Config::getInstance().getTrayMessageShown()) {
+        m_hideIcon->show();
+    }
+
     connect(m_showWindow, &QAction::triggered, this, &Dialog::show);
     connect(m_quit, &QAction::triggered, this, [this]() {
         m_hideIcon->hide();
