@@ -173,6 +173,16 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="clipboardBtn">
+     <property name="toolTip">
+      <string>copy clipboard text</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    </item>
   </layout>
  </widget>
  <resources/>
