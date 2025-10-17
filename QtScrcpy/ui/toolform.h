@@ -47,6 +47,7 @@ private slots:
     void on_touchBtn_clicked();
     void on_groupControlBtn_clicked();
     void on_openScreenBtn_clicked();
+    void on_clipboardBtn_clicked();
 
 private:
     void initStyle();
