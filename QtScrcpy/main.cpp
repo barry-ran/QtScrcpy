@@ -112,18 +112,6 @@ int main(int argc, char *argv[])
     g_mainDlg = new Dialog {};
     g_mainDlg->show();
 
-    qInfo() << QObject::tr("This software is completely open source and free. Use it at your own risk. You can download it at the "
-            "following address:");
-    qInfo() << QString("QtScrcpy %1 <https://github.com/barry-ran/QtScrcpy>").arg(QCoreApplication::applicationVersion());
-
-    qInfo() << QObject::tr("If you need more professional batch control mirror software, you can try the following software:");
-    qInfo() << QString(QObject::tr("QuickMirror") + " <https://lrbnfell4p.feishu.cn/drive/folder/KviYfz5uFlpUT8dXgdjccmfUnse>");
-
-    qInfo() << QObject::tr("If you need more professional game keymap mirror software, you can try the following software:");
-    qInfo() << QString(QObject::tr("QuickAssistant") + " <https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh>");
-
-    qInfo() << QObject::tr("You can contact me with telegram <https://t.me/+Ylf_5V_rDCMyODQ1>");
-
     int ret = a.exec();
     delete g_mainDlg;
 

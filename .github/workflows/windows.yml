@@ -13,6 +13,7 @@ on:
       - '!QtScrcpy/res/**'
       - '.github/workflows/windows.yml'
       - 'ci/win**'
+  workflow_dispatch:
 jobs:
   build:
     name: Build
