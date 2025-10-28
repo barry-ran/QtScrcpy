@@ -46,7 +46,7 @@ QuickMirror function&features:
 - Perfect Chinese input: Supports Xianyu app, supports Samsung phones
 - The free version can cast up to 10 screens, with unlimited functionality (except for automatic screen mirroring)
 - QuickMirror tutorial: https://lrbnfell4p.feishu.cn/docx/EMkvdfIvDowy3UxsXUCcpPV8nDh
-- QuickMirror Telegram communication group: https://t.me/+Ylf_5V_rDCMyODQ1
+- QuickMirror Telegram communication group: https://t.me/+EnQNmb47C_liYmRl
 - Preview of QuickMirror Interface:
 ![quickmirror](docs/image/quickmirror.png)
 
@@ -80,7 +80,7 @@ QuickAssistant Features&Functions:
 - Low latency: USB screen mirroring 1080p latency is within 30ms, which is lower than all screen mirroring software on the market in terms of latency at the same resolution and smoothness
 - Low CPU usage: pure C++development, high-performance GPU video rendering
 - High resolution: adjustable, maximum support for native resolution of Android terminals
-- Telegram Group：https://t.me/+EnQNmb47C_liYmRl
+- Telegram Group：https://t.me/+Ylf_5V_rDCMyODQ1
 - [QuickAssistant](https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh)
 
 ## Group control
