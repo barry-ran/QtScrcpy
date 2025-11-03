@@ -141,6 +141,13 @@ void Dialog::initUI()
     //setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
     setWindowTitle(Config::getInstance().getTitle());
+#ifdef Q_OS_LINUX
+    // Set window icon (inherits from application icon set in main.cpp)
+    // If application icon was set, this will use it automatically
+    if (!qApp->windowIcon().isNull()) {
+        setWindowIcon(qApp->windowIcon());
+    }
+#endif
 
 #ifdef Q_OS_WIN32
     WinUtils::setDarkBorderToWindow((HWND)this->winId(), true);
