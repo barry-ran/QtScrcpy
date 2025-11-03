@@ -1,6 +1,10 @@
 ﻿#include <QApplication>
 #include <QDebug>
 #include <QFile>
+#ifdef Q_OS_LINUX
+#include <QFileInfo>
+#include <QIcon>
+#endif
 #include <QSurfaceFormat>
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -37,10 +41,19 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef Q_OS_LINUX
-    qputenv("QTSCRCPY_ADB_PATH", "../../../QtScrcpy/QtScrcpyCore/src/third_party/adb/linux/adb");
-    qputenv("QTSCRCPY_SERVER_PATH", "../../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
-    qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
-    qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
+    // Only set environment variables if they are not already set (e.g., by AppImage AppRun)
+    if (qgetenv("QTSCRCPY_ADB_PATH").isEmpty()) {
+        qputenv("QTSCRCPY_ADB_PATH", "../../../QtScrcpy/QtScrcpyCore/src/third_party/adb/linux/adb");
+    }
+    if (qgetenv("QTSCRCPY_SERVER_PATH").isEmpty()) {
+        qputenv("QTSCRCPY_SERVER_PATH", "../../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
+    }
+    if (qgetenv("QTSCRCPY_KEYMAP_PATH").isEmpty()) {
+        qputenv("QTSCRCPY_KEYMAP_PATH", "../../../keymap");
+    }
+    if (qgetenv("QTSCRCPY_CONFIG_PATH").isEmpty()) {
+        qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
+    }
 #endif
 
     g_msgType = covertLogLevel(Config::getInstance().getLogLevel());
@@ -79,6 +92,15 @@ int main(int argc, char *argv[])
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     QApplication a(argc, argv);
+
+    // Set application icon for Linux (taskbar icon)
+#ifdef Q_OS_LINUX
+    // Load icon from Qt resource (logo.png is included in res.qrc)
+    QIcon appIcon(":/image/tray/logo.png");
+    if (!appIcon.isNull()) {
+        a.setWindowIcon(appIcon);
+    }
+#endif
 
     // windows下通过qmake VERSION变量或者rc设置版本号和应用名称后，这里可以直接拿到
     // mac下拿到的是CFBundleVersion的值

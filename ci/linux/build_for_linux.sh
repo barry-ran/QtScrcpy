@@ -8,13 +8,14 @@ echo Current ENV_QT_PATH: $ENV_QT_PATH
 echo Current directory: $(pwd)
 # Set variables
 qt_cmake_path=$ENV_QT_PATH/gcc_64/lib/cmake/Qt5
+qt_gcc_path=$ENV_QT_PATH/gcc_64
 export PATH=$qt_gcc_path/bin:$PATH
 
 # Remember working directory
 old_cd=$(pwd)
 
-# Set working dir to the script's path
-cd $(dirname "$0")/.../
+# Set working dir to the script's path (go up two levels from ci/linux/ to project root)
+cd $(dirname "$0")/../../
 
 echo
 echo

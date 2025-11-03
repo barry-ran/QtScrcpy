@@ -11,71 +11,126 @@ on:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
       - '.github/workflows/ubuntu.yml'
+      - 'ci/linux/**'
 jobs:
   build:
     name: Build
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
+    container:
+      image: ubuntu:20.04
+      options: --privileged
     strategy:
       matrix:
-        os: [ubuntu-22.04]
         qt-ver: [5.15.2]
         qt-arch-install: [gcc_64]
         gcc-arch: [x64]
     env:
       target-name: QtScrcpy
-      qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
+      qt-install-path: ${{ github.workspace }}/Qt/${{ matrix.qt-ver }}
       plantform-des: ubuntu
+      DEBIAN_FRONTEND: noninteractive
     steps:
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4.1.1
-        with:
-          version: ${{ matrix.qt-ver }}
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
-          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
-      - name: Install GL library
-        run: sudo apt-get install -y libglew-dev libglfw3-dev
+      - name: Install Git and basic dependencies
+        run: |
+          apt-get update
+          apt-get install -y git ca-certificates sudo
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
           submodules: 'true'
           ssh-key: ${{ secrets.BOT_SSH_KEY }}
-      - name: Build RelWithDebInfo
-        env:
-          ENV_QT_PATH: ${{ env.qt-install-path }}
+      - name: Install system dependencies
         run: |
-          ci/linux/build_for_linux.sh "RelWithDebInfo"
-      - name: Upload RelWithDebInfo
-        uses: actions/upload-artifact@v4
+          apt-get update
+          apt-get install -y \
+            build-essential \
+            cmake \
+            libglew-dev \
+            libglfw3-dev \
+            imagemagick \
+            wget \
+            patchelf \
+            zip \
+            libxcb1-dev \
+            libxkbcommon-dev \
+            libxkbcommon-x11-dev \
+            libx11-dev \
+            libx11-xcb-dev \
+            libfontconfig1-dev \
+            libfreetype6-dev \
+            libxrender-dev \
+            libxext-dev \
+            gnupg \
+            lsb-release \
+            python3 \
+            python3-pip \
+            fuse \
+            libasound2-dev
+      - name: Setup FUSE
+        run: |
+          apt-get install -y fuse
+          if [ ! -e /dev/fuse ]; then
+            mknod /dev/fuse c 10 229 || true
+            chmod 666 /dev/fuse || true
+          fi
+          export APPIMAGE_EXTRACT_AND_RUN=1
+      - name: Install CMake 3.19+
+        run: |
+          apt-get install -y software-properties-common
+          apt-get update
+          apt-get install -y cmake=3.19.* || {
+            wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
+            apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main'
+            apt-get update
+            apt-get install -y cmake
+          }
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v4
         with:
-          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-RelWithDebInfo
-          path: output/x64/RelWithDebInfo/*
+          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
+          key: ubuntu-20.04/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4.1.1
+        with:
+          version: ${{ matrix.qt-ver }}
+          cache: ${{ steps.cache-qt.outputs.cache-hit }}
+          setup-python: false
       - name: Build Release
+        shell: bash
         env:
-          ENV_QT_PATH: ${{ env.qt-install-path }}
+          ENV_QT_PATH: ${{ github.workspace }}/Qt/${{ matrix.qt-ver }}
         run: |
           ci/linux/build_for_linux.sh "Release"
-      - name: Upload Release
+      - name: Package AppImage
+        shell: bash
+        env:
+          ENV_QT_PATH: ${{ github.workspace }}/Qt/${{ matrix.qt-ver }}
+        run: |
+          chmod +x ci/linux/package_appimage.sh
+          ci/linux/package_appimage.sh "Release"
+      - name: Upload AppImage Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}-Release
-          path: output/x64/Release/*
-      - name: Install the zip utility
+          name: QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}-AppImage
+          path: output/appimage/*.AppImage
+          if-no-files-found: error
+      - name: Prepare AppImage for Release
+        if: startsWith(github.ref, 'refs/tags/')
         run: |
-          sudo apt install zip -y
-      - name: Zip the Artifacts
-        run: |
-          zip -r QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip output/x64/Release
-      - name: Upload to Releases
+          APPIMAGE_FILE=$(find output/appimage -name "QtScrcpy-*.AppImage" -type f | head -n 1)
+          if [ -z "$APPIMAGE_FILE" ] || [ ! -f "$APPIMAGE_FILE" ]; then
+            echo "Error: AppImage file not found"
+            exit 1
+          fi
+          FINAL_NAME="QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}.AppImage"
+          cp "$APPIMAGE_FILE" "$FINAL_NAME"
+      - name: Upload AppImage to Releases
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@2.3.0
         with:
-          file: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
-          asset_name: QtScrcpy-${{ matrix.os }}-${{ matrix.qt-arch-install }}.zip
+          file: QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}.AppImage
+          asset_name: QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}.AppImage
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
           overwrite: true
