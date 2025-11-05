@@ -379,6 +379,10 @@ void Dialog::on_wirelessConnectBtn_clicked()
     if (!ui->devicePortEdt->currentText().isEmpty()) {
         addr += ":";
         addr += ui->devicePortEdt->currentText().trimmed();
+    }
+    if (!ui->devicePortEdt->lineEdit()->placeholderText().isEmpty()) {
+        addr += ":";
+        addr += ui->devicePortEdt->lineEdit()->placeholderText().trimmed();
     } else {
         outLog("error: device port is null", false);
         return;
