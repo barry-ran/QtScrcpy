@@ -20,9 +20,6 @@
 #define COMMON_PUSHFILE_KEY "PushFilePath"
 #define COMMON_PUSHFILE_DEF "/sdcard/"
 
-#define COMMON_SERVER_VERSION_KEY "ServerVersion"
-#define COMMON_SERVER_VERSION_DEF "3.3.1"
-
 #define COMMON_SERVER_PATH_KEY "ServerPath"
 #define COMMON_SERVER_PATH_DEF "/data/local/tmp/scrcpy-server.jar"
 
@@ -264,15 +261,6 @@ QString Config::getNickName(const QString &serial)
     name = m_userData->value(SERIAL_NICK_NAME_KEY, SERIAL_NICK_NAME_DEF).toString();
     m_userData->endGroup();
     return name;
-}
-
-QString Config::getServerVersion()
-{
-    QString server;
-    m_settings->beginGroup(GROUP_COMMON);
-    server = m_settings->value(COMMON_SERVER_VERSION_KEY, COMMON_SERVER_VERSION_DEF).toString();
-    m_settings->endGroup();
-    return server;
 }
 
 int Config::getMaxFps()
