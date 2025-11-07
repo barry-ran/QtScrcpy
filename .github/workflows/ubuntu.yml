@@ -101,7 +101,12 @@ jobs:
         env:
           ENV_QT_PATH: ${{ github.workspace }}/Qt/${{ matrix.qt-ver }}
         run: |
+          python3 ci/generate-version.py
           ci/linux/build_for_linux.sh "Release"
+      - name: Get the version
+        shell: bash
+        id: get-version
+        run: echo ::set-output name=version::${GITHUB_REF##*/}
       - name: Package AppImage
         shell: bash
         env:
@@ -112,7 +117,7 @@ jobs:
       - name: Upload AppImage Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}-AppImage
+          name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.gcc-arch }}-${{ steps.get-version.outputs.version }}-AppImage
           path: output/appimage/*.AppImage
           if-no-files-found: error
       - name: Prepare AppImage for Release
@@ -123,14 +128,14 @@ jobs:
             echo "Error: AppImage file not found"
             exit 1
           fi
-          FINAL_NAME="QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}.AppImage"
+          FINAL_NAME="${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.gcc-arch }}-${{ steps.get-version.outputs.version }}.AppImage"
           cp "$APPIMAGE_FILE" "$FINAL_NAME"
       - name: Upload AppImage to Releases
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@2.3.0
         with:
-          file: QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}.AppImage
-          asset_name: QtScrcpy-ubuntu-20.04-${{ matrix.qt-arch-install }}.AppImage
+          file: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.gcc-arch }}-${{ steps.get-version.outputs.version }}.AppImage
+          asset_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.gcc-arch }}-${{ steps.get-version.outputs.version }}.AppImage
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ github.ref }}
           overwrite: true
