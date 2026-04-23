@@ -1,4 +1,5 @@
-// #include <QDesktopWidget>
+#include <QApplication>
+#include <QClipboard>
 #include <QFileInfo>
 #include <QLabel>
 #include <QMessageBox>
@@ -341,28 +342,27 @@ void VideoForm::installShortcut()
         emit device->postCut();
     });
 
-    // clipboardPaste
-    shortcut = new QShortcut(QKeySequence("Ctrl+v"), this);
-    shortcut->setAutoRepeat(false);
-    connect(shortcut, &QShortcut::activated, this, [this]() {
+    // clipboardPaste (PC clipboard changed -> auto sync to Android)
+    // Remove manual Ctrl+V shortcut, replace with automatic clipboard monitoring
+    // by connecting to QApplication::clipboard()->dataChanged()
+    // The old Ctrl+Shift+v for clipboardPaste is also removed - now automatic
+
+    // --- Auto clipboard monitor: PC -> Android (no shortcut needed) ---
+    QClipboard *clipboard = QApplication::clipboard();
+    connect(clipboard, &QClipboard::dataChanged, this, [this]() {
         auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
         if (!device) {
             return;
         }
-        emit device->setDeviceClipboard();
+        // qDebug("PC clipboard changed, auto pushing to Android");
+        emit device->setDeviceClipboard(false); // false = don't pause device video
     });
 
-    // setDeviceClipboard
-    shortcut = new QShortcut(QKeySequence("Ctrl+Shift+v"), this);
-    shortcut->setAutoRepeat(false);
-    connect(shortcut, &QShortcut::activated, this, [this]() {
-        auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
-        if (!device) {
-            return;
-        }
-        emit device->clipboardPaste();
-    });
+    // --- Auto clipboard monitor: Android -> PC ---
+    // Already handled by Receiver::recvDeviceMsg which sets QApplication::clipboard()
+    // when it receives DMT_GET_CLIPBOARD from Android server
 }
+
 
 QRect VideoForm::getScreenRect()
 {
