@@ -12,7 +12,10 @@ if __name__ == '__main__':
 
     # print('get tag:', tag)
 
-    version = str(tag[1:])
+    version = str(tag[1:]).strip()
+    # Strip pre-release suffix (e.g. "-auto-clipboard") for CMake compatibility
+    import re
+    version = re.match(r'^[\d.]+', version).group(0)
     version_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../QtScrcpy/appversion"))
     file=open(version_file, 'w')
     file.write(version)
