@@ -68,7 +68,12 @@ jobs:
         with:
           fetch-depth: 0
           submodules: 'true'
-          ssh-key: ${{ secrets.BOT_SSH_KEY }}
+          # 临时改用 HTTPS 而非 SSH 拉取 submodule
+      - name: Fix submodule URL
+        run: |
+          git config submodule.QtScrcpy/QtScrcpyCore.url https://github.com/barry-ran/QtScrcpyCore.git
+          git submodule sync
+          git submodule update --init --recursive
       # 编译msvc
       - name: Build MSVC
         # shell介绍 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#using-a-specific-shell
