@@ -740,15 +740,15 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         switchFullScreen();
     }
 
-    // If AdbKeyboard is active, inject printable characters as text directly
-    // This makes PC keyboard input go to the phone as text (no phone soft keyboard)
+    // If AdbKeyboard is active, inject printable characters via clipboard+paste
+    // This makes PC keyboard input go to the phone reliably (no phone soft keyboard)
     if (m_imeSwitched && !event->text().isEmpty() && !event->isAutoRepeat()) {
         // Only inject for printable characters (letters, numbers, symbols, space)
         // Skip control keys (Ctrl, Alt, Meta combos) - let those go as keyEvent
         if (!(event->modifiers() & Qt::ControlModifier) && 
             !(event->modifiers() & Qt::MetaModifier)) {
             QString text = event->text();
-            device->postTextInput(text);
+            device->setClipboardAndPaste(text);
             return;
         }
     }
@@ -773,10 +773,10 @@ void VideoForm::inputMethodEvent(QInputMethodEvent *event)
         return;
     }
 
-    // When Chinese IME (e.g. Sogou on PC) commits text, inject it to Android
+    // When Chinese IME (e.g. Sogou on PC) commits text, inject via clipboard+paste
     if (!event->commitString().isEmpty()) {
         QString text = event->commitString();
-        device->postTextInput(text);
+        device->setClipboardAndPaste(text);
         event->accept();
         return;
     }
@@ -917,8 +917,39 @@ void VideoForm::switchToAdbKeyboard()
     proc.start(adbPath, args);
     proc.waitForFinished(3000);
 
-    m_imeSwitched = true;
-    qInfo() << "Switched to AdbKeyboard - soft keyboard will not appear on phone";
+    // Step 5: Disable "show IME with hard keyboard" to prevent soft keyboard popup
+    args.clear();
+    args << "-s" << m_serial << "shell" << "settings" << "put" << "secure" << "show_ime_with_hard_keyboard" << "0";
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+
+    // Step 6: Also disable show_ime_with_hard_keyboard in system (Android 14+)
+    args.clear();
+    args << "-s" << m_serial << "shell" << "settings" << "put" << "system" << "show_ime_with_hard_keyboard" << "0";
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+
+    // Step 7: Verify IME switch was successful
+    args.clear();
+    args << "-s" << m_serial << "shell" << "settings" << "get" << "secure" << "default_input_method";
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+    QString verifyIme = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
+
+    if (verifyIme == "com.android.adbkeyboard/.AdbIME") {
+        m_imeSwitched = true;
+        qInfo() << "Switched to AdbKeyboard - soft keyboard will not appear on phone";
+    } else {
+        qWarning() << "Failed to switch to AdbKeyboard, current IME:" << verifyIme;
+        // Try once more with a small delay
+        QTimer::singleShot(500, this, [this]() {
+            QString adbPath2 = QCoreApplication::applicationDirPath() + "/adb";
+            QStringList args2;
+            args2 << "-s" << m_serial << "shell" << "ime" << "set" << "com.android.adbkeyboard/.AdbIME";
+            QProcess::execute(adbPath2, args2);
+            m_imeSwitched = true;
+        });
+    }
 }
 
 void VideoForm::restoreOriginalIme()
@@ -938,6 +969,12 @@ void VideoForm::restoreOriginalIme()
     QStringList args;
     args << "-s" << m_serial << "shell" << "ime" << "set" << targetIme;
     QProcess proc;
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+
+    // Re-enable "show IME with hard keyboard" for normal use
+    args.clear();
+    args << "-s" << m_serial << "shell" << "settings" << "put" << "secure" << "show_ime_with_hard_keyboard" << "1";
     proc.start(adbPath, args);
     proc.waitForFinished(3000);
 
