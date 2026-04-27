@@ -1,11 +1,13 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QFileInfo>
+#include <QInputMethodEvent>
 #include <QLabel>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QProcess>
 #include <QScreen>
 #include <QShortcut>
 #include <QStyle>
@@ -354,7 +356,15 @@ void VideoForm::installShortcut()
         if (!device) {
             return;
         }
-        // qDebug("PC clipboard changed, auto pushing to Android");
+        // Anti-loop: if the current clipboard text matches what we last pushed from Android,
+        // this dataChanged was triggered by Receiver setting PC clipboard (Android->PC echo),
+        // so skip pushing it back to Android to avoid infinite loop.
+        QString currentText = QApplication::clipboard()->text();
+        if (!m_lastPushedToAndroid.isEmpty() && currentText == m_lastPushedToAndroid) {
+            m_lastPushedToAndroid.clear();
+            return;
+        }
+        m_lastPushedToAndroid = currentText;
         emit device->setDeviceClipboard(false); // false = don't pause device video
     });
 
@@ -730,6 +740,19 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
         switchFullScreen();
     }
 
+    // If AdbKeyboard is active, inject printable characters as text directly
+    // This makes PC keyboard input go to the phone as text (no phone soft keyboard)
+    if (m_imeSwitched && !event->text().isEmpty() && !event->isAutoRepeat()) {
+        // Only inject for printable characters (letters, numbers, symbols, space)
+        // Skip control keys (Ctrl, Alt, Meta combos) - let those go as keyEvent
+        if (!(event->modifiers() & Qt::ControlModifier) && 
+            !(event->modifiers() & Qt::MetaModifier)) {
+            QString text = event->text();
+            device->postTextInput(text);
+            return;
+        }
+    }
+
     emit device->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
 }
 
@@ -740,6 +763,25 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
         return;
     }
     emit device->keyEvent(event, m_videoWidget->frameSize(), m_videoWidget->size());
+}
+
+void VideoForm::inputMethodEvent(QInputMethodEvent *event)
+{
+    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+    if (!device) {
+        event->ignore();
+        return;
+    }
+
+    // When Chinese IME (e.g. Sogou on PC) commits text, inject it to Android
+    if (!event->commitString().isEmpty()) {
+        QString text = event->commitString();
+        device->postTextInput(text);
+        event->accept();
+        return;
+    }
+
+    event->ignore();
 }
 
 void VideoForm::paintEvent(QPaintEvent *paint)
@@ -763,6 +805,14 @@ void VideoForm::showEvent(QShowEvent *event)
             showToolForm(this->show_toolbar);
         });
     }
+    // Switch to AdbKeyboard after device is shown (delay to ensure serial is set)
+    if (!m_imeSwitched && !m_serial.isEmpty()) {
+        QTimer::singleShot(1000, this, [this](){
+            switchToAdbKeyboard();
+        });
+    }
+    // Enable Qt input method for Chinese input support
+    setAttribute(Qt::WA_InputMethodEnabled, true);
 }
 
 void VideoForm::resizeEvent(QResizeEvent *event)
@@ -799,7 +849,109 @@ void VideoForm::closeEvent(QCloseEvent *event)
         return;
     }
     Config::getInstance().setRect(device->getSerial(), geometry());
+    // Restore original IME before disconnecting
+    restoreOriginalIme();
     device->disconnectDevice();
+}
+
+// --- IME Management ---
+
+void VideoForm::switchToAdbKeyboard()
+{
+    if (m_serial.isEmpty()) {
+        return;
+    }
+
+    // Find adb executable path
+    QString adbPath;
+    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+    if (!device) {
+        return;
+    }
+    // Get adb path from the app's directory (adb is deployed alongside the app)
+    adbPath = QCoreApplication::applicationDirPath() + "/adb";
+
+    // Step 1: Save current default IME
+    QStringList args;
+    args << "-s" << m_serial << "shell" << "settings" << "get" << "secure" << "default_input_method";
+    QProcess proc;
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+    QString currentIme = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
+    if (!currentIme.isEmpty() && currentIme != "com.android.adbkeyboard/.AdbIME") {
+        m_originalIme = currentIme;
+        qInfo() << "Original IME saved:" << m_originalIme;
+    }
+
+    // Step 2: Install AdbKeyboard if not already installed
+    // Check if AdbKeyboard is already installed
+    args.clear();
+    args << "-s" << m_serial << "shell" << "pm" << "list" << "packages" << "com.android.adbkeyboard";
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+    QString packages = QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
+
+    if (!packages.contains("com.android.adbkeyboard")) {
+        // Install AdbKeyboard.apk from the app directory
+        QString apkPath = QCoreApplication::applicationDirPath() + "/AdbKeyboard.apk";
+        if (QFileInfo::exists(apkPath)) {
+            args.clear();
+            args << "-s" << m_serial << "install" << "-r" << apkPath;
+            proc.start(adbPath, args);
+            proc.waitForFinished(15000);
+            qInfo() << "AdbKeyboard installed:" << proc.readAllStandardOutput();
+        } else {
+            qWarning() << "AdbKeyboard.apk not found at:" << apkPath;
+        }
+    }
+
+    // Step 3: Enable AdbKeyboard
+    args.clear();
+    args << "-s" << m_serial << "shell" << "ime" << "enable" << "com.android.adbkeyboard/.AdbIME";
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+
+    // Step 4: Switch to AdbKeyboard
+    args.clear();
+    args << "-s" << m_serial << "shell" << "ime" << "set" << "com.android.adbkeyboard/.AdbIME";
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+
+    m_imeSwitched = true;
+    qInfo() << "Switched to AdbKeyboard - soft keyboard will not appear on phone";
+}
+
+void VideoForm::restoreOriginalIme()
+{
+    if (!m_imeSwitched || m_serial.isEmpty()) {
+        return;
+    }
+
+    QString adbPath = QCoreApplication::applicationDirPath() + "/adb";
+
+    // Try to restore to Sogou first (user's known IME), then fall back to saved IME
+    QString targetIme = "com.sohu.inputmethod.sogou/.SogouIME";
+    if (!m_originalIme.isEmpty()) {
+        targetIme = m_originalIme;
+    }
+
+    QStringList args;
+    args << "-s" << m_serial << "shell" << "ime" << "set" << targetIme;
+    QProcess proc;
+    proc.start(adbPath, args);
+    proc.waitForFinished(3000);
+
+    m_imeSwitched = false;
+    qInfo() << "Restored original IME:" << targetIme;
+}
+
+QString VideoForm::runAdbCommand(const QString &serial, const QStringList &args)
+{
+    QString adbPath = QCoreApplication::applicationDirPath() + "/adb";
+    QProcess proc;
+    proc.start(adbPath, QStringList() << "-s" << serial << args);
+    proc.waitForFinished(5000);
+    return QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)

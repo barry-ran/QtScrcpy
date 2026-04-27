@@ -49,6 +49,11 @@ private:
     void installShortcut();
     QRect getScreenRect();
 
+    // IME management: switch to AdbKeyboard on connect, restore on disconnect
+    void switchToAdbKeyboard();
+    void restoreOriginalIme();
+    QString runAdbCommand(const QString &serial, const QStringList &args);
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -57,6 +62,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
+    void inputMethodEvent(QInputMethodEvent *event) override;
 
     void paintEvent(QPaintEvent *) override;
     void showEvent(QShowEvent *event) override;
@@ -87,6 +93,13 @@ private:
 
     //Whether to display the toolbar when connecting a device.
     bool show_toolbar = true;
+
+    // Anti-loop: record last clipboard text pushed to Android, skip dataChanged if same
+    QString m_lastPushedToAndroid;
+
+    // IME management: save original IME to restore on disconnect
+    QString m_originalIme;
+    bool m_imeSwitched = false;
 };
 
 #endif // VIDEOFORM_H
