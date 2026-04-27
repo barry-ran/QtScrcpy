@@ -72,7 +72,8 @@ jobs:
           # 临时改用 HTTPS 而非 SSH 拉取 submodule
       - name: Fix submodule URL
         run: |
-          git config submodule.QtScrcpy/QtScrcpyCore.url https://github.com/barry-ran/QtScrcpyCore.git
+          git config submodule.QtScrcpy/QtScrcpyCore.url https://github.com/ouzhaoyuan/QtScrcpyCore.git
+          git config submodule.QtScrcpy/QtScrcpyCore.branch feat/keyboard-and-clipboard
           git submodule sync
           git submodule update --init --recursive
       # 编译msvc

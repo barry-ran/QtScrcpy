@@ -1,3 +1,4 @@
 [submodule "QtScrcpy/QtScrcpyCore"]
 	path = QtScrcpy/QtScrcpyCore
-	url = https://github.com/barry-ran/QtScrcpyCore.git
+	url = https://github.com/ouzhaoyuan/QtScrcpyCore.git
+	branch = feat/keyboard-and-clipboard
