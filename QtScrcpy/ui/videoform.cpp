@@ -3,7 +3,6 @@
 #include <QFileInfo>
 #include <QInputMethodEvent>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QMouseEvent>
@@ -608,13 +607,15 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
             QString posTip = QString(R"("pos": {"x": %1, "y": %2})").arg(x).arg(y);
             qInfo() << posTip.toStdString().c_str();
 
-            // Record click position in Android coords for overlay input positioning
+            // Record click position in Android coords for IME cursor positioning
             if (m_imeSwitched && m_videoWidget->frameSize().isValid()) {
                 QPointF widgetPos = m_videoWidget->mapFrom(this, localPos.toPoint());
                 m_lastClickAndroid.setX(qRound(widgetPos.x() * m_videoWidget->frameSize().width() / m_videoWidget->width()));
                 m_lastClickAndroid.setY(qRound(widgetPos.y() * m_videoWidget->frameSize().height() / m_videoWidget->height()));
-                // Show overlay input at click position on the video
-                showOverlayInput(localPos);
+                // Set initial IME cursor position at click point
+                m_imeCursorRect = QRectF(localPos.x() - 1, localPos.y() - 16, 2, 16);
+                QInputMethod *im = qApp->inputMethod();
+                if (im) im->update(Qt::ImCursorRectangle);
                 // Async query focused input bounds via UIAutomator for precise positioning
                 queryFocusedInputBounds();
             }
@@ -853,9 +854,13 @@ void VideoForm::resizeEvent(QResizeEvent *event)
         }
     }
 
-    // Reposition overlay input when window resizes (fullscreen, maximize, etc.)
-    if (m_overlayInput && m_overlayInput->isVisible() && !m_lastInputBounds.isEmpty()) {
-        adjustOverlayByBounds(m_lastInputBounds);
+    // Reposition IME cursor when window resizes (fullscreen, maximize, etc.)
+    if (m_imeSwitched && !m_lastInputBounds.isEmpty()) {
+        QPointF topLeft = androidToFormPos(m_lastInputBounds.left(), m_lastInputBounds.top());
+        QPointF bottomRight = androidToFormPos(m_lastInputBounds.right(), m_lastInputBounds.bottom());
+        m_imeCursorRect = QRectF(topLeft.x(), topLeft.y(), qMax(bottomRight.x() - topLeft.x(), 2.0), qMax(bottomRight.y() - topLeft.y(), 16.0));
+        QInputMethod *im = qApp->inputMethod();
+        if (im) im->update(Qt::ImCursorRectangle);
     }
 }
 
@@ -1009,7 +1014,7 @@ QString VideoForm::runAdbCommand(const QString &serial, const QStringList &args)
     return QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
 }
 
-// --- Overlay Input Box ---
+// --- IME Cursor Positioning (no visible overlay, just tell PC IME where the cursor is) ---
 
 QPointF VideoForm::androidToFormPos(int ax, int ay)
 {
@@ -1022,82 +1027,6 @@ QPointF VideoForm::androidToFormPos(int ax, int ay)
     // VideoWidget coord -> VideoForm coord (handles black border offset + DPI)
     QPoint mapped = m_videoWidget->mapTo(this, QPoint(qRound(wx), qRound(wy)));
     return QPointF(mapped);
-}
-
-void VideoForm::showOverlayInput(const QPointF& clickFormPos)
-{
-    if (!m_overlayInput) {
-        m_overlayInput = new QLineEdit(this);
-        m_overlayInput->setParent(this);
-
-        // Style: fully invisible - no visual box, no cursor, but still captures focus & IME
-        m_overlayInput->setStyleSheet(R"(
-            QLineEdit {
-                background: transparent;
-                border: none;
-                padding: 0px;
-                color: transparent;
-                selection-background-color: transparent;
-                selection-color: transparent;
-            }
-            QLineEdit:focus {
-                background: transparent;
-                border: none;
-            }
-        )");
-
-        // Let mouse clicks pass through to the video widget below
-        m_overlayInput->setAttribute(Qt::WA_TransparentForMouseEvents);
-
-        // Enter key: send text to phone
-        connect(m_overlayInput, &QLineEdit::returnPressed, this, [this]() {
-            if (!m_overlayInput || m_overlayInput->text().isEmpty()) return;
-            auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
-            if (!device) return;
-            QString text = m_overlayInput->text();
-            device->setClipboardAndPaste(text);
-            hideOverlayInput();
-        });
-
-        // Install event filter for ESC key
-        m_overlayInput->installEventFilter(this);
-    }
-
-    // Position: place invisible IME anchor at the click point
-    // Use full-width but transparent so IME candidate window follows correctly
-    // The widget is visually invisible (transparent bg/border/text/cursor)
-    int imeWidth = m_videoWidget->width();
-    int imeHeight = 32;
-    int x = m_videoWidget->pos().x();
-    int y = qBound(m_videoWidget->pos().y(),
-                    int(clickFormPos.y()) - imeHeight / 2,
-                    m_videoWidget->pos().y() + m_videoWidget->height() - imeHeight);
-
-    m_overlayInput->setGeometry(x, y, imeWidth, imeHeight);
-    m_overlayInput->clear();
-    m_overlayInput->show();
-    m_overlayInput->setFocus();
-}
-
-void VideoForm::hideOverlayInput()
-{
-    if (m_overlayInput) {
-        m_overlayInput->hide();
-        m_overlayInput->clear();
-        m_lastInputBounds = QRect();
-    }
-}
-
-bool VideoForm::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == m_overlayInput && event->type() == QEvent::KeyPress) {
-        auto keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Escape) {
-            hideOverlayInput();
-            return true;
-        }
-    }
-    return QWidget::eventFilter(watched, event);
 }
 
 void VideoForm::queryFocusedInputBounds()
@@ -1116,22 +1045,17 @@ void VideoForm::queryFocusedInputBounds()
                 }
 
                 QString xml = QString::fromUtf8(proc->readAllStandardOutput());
-                // Parse UIAutomator XML: find focused EditText/EditText subclass
-                // Format: <node ... bounds="[x1,y1][x2,y2]" focused="true" class="android.widget.EditText" ... />
-                // Or: focused="true" may appear after bounds, so we search for EditText with focused="true"
                 QRegularExpression re(
                     R"(class="android\.widget\.EditText"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"[^>]*focused="true")");
                 QRegularExpressionMatch match = re.match(xml);
 
                 if (!match.hasMatch()) {
-                    // Try alternate order: focused before bounds
                     QRegularExpression re2(
                         R"(class="android\.widget\.EditText"[^>]*focused="true"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]")");
                     match = re2.match(xml);
                 }
 
                 if (!match.hasMatch()) {
-                    // Try any focused node (might be a subclass like android.widget.MultiAutoCompleteTextView)
                     QRegularExpression re3(
                         R"(focused="true"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]")");
                     match = re3.match(xml);
@@ -1144,38 +1068,47 @@ void VideoForm::queryFocusedInputBounds()
                     int bottom = match.captured(4).toInt();
                     QRect bounds(left, top, right - left, bottom - top);
                     m_lastInputBounds = bounds;
-                    adjustOverlayByBounds(bounds);
-                    qInfo() << "Overlay adjusted to UIAutomator bounds:" << bounds;
+
+                    // Convert Android input bounds to PC screen coordinates
+                    QPointF topLeft = androidToFormPos(bounds.left(), bounds.top());
+                    QPointF bottomRight = androidToFormPos(bounds.right(), bounds.bottom());
+                    m_imeCursorRect = QRectF(topLeft.x(), topLeft.y(),
+                                             qMax(bottomRight.x() - topLeft.x(), 2.0),
+                                             qMax(bottomRight.y() - topLeft.y(), 16.0));
+
+                    // Tell Qt IME to reposition its candidate window
+                    QInputMethod *im = qApp->inputMethod();
+                    if (im) im->update(Qt::ImCursorRectangle);
+
+                    qInfo() << "IME cursor repositioned to UIAutomator bounds:" << bounds
+                            << "-> PC pos:" << m_imeCursorRect;
                 }
 
                 proc->deleteLater();
             });
 
-    // uiautomator dump to stdout (works on Android 7+, /dev/tty)
-    // Fallback: dump to file then cat
     proc->start(adbPath, QStringList()
                 << "-s" << m_serial
                 << "shell"
                 << "uiautomator" << "dump" << "/dev/tty" << "2>/dev/null");
 }
 
-void VideoForm::adjustOverlayByBounds(const QRect& androidBounds)
+QVariant VideoForm::inputMethodQuery(Qt::InputMethodQuery query) const
 {
-    if (!m_overlayInput || !m_overlayInput->isVisible()) return;
-
-    // Android bounds -> PC VideoForm coordinates
-    // Reposition the invisible IME anchor to the top of the phone's input field
-    QPointF topLeft = androidToFormPos(androidBounds.left(), androidBounds.top());
-
-    int imeWidth = m_videoWidget->width();
-    int imeHeight = 32;
-    int x = m_videoWidget->pos().x();
-    int y = qBound(m_videoWidget->pos().y(),
-                    int(topLeft.y()),
-                    m_videoWidget->pos().y() + m_videoWidget->height() - imeHeight);
-
-    // Keep invisible, just reposition the IME anchor
-    m_overlayInput->setGeometry(x, y, imeWidth, imeHeight);
+    switch (query) {
+    case Qt::ImCursorRectangle:
+        // Tell the PC input method where to show its candidate window
+        // This is the key: returns the phone input field's position on PC screen
+        return m_imeCursorRect;
+    case Qt::ImEnabled:
+        // Enable IME input so inputMethodEvent gets called
+        return m_imeSwitched;
+    case Qt::ImHints:
+        // No special hints (allow all IME features including Chinese input)
+        return static_cast<int>(Qt::ImhNone);
+    default:
+        return QWidget::inputMethodQuery(query);
+    }
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)

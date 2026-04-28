@@ -3,7 +3,6 @@
 
 #include <QPointer>
 #include <QWidget>
-#include <QLineEdit>
 
 #include "../QtScrcpyCore/include/QtScrcpyCore.h"
 
@@ -55,13 +54,9 @@ private:
     void restoreOriginalIme();
     QString runAdbCommand(const QString &serial, const QStringList &args);
 
-    // Overlay input box: show PC input at phone input's position on screen
-    void showOverlayInput(const QPointF& clickFormPos);
-    void hideOverlayInput();
+    // IME cursor positioning: query phone input bounds and position PC IME candidate window
     QPointF androidToFormPos(int ax, int ay);
     void queryFocusedInputBounds();
-    void adjustOverlayByBounds(const QRect& androidBounds);
-    bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -72,6 +67,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
     void inputMethodEvent(QInputMethodEvent *event) override;
+    QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
 
     void paintEvent(QPaintEvent *) override;
     void showEvent(QShowEvent *event) override;
@@ -110,10 +106,10 @@ private:
     QString m_originalIme;
     bool m_imeSwitched = false;
 
-    // Overlay input box
-    QLineEdit* m_overlayInput = nullptr;
-    QRect m_lastInputBounds;    // Android coords of the focused input field
-    QPoint m_lastClickAndroid;  // Last click position in Android coords
+    // IME cursor positioning: phone input field position mapped to PC screen coordinates
+    QRectF m_imeCursorRect;    // PC screen coordinates where the phone's input field is
+    QRect m_lastInputBounds;   // Android coordinates of the focused input field (from UIAutomator)
+    QPoint m_lastClickAndroid; // Last click position in Android coords
 };
 
 #endif // VIDEOFORM_H
