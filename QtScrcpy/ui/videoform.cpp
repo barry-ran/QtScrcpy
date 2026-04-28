@@ -795,7 +795,52 @@ void VideoForm::inputMethodEvent(QInputMethodEvent *event)
         return;
     }
 
+    // When WA_InputMethodEnabled is on, Qt sends key events through the IME pipeline.
+    // Control keys like Backspace, Delete, Enter arrive here as QKeyEvent with
+    // special type QEvent::InputMethodQuery or get eaten by the IME itself.
+    // We need to handle preedit cancellation and forward control keys to Android.
+    if (event->commitString().isEmpty() && event->preeditString().isEmpty()) {
+        // No commit and no preedit update = likely a control key that IME intercepted.
+        // Check the accompanying key event (Qt may embed it via QEvent::KeyPress through IME)
+        // Since we can't access the original keyEvent here, we handle control keys
+        // in keyPressEvent by marking them to bypass IME.
+    }
+
     event->ignore();
+}
+
+bool VideoForm::event(QEvent *event)
+{
+    // CRITICAL: When WA_InputMethodEnabled is true, Qt routes key events through
+    // the IME pipeline. Control keys (Backspace, Delete, Enter, arrows, etc.)
+    // get eaten by the IME (e.g. Sogou shows emoji panel on Backspace) and
+    // never reach keyPressEvent. We must intercept them here and send directly
+    // to Android.
+    if (m_imeSwitched && event->type() == QEvent::KeyPress) {
+        auto keyEvent = static_cast<QKeyEvent*>(event);
+        int key = keyEvent->key();
+        // List of control keys that should bypass IME and go directly to Android
+        if (key == Qt::Key_Backspace || key == Qt::Key_Delete ||
+            key == Qt::Key_Return || key == Qt::Key_Enter ||
+            key == Qt::Key_Tab ||
+            key == Qt::Key_Left || key == Qt::Key_Right ||
+            key == Qt::Key_Up || key == Qt::Key_Down ||
+            key == Qt::Key_Home || key == Qt::Key_End ||
+            key == Qt::Key_PageUp || key == Qt::Key_PageDown) {
+            auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+            if (device && !keyEvent->isAutoRepeat()) {
+                // Cancel any active IME preedit before sending control key
+                QInputMethod *im = qApp->inputMethod();
+                if (im && im->isVisible()) {
+                    im->reset();
+                }
+                // Send control key to Android via the normal key event pipeline
+                emit device->keyEvent(keyEvent, m_videoWidget->frameSize(), m_videoWidget->size());
+                return true; // event handled, don't pass to IME
+            }
+        }
+    }
+    return QWidget::event(event);
 }
 
 void VideoForm::paintEvent(QPaintEvent *paint)
