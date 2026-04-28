@@ -3,11 +3,13 @@
 #include <QFileInfo>
 #include <QInputMethodEvent>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QProcess>
+#include <QRegularExpression>
 #include <QScreen>
 #include <QShortcut>
 #include <QStyle>
@@ -605,6 +607,17 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
             qreal y = localPos.y() / m_videoWidget->size().height();
             QString posTip = QString(R"("pos": {"x": %1, "y": %2})").arg(x).arg(y);
             qInfo() << posTip.toStdString().c_str();
+
+            // Record click position in Android coords for overlay input positioning
+            if (m_imeSwitched && m_videoWidget->frameSize().isValid()) {
+                QPointF widgetPos = m_videoWidget->mapFrom(this, localPos.toPoint());
+                m_lastClickAndroid.setX(qRound(widgetPos.x() * m_videoWidget->frameSize().width() / m_videoWidget->width()));
+                m_lastClickAndroid.setY(qRound(widgetPos.y() * m_videoWidget->frameSize().height() / m_videoWidget->height()));
+                // Show overlay input at click position on the video
+                showOverlayInput(localPos);
+                // Async query focused input bounds via UIAutomator for precise positioning
+                queryFocusedInputBounds();
+            }
         }
     } else {
         if (event->button() == Qt::LeftButton) {
@@ -839,6 +852,11 @@ void VideoForm::resizeEvent(QResizeEvent *event)
             setMinimumWidth(0);
         }
     }
+
+    // Reposition overlay input when window resizes (fullscreen, maximize, etc.)
+    if (m_overlayInput && m_overlayInput->isVisible() && !m_lastInputBounds.isEmpty()) {
+        adjustOverlayByBounds(m_lastInputBounds);
+    }
 }
 
 void VideoForm::closeEvent(QCloseEvent *event)
@@ -989,6 +1007,171 @@ QString VideoForm::runAdbCommand(const QString &serial, const QStringList &args)
     proc.start(adbPath, QStringList() << "-s" << serial << args);
     proc.waitForFinished(5000);
     return QString::fromUtf8(proc.readAllStandardOutput()).trimmed();
+}
+
+// --- Overlay Input Box ---
+
+QPointF VideoForm::androidToFormPos(int ax, int ay)
+{
+    if (!m_videoWidget || !m_frameSize.isValid()) {
+        return QPointF();
+    }
+    // Android coord -> VideoWidget coord
+    qreal wx = ax * m_videoWidget->width() / qreal(m_frameSize.width());
+    qreal wy = ay * m_videoWidget->height() / qreal(m_frameSize.height());
+    // VideoWidget coord -> VideoForm coord (handles black border offset + DPI)
+    return m_videoWidget->mapTo(this, QPointF(wx, wy));
+}
+
+void VideoForm::showOverlayInput(const QPointF& clickFormPos)
+{
+    if (!m_overlayInput) {
+        m_overlayInput = new QLineEdit(this);
+        m_overlayInput->setParent(this);
+
+        // Style: semi-transparent white bg, blue border, matches phone input feel
+        m_overlayInput->setStyleSheet(R"(
+            QLineEdit {
+                background: rgba(255, 255, 255, 230);
+                border: 2px solid #4A90D9;
+                border-radius: 4px;
+                padding: 4px 8px;
+                font-size: 14px;
+                color: #333;
+            }
+            QLineEdit:focus {
+                border: 2px solid #0078D7;
+                background: rgba(255, 255, 255, 245);
+            }
+        )");
+
+        // Enter key: send text to phone
+        connect(m_overlayInput, &QLineEdit::returnPressed, this, [this]() {
+            if (!m_overlayInput || m_overlayInput->text().isEmpty()) return;
+            auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+            if (!device) return;
+            QString text = m_overlayInput->text();
+            device->setClipboardAndPaste(text);
+            hideOverlayInput();
+        });
+
+        // Install event filter for ESC key
+        m_overlayInput->installEventFilter(this);
+    }
+
+    // Position: show above the click point, leaving room for the input box height
+    int inputHeight = 36;
+    int inputWidth = qMin(m_videoWidget->width() - 20, 300);
+
+    // Ensure it stays within the video area
+    int x = qBound(m_videoWidget->pos().x(),
+                    int(clickFormPos.x()) - inputWidth / 2,
+                    m_videoWidget->pos().x() + m_videoWidget->width() - inputWidth);
+    int y = qBound(m_videoWidget->pos().y(),
+                    int(clickFormPos.y()) - inputHeight - 4,
+                    m_videoWidget->pos().y() + m_videoWidget->height() - inputHeight);
+
+    m_overlayInput->setGeometry(x, y, inputWidth, inputHeight);
+    m_overlayInput->clear();
+    m_overlayInput->show();
+    m_overlayInput->setFocus();
+}
+
+void VideoForm::hideOverlayInput()
+{
+    if (m_overlayInput) {
+        m_overlayInput->hide();
+        m_overlayInput->clear();
+        m_lastInputBounds = QRect();
+    }
+}
+
+bool VideoForm::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_overlayInput && event->type() == QEvent::KeyPress) {
+        auto keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Escape) {
+            hideOverlayInput();
+            return true;
+        }
+    }
+    return QWidget::eventFilter(watched, event);
+}
+
+void VideoForm::queryFocusedInputBounds()
+{
+    if (m_serial.isEmpty()) return;
+
+    QString adbPath = QCoreApplication::applicationDirPath() + "/adb";
+
+    // Run uiautomator dump asynchronously
+    QProcess* proc = new QProcess(this);
+    connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, [this, proc](int exitCode) {
+                if (exitCode != 0) {
+                    proc->deleteLater();
+                    return;
+                }
+
+                QString xml = QString::fromUtf8(proc->readAllStandardOutput());
+                // Parse UIAutomator XML: find focused EditText/EditText subclass
+                // Format: <node ... bounds="[x1,y1][x2,y2]" focused="true" class="android.widget.EditText" ... />
+                // Or: focused="true" may appear after bounds, so we search for EditText with focused="true"
+                QRegularExpression re(
+                    R"(class="android\.widget\.EditText"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"[^>]*focused="true")");
+                QRegularExpressionMatch match = re.match(xml);
+
+                if (!match.hasMatch()) {
+                    // Try alternate order: focused before bounds
+                    QRegularExpression re2(
+                        R"(class="android\.widget\.EditText"[^>]*focused="true"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]")");
+                    match = re2.match(xml);
+                }
+
+                if (!match.hasMatch()) {
+                    // Try any focused node (might be a subclass like android.widget.MultiAutoCompleteTextView)
+                    QRegularExpression re3(
+                        R"(focused="true"[^>]*bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]")");
+                    match = re3.match(xml);
+                }
+
+                if (match.hasMatch()) {
+                    int left = match.captured(1).toInt();
+                    int top = match.captured(2).toInt();
+                    int right = match.captured(3).toInt();
+                    int bottom = match.captured(4).toInt();
+                    QRect bounds(left, top, right - left, bottom - top);
+                    m_lastInputBounds = bounds;
+                    adjustOverlayByBounds(bounds);
+                    qInfo() << "Overlay adjusted to UIAutomator bounds:" << bounds;
+                }
+
+                proc->deleteLater();
+            });
+
+    // uiautomator dump to stdout (works on Android 7+, /dev/tty)
+    // Fallback: dump to file then cat
+    proc->start(adbPath, QStringList()
+                << "-s" << m_serial
+                << "shell"
+                << "uiautomator" << "dump" << "/dev/tty" << "2>/dev/null");
+}
+
+void VideoForm::adjustOverlayByBounds(const QRect& androidBounds)
+{
+    if (!m_overlayInput || !m_overlayInput->isVisible()) return;
+
+    // Android bounds -> PC VideoForm coordinates
+    QPointF topLeft = androidToFormPos(androidBounds.left(), androidBounds.top());
+    QPointF bottomRight = androidToFormPos(androidBounds.right(), androidBounds.bottom());
+
+    int width = qMax(int(bottomRight.x() - topLeft.x()), 100);
+    int height = qMax(int(bottomRight.y() - topLeft.y()), 36);
+
+    // Limit max width to video widget width
+    width = qMin(width, m_videoWidget->width());
+
+    m_overlayInput->setGeometry(int(topLeft.x()), int(topLeft.y()), width, height);
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)

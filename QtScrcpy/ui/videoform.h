@@ -3,6 +3,7 @@
 
 #include <QPointer>
 #include <QWidget>
+#include <QLineEdit>
 
 #include "../QtScrcpyCore/include/QtScrcpyCore.h"
 
@@ -54,6 +55,14 @@ private:
     void restoreOriginalIme();
     QString runAdbCommand(const QString &serial, const QStringList &args);
 
+    // Overlay input box: show PC input at phone input's position on screen
+    void showOverlayInput(const QPointF& clickFormPos);
+    void hideOverlayInput();
+    QPointF androidToFormPos(int ax, int ay);
+    void queryFocusedInputBounds();
+    void adjustOverlayByBounds(const QRect& androidBounds);
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -100,6 +109,11 @@ private:
     // IME management: save original IME to restore on disconnect
     QString m_originalIme;
     bool m_imeSwitched = false;
+
+    // Overlay input box
+    QLineEdit* m_overlayInput = nullptr;
+    QRect m_lastInputBounds;    // Android coords of the focused input field
+    QPoint m_lastClickAndroid;  // Last click position in Android coords
 };
 
 #endif // VIDEOFORM_H
