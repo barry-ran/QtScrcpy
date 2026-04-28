@@ -1020,7 +1020,8 @@ QPointF VideoForm::androidToFormPos(int ax, int ay)
     qreal wx = ax * m_videoWidget->width() / qreal(m_frameSize.width());
     qreal wy = ay * m_videoWidget->height() / qreal(m_frameSize.height());
     // VideoWidget coord -> VideoForm coord (handles black border offset + DPI)
-    return m_videoWidget->mapTo(this, QPointF(wx, wy));
+    QPoint mapped = m_videoWidget->mapTo(this, QPoint(qRound(wx), qRound(wy)));
+    return QPointF(mapped);
 }
 
 void VideoForm::showOverlayInput(const QPointF& clickFormPos)
