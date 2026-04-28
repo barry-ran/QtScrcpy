@@ -1030,21 +1030,23 @@ void VideoForm::showOverlayInput(const QPointF& clickFormPos)
         m_overlayInput = new QLineEdit(this);
         m_overlayInput->setParent(this);
 
-        // Style: semi-transparent white bg, blue border, matches phone input feel
+        // Style: fully invisible - no visual box, no cursor, but still captures focus & IME
         m_overlayInput->setStyleSheet(R"(
             QLineEdit {
-                background: rgba(255, 255, 255, 230);
-                border: 2px solid #4A90D9;
-                border-radius: 4px;
-                padding: 4px 8px;
-                font-size: 14px;
-                color: #333;
+                background: transparent;
+                border: none;
+                padding: 0px;
+                color: transparent;
             }
             QLineEdit:focus {
-                border: 2px solid #0078D7;
-                background: rgba(255, 255, 255, 245);
+                background: transparent;
+                border: none;
             }
         )");
+        m_overlayInput->setCursorWidth(0); // Hide blinking cursor
+
+        // Let mouse clicks pass through to the video widget below
+        m_overlayInput->setAttribute(Qt::WA_TransparentForMouseEvents);
 
         // Enter key: send text to phone
         connect(m_overlayInput, &QLineEdit::returnPressed, this, [this]() {
@@ -1060,19 +1062,17 @@ void VideoForm::showOverlayInput(const QPointF& clickFormPos)
         m_overlayInput->installEventFilter(this);
     }
 
-    // Position: show above the click point, leaving room for the input box height
-    int inputHeight = 36;
-    int inputWidth = qMin(m_videoWidget->width() - 20, 300);
-
-    // Ensure it stays within the video area
-    int x = qBound(m_videoWidget->pos().x(),
-                    int(clickFormPos.x()) - inputWidth / 2,
-                    m_videoWidget->pos().x() + m_videoWidget->width() - inputWidth);
+    // Position: place invisible IME anchor at the click point
+    // Use full-width but transparent so IME candidate window follows correctly
+    // The widget is visually invisible (transparent bg/border/text/cursor)
+    int imeWidth = m_videoWidget->width();
+    int imeHeight = 32;
+    int x = m_videoWidget->pos().x();
     int y = qBound(m_videoWidget->pos().y(),
-                    int(clickFormPos.y()) - inputHeight - 4,
-                    m_videoWidget->pos().y() + m_videoWidget->height() - inputHeight);
+                    int(clickFormPos.y()) - imeHeight / 2,
+                    m_videoWidget->pos().y() + m_videoWidget->height() - imeHeight);
 
-    m_overlayInput->setGeometry(x, y, inputWidth, inputHeight);
+    m_overlayInput->setGeometry(x, y, imeWidth, imeHeight);
     m_overlayInput->clear();
     m_overlayInput->show();
     m_overlayInput->setFocus();
@@ -1163,16 +1163,18 @@ void VideoForm::adjustOverlayByBounds(const QRect& androidBounds)
     if (!m_overlayInput || !m_overlayInput->isVisible()) return;
 
     // Android bounds -> PC VideoForm coordinates
+    // Reposition the invisible IME anchor to the top of the phone's input field
     QPointF topLeft = androidToFormPos(androidBounds.left(), androidBounds.top());
-    QPointF bottomRight = androidToFormPos(androidBounds.right(), androidBounds.bottom());
 
-    int width = qMax(int(bottomRight.x() - topLeft.x()), 100);
-    int height = qMax(int(bottomRight.y() - topLeft.y()), 36);
+    int imeWidth = m_videoWidget->width();
+    int imeHeight = 32;
+    int x = m_videoWidget->pos().x();
+    int y = qBound(m_videoWidget->pos().y(),
+                    int(topLeft.y()),
+                    m_videoWidget->pos().y() + m_videoWidget->height() - imeHeight);
 
-    // Limit max width to video widget width
-    width = qMin(width, m_videoWidget->width());
-
-    m_overlayInput->setGeometry(int(topLeft.x()), int(topLeft.y()), width, height);
+    // Keep invisible, just reposition the IME anchor
+    m_overlayInput->setGeometry(x, y, imeWidth, imeHeight);
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)
