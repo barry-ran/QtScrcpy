@@ -1037,13 +1037,14 @@ void VideoForm::showOverlayInput(const QPointF& clickFormPos)
                 border: none;
                 padding: 0px;
                 color: transparent;
+                selection-background-color: transparent;
+                selection-color: transparent;
             }
             QLineEdit:focus {
                 background: transparent;
                 border: none;
             }
         )");
-        m_overlayInput->setCursorWidth(0); // Hide blinking cursor
 
         // Let mouse clicks pass through to the video widget below
         m_overlayInput->setAttribute(Qt::WA_TransparentForMouseEvents);
