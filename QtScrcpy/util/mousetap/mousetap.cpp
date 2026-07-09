@@ -4,7 +4,7 @@
 #ifdef Q_OS_WIN32
 #include "winmousetap.h"
 #endif
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
 #include "cocoamousetap.h"
 #endif
 #ifdef Q_OS_LINUX
@@ -18,7 +18,7 @@ MouseTap *MouseTap::getInstance()
 #ifdef Q_OS_WIN32
         s_instance = new WinMouseTap();
 #endif
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
         s_instance = new CocoaMouseTap();
 #endif
 #ifdef Q_OS_LINUX

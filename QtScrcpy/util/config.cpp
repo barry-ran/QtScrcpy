@@ -4,7 +4,7 @@
 #include <QDebug>
 
 #include "config.h"
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
 #include "path.h"
 #endif
 
@@ -99,6 +99,9 @@
 #define COMMON_SHOW_TOOLBAR_KEY "showToolbar"
 #define COMMON_SHOW_TOOLBAR_DEF true
 
+#define COMMON_DECODE_MODE_KEY "DecodeMode"
+#define COMMON_DECODE_MODE_DEF 0
+
 // device config
 #define SERIAL_WINDOW_RECT_KEY_X "WindowRectX"
 #define SERIAL_WINDOW_RECT_KEY_Y "WindowRectY"
@@ -147,7 +150,7 @@ const QString &Config::getConfigPath()
             // default application dir
             // mac系统当从finder打开app时，默认工作目录不再是可执行程序的目录了，而是"/"
             // 而Qt的获取工作目录的api都依赖QCoreApplication的初始化，所以使用mac api获取当前目录
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
             // get */QtScrcpy.app path
             s_configPath = Path::GetCurrentPath();
             s_configPath += "/Contents/MacOS/config";
@@ -178,6 +181,7 @@ void Config::setUserBootConfig(const UserBootConfig &config)
     m_userData->setValue(COMMON_SIMPLE_MODE_KEY, config.simpleMode);
     m_userData->setValue(COMMON_AUTO_UPDATE_DEVICE_KEY, config.autoUpdateDevice);
     m_userData->setValue(COMMON_SHOW_TOOLBAR_KEY, config.showToolbar);
+    m_userData->setValue(COMMON_DECODE_MODE_KEY, config.decodeMode);
     m_userData->endGroup();
     m_userData->sync();
 }
@@ -202,6 +206,7 @@ UserBootConfig Config::getUserBootConfig()
     config.simpleMode = m_userData->value(COMMON_SIMPLE_MODE_KEY, COMMON_SIMPLE_MODE_DEF).toBool();
     config.autoUpdateDevice = m_userData->value(COMMON_AUTO_UPDATE_DEVICE_KEY, COMMON_AUTO_UPDATE_DEVICE_DEF).toBool();
     config.showToolbar =m_userData->value(COMMON_SHOW_TOOLBAR_KEY,COMMON_SHOW_TOOLBAR_DEF).toBool();
+    config.decodeMode = m_userData->value(COMMON_DECODE_MODE_KEY, COMMON_DECODE_MODE_DEF).toInt();
     m_userData->endGroup();
     return config;
 }

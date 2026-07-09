@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     qputenv("QTSCRCPY_CONFIG_PATH", "../../../config");
 #endif
 
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
     qputenv("QTSCRCPY_ADB_PATH", "../../../../../../QtScrcpy/QtScrcpyCore/src/third_party/adb/mac/adb");
     qputenv("QTSCRCPY_SERVER_PATH", "../../../../../../QtScrcpy/QtScrcpyCore/src/third_party/scrcpy-server");
     qputenv("QTSCRCPY_KEYMAP_PATH", "../../../../../../keymap");
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     }
 
     installTranslator();
-#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
+#if defined(Q_OS_WIN32) || defined(Q_OS_MACOS)
     MouseTap::getInstance()->initMouseEventTap();
 #endif
 
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     int ret = a.exec();
     delete g_mainDlg;
 
-#if defined(Q_OS_WIN32) || defined(Q_OS_OSX)
+#if defined(Q_OS_WIN32) || defined(Q_OS_MACOS)
     MouseTap::getInstance()->quitMouseEventTap();
 #endif
     return ret;

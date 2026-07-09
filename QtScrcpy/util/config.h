@@ -23,6 +23,7 @@ struct UserBootConfig
     bool simpleMode       = false;
     bool autoUpdateDevice = true;
     bool showToolbar      = true;
+    int decodeMode        = 0;  // 0=FFmpeg OpenGL (默认), 1=VideoToolbox Metal (Apple Silicon)
 };
 
 class QSettings;

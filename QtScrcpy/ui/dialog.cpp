@@ -172,6 +172,10 @@ void Dialog::initUI()
     ui->lockOrientationBox->addItem("270");
     ui->lockOrientationBox->setCurrentIndex(0);
 
+    ui->decodeModeBox->addItem(tr("FFmpeg 软解 + OpenGL（通用，CPU 占用较高）"));
+    ui->decodeModeBox->addItem(tr("VideoToolbox 硬解 + Metal（Apple Silicon，CPU 极低）"));
+    ui->decodeModeBox->setCurrentIndex(0);
+
     // 加载IP历史记录
     loadIpHistory();
 
@@ -223,6 +227,7 @@ void Dialog::updateBootConfig(bool toView)
         ui->useSingleModeCheck->setChecked(config.simpleMode);
         ui->autoUpdatecheckBox->setChecked(config.autoUpdateDevice);
         ui->showToolbar->setChecked(config.showToolbar);
+        ui->decodeModeBox->setCurrentIndex(config.decodeMode);
     } else {
         UserBootConfig config;
 
@@ -242,6 +247,7 @@ void Dialog::updateBootConfig(bool toView)
         config.simpleMode = ui->useSingleModeCheck->isChecked();
         config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
         config.showToolbar = ui->showToolbar->isChecked();
+        config.decodeMode = ui->decodeModeBox->currentIndex();
 
         // 保存当前IP到历史记录
         QString currentIp = ui->deviceIpEdt->currentText().trimmed();
@@ -360,6 +366,7 @@ void Dialog::on_startServerBtn_clicked()
     params.codecOptions = Config::getInstance().getCodecOptions();
     params.codecName = Config::getInstance().getCodecName();
     params.scid = QRandomGenerator::global()->bounded(1, 10000) & 0x7FFFFFFF;
+    params.decodeMode = ui->decodeModeBox->currentIndex();
 
     qsc::IDeviceManage::getInstance().connectDevice(params);
 }
@@ -502,7 +509,7 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
     if (!success) {
         return;
     }
-    auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin(), ui->showToolbar->isChecked());
+    auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin(), ui->showToolbar->isChecked(), ui->decodeModeBox->currentIndex());
     videoForm->setSerial(serial);
 
     qsc::IDeviceManage::getInstance().getDevice(serial)->setUserData(static_cast<void*>(videoForm));
