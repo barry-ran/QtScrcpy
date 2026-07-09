@@ -38,6 +38,9 @@ struct MetalVideoWidget::Impl {
     CAMetalLayer *layer = nil;
     // 缓存上次 frame 尺寸避免无谓的 NSEqualRects
     CGFloat lastFrameW = 0, lastFrameH = 0;
+    // drawable 耗尽诊断
+    int drawableFailCount = 0;
+    int drawableTotalCount = 0;
 };
 
 MetalVideoWidget::MetalVideoWidget(QWidget *parent)
@@ -113,7 +116,16 @@ void MetalVideoWidget::renderFrame(CVPixelBufferRef pixelBuffer, int width, int 
         d->layer.drawableSize = CGSizeMake(newW * scale, newH * scale);
 
         id<CAMetalDrawable> draw = [d->layer nextDrawable];
-        if (!draw) return;
+        if (!draw) {
+            d->drawableFailCount++;
+            // 每 60 次失败报告一次，避免日志风暴
+            if (d->drawableFailCount % 60 == 1) {
+                qWarning("MetalWidget: nextDrawable nil (fail %d/%d)",
+                         d->drawableFailCount, d->drawableTotalCount);
+            }
+            return;
+        }
+        d->drawableTotalCount++;
 
         CVMetalTextureRef yR = nil, uvR = nil;
         if (CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, d->tc, pixelBuffer, nil,
@@ -139,11 +151,26 @@ void MetalVideoWidget::renderFrame(CVPixelBufferRef pixelBuffer, int width, int 
         [enc endEncoding];
         [cb presentDrawable:draw];
 
-        CVPixelBufferRetain(pixelBuffer); CFRetain(yR); CFRetain(uvR);
-        [cb addCompletedHandler:^(id<MTLCommandBuffer>) {
-            CVPixelBufferRelease(pixelBuffer); CFRelease(yR); CFRelease(uvR);
+        // 对 pixelBuffer Retain，GPU 完成时 Release
+        // 这确保了 pixel buffer 在整个 GPU 管线生命周期内有效
+        CVPixelBufferRetain(pixelBuffer);
+        CFRetain(yR); CFRetain(uvR);
+        [cb addCompletedHandler:^(id<MTLCommandBuffer> buf) {
+            if (buf.status == MTLCommandBufferStatusError) {
+                const char *errStr = buf.error.localizedDescription.UTF8String;
+                qWarning("MetalWidget: command buffer error: %s",
+                         errStr ? errStr : "unknown");
+            }
+            CVPixelBufferRelease(pixelBuffer);
+            CFRelease(yR);
+            CFRelease(uvR);
         }];
         [cb commit];
+
+        // 释放 Create 规则的引用：GPU handler 中的 CFRelease 只平衡了
+        // 上面的 CFRetain。Create 的原始引用在此处释放。
+        CFRelease(yR);
+        CFRelease(uvR);
     }
 }
 
