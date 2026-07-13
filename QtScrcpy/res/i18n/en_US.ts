@@ -20,12 +20,12 @@
         <translation>no lock</translation>
     </message>
     <message>
-        <source>FFmpeg + OpenGL (Universal, higher CPU)</source>
-        <translation>FFmpeg + OpenGL (Universal, higher CPU)</translation>
+        <source>FFmpeg + OpenGL (Universal Default)</source>
+        <translation>FFmpeg + OpenGL (Universal Default)</translation>
     </message>
     <message>
-        <source>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</source>
-        <translation>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</translation>
+        <source>VideoToolbox + Metal (Apple Silicon Only)</source>
+        <translation>VideoToolbox + Metal (Apple Silicon Only)</translation>
     </message>
     <message>
         <source>Notice</source>
@@ -220,8 +220,8 @@
         <translation>Decode Mode:</translation>
     </message>
     <message>
-        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</source>
-        <translation>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</translation>
+        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only</source>
+        <translation>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only</translation>
     </message>
     <message>
         <source>lock orientation:</source>

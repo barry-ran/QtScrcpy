@@ -28,7 +28,6 @@
 
 #ifdef Q_OS_MACOS
 #include "metalvideowindow.h"
-#include "../../QtScrcpyCore/src/device/decoder/vtdecoder.h"
 #endif
 
 VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int decodeMode, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin), m_decodeMode(decodeMode)

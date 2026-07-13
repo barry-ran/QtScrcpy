@@ -20,12 +20,12 @@
         <translation>ロックなし</translation>
     </message>
     <message>
-        <source>FFmpeg + OpenGL (Universal, higher CPU)</source>
-        <translation type="unfinished"></translation>
+        <source>FFmpeg + OpenGL (Universal Default)</source>
+        <translation>FFmpeg + OpenGL（ユニバーサルデフォルト）</translation>
     </message>
     <message>
-        <source>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</source>
-        <translation type="unfinished"></translation>
+        <source>VideoToolbox + Metal (Apple Silicon Only)</source>
+        <translation>VideoToolbox + Metal（Apple Silicon専用）</translation>
     </message>
     <message>
         <source>Notice</source>
@@ -217,11 +217,11 @@
     </message>
     <message>
         <source>Decode Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>デコードモード：</translation>
     </message>
     <message>
-        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</source>
-        <translation type="unfinished"></translation>
+        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only</source>
+        <translation>FFmpeg：互換性が高い；VideoToolbox：Apple Siliconのみ</translation>
     </message>
     <message>
         <source>lock orientation:</source>

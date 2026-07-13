@@ -20,12 +20,12 @@
         <translation>不锁定</translation>
     </message>
     <message>
-        <source>FFmpeg + OpenGL (Universal, higher CPU)</source>
-        <translation></translation>
+        <source>FFmpeg + OpenGL (Universal Default)</source>
+        <translation>FFmpeg + OpenGL（通用默认）</translation>
     </message>
     <message>
-        <source>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</source>
-        <translation></translation>
+        <source>VideoToolbox + Metal (Apple Silicon Only)</source>
+        <translation>VideoToolbox + Metal（Apple Silicon 专用）</translation>
     </message>
     <message>
         <source>Notice</source>
@@ -217,11 +217,11 @@
     </message>
     <message>
         <source>Decode Mode:</source>
-        <translation></translation>
+        <translation>解码模式：</translation>
     </message>
     <message>
-        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</source>
-        <translation></translation>
+        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only</source>
+        <translation>FFmpeg：兼容性更好；VideoToolbox：仅 Apple Silicon</translation>
     </message>
     <message>
         <source>lock orientation:</source>

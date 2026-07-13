@@ -37,6 +37,14 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
 
     updateBootConfig(true);
 
+    // Intel Mac 上如果配置文件遗留 decodeMode=1，强制重置为 0
+    // （VideoToolbox 选项在 initUI() 中已被移除）
+#if defined(Q_OS_MACOS) && !defined(__arm64__)
+    if (ui->decodeModeBox->currentIndex() != 0) {
+        ui->decodeModeBox->setCurrentIndex(0);
+    }
+#endif
+
     on_useSingleModeCheck_clicked();
     on_updateDevice_clicked();
 
@@ -172,9 +180,18 @@ void Dialog::initUI()
     ui->lockOrientationBox->addItem("270");
     ui->lockOrientationBox->setCurrentIndex(0);
 
-    ui->decodeModeBox->addItem(tr("FFmpeg + OpenGL (Universal, higher CPU)"));
-    ui->decodeModeBox->addItem(tr("VideoToolbox + Metal (Apple Silicon, ultra-low CPU)"));
+    ui->decodeModeBox->addItem(tr("FFmpeg + OpenGL (Universal Default)"));
+    ui->decodeModeBox->addItem(tr("VideoToolbox + Metal (Apple Silicon Only)"));
     ui->decodeModeBox->setCurrentIndex(0);
+
+#ifndef Q_OS_MACOS
+    // 非 macOS：隐藏整个解码模式控件行
+    ui->decodeModeLabel->hide();
+    ui->decodeModeBox->hide();
+#elif !defined(__arm64__)
+    // Intel Mac：移除 VideoToolbox 选项，用户只看到 FFmpeg
+    ui->decodeModeBox->removeItem(1);
+#endif
 
     // 加载IP历史记录
     loadIpHistory();

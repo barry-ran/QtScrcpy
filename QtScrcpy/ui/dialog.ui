@@ -449,7 +449,7 @@
                </sizepolicy>
               </property>
               <property name="toolTip">
-               <string>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</string>
+               <string>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only</string>
               </property>
              </widget>
             </item>
