@@ -436,7 +436,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>解码方式：</string>
+               <string>Decode Mode:</string>
               </property>
              </widget>
             </item>
@@ -449,7 +449,7 @@
                </sizepolicy>
               </property>
               <property name="toolTip">
-               <string>FFmpeg 软解兼容性好; VideoToolbox 仅在 Apple Silicon Mac 上可用，CPU 占用极低</string>
+               <string>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</string>
               </property>
              </widget>
             </item>

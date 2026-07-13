@@ -172,8 +172,8 @@ void Dialog::initUI()
     ui->lockOrientationBox->addItem("270");
     ui->lockOrientationBox->setCurrentIndex(0);
 
-    ui->decodeModeBox->addItem(tr("FFmpeg 软解 + OpenGL（通用，CPU 占用较高）"));
-    ui->decodeModeBox->addItem(tr("VideoToolbox 硬解 + Metal（Apple Silicon，CPU 极低）"));
+    ui->decodeModeBox->addItem(tr("FFmpeg + OpenGL (Universal, higher CPU)"));
+    ui->decodeModeBox->addItem(tr("VideoToolbox + Metal (Apple Silicon, ultra-low CPU)"));
     ui->decodeModeBox->setCurrentIndex(0);
 
     // 加载IP历史记录
