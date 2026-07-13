@@ -20,6 +20,14 @@
         <translation>잠금 없음</translation>
     </message>
     <message>
+        <source>FFmpeg + OpenGL (Universal, higher CPU)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Notice</source>
         <translation>알림</translation>
     </message>
@@ -57,6 +65,14 @@
     <message>
         <source>QuickAssistant</source>
         <translation>빠른 도우미</translation>
+    </message>
+    <message>
+        <source>If you need more professional PC remote software, you can try the following software:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QuickDesk</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You can contact me with telegram &lt;https://t.me/+Ylf_5V_rDCMyODQ1&gt;</source>
@@ -118,12 +134,20 @@
         <translation>스크린샷</translation>
     </message>
     <message>
+        <source>copy clipboard text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>open screen</source>
         <translation>화면 열기</translation>
     </message>
     <message>
         <source>group control</source>
         <translation>그룹 제어</translation>
+    </message>
+    <message>
+        <source>edit keymap</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -190,6 +214,14 @@
     <message>
         <source>Double click to connect:</source>
         <translation>더블 클릭하여 연결:</translation>
+    </message>
+    <message>
+        <source>Decode Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>lock orientation:</source>
@@ -316,6 +348,30 @@
     <message>
         <source>record save path:</source>
         <translation>기록 저장 경로:</translation>
+    </message>
+    <message>
+        <source>Codec Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default (Auto)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MTK Encoder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open MTK encoder advanced settings: optimization levels, reset, auto-reset, etc. For MediaTek devices only.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encoder Settings...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

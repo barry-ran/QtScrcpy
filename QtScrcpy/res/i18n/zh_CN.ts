@@ -20,6 +20,14 @@
         <translation>不锁定</translation>
     </message>
     <message>
+        <source>FFmpeg + OpenGL (Universal, higher CPU)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>Notice</source>
         <translation>提示</translation>
     </message>
@@ -57,6 +65,14 @@
     <message>
         <source>QuickAssistant</source>
         <translation>极限手游助手</translation>
+    </message>
+    <message>
+        <source>If you need more professional PC remote software, you can try the following software:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>QuickDesk</source>
+        <translation></translation>
     </message>
     <message>
         <source>You can contact me with telegram &lt;https://t.me/+Ylf_5V_rDCMyODQ1&gt;</source>
@@ -118,12 +134,20 @@
         <translation>截图</translation>
     </message>
     <message>
+        <source>copy clipboard text</source>
+        <translation></translation>
+    </message>
+    <message>
         <source>open screen</source>
         <translation>打开屏幕</translation>
     </message>
     <message>
         <source>group control</source>
         <translation>群控</translation>
+    </message>
+    <message>
+        <source>edit keymap</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -190,6 +214,14 @@
     <message>
         <source>Double click to connect:</source>
         <translation>双击连接：</translation>
+    </message>
+    <message>
+        <source>Decode Mode:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</source>
+        <translation></translation>
     </message>
     <message>
         <source>lock orientation:</source>
@@ -316,6 +348,30 @@
     <message>
         <source>record save path:</source>
         <translation>录像保存路径</translation>
+    </message>
+    <message>
+        <source>Codec Mode:</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Default (Auto)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>MTK Encoder</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Open MTK encoder advanced settings: optimization levels, reset, auto-reset, etc. For MediaTek devices only.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Encoder Settings...</source>
+        <translation></translation>
     </message>
 </context>
 </TS>

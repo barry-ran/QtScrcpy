@@ -20,6 +20,14 @@
         <translation>no lock</translation>
     </message>
     <message>
+        <source>FFmpeg + OpenGL (Universal, higher CPU)</source>
+        <translation>FFmpeg + OpenGL (Universal, higher CPU)</translation>
+    </message>
+    <message>
+        <source>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</source>
+        <translation>VideoToolbox + Metal (Apple Silicon, ultra-low CPU)</translation>
+    </message>
+    <message>
         <source>Notice</source>
         <translation>Notice</translation>
     </message>
@@ -57,6 +65,14 @@
     <message>
         <source>QuickAssistant</source>
         <translation>QuickAssistant</translation>
+    </message>
+    <message>
+        <source>If you need more professional PC remote software, you can try the following software:</source>
+        <translation>If you need more professional PC remote software, you can try the following software:</translation>
+    </message>
+    <message>
+        <source>QuickDesk</source>
+        <translation>QuickDesk</translation>
     </message>
     <message>
         <source>You can contact me with telegram &lt;https://t.me/+Ylf_5V_rDCMyODQ1&gt;</source>
@@ -118,12 +134,20 @@
         <translation>screen shot</translation>
     </message>
     <message>
+        <source>copy clipboard text</source>
+        <translation>copy clipboard text</translation>
+    </message>
+    <message>
         <source>open screen</source>
         <translation>open screen</translation>
     </message>
     <message>
         <source>group control</source>
         <translation>group control</translation>
+    </message>
+    <message>
+        <source>edit keymap</source>
+        <translation>edit keymap</translation>
     </message>
 </context>
 <context>
@@ -190,6 +214,14 @@
     <message>
         <source>Double click to connect:</source>
         <translation>Double click to connect:</translation>
+    </message>
+    <message>
+        <source>Decode Mode:</source>
+        <translation>Decode Mode:</translation>
+    </message>
+    <message>
+        <source>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</source>
+        <translation>FFmpeg: better compatibility; VideoToolbox: Apple Silicon only, ultra-low CPU usage</translation>
     </message>
     <message>
         <source>lock orientation:</source>
@@ -316,6 +348,30 @@
     <message>
         <source>record save path:</source>
         <translation>record save path:</translation>
+    </message>
+    <message>
+        <source>Codec Mode:</source>
+        <translation>Codec Mode:</translation>
+    </message>
+    <message>
+        <source>Default (Auto)</source>
+        <translation>Default (Auto)</translation>
+    </message>
+    <message>
+        <source>MTK Encoder</source>
+        <translation>MTK Encoder</translation>
+    </message>
+    <message>
+        <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
+        <translation>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</translation>
+    </message>
+    <message>
+        <source>Open MTK encoder advanced settings: optimization levels, reset, auto-reset, etc. For MediaTek devices only.</source>
+        <translation>Open MTK encoder advanced settings: optimization levels, reset, auto-reset, etc. For MediaTek devices only.</translation>
+    </message>
+    <message>
+        <source>Encoder Settings...</source>
+        <translation>Encoder Settings...</translation>
     </message>
 </context>
 </TS>
