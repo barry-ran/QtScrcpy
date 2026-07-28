@@ -62,9 +62,11 @@ bool VideoForm::isMetalMode() const
 
 QWidget* VideoForm::videoWidget() const
 {
+#ifdef Q_OS_MACOS
     if (isMetalMode()) {
         return m_metalWidget.data();
     }
+#endif
     return m_videoWidget.data();
 }
 
