@@ -89,8 +89,11 @@ if (NOT MSVC)
     # lots of warnings and all warnings as errors
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 
-    # disable some warning
-    add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions -Wno-overloaded-virtual)
+    # disable clang-only warnings
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|AppleClang")
+        add_compile_options(-Wno-nested-anon-types -Wno-c++17-extensions)
+    endif()
+    add_compile_options(-Wno-overloaded-virtual)
 endif()
 
 #
