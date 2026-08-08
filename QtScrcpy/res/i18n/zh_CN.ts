@@ -521,5 +521,87 @@
         <source>refresh</source>
         <translation>刷新</translation>
     </message>
+
+<message>
+        <source>Codec Mode:</source>
+        <translation>编码模式：</translation>
+    </message>
+<message>
+        <source>Default (Auto)</source>
+        <translation>默认（自动）</translation>
+    </message>
+<message>
+        <source>MTK Encoder</source>
+        <translation>MTK 编码器</translation>
+    </message>
+<message>
+        <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
+        <translation>编码器选择：默认使用系统自动选择；MTK 启用精细调优。仅限 MediaTek 设备。</translation>
+    </message>
+<message>
+        <source>Open MTK encoder advanced settings: optimization levels for visual quality and performance. For MediaTek devices only.</source>
+        <translation>打开 MTK 编码器高级设置：画质与性能优化级别调优。仅限 MediaTek 设备。</translation>
+    </message>
+<message>
+        <source>Encoder Settings...</source>
+        <translation>编码器设置...</translation>
+    </message>
+</context>
+<context>
+    <name>MtkConfigDialog</name>
+    <message>
+        <source>Encoder Settings (MediaTek Only)</source>
+        <translation>编码器设置（仅限 MediaTek）</translation>
+    </message>
+    <message>
+        <source>This feature is for MediaTek (MTK) devices only.
+Using on non-MTK devices may cause encoding failure or visual artifacts.</source>
+        <translation>此功能仅适用于 MediaTek (MTK) 设备。
+在非 MTK 设备上使用可能导致编码失败或画面异常。</translation>
+    </message>
+    <message>
+        <source>Encoding Optimization Level</source>
+        <translation>编码优化级别</translation>
+    </message>
+    <message>
+        <source>Profile:</source>
+        <translation>方案：</translation>
+    </message>
+    <message>
+        <source>Game Mode (20Mbps, QP≤28)</source>
+        <translation>游戏模式（20Mbps, QP≤28）</translation>
+    </message>
+    <message>
+        <source>Balanced (8Mbps, QP≤35)</source>
+        <translation>均衡模式（8Mbps, QP≤35）</translation>
+    </message>
+    <message>
+        <source>Power Saver (4Mbps, QP≤35)</source>
+        <translation>省电模式（4Mbps, QP≤35）</translation>
+    </message>
+    <message>
+        <source>VBR + hard QP cap at 28 + short GOP. The strongest anti-blur shield for real-time gaming.</source>
+        <translation>VBR + QP硬上限28 + 短GOP。最强大的防模糊护盾，适用于实时游戏。</translation>
+    </message>
+    <message>
+        <source>Standard anti-blur protection with optimal visual quality. Recommended for daily use.</source>
+        <translation>标准防模糊保护，最佳视觉质量。推荐日常使用。</translation>
+    </message>
+    <message>
+        <source>Maximum power saving: low-power ME + single ref frame. Saves most encoder power for non-gaming scenarios.</source>
+        <translation>最大省电：低功耗ME + 单参考帧。非游戏场景下最大程度节省编码器功耗。</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 28 + short GOP (5 frames). Hard ceiling blocks Sticky QP completely — best for real-time gaming.</source>
+        <translation>VBR + QP上限28 + 短GOP（5帧）。硬上限完全阻止Sticky QP — 最适合实时游戏。</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 35 + standard GOP. Matches default visual quality while preventing QP runaway. Ideal for daily use.</source>
+        <translation>VBR + QP上限35 + 标准GOP。保持默认视觉质量同时防止QP失控。日常使用理想选择。</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 35 + disabled visual optimizations + low-power ME + single ref frame. Maximum power saving for non-intensive scenarios.</source>
+        <translation>VBR + QP上限35 + 关闭视觉优化 + 低功耗ME + 单参考帧。非高强度场景最大化省电。</translation>
+    </message>
 </context>
 </TS>

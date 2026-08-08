@@ -13,6 +13,7 @@
 #include "adbprocess.h"
 #include "../QtScrcpyCore/include/QtScrcpyCore.h"
 #include "audio/audiooutput.h"
+#include "mtkconfigdialog.h"
 
 namespace Ui
 {
@@ -72,6 +73,9 @@ private slots:
 
     void on_autoUpdatecheckBox_toggled(bool checked);
 
+    void on_codecModeBox_currentIndexChanged(int index);
+    void on_mtkConfigBtn_clicked();
+
     void on_videoSourceBox_currentIndexChanged(int index);
     void on_refreshCameraBtn_clicked();
     void on_refreshAppsBtn_clicked();
@@ -98,6 +102,7 @@ private:
     void savePortHistory(const QString &port);
 
     void showPortEditMenu(const QPoint &pos);
+    void syncMtkLevelToUi();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -123,6 +128,9 @@ private:
     QAction *m_quit;
     AudioOutput m_audioOutput;
     QTimer m_autoUpdatetimer;
+    quint32 m_prevBitRate = 2000000;
+    int m_prevMaxSizeIndex = 0;
+    QPointer<MtkConfigDialog> m_mtkDialog;
 };
 
 #endif // DIALOG_H

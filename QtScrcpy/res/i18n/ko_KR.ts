@@ -349,29 +349,87 @@
         <source>record save path:</source>
         <translation>기록 저장 경로:</translation>
     </message>
-    <message>
+
+<message>
         <source>Codec Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>코덱 모드：</translation>
     </message>
-    <message>
+<message>
         <source>Default (Auto)</source>
-        <translation type="unfinished"></translation>
+        <translation>기본값（자동）</translation>
     </message>
-    <message>
+<message>
         <source>MTK Encoder</source>
-        <translation type="unfinished"></translation>
+        <translation>MTK 인코더</translation>
     </message>
-    <message>
+<message>
         <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
-        <translation type="unfinished"></translation>
+        <translation>인코더 선택：기본값은 시스템 자동 선택. MTK는 세부 튜닝을 활성화합니다. MediaTek 기기 전용.</translation>
     </message>
-    <message>
-        <source>Open MTK encoder advanced settings: optimization levels, reset, auto-reset, etc. For MediaTek devices only.</source>
-        <translation type="unfinished"></translation>
+<message>
+        <source>Open MTK encoder advanced settings: optimization levels for visual quality and performance. For MediaTek devices only.</source>
+        <translation>MTK 인코더 고급 설정 열기：화질 및 성능 최적화 레벨. MediaTek 기기 전용.</translation>
     </message>
-    <message>
+<message>
         <source>Encoder Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>인코더 설정...</translation>
+    </message>
+</context>
+<context>
+    <name>MtkConfigDialog</name>
+    <message>
+        <source>Encoder Settings (MediaTek Only)</source>
+        <translation>인코더 설정 (MediaTek 전용)</translation>
+    </message>
+    <message>
+        <source>This feature is for MediaTek (MTK) devices only.
+Using on non-MTK devices may cause encoding failure or visual artifacts.</source>
+        <translation>이 기능은 MediaTek(MTK) 기기 전용입니다.
+비 MTK 기기에서 사용하면 인코딩 실패 또는 화면 이상이 발생할 수 있습니다.</translation>
+    </message>
+    <message>
+        <source>Encoding Optimization Level</source>
+        <translation>인코딩 최적화 레벨</translation>
+    </message>
+    <message>
+        <source>Profile:</source>
+        <translation>프로필:</translation>
+    </message>
+    <message>
+        <source>Game Mode (20Mbps, QP≤28)</source>
+        <translation>게임 모드 (20Mbps, QP≤28)</translation>
+    </message>
+    <message>
+        <source>Balanced (8Mbps, QP≤35)</source>
+        <translation>균형 (8Mbps, QP≤35)</translation>
+    </message>
+    <message>
+        <source>Power Saver (4Mbps, QP≤35)</source>
+        <translation>절전 (4Mbps, QP≤35)</translation>
+    </message>
+    <message>
+        <source>VBR + hard QP cap at 28 + short GOP. The strongest anti-blur shield for real-time gaming.</source>
+        <translation>VBR + QP 하드 상한 28 + 짧은 GOP. 실시간 게임을 위한 최강의 안티 블러 실드.</translation>
+    </message>
+    <message>
+        <source>Standard anti-blur protection with optimal visual quality. Recommended for daily use.</source>
+        <translation>표준 안티 블러 보호, 최적의 화질. 일상 사용에 권장.</translation>
+    </message>
+    <message>
+        <source>Maximum power saving: low-power ME + single ref frame. Saves most encoder power for non-gaming scenarios.</source>
+        <translation>최대 절전: 저전력 ME + 단일 참조 프레임. 비게임 시나리오에서 인코더 전력 최대 절약.</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 28 + short GOP (5 frames). Hard ceiling blocks Sticky QP completely — best for real-time gaming.</source>
+        <translation>VBR + QP 상한 28 + 짧은 GOP (5프레임). 하드 상한이 Sticky QP를 완전히 차단 — 실시간 게임에 최적.</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 35 + standard GOP. Matches default visual quality while preventing QP runaway. Ideal for daily use.</source>
+        <translation>VBR + QP 상한 35 + 표준 GOP. QP 폭주를 방지하며 기본 화질 유지. 일상 사용에 이상적.</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 35 + disabled visual optimizations + low-power ME + single ref frame. Maximum power saving for non-intensive scenarios.</source>
+        <translation>VBR + QP 상한 35 + 비주얼 최적화 비활성화 + 저전력 ME + 단일 참조 프레임. 비집중 시나리오용 최대 절전.</translation>
     </message>
 </context>
 </TS>

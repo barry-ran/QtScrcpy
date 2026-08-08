@@ -522,4 +522,61 @@
         <translation>refresh</translation>
     </message>
 </context>
+<context>
+    <name>MtkConfigDialog</name>
+    <message>
+        <source>Encoder Settings (MediaTek Only)</source>
+        <translation>Encoder Settings (MediaTek Only)</translation>
+    </message>
+    <message>
+        <source>This feature is for MediaTek (MTK) devices only.
+Using on non-MTK devices may cause encoding failure or visual artifacts.</source>
+        <translation>This feature is for MediaTek (MTK) devices only.
+Using on non-MTK devices may cause encoding failure or visual artifacts.</translation>
+    </message>
+    <message>
+        <source>Encoding Optimization Level</source>
+        <translation>Encoding Optimization Level</translation>
+    </message>
+    <message>
+        <source>Profile:</source>
+        <translation>Profile:</translation>
+    </message>
+    <message>
+        <source>Game Mode (20Mbps, QP≤28)</source>
+        <translation>Game Mode (20Mbps, QP≤28)</translation>
+    </message>
+    <message>
+        <source>Balanced (8Mbps, QP≤35)</source>
+        <translation>Balanced (8Mbps, QP≤35)</translation>
+    </message>
+    <message>
+        <source>Power Saver (4Mbps, QP≤35)</source>
+        <translation>Power Saver (4Mbps, QP≤35)</translation>
+    </message>
+    <message>
+        <source>VBR + hard QP cap at 28 + short GOP. The strongest anti-blur shield for real-time gaming.</source>
+        <translation>VBR + hard QP cap at 28 + short GOP. The strongest anti-blur shield for real-time gaming.</translation>
+    </message>
+    <message>
+        <source>Standard anti-blur protection with optimal visual quality. Recommended for daily use.</source>
+        <translation>Standard anti-blur protection with optimal visual quality. Recommended for daily use.</translation>
+    </message>
+    <message>
+        <source>Maximum power saving: low-power ME + single ref frame. Saves most encoder power for non-gaming scenarios.</source>
+        <translation>Maximum power saving: low-power ME + single ref frame. Saves most encoder power for non-gaming scenarios.</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 28 + short GOP (5 frames). Hard ceiling blocks Sticky QP completely — best for real-time gaming.</source>
+        <translation>VBR + QP cap at 28 + short GOP (5 frames). Hard ceiling blocks Sticky QP completely — best for real-time gaming.</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 35 + standard GOP. Matches default visual quality while preventing QP runaway. Ideal for daily use.</source>
+        <translation>VBR + QP cap at 35 + standard GOP. Matches default visual quality while preventing QP runaway. Ideal for daily use.</translation>
+    </message>
+    <message>
+        <source>VBR + QP cap at 35 + disabled visual optimizations + low-power ME + single ref frame. Maximum power saving for non-intensive scenarios.</source>
+        <translation>VBR + QP cap at 35 + disabled visual optimizations + low-power ME + single ref frame. Maximum power saving for non-intensive scenarios.</translation>
+    </message>
+</context>
 </TS>

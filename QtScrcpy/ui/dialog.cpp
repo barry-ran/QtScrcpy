@@ -198,6 +198,8 @@ void Dialog::initUI()
 
     ui->bitRateEdit->setValidator(new QIntValidator(1, 99999, this));
 
+    ui->mtkConfigBtn->setVisible(false);
+
     ui->maxSizeBox->addItem("640");
     ui->maxSizeBox->addItem("720");
     ui->maxSizeBox->addItem("1080");
@@ -423,6 +425,12 @@ void Dialog::updateBootConfig(bool toView)
         ui->autoUpdatecheckBox->setChecked(config.autoUpdateDevice);
         ui->showToolbar->setChecked(config.showToolbar);
         ui->decodeModeBox->setCurrentIndex(config.decodeMode);
+        ui->codecModeBox->setCurrentIndex(config.codecModeIndex);
+
+        // Restore MTK config dialog state (if dialog was previously opened)
+        if (m_mtkDialog) {
+            m_mtkDialog->setLevel(config.mtkLevel);
+        }
         ui->videoSourceBox->setCurrentIndex(config.videoSource);
         ui->cameraFacingBox->setCurrentIndex(qBound(0, config.cameraFacing, 1));
         if (m_advancedDisplayGroup) {
@@ -460,6 +468,13 @@ void Dialog::updateBootConfig(bool toView)
         config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
         config.showToolbar = ui->showToolbar->isChecked();
         config.decodeMode = ui->decodeModeBox->currentIndex();
+        config.codecModeIndex = ui->codecModeBox->currentIndex();
+
+        // Save MTK config dialog state (if opened)
+        if (m_mtkDialog) {
+            config.mtkLevel = m_mtkDialog->selectedLevel();
+        }
+
         config.videoSource = ui->videoSourceBox->currentIndex();
         config.cameraFacing = qMin(ui->cameraFacingBox->currentIndex(), 1);
         if (m_advancedDisplayGroup) {
@@ -628,8 +643,29 @@ void Dialog::on_startServerBtn_clicked()
     params.pushFilePath = Config::getInstance().getPushFilePath();
     params.gameScript = camera ? QString() : getGameScript(ui->gameBox->currentText());
     params.logLevel = Config::getInstance().getLogLevel();
-    params.codecOptions = Config::getInstance().getCodecOptions();
-    params.codecName = Config::getInstance().getCodecName();
+    // Apply MTK codec preset from config dialog (if MTK mode selected)
+    if (ui->codecModeBox->currentIndex() == 1) {
+        // Restore from saved dialog state or use defaults
+        int mtkLevel = 1;
+        if (m_mtkDialog) {
+            mtkLevel = m_mtkDialog->selectedLevel();
+        } else {
+            UserBootConfig config = Config::getInstance().getUserBootConfig();
+            mtkLevel = config.mtkLevel;
+        }
+        QString codecOptions;
+        QString codecName;
+        quint32 bitRate = 0;
+        MtkConfigDialog::buildLevelParams(mtkLevel, codecOptions, codecName, bitRate);
+        params.codecOptions = codecOptions;
+        params.codecName = codecName;
+        if (bitRate > 0) {
+            params.bitRate = bitRate;
+        }
+    } else {
+        params.codecOptions = Config::getInstance().getCodecOptions();
+        params.codecName = Config::getInstance().getCodecName();
+    }
     params.scid = QRandomGenerator::global()->bounded(1, 10000) & 0x7FFFFFFF;
     params.decodeMode = ui->decodeModeBox->currentIndex();
     // Disabled widgets may remain checked from persisted settings. Advanced
@@ -1400,4 +1436,108 @@ void Dialog::showPortEditMenu(const QPoint &pos)
     menu->addAction(clearHistoryAction);
     menu->exec(ui->devicePortEdt->lineEdit()->mapToGlobal(pos));
     delete menu;
+}
+
+
+void Dialog::on_codecModeBox_currentIndexChanged(int index)
+{
+    // Block signals while updating bitrate to avoid recursive calls
+    ui->bitRateEdit->blockSignals(true);
+    ui->bitRateBox->blockSignals(true);
+
+    if (index == 0) {
+        // Default: restore previous settings
+        if (m_prevBitRate == 0) {
+            ui->bitRateEdit->setText("2");
+            ui->bitRateBox->setCurrentText("Mbps");
+        } else if (m_prevBitRate % 1000000 == 0) {
+            ui->bitRateEdit->setText(QString::number(m_prevBitRate / 1000000));
+            ui->bitRateBox->setCurrentText("Mbps");
+        } else {
+            ui->bitRateEdit->setText(QString::number(m_prevBitRate / 1000));
+            ui->bitRateBox->setCurrentText("Kbps");
+        }
+        // Restore previous max size
+        ui->maxSizeBox->setCurrentIndex(m_prevMaxSizeIndex);
+    } else {
+        // MTK mode: save current settings for Default-mode restoration
+        m_prevBitRate = getBitRate();
+        m_prevMaxSizeIndex = ui->maxSizeBox->currentIndex();
+
+        // Sync bitrate & maxSize to match the saved encoder level
+        UserBootConfig config = Config::getInstance().getUserBootConfig();
+        int level = config.mtkLevel;
+        quint32 bitrate = MtkConfigDialog::levelBitRate(level);
+        if (bitrate > 0) {
+            if (bitrate % 1000000 == 0) {
+                ui->bitRateEdit->setText(QString::number(bitrate / 1000000));
+                ui->bitRateBox->setCurrentText("Mbps");
+            } else {
+                ui->bitRateEdit->setText(QString::number(bitrate / 1000));
+                ui->bitRateBox->setCurrentText("Kbps");
+            }
+        }
+        int maxSizeIdx = MtkConfigDialog::levelMaxSizeIndex(level);
+        if (maxSizeIdx >= 0) {
+            ui->maxSizeBox->setCurrentIndex(maxSizeIdx);
+        }
+    }
+
+    // Show/hide MTK config button based on mode
+    ui->mtkConfigBtn->setVisible(index != 0);
+
+    ui->bitRateEdit->blockSignals(false);
+    ui->bitRateBox->blockSignals(false);
+}
+
+void Dialog::on_mtkConfigBtn_clicked()
+{
+    if (!m_mtkDialog) {
+        m_mtkDialog = new MtkConfigDialog(this);
+        // Only restore saved level on first creation — subsequent opens
+        // preserve the user's last selection in the dialog
+        UserBootConfig bootConfig = Config::getInstance().getUserBootConfig();
+        m_mtkDialog->setLevel(bootConfig.mtkLevel);
+
+        // Sync bitrate & maxSize UI in real-time as user switches levels
+        connect(m_mtkDialog.data(), &MtkConfigDialog::levelChanged,
+                this, &Dialog::syncMtkLevelToUi);
+    }
+
+    m_mtkDialog->exec();
+
+    // Sync after dialog closes — covers the case where the initial level
+    // was restored via setLevel() above and no levelChanged signal fired.
+    syncMtkLevelToUi();
+}
+
+void Dialog::syncMtkLevelToUi()
+{
+    if (!m_mtkDialog || ui->codecModeBox->currentIndex() != 1) {
+        return;
+    }
+
+    int level = m_mtkDialog->selectedLevel();
+
+    // Update bitrate
+    quint32 bitrate = MtkConfigDialog::levelBitRate(level);
+    if (bitrate > 0) {
+        ui->bitRateEdit->blockSignals(true);
+        ui->bitRateBox->blockSignals(true);
+        if (bitrate % 1000000 == 0) {
+            ui->bitRateEdit->setText(QString::number(bitrate / 1000000));
+            ui->bitRateBox->setCurrentText("Mbps");
+        } else {
+            ui->bitRateEdit->setText(QString::number(bitrate / 1000));
+            ui->bitRateBox->setCurrentText("Kbps");
+        }
+        ui->bitRateEdit->blockSignals(false);
+        ui->bitRateBox->blockSignals(false);
+    }
+
+    // Update max size (only when the level prescribes one)
+    int maxSizeIdx = MtkConfigDialog::levelMaxSizeIndex(level);
+    if (maxSizeIdx >= 0) {
+        ui->maxSizeBox->setCurrentIndex(maxSizeIdx);
+    }
 }
