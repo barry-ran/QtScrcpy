@@ -87,7 +87,7 @@ QtScrcpy 可以通过 USB / 网络连接Android设备，并进行显示和控制
 
 ## Star历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=barry-ran/QtScrcpy&type=Date)](https://star-history.com/#barry-ran/QtScrcpy&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=barry-ran/QtScrcpy&type=Date)](https://star-history.dera.page/#barry-ran/QtScrcpy&Date)
 
 ![gc](docs/image/group-control.gif)
 
