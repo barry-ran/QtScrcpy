@@ -449,7 +449,7 @@ void Dialog::updateBootConfig(bool toView)
         }
         updateVideoSourceUi();
     } else {
-        UserBootConfig config;
+        UserBootConfig config = Config::getInstance().getUserBootConfig();
 
         config.bitRate = getBitRate();
         config.maxSizeIndex = ui->maxSizeBox->currentIndex();
