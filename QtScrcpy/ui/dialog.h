@@ -13,7 +13,7 @@
 #include "adbprocess.h"
 #include "../QtScrcpyCore/include/QtScrcpyCore.h"
 #include "audio/audiooutput.h"
-#include "mtkconfigdialog.h"
+#include "presetconfigdialog.h"
 
 namespace Ui
 {
@@ -74,7 +74,7 @@ private slots:
     void on_autoUpdatecheckBox_toggled(bool checked);
 
     void on_codecModeBox_currentIndexChanged(int index);
-    void on_mtkConfigBtn_clicked();
+    void on_presetConfigBtn_clicked();
 
     void on_videoSourceBox_currentIndexChanged(int index);
     void on_refreshCameraBtn_clicked();
@@ -102,7 +102,7 @@ private:
     void savePortHistory(const QString &port);
 
     void showPortEditMenu(const QPoint &pos);
-    void syncMtkLevelToUi();
+    void syncPresetLevelToUi();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -130,7 +130,7 @@ private:
     QTimer m_autoUpdatetimer;
     quint32 m_prevBitRate = 2000000;
     int m_prevMaxSizeIndex = 0;
-    QPointer<MtkConfigDialog> m_mtkDialog;
+    QPointer<PresetConfigDialog> m_presetDialog;
 };
 
 #endif // DIALOG_H

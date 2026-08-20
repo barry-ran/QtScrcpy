@@ -531,16 +531,12 @@
         <translation>デフォルト（自動）</translation>
     </message>
 <message>
-        <source>MTK Encoder</source>
-        <translation>MTK エンコーダー</translation>
+        <source>Encoder selection: Default uses system auto-select; presets enable vendor-specific tuning.</source>
+        <translation>エンコーダー選択：デフォルトはシステム自動選択。プリセットはベンダー固有のチューニングを有効にします。</translation>
     </message>
 <message>
-        <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
-        <translation>エンコーダー選択：デフォルトはシステム自動選択。MTKは詳細チューニングを有効にします。MediaTekデバイス専用。</translation>
-    </message>
-<message>
-        <source>Open MTK encoder advanced settings: optimization levels for visual quality and performance. For MediaTek devices only.</source>
-        <translation>MTK エンコーダーの詳細設定を開く：画質とパフォーマンスの最適化レベル。MediaTekデバイス専用。</translation>
+        <source>Open encoder advanced settings: optimization levels for visual quality and performance.</source>
+        <translation>エンコーダーの詳細設定を開く：画質とパフォーマンスの最適化レベル。</translation>
     </message>
 <message>
         <source>Encoder Settings...</source>
@@ -548,10 +544,14 @@
     </message>
 </context>
 <context>
-    <name>MtkConfigDialog</name>
+    <name>PresetConfigDialog</name>
     <message>
-        <source>Encoder Settings (MediaTek Only)</source>
-        <translation>エンコーダー設定（MediaTek専用）</translation>
+        <source>Settings</source>
+        <translation>設定</translation>
+    </message>
+    <message>
+        <source>MTK Encoder</source>
+        <translation>MTK エンコーダー</translation>
     </message>
     <message>
         <source>This feature is for MediaTek (MTK) devices only.

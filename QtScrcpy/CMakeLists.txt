@@ -182,8 +182,10 @@ set(QC_UI_SOURCES
     ui/dialog.cpp
     ui/dialog.h
     ui/dialog.ui
-    ui/mtkconfigdialog.h
-    ui/mtkconfigdialog.cpp
+    ui/encoderpreset.h
+    ui/encoderpreset.cpp
+    ui/presetconfigdialog.h
+    ui/presetconfigdialog.cpp
     render/qyuvopenglwidget.h
     render/qyuvopenglwidget.cpp
 )

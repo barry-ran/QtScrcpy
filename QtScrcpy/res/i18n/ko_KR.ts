@@ -359,16 +359,12 @@
         <translation>기본값（자동）</translation>
     </message>
 <message>
-        <source>MTK Encoder</source>
-        <translation>MTK 인코더</translation>
+        <source>Encoder selection: Default uses system auto-select; presets enable vendor-specific tuning.</source>
+        <translation>인코더 선택：기본값은 시스템 자동 선택. 프리셋은 벤더별 튜닝을 활성화합니다.</translation>
     </message>
 <message>
-        <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
-        <translation>인코더 선택：기본값은 시스템 자동 선택. MTK는 세부 튜닝을 활성화합니다. MediaTek 기기 전용.</translation>
-    </message>
-<message>
-        <source>Open MTK encoder advanced settings: optimization levels for visual quality and performance. For MediaTek devices only.</source>
-        <translation>MTK 인코더 고급 설정 열기：화질 및 성능 최적화 레벨. MediaTek 기기 전용.</translation>
+        <source>Open encoder advanced settings: optimization levels for visual quality and performance.</source>
+        <translation>인코더 고급 설정 열기：화질 및 성능 최적화 레벨.</translation>
     </message>
 <message>
         <source>Encoder Settings...</source>
@@ -376,10 +372,14 @@
     </message>
 </context>
 <context>
-    <name>MtkConfigDialog</name>
+    <name>PresetConfigDialog</name>
     <message>
-        <source>Encoder Settings (MediaTek Only)</source>
-        <translation>인코더 설정 (MediaTek 전용)</translation>
+        <source>Settings</source>
+        <translation>설정</translation>
+    </message>
+    <message>
+        <source>MTK Encoder</source>
+        <translation>MTK 인코더</translation>
     </message>
     <message>
         <source>This feature is for MediaTek (MTK) devices only.

@@ -531,16 +531,12 @@
         <translation>默认（自动）</translation>
     </message>
 <message>
-        <source>MTK Encoder</source>
-        <translation>MTK 编码器</translation>
+        <source>Encoder selection: Default uses system auto-select; presets enable vendor-specific tuning.</source>
+        <translation>编码器选择：默认使用系统自动选择；预设启用厂商专属调优。</translation>
     </message>
 <message>
-        <source>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</source>
-        <translation>编码器选择：默认使用系统自动选择；MTK 启用精细调优。仅限 MediaTek 设备。</translation>
-    </message>
-<message>
-        <source>Open MTK encoder advanced settings: optimization levels for visual quality and performance. For MediaTek devices only.</source>
-        <translation>打开 MTK 编码器高级设置：画质与性能优化级别调优。仅限 MediaTek 设备。</translation>
+        <source>Open encoder advanced settings: optimization levels for visual quality and performance.</source>
+        <translation>打开编码器高级设置：画质与性能优化级别调优。</translation>
     </message>
 <message>
         <source>Encoder Settings...</source>
@@ -548,10 +544,14 @@
     </message>
 </context>
 <context>
-    <name>MtkConfigDialog</name>
+    <name>PresetConfigDialog</name>
     <message>
-        <source>Encoder Settings (MediaTek Only)</source>
-        <translation>编码器设置（仅限 MediaTek）</translation>
+        <source>Settings</source>
+        <translation>设置</translation>
+    </message>
+    <message>
+        <source>MTK Encoder</source>
+        <translation>MTK 编码器</translation>
     </message>
     <message>
         <source>This feature is for MediaTek (MTK) devices only.

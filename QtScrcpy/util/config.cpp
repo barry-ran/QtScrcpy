@@ -105,8 +105,8 @@
 #define COMMON_CODEC_MODE_INDEX_KEY "CodecModeIndex"
 #define COMMON_CODEC_MODE_INDEX_DEF 0
 
-#define COMMON_MTK_LEVEL_KEY "MtkLevel"
-#define COMMON_MTK_LEVEL_DEF 1
+#define COMMON_PRESET_LEVEL_KEY "PresetLevel"
+#define COMMON_PRESET_LEVEL_DEF 1
 
 #define COMMON_VIDEO_SOURCE_KEY "VideoSource"
 #define COMMON_VIDEO_SOURCE_DEF 0
@@ -195,7 +195,7 @@ void Config::setUserBootConfig(const UserBootConfig &config)
     m_userData->setValue(COMMON_SHOW_TOOLBAR_KEY, config.showToolbar);
     m_userData->setValue(COMMON_DECODE_MODE_KEY, config.decodeMode);
     m_userData->setValue(COMMON_CODEC_MODE_INDEX_KEY, config.codecModeIndex);
-    m_userData->setValue(COMMON_MTK_LEVEL_KEY, config.mtkLevel);
+    m_userData->setValue(COMMON_PRESET_LEVEL_KEY, config.presetLevel);
     m_userData->setValue(COMMON_VIDEO_SOURCE_KEY, config.videoSource);
     m_userData->setValue(COMMON_CAMERA_FACING_KEY, config.cameraFacing);
     m_userData->setValue("AdvancedDisplay", config.advancedDisplay);
@@ -235,7 +235,12 @@ UserBootConfig Config::getUserBootConfig()
     config.showToolbar =m_userData->value(COMMON_SHOW_TOOLBAR_KEY,COMMON_SHOW_TOOLBAR_DEF).toBool();
     config.decodeMode = m_userData->value(COMMON_DECODE_MODE_KEY, COMMON_DECODE_MODE_DEF).toInt();
     config.codecModeIndex = m_userData->value(COMMON_CODEC_MODE_INDEX_KEY, COMMON_CODEC_MODE_INDEX_DEF).toInt();
-    config.mtkLevel = m_userData->value(COMMON_MTK_LEVEL_KEY, COMMON_MTK_LEVEL_DEF).toInt();
+    // PresetLevel replaced the MTK-specific MtkLevel key; fall back to the old
+    // key so users who already picked a tier keep their selection.
+    config.presetLevel = m_userData->value(COMMON_PRESET_LEVEL_KEY, -1).toInt();
+    if (config.presetLevel < 0) {
+        config.presetLevel = m_userData->value("MtkLevel", COMMON_PRESET_LEVEL_DEF).toInt();
+    }
     config.videoSource = m_userData->value(COMMON_VIDEO_SOURCE_KEY, COMMON_VIDEO_SOURCE_DEF).toInt();
     config.cameraFacing = m_userData->value(COMMON_CAMERA_FACING_KEY, COMMON_CAMERA_FACING_DEF).toInt();
     config.advancedDisplay = m_userData->value("AdvancedDisplay", false).toBool();

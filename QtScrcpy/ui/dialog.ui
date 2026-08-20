@@ -544,24 +544,19 @@
                </sizepolicy>
               </property>
               <property name="toolTip">
-               <string>Encoder selection: Default uses system auto-select; MTK enables fine-grained tuning. For MediaTek devices only.</string>
+               <string>Encoder selection: Default uses system auto-select; presets enable vendor-specific tuning.</string>
               </property>
               <item>
                <property name="text">
                 <string>Default (Auto)</string>
                </property>
               </item>
-              <item>
-               <property name="text">
-                <string>MTK Encoder</string>
-               </property>
-              </item>
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="mtkConfigBtn">
+             <widget class="QPushButton" name="presetConfigBtn">
               <property name="toolTip">
-               <string>Open MTK encoder advanced settings: optimization levels for visual quality and performance. For MediaTek devices only.</string>
+               <string>Open encoder advanced settings: optimization levels for visual quality and performance.</string>
               </property>
               <property name="text">
                <string>Encoder Settings...</string>

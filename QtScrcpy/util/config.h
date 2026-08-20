@@ -25,7 +25,7 @@ struct UserBootConfig
     bool showToolbar      = true;
     int decodeMode        = 0;  // 0=FFmpeg OpenGL (默认), 1=VideoToolbox Metal (Apple Silicon)
     int codecModeIndex    = 0;
-    int mtkLevel          = 1;  // 0=Game Mode(20Mbps), 1=Balanced(8Mbps), 2=Power Saver(4Mbps)
+    int presetLevel       = 1;  // optimization tier of the currently selected encoder preset
     int videoSource       = 0;  // 0=display, 1=camera
     int cameraFacing      = 0;  // 0=back, 1=front
     bool advancedDisplay = false;

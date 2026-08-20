@@ -521,12 +521,36 @@
         <source>refresh</source>
         <translation>refresh</translation>
     </message>
+    <message>
+        <source>Codec Mode:</source>
+        <translation>Codec Mode:</translation>
+    </message>
+    <message>
+        <source>Default (Auto)</source>
+        <translation>Default (Auto)</translation>
+    </message>
+    <message>
+        <source>Encoder selection: Default uses system auto-select; presets enable vendor-specific tuning.</source>
+        <translation>Encoder selection: Default uses system auto-select; presets enable vendor-specific tuning.</translation>
+    </message>
+    <message>
+        <source>Encoder Settings...</source>
+        <translation>Encoder Settings...</translation>
+    </message>
+    <message>
+        <source>Open encoder advanced settings: optimization levels for visual quality and performance.</source>
+        <translation>Open encoder advanced settings: optimization levels for visual quality and performance.</translation>
+    </message>
 </context>
 <context>
-    <name>MtkConfigDialog</name>
+    <name>PresetConfigDialog</name>
     <message>
-        <source>Encoder Settings (MediaTek Only)</source>
-        <translation>Encoder Settings (MediaTek Only)</translation>
+        <source>Settings</source>
+        <translation>Settings</translation>
+    </message>
+    <message>
+        <source>MTK Encoder</source>
+        <translation>MTK Encoder</translation>
     </message>
     <message>
         <source>This feature is for MediaTek (MTK) devices only.
