@@ -37,6 +37,8 @@ public:
     void outLog(const QString &log, bool newLine = true);
     bool filterLog(const QString &log);
     void getIPbyIp();
+    // show the main window (e.g. when hidden in the tray) and give it focus
+    void bringToFront();
 
 private slots:
     void onDeviceConnected(bool success, const QString& serial, const QString& deviceName, const QSize& size);

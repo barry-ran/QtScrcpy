@@ -204,6 +204,8 @@ set(QC_UTIL_SOURCES
     util/config.cpp
     util/mousetap/mousetap.h
     util/mousetap/mousetap.cpp
+    util/singleinstance.h
+    util/singleinstance.cpp
 )
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(QC_UTIL_SOURCES ${QC_UTIL_SOURCES} 
