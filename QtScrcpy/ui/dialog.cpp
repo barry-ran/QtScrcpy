@@ -430,6 +430,7 @@ void Dialog::updateBootConfig(bool toView)
         ui->useSingleModeCheck->setChecked(config.simpleMode);
         ui->autoUpdatecheckBox->setChecked(config.autoUpdateDevice);
         ui->showToolbar->setChecked(config.showToolbar);
+        ui->quitOnCloseCheck->setChecked(config.quitOnClose);
         ui->decodeModeBox->setCurrentIndex(config.decodeMode);
         ui->codecModeBox->setCurrentIndex(config.codecModeIndex);
 
@@ -473,6 +474,7 @@ void Dialog::updateBootConfig(bool toView)
         config.simpleMode = ui->useSingleModeCheck->isChecked();
         config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
         config.showToolbar = ui->showToolbar->isChecked();
+        config.quitOnClose = ui->quitOnCloseCheck->isChecked();
         config.decodeMode = ui->decodeModeBox->currentIndex();
         config.codecModeIndex = ui->codecModeBox->currentIndex();
 
@@ -565,6 +567,16 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 
 void Dialog::closeEvent(QCloseEvent *event)
 {
+    if (ui->quitOnCloseCheck->isChecked()) {
+        // The user opted out of the system tray: closing the window quits the app.
+        // Ignore the event (instead of accepting it) so WA_DeleteOnClose does not
+        // delete this dialog here; main() deletes it after the event loop returns.
+        m_hideIcon->hide();
+        event->ignore();
+        qApp->quit();
+        return;
+    }
+
     this->hide();
     if (!Config::getInstance().getTrayMessageShown()) {
         Config::getInstance().setTrayMessageShown(true);
