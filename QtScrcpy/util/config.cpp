@@ -99,6 +99,9 @@
 #define COMMON_SHOW_TOOLBAR_KEY "showToolbar"
 #define COMMON_SHOW_TOOLBAR_DEF true
 
+#define COMMON_QUIT_ON_CLOSE_KEY "QuitOnClose"
+#define COMMON_QUIT_ON_CLOSE_DEF false
+
 #define COMMON_DECODE_MODE_KEY "DecodeMode"
 #define COMMON_DECODE_MODE_DEF 0
 
@@ -193,6 +196,7 @@ void Config::setUserBootConfig(const UserBootConfig &config)
     m_userData->setValue(COMMON_SIMPLE_MODE_KEY, config.simpleMode);
     m_userData->setValue(COMMON_AUTO_UPDATE_DEVICE_KEY, config.autoUpdateDevice);
     m_userData->setValue(COMMON_SHOW_TOOLBAR_KEY, config.showToolbar);
+    m_userData->setValue(COMMON_QUIT_ON_CLOSE_KEY, config.quitOnClose);
     m_userData->setValue(COMMON_DECODE_MODE_KEY, config.decodeMode);
     m_userData->setValue(COMMON_CODEC_MODE_INDEX_KEY, config.codecModeIndex);
     m_userData->setValue(COMMON_PRESET_LEVEL_KEY, config.presetLevel);
@@ -233,6 +237,7 @@ UserBootConfig Config::getUserBootConfig()
     config.simpleMode = m_userData->value(COMMON_SIMPLE_MODE_KEY, COMMON_SIMPLE_MODE_DEF).toBool();
     config.autoUpdateDevice = m_userData->value(COMMON_AUTO_UPDATE_DEVICE_KEY, COMMON_AUTO_UPDATE_DEVICE_DEF).toBool();
     config.showToolbar =m_userData->value(COMMON_SHOW_TOOLBAR_KEY,COMMON_SHOW_TOOLBAR_DEF).toBool();
+    config.quitOnClose = m_userData->value(COMMON_QUIT_ON_CLOSE_KEY, COMMON_QUIT_ON_CLOSE_DEF).toBool();
     config.decodeMode = m_userData->value(COMMON_DECODE_MODE_KEY, COMMON_DECODE_MODE_DEF).toInt();
     config.codecModeIndex = m_userData->value(COMMON_CODEC_MODE_INDEX_KEY, COMMON_CODEC_MODE_INDEX_DEF).toInt();
     // PresetLevel replaced the MTK-specific MtkLevel key; fall back to the old

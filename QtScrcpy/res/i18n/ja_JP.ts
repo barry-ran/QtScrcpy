@@ -506,6 +506,14 @@
         <translation>ツールバーを表示</translation>
     </message>
     <message>
+        <source>Quit the app when the window is closed instead of hiding it to the system tray</source>
+        <translation>ウィンドウを閉じたときに、システムトレイに隠さずにアプリを終了します</translation>
+    </message>
+    <message>
+        <source>quit on close</source>
+        <translation>閉じたら終了</translation>
+    </message>
+    <message>
         <source>record save path:</source>
         <translation>録画の保存先:</translation>
     </message>
