@@ -563,6 +563,14 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
     }
 }
 
+void Dialog::bringToFront()
+{
+    show();
+    setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    raise();
+    activateWindow();
+}
+
 void Dialog::closeEvent(QCloseEvent *event)
 {
     this->hide();
