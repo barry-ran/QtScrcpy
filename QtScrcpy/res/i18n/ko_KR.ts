@@ -346,6 +346,14 @@
         <translation>도구 모음 표시</translation>
     </message>
     <message>
+        <source>Quit the app when the window is closed instead of hiding it to the system tray</source>
+        <translation>창을 닫을 때 시스템 트레이로 숨기지 않고 앱을 종료합니다</translation>
+    </message>
+    <message>
+        <source>quit on close</source>
+        <translation>닫을 때 종료</translation>
+    </message>
+    <message>
         <source>record save path:</source>
         <translation>기록 저장 경로:</translation>
     </message>

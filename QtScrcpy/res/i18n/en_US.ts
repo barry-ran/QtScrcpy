@@ -506,6 +506,14 @@
         <translation>show toolbar</translation>
     </message>
     <message>
+        <source>Quit the app when the window is closed instead of hiding it to the system tray</source>
+        <translation>Quit the app when the window is closed instead of hiding it to the system tray</translation>
+    </message>
+    <message>
+        <source>quit on close</source>
+        <translation>quit on close</translation>
+    </message>
+    <message>
         <source>record save path:</source>
         <translation>record save path:</translation>
     </message>

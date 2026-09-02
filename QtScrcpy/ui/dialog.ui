@@ -906,6 +906,16 @@
               </property>
              </widget>
             </item>
+            <item row="2" column="1">
+             <widget class="QCheckBox" name="quitOnCloseCheck">
+              <property name="toolTip">
+               <string>Quit the app when the window is closed instead of hiding it to the system tray</string>
+              </property>
+              <property name="text">
+               <string>quit on close</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>

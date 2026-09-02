@@ -506,6 +506,14 @@
         <translation>显示工具栏</translation>
     </message>
     <message>
+        <source>Quit the app when the window is closed instead of hiding it to the system tray</source>
+        <translation>关闭窗口时退出程序，而不是隐藏到系统托盘</translation>
+    </message>
+    <message>
+        <source>quit on close</source>
+        <translation>关闭时退出</translation>
+    </message>
+    <message>
         <source>record save path:</source>
         <translation>录像保存路径</translation>
     </message>
