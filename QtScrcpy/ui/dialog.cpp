@@ -322,17 +322,16 @@ void Dialog::initUI()
     ui->verticalLayout_5->addWidget(ui->usbGroupBox);
     ui->verticalLayout_5->addWidget(ui->wirelessGroupBox);
     startConfigLayout->addWidget(ui->configGroupBox);
-    startConfigLayout->addStretch();
+    startConfigLayout->addWidget(ui->adbGroupBox);
+    startConfigLayout->addWidget(ui->outEdit, 1);
     advancedDisplayLayout->addWidget(m_advancedDisplayGroup);
     advancedDisplayLayout->addStretch();
     initAdvancedConfigUi(advancedConfigPage);
     configTabs->addTab(startConfigPage, tr("Start Config"));
     configTabs->addTab(advancedDisplayPage, tr("Advanced Display"));
     configTabs->addTab(advancedConfigPage, tr("Advanced Config"));
-    configTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+    configTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     ui->verticalLayout_6->addWidget(configTabs);
-    ui->verticalLayout_6->addWidget(ui->adbGroupBox);
-    ui->verticalLayout_6->addWidget(ui->outEdit);
 
     ui->leftWidget->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
     ui->leftWidget->setMinimumWidth(0);
@@ -357,9 +356,7 @@ void Dialog::initUI()
     ui->verticalLayout_5->setStretch(2, 0);
     ui->verticalLayout_5->setStretch(3, 0);
     ui->verticalLayout_4->setStretch(2, 1);
-    ui->verticalLayout_6->setStretch(0, 0);
-    ui->verticalLayout_6->setStretch(1, 0);
-    ui->verticalLayout_6->setStretch(2, 1);
+    ui->verticalLayout_6->setStretch(0, 1);
 }
 
 void Dialog::initAdvancedDisplayUi()
