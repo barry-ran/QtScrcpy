@@ -1387,9 +1387,10 @@ void Dialog::loadIpHistory()
     QStringList ipList = Config::getInstance().getIpHistory();
     ui->deviceIpEdt->clear();
     ui->deviceIpEdt->addItems(ipList);
-    ui->deviceIpEdt->setContentsMargins(0, 0, 0, 0);
 
     if (ui->deviceIpEdt->lineEdit()) {
+        ui->deviceIpEdt->lineEdit()->setFrame(false);
+        ui->deviceIpEdt->lineEdit()->setTextMargins(0, 0, 0, 0);
         ui->deviceIpEdt->lineEdit()->setMaxLength(128);
         ui->deviceIpEdt->lineEdit()->setPlaceholderText("192.168.0.1");
     }
@@ -1429,9 +1430,10 @@ void Dialog::loadPortHistory()
     QStringList portList = Config::getInstance().getPortHistory();
     ui->devicePortEdt->clear();
     ui->devicePortEdt->addItems(portList);
-    ui->devicePortEdt->setContentsMargins(0, 0, 0, 0);
 
     if (ui->devicePortEdt->lineEdit()) {
+        ui->devicePortEdt->lineEdit()->setFrame(false);
+        ui->devicePortEdt->lineEdit()->setTextMargins(0, 0, 0, 0);
         ui->devicePortEdt->lineEdit()->setMaxLength(6);
         ui->devicePortEdt->lineEdit()->setPlaceholderText("5555");
     }

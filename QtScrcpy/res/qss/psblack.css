@@ -383,6 +383,30 @@ QComboBox:focus {
     padding: 0 35px 0 8px;
 }
 
+/* These editable fields need all of the space before the 30px drop-down
+ * button. The generic combo-box padding reserves it twice when focused. */
+QComboBox#deviceIpEdt, QComboBox#devicePortEdt,
+QComboBox#deviceIpEdt:focus, QComboBox#devicePortEdt:focus {
+    padding: 0 20px 0 3px;
+}
+
+QComboBox#deviceIpEdt::drop-down,
+QComboBox#devicePortEdt::drop-down {
+    width: 20px;
+}
+
+/* Editable combo boxes own their internal QLineEdit. Do not apply the
+ * standalone line-edit frame and padding inside them, otherwise its text
+ * area no longer fills the combo box's edit field. */
+QComboBox QLineEdit,
+QComboBox QLineEdit:hover,
+QComboBox QLineEdit:focus {
+    background: transparent;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
 QComboBox::drop-down, QDateEdit::drop-down, QTimeEdit::drop-down,
 QDateTimeEdit::drop-down {
     subcontrol-origin: border;
