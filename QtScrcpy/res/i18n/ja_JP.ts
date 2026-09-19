@@ -189,115 +189,115 @@
     </message>
     <message>
         <source>Advanced Config</source>
-        <translation type="unfinished"></translation>
+        <translation>高度な設定</translation>
     </message>
     <message>
         <source>Application configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>アプリケーション設定</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>自動</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語</translation>
     </message>
     <message>
         <source>Window title</source>
-        <translation type="unfinished"></translation>
+        <translation>ウィンドウタイトル</translation>
     </message>
     <message>
         <source>Push file path</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル送信先</translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation type="unfinished"></translation>
+        <translation>無制限</translation>
     </message>
     <message>
         <source>Maximum FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>最大 FPS</translation>
     </message>
     <message>
         <source>Render expired video frames</source>
-        <translation type="unfinished"></translation>
+        <translation>期限切れの動画フレームを描画</translation>
     </message>
     <message>
         <source>Software OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>ソフトウェア OpenGL</translation>
     </message>
     <message>
         <source>OpenGL ES</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL ES</translation>
     </message>
     <message>
         <source>Desktop OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>デスクトップ OpenGL</translation>
     </message>
     <message>
         <source>Takes effect after restarting QtScrcpy.</source>
-        <translation type="unfinished"></translation>
+        <translation>QtScrcpy の再起動後に有効になります。</translation>
     </message>
     <message>
         <source>OpenGL backend</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL バックエンド</translation>
     </message>
     <message>
         <source>Device server path</source>
-        <translation type="unfinished"></translation>
+        <translation>デバイス側サーバーパス</translation>
     </message>
     <message>
         <source>Use bundled ADB</source>
-        <translation type="unfinished"></translation>
+        <translation>同梱 ADB を使用</translation>
     </message>
     <message>
         <source>ADB executable</source>
-        <translation type="unfinished"></translation>
+        <translation>ADB 実行ファイル</translation>
     </message>
     <message>
         <source>Codec options</source>
-        <translation type="unfinished"></translation>
+        <translation>コーデックオプション</translation>
     </message>
     <message>
         <source>Codec name</source>
-        <translation type="unfinished"></translation>
+        <translation>コーデック名</translation>
     </message>
     <message>
         <source>Log level</source>
-        <translation type="unfinished"></translation>
+        <translation>ログレベル</translation>
     </message>
     <message>
         <source>Open Config Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>設定ディレクトリを開く</translation>
     </message>
     <message>
         <source>Open Keymap Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>キーマップディレクトリを開く</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>保存</translation>
     </message>
     <message>
         <source>Save failed</source>
-        <translation type="unfinished"></translation>
+        <translation>保存に失敗しました</translation>
     </message>
     <message>
         <source>Unable to save config.ini.</source>
-        <translation type="unfinished"></translation>
+        <translation>config.ini を保存できません。</translation>
     </message>
     <message>
         <source>Configuration saved</source>
-        <translation type="unfinished"></translation>
+        <translation>設定を保存しました</translation>
     </message>
     <message>
         <source>The settings were saved to config.ini. Restart QtScrcpy for all changes to take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>設定を config.ini に保存しました。すべての変更を反映するには QtScrcpy を再起動してください。</translation>
     </message>
     <message>
         <source>Open directory failed</source>
-        <translation type="unfinished"></translation>
+        <translation>ディレクトリを開けませんでした</translation>
     </message>
 </context>
 <context>

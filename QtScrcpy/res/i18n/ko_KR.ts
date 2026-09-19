@@ -45,259 +45,259 @@
     </message>
     <message>
         <source>display</source>
-        <translation type="unfinished"></translation>
+        <translation>디스플레이</translation>
     </message>
     <message>
         <source>camera</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라</translation>
     </message>
     <message>
         <source>back</source>
-        <translation type="unfinished"></translation>
+        <translation>후면</translation>
     </message>
     <message>
         <source>front</source>
-        <translation type="unfinished"></translation>
+        <translation>전면</translation>
     </message>
     <message>
         <source>Start Config</source>
-        <translation type="unfinished">시작 구성</translation>
+        <translation>시작 구성</translation>
     </message>
     <message>
         <source>Advanced Display</source>
-        <translation type="unfinished"></translation>
+        <translation>고급 디스플레이</translation>
     </message>
     <message>
         <source>Advanced Config</source>
-        <translation type="unfinished"></translation>
+        <translation>고급 설정</translation>
     </message>
     <message>
         <source>Advanced display</source>
-        <translation type="unfinished"></translation>
+        <translation>고급 디스플레이</translation>
     </message>
     <message>
         <source>Primary display</source>
-        <translation type="unfinished"></translation>
+        <translation>기본 디스플레이</translation>
     </message>
     <message>
         <source>Existing display ID</source>
-        <translation type="unfinished"></translation>
+        <translation>기존 디스플레이 ID</translation>
     </message>
     <message>
         <source>New virtual display</source>
-        <translation type="unfinished"></translation>
+        <translation>새 가상 디스플레이</translation>
     </message>
     <message>
         <source>Display mode</source>
-        <translation type="unfinished"></translation>
+        <translation>디스플레이 모드</translation>
     </message>
     <message>
         <source>Display ID</source>
-        <translation type="unfinished"></translation>
+        <translation>디스플레이 ID</translation>
     </message>
     <message>
         <source>Virtual size / DPI</source>
-        <translation type="unfinished"></translation>
+        <translation>가상 크기 / DPI</translation>
     </message>
     <message>
         <source>Crop</source>
-        <translation type="unfinished"></translation>
+        <translation>자르기</translation>
     </message>
     <message>
         <source>Resize virtual display with window</source>
-        <translation type="unfinished"></translation>
+        <translation>창 크기에 맞춰 가상 디스플레이 조정</translation>
     </message>
     <message>
         <source>Server default</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 기본값</translation>
     </message>
     <message>
         <source>IME policy</source>
-        <translation type="unfinished"></translation>
+        <translation>IME 정책</translation>
     </message>
     <message>
         <source>Show system decorations</source>
-        <translation type="unfinished"></translation>
+        <translation>시스템 장식 표시</translation>
     </message>
     <message>
         <source>Destroy content on close</source>
-        <translation type="unfinished"></translation>
+        <translation>닫을 때 콘텐츠 삭제</translation>
     </message>
     <message>
         <source>Keep device active</source>
-        <translation type="unfinished"></translation>
+        <translation>기기 활성 유지</translation>
     </message>
     <message>
         <source>refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>새로 고침</translation>
     </message>
     <message>
         <source>Start app</source>
-        <translation type="unfinished"></translation>
+        <translation>앱 시작</translation>
     </message>
     <message>
         <source>Application configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>애플리케이션 설정</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>자동</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>언어</translation>
     </message>
     <message>
         <source>Window title</source>
-        <translation type="unfinished"></translation>
+        <translation>창 제목</translation>
     </message>
     <message>
         <source>Push file path</source>
-        <translation type="unfinished"></translation>
+        <translation>파일 전송 경로</translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation type="unfinished"></translation>
+        <translation>제한 없음</translation>
     </message>
     <message>
         <source>Maximum FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>최대 FPS</translation>
     </message>
     <message>
         <source>Render expired video frames</source>
-        <translation type="unfinished"></translation>
+        <translation>만료된 비디오 프레임 렌더링</translation>
     </message>
     <message>
         <source>Software OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>소프트웨어 OpenGL</translation>
     </message>
     <message>
         <source>OpenGL ES</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL ES</translation>
     </message>
     <message>
         <source>Desktop OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>데스크톱 OpenGL</translation>
     </message>
     <message>
         <source>Takes effect after restarting QtScrcpy.</source>
-        <translation type="unfinished"></translation>
+        <translation>QtScrcpy를 다시 시작한 후 적용됩니다.</translation>
     </message>
     <message>
         <source>OpenGL backend</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL 백엔드</translation>
     </message>
     <message>
         <source>Device server path</source>
-        <translation type="unfinished"></translation>
+        <translation>기기 서버 경로</translation>
     </message>
     <message>
         <source>Use bundled ADB</source>
-        <translation type="unfinished"></translation>
+        <translation>내장 ADB 사용</translation>
     </message>
     <message>
         <source>ADB executable</source>
-        <translation type="unfinished"></translation>
+        <translation>ADB 실행 파일</translation>
     </message>
     <message>
         <source>Codec options</source>
-        <translation type="unfinished"></translation>
+        <translation>코덱 옵션</translation>
     </message>
     <message>
         <source>Codec name</source>
-        <translation type="unfinished"></translation>
+        <translation>코덱 이름</translation>
     </message>
     <message>
         <source>Log level</source>
-        <translation type="unfinished"></translation>
+        <translation>로그 수준</translation>
     </message>
     <message>
         <source>Open Config Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>구성 디렉터리 열기</translation>
     </message>
     <message>
         <source>Open Keymap Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>키맵 디렉터리 열기</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>저장</translation>
     </message>
     <message>
         <source>Save failed</source>
-        <translation type="unfinished"></translation>
+        <translation>저장 실패</translation>
     </message>
     <message>
         <source>Unable to save config.ini.</source>
-        <translation type="unfinished"></translation>
+        <translation>config.ini를 저장할 수 없습니다.</translation>
     </message>
     <message>
         <source>Configuration saved</source>
-        <translation type="unfinished"></translation>
+        <translation>구성을 저장했습니다</translation>
     </message>
     <message>
         <source>The settings were saved to config.ini. Restart QtScrcpy for all changes to take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>설정이 config.ini에 저장되었습니다. 모든 변경 사항을 적용하려면 QtScrcpy를 다시 시작하세요.</translation>
     </message>
     <message>
         <source>Open directory failed</source>
-        <translation type="unfinished"></translation>
+        <translation>디렉터리를 열지 못했습니다</translation>
     </message>
     <message>
         <source>invalid display ID</source>
-        <translation type="unfinished"></translation>
+        <translation>잘못된 디스플레이 ID</translation>
     </message>
     <message>
         <source>flex display requires video, a new virtual display, and no crop</source>
-        <translation type="unfinished"></translation>
+        <translation>유연한 디스플레이에는 비디오, 새 가상 디스플레이 및 자르기 없음이 필요합니다</translation>
     </message>
     <message>
         <source>camera preview requires Android 12 or later</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 미리보기에는 Android 12 이상이 필요합니다</translation>
     </message>
     <message>
         <source>virtual display requires Android 10 or later</source>
-        <translation type="unfinished"></translation>
+        <translation>가상 디스플레이에는 Android 10 이상이 필요합니다</translation>
     </message>
     <message>
         <source>could not verify Android version for camera preview</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 미리보기용 Android 버전을 확인할 수 없습니다</translation>
     </message>
     <message>
         <source>no device</source>
-        <translation type="unfinished"></translation>
+        <translation>기기가 없습니다</translation>
     </message>
     <message>
         <source>stop preview first</source>
-        <translation type="unfinished"></translation>
+        <translation>먼저 미리 보기를 중지하세요</translation>
     </message>
     <message>
         <source>camera refresh failed</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 새로 고침에 실패했습니다</translation>
     </message>
     <message>
         <source>camera refreshed</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라를 새로 고쳤습니다</translation>
     </message>
     <message>
         <source>no camera</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라 없음</translation>
     </message>
     <message>
         <source>stop server first</source>
-        <translation type="unfinished"></translation>
+        <translation>먼저 서버를 중지하세요</translation>
     </message>
     <message>
         <source>app refresh failed</source>
-        <translation type="unfinished"></translation>
+        <translation>앱 새로 고침에 실패했습니다</translation>
     </message>
     <message>
         <source>apps refreshed</source>
-        <translation type="unfinished"></translation>
+        <translation>앱을 새로 고쳤습니다</translation>
     </message>
     <message>
         <source>no launchable app</source>
-        <translation type="unfinished"></translation>
+        <translation>실행 가능한 앱이 없습니다</translation>
     </message>
 </context>
 <context>
@@ -339,11 +339,11 @@
     </message>
     <message>
         <source>If you need more professional PC remote software, you can try the following software:</source>
-        <translation type="unfinished"></translation>
+        <translation>더 전문적인 PC 원격 제어 소프트웨어가 필요하다면 다음 소프트웨어를 사용해 보세요:</translation>
     </message>
     <message>
         <source>QuickDesk</source>
-        <translation type="unfinished"></translation>
+        <translation>QuickDesk</translation>
     </message>
     <message>
         <source>You can contact me with telegram &lt;https://t.me/+Ylf_5V_rDCMyODQ1&gt;</source>
@@ -366,7 +366,7 @@
     </message>
     <message>
         <source>copy clipboard text</source>
-        <translation type="unfinished"></translation>
+        <translation>클립보드 텍스트 복사</translation>
     </message>
     <message>
         <source>open screen</source>
@@ -378,63 +378,63 @@
     </message>
     <message>
         <source>full screen (Ctrl+F)</source>
-        <translation type="unfinished"></translation>
+        <translation>전체 화면 (Ctrl+F)</translation>
     </message>
     <message>
         <source>expand notify (Ctrl+N)</source>
-        <translation type="unfinished"></translation>
+        <translation>알림 패널 펼치기 (Ctrl+N)</translation>
     </message>
     <message>
         <source>expand settings panel (Ctrl+Alt+N)</source>
-        <translation type="unfinished"></translation>
+        <translation>설정 패널 펼치기 (Ctrl+Alt+N)</translation>
     </message>
     <message>
         <source>rotate device (Ctrl+R)</source>
-        <translation type="unfinished"></translation>
+        <translation>기기 회전 (Ctrl+R)</translation>
     </message>
     <message>
         <source>close screen (Ctrl+O)</source>
-        <translation type="unfinished"></translation>
+        <translation>화면 닫기 (Ctrl+O)</translation>
     </message>
     <message>
         <source>power (Ctrl+P)</source>
-        <translation type="unfinished"></translation>
+        <translation>전원 (Ctrl+P)</translation>
     </message>
     <message>
         <source>volume up (Ctrl+Up)</source>
-        <translation type="unfinished"></translation>
+        <translation>볼륨 높이기 (Ctrl+Up)</translation>
     </message>
     <message>
         <source>volume down (Ctrl+Down)</source>
-        <translation type="unfinished"></translation>
+        <translation>볼륨 낮추기 (Ctrl+Down)</translation>
     </message>
     <message>
         <source>app switch (Ctrl+S)</source>
-        <translation type="unfinished"></translation>
+        <translation>앱 전환 (Ctrl+S)</translation>
     </message>
     <message>
         <source>menu (Ctrl+M)</source>
-        <translation type="unfinished"></translation>
+        <translation>메뉴 (Ctrl+M)</translation>
     </message>
     <message>
         <source>home (Ctrl+H)</source>
-        <translation type="unfinished"></translation>
+        <translation>홈 (Ctrl+H)</translation>
     </message>
     <message>
         <source>return (Ctrl+B)</source>
-        <translation type="unfinished"></translation>
+        <translation>뒤로 (Ctrl+B)</translation>
     </message>
     <message>
         <source>torch</source>
-        <translation type="unfinished"></translation>
+        <translation>손전등</translation>
     </message>
     <message>
         <source>zoom out</source>
-        <translation type="unfinished"></translation>
+        <translation>축소</translation>
     </message>
     <message>
         <source>zoom in</source>
-        <translation type="unfinished"></translation>
+        <translation>확대</translation>
     </message>
 </context>
 <context>
@@ -666,15 +666,15 @@
     </message>
     <message>
         <source>video source:</source>
-        <translation type="unfinished"></translation>
+        <translation>비디오 소스:</translation>
     </message>
     <message>
         <source>camera:</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라:</translation>
     </message>
     <message>
         <source>refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>새로 고침</translation>
     </message>
 </context>
 </TS>

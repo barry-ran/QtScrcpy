@@ -189,115 +189,115 @@
     </message>
     <message>
         <source>Advanced Config</source>
-        <translation type="unfinished"></translation>
+        <translation>Advanced Config</translation>
     </message>
     <message>
         <source>Application configuration</source>
-        <translation type="unfinished"></translation>
+        <translation>Application configuration</translation>
     </message>
     <message>
         <source>Automatic</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatic</translation>
     </message>
     <message>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>Language</translation>
     </message>
     <message>
         <source>Window title</source>
-        <translation type="unfinished"></translation>
+        <translation>Window title</translation>
     </message>
     <message>
         <source>Push file path</source>
-        <translation type="unfinished"></translation>
+        <translation>Push file path</translation>
     </message>
     <message>
         <source>Unlimited</source>
-        <translation type="unfinished"></translation>
+        <translation>Unlimited</translation>
     </message>
     <message>
         <source>Maximum FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximum FPS</translation>
     </message>
     <message>
         <source>Render expired video frames</source>
-        <translation type="unfinished"></translation>
+        <translation>Render expired video frames</translation>
     </message>
     <message>
         <source>Software OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>Software OpenGL</translation>
     </message>
     <message>
         <source>OpenGL ES</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL ES</translation>
     </message>
     <message>
         <source>Desktop OpenGL</source>
-        <translation type="unfinished"></translation>
+        <translation>Desktop OpenGL</translation>
     </message>
     <message>
         <source>Takes effect after restarting QtScrcpy.</source>
-        <translation type="unfinished"></translation>
+        <translation>Takes effect after restarting QtScrcpy.</translation>
     </message>
     <message>
         <source>OpenGL backend</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenGL backend</translation>
     </message>
     <message>
         <source>Device server path</source>
-        <translation type="unfinished"></translation>
+        <translation>Device server path</translation>
     </message>
     <message>
         <source>Use bundled ADB</source>
-        <translation type="unfinished"></translation>
+        <translation>Use bundled ADB</translation>
     </message>
     <message>
         <source>ADB executable</source>
-        <translation type="unfinished"></translation>
+        <translation>ADB executable</translation>
     </message>
     <message>
         <source>Codec options</source>
-        <translation type="unfinished"></translation>
+        <translation>Codec options</translation>
     </message>
     <message>
         <source>Codec name</source>
-        <translation type="unfinished"></translation>
+        <translation>Codec name</translation>
     </message>
     <message>
         <source>Log level</source>
-        <translation type="unfinished"></translation>
+        <translation>Log level</translation>
     </message>
     <message>
         <source>Open Config Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Config Directory</translation>
     </message>
     <message>
         <source>Open Keymap Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Open Keymap Directory</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Save</translation>
     </message>
     <message>
         <source>Save failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Save failed</translation>
     </message>
     <message>
         <source>Unable to save config.ini.</source>
-        <translation type="unfinished"></translation>
+        <translation>Unable to save config.ini.</translation>
     </message>
     <message>
         <source>Configuration saved</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuration saved</translation>
     </message>
     <message>
         <source>The settings were saved to config.ini. Restart QtScrcpy for all changes to take effect.</source>
-        <translation type="unfinished"></translation>
+        <translation>The settings were saved to config.ini. Restart QtScrcpy for all changes to take effect.</translation>
     </message>
     <message>
         <source>Open directory failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Open directory failed</translation>
     </message>
 </context>
 <context>
