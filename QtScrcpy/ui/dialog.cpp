@@ -1,9 +1,11 @@
 ﻿#include <QDebug>
 #include <QAbstractItemView>
+#include <QDesktopServices>
 #include <QCheckBox>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QFrame>
 #include <QFileInfo>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -17,13 +19,16 @@
 #include <QRegularExpression>
 #include <QSizePolicy>
 #include <QScreen>
+#include <QScrollArea>
 #include <QSet>
 #include <QStandardPaths>
 #include <QStyledItemDelegate>
+#include <QSpinBox>
 #include <QTabWidget>
 #include <QTime>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QUrl>
 
 #include "config.h"
 #include "dialog.h"
@@ -300,6 +305,7 @@ void Dialog::initUI()
     auto *configTabs = new QTabWidget(ui->rightWidget);
     auto *startConfigPage = new QWidget(configTabs);
     auto *advancedDisplayPage = new QWidget(configTabs);
+    auto *advancedConfigPage = new QWidget(configTabs);
     auto *startConfigLayout = new QVBoxLayout(startConfigPage);
     auto *advancedDisplayLayout = new QVBoxLayout(advancedDisplayPage);
     startConfigLayout->setContentsMargins(0, 0, 0, 0);
@@ -319,8 +325,10 @@ void Dialog::initUI()
     startConfigLayout->addStretch();
     advancedDisplayLayout->addWidget(m_advancedDisplayGroup);
     advancedDisplayLayout->addStretch();
+    initAdvancedConfigUi(advancedConfigPage);
     configTabs->addTab(startConfigPage, tr("Start Config"));
     configTabs->addTab(advancedDisplayPage, tr("Advanced Display"));
+    configTabs->addTab(advancedConfigPage, tr("Advanced Config"));
     configTabs->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     ui->verticalLayout_6->addWidget(configTabs);
     ui->verticalLayout_6->addWidget(ui->adbGroupBox);
@@ -412,8 +420,154 @@ void Dialog::initAdvancedDisplayUi()
 
     connect(m_displayModeBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Dialog::updateAdvancedDisplayUi);
     connect(m_flexDisplayCheck, &QCheckBox::toggled, this, &Dialog::updateAdvancedDisplayUi);
-    connect(m_refreshAppsBtn, &QPushButton::clicked, this, &Dialog::on_refreshAppsBtn_clicked);
+    connect(m_refreshAppsBtn, &QPushButton::clicked, this, &Dialog::refreshApps);
     updateAdvancedDisplayUi();
+}
+
+void Dialog::initAdvancedConfigUi(QWidget *parent)
+{
+    auto *pageLayout = new QVBoxLayout(parent);
+    pageLayout->setContentsMargins(0, 0, 0, 0);
+    auto *scrollArea = new QScrollArea(parent);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+    auto *content = new QWidget(scrollArea);
+    auto *contentLayout = new QVBoxLayout(content);
+    contentLayout->setContentsMargins(0, 0, 0, 0);
+
+    auto *group = new QGroupBox(tr("Application configuration"), content);
+    auto *layout = new QFormLayout(group);
+
+    m_configLanguageBox = new QComboBox(group);
+    m_configLanguageBox->addItem(tr("Automatic"), "Auto");
+    m_configLanguageBox->addItem("简体中文", "zh_CN");
+    m_configLanguageBox->addItem("English", "en_US");
+    m_configLanguageBox->addItem("日本語", "ja_JP");
+    m_configLanguageBox->addItem("한국어", "ko_KR");
+    layout->addRow(tr("Language"), m_configLanguageBox);
+
+    m_configTitleEdit = new QLineEdit(group);
+    layout->addRow(tr("Window title"), m_configTitleEdit);
+
+    m_configPushPathEdit = new QLineEdit(group);
+    m_configPushPathEdit->setPlaceholderText("/sdcard/");
+    layout->addRow(tr("Push file path"), m_configPushPathEdit);
+
+    m_configMaxFpsSpin = new QSpinBox(group);
+    m_configMaxFpsSpin->setRange(0, 1000);
+    m_configMaxFpsSpin->setSpecialValueText(tr("Unlimited"));
+    layout->addRow(tr("Maximum FPS"), m_configMaxFpsSpin);
+
+    m_configRenderExpiredCheck = new QCheckBox(tr("Render expired video frames"), group);
+    layout->addRow(m_configRenderExpiredCheck);
+
+    m_configOpenGlBox = new QComboBox(group);
+    m_configOpenGlBox->addItem(tr("Automatic"), -1);
+    m_configOpenGlBox->addItem(tr("Software OpenGL"), 0);
+    m_configOpenGlBox->addItem(tr("OpenGL ES"), 1);
+    m_configOpenGlBox->addItem(tr("Desktop OpenGL"), 2);
+    m_configOpenGlBox->setToolTip(tr("Takes effect after restarting QtScrcpy."));
+    layout->addRow(tr("OpenGL backend"), m_configOpenGlBox);
+
+    m_configServerPathEdit = new QLineEdit(group);
+    m_configServerPathEdit->setPlaceholderText("/data/local/tmp/scrcpy-server.jar");
+    layout->addRow(tr("Device server path"), m_configServerPathEdit);
+
+    m_configAdbPathEdit = new QLineEdit(group);
+    m_configAdbPathEdit->setPlaceholderText(tr("Use bundled ADB"));
+    layout->addRow(tr("ADB executable"), m_configAdbPathEdit);
+
+    m_configCodecOptionsEdit = new QLineEdit(group);
+    m_configCodecOptionsEdit->setPlaceholderText("profile=1,level=2");
+    layout->addRow(tr("Codec options"), m_configCodecOptionsEdit);
+
+    m_configCodecNameEdit = new QLineEdit(group);
+    m_configCodecNameEdit->setPlaceholderText("OMX.qcom.video.encoder.avc");
+    layout->addRow(tr("Codec name"), m_configCodecNameEdit);
+
+    m_configLogLevelBox = new QComboBox(group);
+    m_configLogLevelBox->addItem("verbose", "verbose");
+    m_configLogLevelBox->addItem("debug", "debug");
+    m_configLogLevelBox->addItem("info", "info");
+    m_configLogLevelBox->addItem("warn", "warn");
+    m_configLogLevelBox->addItem("error", "error");
+    layout->addRow(tr("Log level"), m_configLogLevelBox);
+
+    auto *buttons = new QHBoxLayout();
+    auto *openConfigButton = new QPushButton(tr("Open Config Directory"), group);
+    auto *openKeymapButton = new QPushButton(tr("Open Keymap Directory"), group);
+    auto *saveButton = new QPushButton(tr("Save"), group);
+    buttons->addWidget(openConfigButton);
+    buttons->addWidget(openKeymapButton);
+    buttons->addStretch();
+    buttons->addWidget(saveButton);
+    layout->addRow(buttons);
+
+    contentLayout->addWidget(group);
+    contentLayout->addStretch();
+    scrollArea->setWidget(content);
+    pageLayout->addWidget(scrollArea);
+
+    connect(openConfigButton, &QPushButton::clicked, this, [this] {
+        openUserDirectory(Config::getInstance().getConfigDirectory());
+    });
+    connect(openKeymapButton, &QPushButton::clicked, this, [this] {
+        openUserDirectory(getKeyMapPath());
+    });
+    connect(saveButton, &QPushButton::clicked, this, &Dialog::saveAdvancedConfig);
+    loadAdvancedConfig();
+}
+
+void Dialog::loadAdvancedConfig()
+{
+    Config &config = Config::getInstance();
+    m_configLanguageBox->setCurrentIndex(qMax(0, m_configLanguageBox->findData(config.getLanguage())));
+    m_configTitleEdit->setText(config.getTitle());
+    m_configPushPathEdit->setText(config.getPushFilePath());
+    m_configMaxFpsSpin->setValue(qBound(0, config.getMaxFps(), m_configMaxFpsSpin->maximum()));
+    m_configRenderExpiredCheck->setChecked(config.getRenderExpiredFrames() != 0);
+    m_configOpenGlBox->setCurrentIndex(qMax(0, m_configOpenGlBox->findData(config.getDesktopOpenGL())));
+    m_configServerPathEdit->setText(config.getServerPath());
+    m_configAdbPathEdit->setText(config.getAdbPath());
+    m_configCodecOptionsEdit->setText(config.getCodecOptions());
+    m_configCodecNameEdit->setText(config.getCodecName());
+    m_configLogLevelBox->setCurrentIndex(qMax(0, m_configLogLevelBox->findData(config.getLogLevel())));
+}
+
+void Dialog::saveAdvancedConfig()
+{
+    QString pushPath = m_configPushPathEdit->text().trimmed();
+    if (!pushPath.isEmpty() && !pushPath.endsWith('/')) {
+        pushPath += '/';
+    }
+
+    QMap<QString, QVariant> values;
+    values.insert("Language", m_configLanguageBox->currentData());
+    values.insert("WindowTitle", m_configTitleEdit->text().trimmed());
+    values.insert("PushFilePath", pushPath);
+    values.insert("MaxFps", m_configMaxFpsSpin->value());
+    values.insert("RenderExpiredFrames", m_configRenderExpiredCheck->isChecked() ? 1 : 0);
+    values.insert("UseDesktopOpenGL", m_configOpenGlBox->currentData());
+    values.insert("ServerPath", m_configServerPathEdit->text().trimmed());
+    values.insert("AdbPath", m_configAdbPathEdit->text().trimmed());
+    values.insert("CodecOptions", m_configCodecOptionsEdit->text().trimmed());
+    values.insert("CodecName", m_configCodecNameEdit->text().trimmed());
+    values.insert("LogLevel", m_configLogLevelBox->currentData());
+
+    if (!Config::getInstance().updateCommonConfig(values)) {
+        QMessageBox::warning(this, tr("Save failed"), tr("Unable to save config.ini."));
+        return;
+    }
+    m_configPushPathEdit->setText(pushPath);
+    QMessageBox::information(this, tr("Configuration saved"),
+                             tr("The settings were saved to config.ini. Restart QtScrcpy for all changes to take effect."));
+}
+
+void Dialog::openUserDirectory(const QString &path)
+{
+    if (!QDir().mkpath(path) || !QDesktopServices::openUrl(QUrl::fromLocalFile(path))) {
+        QMessageBox::warning(this, tr("Open directory failed"), path);
+    }
 }
 
 void Dialog::updateAdvancedDisplayUi()
@@ -880,7 +1034,7 @@ void Dialog::on_refreshCameraBtn_clicked()
     pushAdb->push(serial, getServerPath(), Config::getInstance().getServerPath());
 }
 
-void Dialog::on_refreshAppsBtn_clicked()
+void Dialog::refreshApps()
 {
     const QString serial = ui->serialBox->currentText().trimmed();
     if (serial.isEmpty()) {

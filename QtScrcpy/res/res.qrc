@@ -18,10 +18,12 @@
         <file>qss/psblack/checkbox_parcial_disable.png</file>
         <file>qss/psblack/checkbox_unchecked.png</file>
         <file>qss/psblack/checkbox_unchecked_disable.png</file>
+        <file>qss/psblack/combo_down_arrow.svg</file>
         <file>qss/psblack/radiobutton_checked.png</file>
         <file>qss/psblack/radiobutton_checked_disable.png</file>
         <file>qss/psblack/radiobutton_unchecked.png</file>
         <file>qss/psblack/radiobutton_unchecked_disable.png</file>
+        <file>qss/psblack/spin_up_arrow.svg</file>
         <file>i18n/en_US.qm</file>
         <file>i18n/zh_CN.qm</file>
         <file>i18n/ja_JP.qm</file>

@@ -356,7 +356,10 @@ QTimeEdit::up-button, QDateTimeEdit::up-button {
     subcontrol-origin: border;
     subcontrol-position: top right;
     width: 22px;
-    image: url(:/qss/psblack/add_top.png);
+    background: #3a3a3a;
+    border: none;
+    border-left: 1px solid #5a5a5a;
+    border-top-right-radius: 4px;
 }
 
 QSpinBox::down-button, QDoubleSpinBox::down-button, QDateEdit::down-button,
@@ -364,14 +367,32 @@ QTimeEdit::down-button, QDateTimeEdit::down-button {
     subcontrol-origin: border;
     subcontrol-position: bottom right;
     width: 22px;
-    image: url(:/qss/psblack/add_bottom.png);
+    background: #3a3a3a;
+    border: none;
+    border-left: 1px solid #5a5a5a;
+    border-top: 1px solid #5a5a5a;
+    border-bottom-right-radius: 4px;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow, QDateEdit::up-arrow,
+QTimeEdit::up-arrow, QDateTimeEdit::up-arrow {
+    image: url(:/qss/psblack/spin_up_arrow.svg);
+    width: 10px;
+    height: 6px;
+}
+
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow, QDateEdit::down-arrow,
+QTimeEdit::down-arrow, QDateTimeEdit::down-arrow {
+    image: url(:/qss/psblack/combo_down_arrow.svg);
+    width: 10px;
+    height: 6px;
 }
 
 QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
 QDateEdit::up-button:hover, QTimeEdit::up-button:hover, QDateTimeEdit::up-button:hover,
 QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover,
 QDateEdit::down-button:hover, QTimeEdit::down-button:hover, QDateTimeEdit::down-button:hover {
-    background: #303030;
+    background: #4a4a4a;
 }
 
 QComboBox {
@@ -413,20 +434,21 @@ QDateTimeEdit::drop-down {
     subcontrol-position: top right;
     width: 30px;
     border: none;
-    border-left: 1px solid #3f3f3f;
+    background: #3a3a3a;
+    border-left: 1px solid #5a5a5a;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
 
 QComboBox:hover::drop-down, QComboBox:on::drop-down {
-    background: #303030;
+    background: #4a4a4a;
 }
 
 QComboBox::down-arrow, QDateEdit[calendarPopup="true"]::down-arrow,
 QTimeEdit[calendarPopup="true"]::down-arrow, QDateTimeEdit[calendarPopup="true"]::down-arrow {
-    image: url(:/qss/psblack/add_bottom.png);
-    width: 10px;
-    height: 10px;
+    image: url(:/qss/psblack/combo_down_arrow.svg);
+    width: 12px;
+    height: 8px;
 }
 
 QComboBox QAbstractItemView {

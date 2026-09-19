@@ -26,6 +26,7 @@ class QLineEdit;
 class QCheckBox;
 class QGroupBox;
 class QPushButton;
+class QSpinBox;
 class Dialog : public QWidget
 {
     Q_OBJECT
@@ -80,7 +81,6 @@ private slots:
 
     void on_videoSourceBox_currentIndexChanged(int index);
     void on_refreshCameraBtn_clicked();
-    void on_refreshAppsBtn_clicked();
 
     void showIpEditMenu(const QPoint &pos);
 
@@ -95,6 +95,11 @@ private:
     int findDeviceFromeSerialBox(bool wifi);
     quint32 getBitRate();
     const QString &getServerPath();
+    void initAdvancedConfigUi(QWidget *parent);
+    void loadAdvancedConfig();
+    void saveAdvancedConfig();
+    void openUserDirectory(const QString &path);
+    void refreshApps();
     void updateVideoSourceUi();
     void initAdvancedDisplayUi();
     void updateAdvancedDisplayUi();
@@ -114,6 +119,17 @@ private:
     qsc::AdbProcess m_adb;
     QSystemTrayIcon *m_hideIcon;
     QGroupBox *m_advancedDisplayGroup = nullptr;
+    QComboBox *m_configLanguageBox = nullptr;
+    QLineEdit *m_configTitleEdit = nullptr;
+    QLineEdit *m_configPushPathEdit = nullptr;
+    QSpinBox *m_configMaxFpsSpin = nullptr;
+    QCheckBox *m_configRenderExpiredCheck = nullptr;
+    QComboBox *m_configOpenGlBox = nullptr;
+    QLineEdit *m_configServerPathEdit = nullptr;
+    QLineEdit *m_configAdbPathEdit = nullptr;
+    QLineEdit *m_configCodecOptionsEdit = nullptr;
+    QLineEdit *m_configCodecNameEdit = nullptr;
+    QComboBox *m_configLogLevelBox = nullptr;
     QComboBox *m_displayModeBox = nullptr;
     QLineEdit *m_displayIdEdit = nullptr;
     QLineEdit *m_newDisplayEdit = nullptr;
