@@ -8,6 +8,7 @@ dmg_settings_path = '%s/dmg-settings.json' % current_file_path
 dmg_background_img = '%s/dmg-background.jpg' % current_file_path
 app_path = '%s/../../build/QtScrcpy.app' % current_file_path
 dmg_path = '%s/../../build/QtScrcpy.dmg' % current_file_path
+readme_path = '%s/README_MACOS.md' % current_file_path
 app_name = 'QtScrcpy'
 
 def console_print(msg):
@@ -38,6 +39,12 @@ def generate_dmg_info():
                  'y': 227,
                  'type': 'link',
                  'path': '/Applications'
+                 },
+                 {
+                 'x': 390,
+                 'y': 400,
+                 'type': 'file',
+                 'path': readme_path
                  }
                  ]
                 }
