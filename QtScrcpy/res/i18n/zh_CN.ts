@@ -187,6 +187,133 @@
         <source>Advanced Display</source>
         <translation>高级显示</translation>
     </message>
+    <message>
+        <source>Advanced Config</source>
+        <translation>高级配置</translation>
+    </message>
+    <message>
+        <source>Application configuration</source>
+        <translation>应用配置</translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <source>Language</source>
+        <translation>语言</translation>
+    </message>
+    <message>
+        <source>Window title</source>
+        <translation>窗口标题</translation>
+    </message>
+    <message>
+        <source>Push file path</source>
+        <translation>文件推送路径</translation>
+    </message>
+    <message>
+        <source>Unlimited</source>
+        <translation>不限</translation>
+    </message>
+    <message>
+        <source>Maximum FPS</source>
+        <translation>最大 FPS</translation>
+    </message>
+    <message>
+        <source>Render expired video frames</source>
+        <translation>渲染过期视频帧</translation>
+    </message>
+    <message>
+        <source>Software OpenGL</source>
+        <translation>软件 OpenGL</translation>
+    </message>
+    <message>
+        <source>OpenGL ES</source>
+        <translation>OpenGL ES</translation>
+    </message>
+    <message>
+        <source>Desktop OpenGL</source>
+        <translation>桌面 OpenGL</translation>
+    </message>
+    <message>
+        <source>Takes effect after restarting QtScrcpy.</source>
+        <translation>重启 QtScrcpy 后生效。</translation>
+    </message>
+    <message>
+        <source>OpenGL backend</source>
+        <translation>OpenGL 后端</translation>
+    </message>
+    <message>
+        <source>Device server path</source>
+        <translation>设备端服务路径</translation>
+    </message>
+    <message>
+        <source>Use bundled ADB</source>
+        <translation>使用内置 ADB</translation>
+    </message>
+    <message>
+        <source>ADB executable</source>
+        <translation>ADB 可执行文件</translation>
+    </message>
+    <message>
+        <source>Codec options</source>
+        <translation>编码选项</translation>
+    </message>
+    <message>
+        <source>Codec name</source>
+        <translation>编码器名称</translation>
+    </message>
+    <message>
+        <source>Log level</source>
+        <translation>日志级别</translation>
+    </message>
+    <message>
+        <source>Open Config Directory</source>
+        <translation>打开配置目录</translation>
+    </message>
+    <message>
+        <source>Open Keymap Directory</source>
+        <translation>打开按键映射目录</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>保存</translation>
+    </message>
+    <message>
+        <source>Save failed</source>
+        <translation>保存失败</translation>
+    </message>
+    <message>
+        <source>Unable to save config.ini.</source>
+        <translation>无法保存 config.ini。</translation>
+    </message>
+    <message>
+        <source>Configuration saved</source>
+        <translation>配置已保存</translation>
+    </message>
+    <message>
+        <source>The settings were saved to config.ini. Restart QtScrcpy for all changes to take effect.</source>
+        <translation>设置已保存到 config.ini。重启 QtScrcpy 后全部生效。</translation>
+    </message>
+    <message>
+        <source>Open directory failed</source>
+        <translation>打开目录失败</translation>
+    </message>
+</context>
+<context>
+    <name>PresetConfigDialog</name>
+    <message>
+        <source>Settings</source>
+        <translation>设置</translation>
+    </message>
+    <message>
+        <source>Encoding Optimization Level</source>
+        <translation>编码优化级别</translation>
+    </message>
+    <message>
+        <source>Profile:</source>
+        <translation>方案：</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -529,87 +656,25 @@
         <source>refresh</source>
         <translation>刷新</translation>
     </message>
-
-<message>
+    <message>
         <source>Codec Mode:</source>
         <translation>编码模式：</translation>
     </message>
-<message>
+    <message>
         <source>Default (Auto)</source>
         <translation>默认（自动）</translation>
     </message>
-<message>
+    <message>
         <source>Encoder selection: Default uses system auto-select; presets enable vendor-specific tuning.</source>
         <translation>编码器选择：默认使用系统自动选择；预设启用厂商专属调优。</translation>
     </message>
-<message>
+    <message>
         <source>Open encoder advanced settings: optimization levels for visual quality and performance.</source>
         <translation>打开编码器高级设置：画质与性能优化级别调优。</translation>
     </message>
-<message>
+    <message>
         <source>Encoder Settings...</source>
         <translation>编码器设置...</translation>
-    </message>
-</context>
-<context>
-    <name>PresetConfigDialog</name>
-    <message>
-        <source>Settings</source>
-        <translation>设置</translation>
-    </message>
-    <message>
-        <source>MTK Encoder</source>
-        <translation>MTK 编码器</translation>
-    </message>
-    <message>
-        <source>This feature is for MediaTek (MTK) devices only.
-Using on non-MTK devices may cause encoding failure or visual artifacts.</source>
-        <translation>此功能仅适用于 MediaTek (MTK) 设备。
-在非 MTK 设备上使用可能导致编码失败或画面异常。</translation>
-    </message>
-    <message>
-        <source>Encoding Optimization Level</source>
-        <translation>编码优化级别</translation>
-    </message>
-    <message>
-        <source>Profile:</source>
-        <translation>方案：</translation>
-    </message>
-    <message>
-        <source>Game Mode (20Mbps, QP≤28)</source>
-        <translation>游戏模式（20Mbps, QP≤28）</translation>
-    </message>
-    <message>
-        <source>Balanced (8Mbps, QP≤35)</source>
-        <translation>均衡模式（8Mbps, QP≤35）</translation>
-    </message>
-    <message>
-        <source>Power Saver (4Mbps, QP≤35)</source>
-        <translation>省电模式（4Mbps, QP≤35）</translation>
-    </message>
-    <message>
-        <source>VBR + hard QP cap at 28 + short GOP. The strongest anti-blur shield for real-time gaming.</source>
-        <translation>VBR + QP硬上限28 + 短GOP。最强大的防模糊护盾，适用于实时游戏。</translation>
-    </message>
-    <message>
-        <source>Standard anti-blur protection with optimal visual quality. Recommended for daily use.</source>
-        <translation>标准防模糊保护，最佳视觉质量。推荐日常使用。</translation>
-    </message>
-    <message>
-        <source>Maximum power saving: low-power ME + single ref frame. Saves most encoder power for non-gaming scenarios.</source>
-        <translation>最大省电：低功耗ME + 单参考帧。非游戏场景下最大程度节省编码器功耗。</translation>
-    </message>
-    <message>
-        <source>VBR + QP cap at 28 + short GOP (5 frames). Hard ceiling blocks Sticky QP completely — best for real-time gaming.</source>
-        <translation>VBR + QP上限28 + 短GOP（5帧）。硬上限完全阻止Sticky QP — 最适合实时游戏。</translation>
-    </message>
-    <message>
-        <source>VBR + QP cap at 35 + standard GOP. Matches default visual quality while preventing QP runaway. Ideal for daily use.</source>
-        <translation>VBR + QP上限35 + 标准GOP。保持默认视觉质量同时防止QP失控。日常使用理想选择。</translation>
-    </message>
-    <message>
-        <source>VBR + QP cap at 35 + disabled visual optimizations + low-power ME + single ref frame. Maximum power saving for non-intensive scenarios.</source>
-        <translation>VBR + QP上限35 + 关闭视觉优化 + 低功耗ME + 单参考帧。非高强度场景最大化省电。</translation>
     </message>
 </context>
 </TS>
