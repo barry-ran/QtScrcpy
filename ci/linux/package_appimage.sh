@@ -245,8 +245,8 @@ if [ -d "$QT_PLUGINS_DIR" ]; then
 fi
 export QTSCRCPY_ADB_PATH="$HERE/usr/lib/qtscrcpy/adb"
 export QTSCRCPY_SERVER_PATH="$HERE/usr/lib/qtscrcpy/scrcpy-server"
-export QTSCRCPY_KEYMAP_PATH="$HERE/usr/share/keymap"
-export QTSCRCPY_CONFIG_PATH="$HERE/usr/share/config"
+export QTSCRCPY_DEFAULT_KEYMAP_PATH="$HERE/usr/share/keymap"
+export QTSCRCPY_DEFAULT_CONFIG_PATH="$HERE/usr/share/config"
 exec "$HERE/usr/bin/QtScrcpy" "$@"
 APPRUN_EOF
 else
@@ -255,8 +255,8 @@ else
 HERE="$(dirname "$(readlink -f "${0}")")"
 export QTSCRCPY_ADB_PATH="$HERE/usr/lib/qtscrcpy/adb"
 export QTSCRCPY_SERVER_PATH="$HERE/usr/lib/qtscrcpy/scrcpy-server"
-export QTSCRCPY_KEYMAP_PATH="$HERE/usr/share/keymap"
-export QTSCRCPY_CONFIG_PATH="$HERE/usr/share/config"
+export QTSCRCPY_DEFAULT_KEYMAP_PATH="$HERE/usr/share/keymap"
+export QTSCRCPY_DEFAULT_CONFIG_PATH="$HERE/usr/share/config"
 exec "$HERE/usr/bin/QtScrcpy" "$@"
 APPRUN_EOF
 fi

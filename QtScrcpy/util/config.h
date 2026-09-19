@@ -92,6 +92,9 @@ public:
 private:
     explicit Config(QObject *parent = nullptr);
     const QString &getConfigPath();
+    QString getDefaultConfigPath() const;
+    void initializeConfig();
+    void migrateLegacyConfig(const QString &configPath) const;
 
 private:
     static QString s_configPath;

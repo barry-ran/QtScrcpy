@@ -1,8 +1,10 @@
 ﻿#include <QDebug>
 #include <QAbstractItemView>
 #include <QCheckBox>
+#include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -15,6 +17,8 @@
 #include <QRegularExpression>
 #include <QSizePolicy>
 #include <QScreen>
+#include <QSet>
+#include <QStandardPaths>
 #include <QStyledItemDelegate>
 #include <QTabWidget>
 #include <QTime>
@@ -32,6 +36,7 @@
 #endif
 
 QString s_keyMapPath = "";
+QString s_defaultKeyMapPath = "";
 
 namespace {
 class ComboBoxItemDelegate final : public QStyledItemDelegate
@@ -52,12 +57,42 @@ const QString &getKeyMapPath()
 {
     if (s_keyMapPath.isEmpty()) {
         s_keyMapPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_KEYMAP_PATH"));
-        QFileInfo fileInfo(s_keyMapPath);
-        if (s_keyMapPath.isEmpty() || !fileInfo.isDir()) {
-            s_keyMapPath = QCoreApplication::applicationDirPath() + "/keymap";
+        if (s_keyMapPath.isEmpty()) {
+            s_keyMapPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/keymap";
+        }
+        if (!QDir().mkpath(s_keyMapPath)) {
+            qWarning() << "Failed to create keymap directory:" << s_keyMapPath;
         }
     }
     return s_keyMapPath;
+}
+
+const QString &getDefaultKeyMapPath()
+{
+    if (s_defaultKeyMapPath.isEmpty()) {
+        s_defaultKeyMapPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_DEFAULT_KEYMAP_PATH"));
+        if (s_defaultKeyMapPath.isEmpty()) {
+            s_defaultKeyMapPath = QCoreApplication::applicationDirPath() + "/keymap";
+        }
+    }
+    return s_defaultKeyMapPath;
+}
+
+void initializeKeyMapDirectory()
+{
+    const QDir defaultDir(getDefaultKeyMapPath());
+    const QDir userDir(getKeyMapPath());
+    if (!defaultDir.exists() || !userDir.exists()) {
+        return;
+    }
+
+    const QFileInfoList defaults = defaultDir.entryInfoList(QStringList() << "*.json", QDir::Files);
+    for (const QFileInfo &fileInfo : defaults) {
+        const QString userFile = userDir.filePath(fileInfo.fileName());
+        if (!QFileInfo::exists(userFile) && !QFile::copy(fileInfo.filePath(), userFile)) {
+            qWarning() << "Failed to copy default keymap to:" << userFile;
+        }
+    }
 }
 
 Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
@@ -542,6 +577,9 @@ QString Dialog::getGameScript(const QString &fileName)
     }
 
     QFile loadFile(getKeyMapPath() + "/" + fileName);
+    if (!loadFile.exists()) {
+        loadFile.setFileName(getDefaultKeyMapPath() + "/" + fileName);
+    }
     if (!loadFile.open(QIODevice::ReadOnly)) {
         outLog("open file failed:" + fileName, true);
         return "";
@@ -1174,18 +1212,23 @@ void Dialog::on_stopAllServerBtn_clicked()
 void Dialog::on_refreshGameScriptBtn_clicked()
 {
     ui->gameBox->clear();
-    QDir dir(getKeyMapPath());
-    if (!dir.exists()) {
+    initializeKeyMapDirectory();
+    const QDir userDir(getKeyMapPath());
+    const QDir defaultDir(getDefaultKeyMapPath());
+    if (!userDir.exists() && !defaultDir.exists()) {
         outLog("keymap directory not find", true);
         return;
     }
-    dir.setFilter(QDir::Files | QDir::NoSymLinks);
-    QFileInfoList list = dir.entryInfoList();
-    QFileInfo fileInfo;
-    int size = list.size();
-    for (int i = 0; i < size; ++i) {
-        fileInfo = list.at(i);
-        ui->gameBox->addItem(fileInfo.fileName());
+    QSet<QString> fileNames;
+    const QList<QDir> directories {userDir, defaultDir};
+    for (const QDir &dir : directories) {
+        const QFileInfoList list = dir.entryInfoList(QStringList() << "*.json", QDir::Files | QDir::NoSymLinks);
+        for (const QFileInfo &fileInfo : list) {
+            if (!fileNames.contains(fileInfo.fileName())) {
+                fileNames.insert(fileInfo.fileName());
+                ui->gameBox->addItem(fileInfo.fileName());
+            }
+        }
     }
 }
 

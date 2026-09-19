@@ -2,11 +2,11 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QStandardPaths>
 
 #include "config.h"
-#ifdef Q_OS_MACOS
-#include "path.h"
-#endif
 
 #define GROUP_COMMON "common"
 
@@ -140,6 +140,7 @@ QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
 {
+    initializeConfig();
     m_settings = new QSettings(getConfigPath() + "/config.ini", QSettings::IniFormat);
     m_userData = new QSettings(getConfigPath() + "/userdata.ini", QSettings::IniFormat);
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
@@ -160,21 +161,59 @@ const QString &Config::getConfigPath()
 {
     if (s_configPath.isEmpty()) {
         s_configPath = QString::fromLocal8Bit(qgetenv("QTSCRCPY_CONFIG_PATH"));
-        QFileInfo fileInfo(s_configPath);
-        if (s_configPath.isEmpty() || !fileInfo.isDir()) {
-            // default application dir
-            // mac系统当从finder打开app时，默认工作目录不再是可执行程序的目录了，而是"/"
-            // 而Qt的获取工作目录的api都依赖QCoreApplication的初始化，所以使用mac api获取当前目录
-#ifdef Q_OS_MACOS
-            // get */QtScrcpy.app path
-            s_configPath = Path::GetCurrentPath();
-            s_configPath += "/Contents/MacOS/config";
-#else
-            s_configPath = "config";
-#endif
+        if (s_configPath.isEmpty()) {
+            s_configPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+        }
+        if (!QDir().mkpath(s_configPath)) {
+            qWarning() << "Failed to create configuration directory:" << s_configPath;
         }
     }
     return s_configPath;
+}
+
+QString Config::getDefaultConfigPath() const
+{
+    return QString::fromLocal8Bit(qgetenv("QTSCRCPY_DEFAULT_CONFIG_PATH"));
+}
+
+void Config::initializeConfig()
+{
+    const QString configPath = getConfigPath();
+    const QString configFile = configPath + "/config.ini";
+    const QString defaultConfigFile = getDefaultConfigPath() + "/config.ini";
+
+    migrateLegacyConfig(configPath);
+
+    // The application bundle is read-only in AppImage and should be treated as
+    // read-only on macOS. Seed a user-owned copy only once, preserving changes
+    // across upgrades.
+    if (!QFileInfo::exists(configFile) && QFileInfo(defaultConfigFile).isFile()
+        && !QFile::copy(defaultConfigFile, configFile)) {
+        qWarning() << "Failed to copy default configuration to:" << configFile;
+    }
+}
+
+void Config::migrateLegacyConfig(const QString &configPath) const
+{
+    // Older releases stored mutable files beside the executable. Copy them once
+    // so existing users retain their settings when switching to standard paths.
+    if (!qgetenv("QTSCRCPY_CONFIG_PATH").isEmpty()) {
+        return;
+    }
+
+    const QDir legacyDir(QString::fromLocal8Bit(qgetenv("QTSCRCPY_LEGACY_CONFIG_PATH")));
+    if (!legacyDir.exists()) {
+        return;
+    }
+    const QDir userDir(configPath);
+    for (const QString &fileName : QStringList() << "config.ini" << "userdata.ini") {
+        const QString sourceFile = legacyDir.filePath(fileName);
+        const QString targetFile = userDir.filePath(fileName);
+        if (QFileInfo(sourceFile).isFile() && !QFileInfo::exists(targetFile)
+            && !QFile::copy(sourceFile, targetFile)) {
+            qWarning() << "Failed to migrate configuration to:" << targetFile;
+        }
+    }
 }
 
 void Config::setUserBootConfig(const UserBootConfig &config)
