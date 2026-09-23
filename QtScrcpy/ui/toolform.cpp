@@ -1,4 +1,4 @@
-#include <QDebug>
+﻿#include <QDebug>
 #include <QHideEvent>
 #include <QMouseEvent>
 #include <QShowEvent>
@@ -7,6 +7,7 @@
 #include "toolform.h"
 #include "ui_toolform.h"
 #include "videoform.h"
+#include "keymapdialog.h"
 #include "../groupcontroller/groupcontroller.h"
 
 ToolForm::ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos) : MagneticWidget(adsorbWidget, adsorbPos), ui(new Ui::ToolForm)
@@ -56,6 +57,7 @@ void ToolForm::updateCameraMode()
     ui->homeBtn->setVisible(!camera);
     ui->returnBtn->setVisible(!camera);
     ui->clipboardBtn->setVisible(!camera);
+    ui->keymapBtn->setVisible(!camera);
     ui->cameraTorchBtn->setVisible(camera);
     ui->cameraZoomOutBtn->setVisible(camera);
     ui->cameraZoomInBtn->setVisible(camera);
@@ -81,6 +83,8 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->touchBtn, QChar(0xf111), 15);
     IconHelper::Instance()->SetIcon(ui->groupControlBtn, QChar(0xf0c0), 15);
     IconHelper::Instance()->SetIcon(ui->clipboardBtn, QChar(0xf0c5), 15);
+    // Keymap manager button — joystick icon (FontAwesome f11b)
+    IconHelper::Instance()->SetIcon(ui->keymapBtn, QChar(0xf11b), 15);
     IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), 15);
     IconHelper::Instance()->SetIcon(ui->cameraZoomOutBtn, QChar(0xf010), 15);
     IconHelper::Instance()->SetIcon(ui->cameraZoomInBtn, QChar(0xf00e), 15);
@@ -314,4 +318,17 @@ void ToolForm::on_clipboardBtn_clicked()
         return;
     }
     device->requestDeviceClipboard();
+}
+
+void ToolForm::on_keymapBtn_clicked()
+{
+    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+    if (!device) {
+        return;
+    }
+    // Open the Keymap Manager dialog
+    KeymapDialog *dlg = new KeymapDialog(m_serial, this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->setWindowModality(Qt::NonModal);
+    dlg->show();
 }
