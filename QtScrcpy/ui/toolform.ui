@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>ToolForm</class>
  <widget class="QWidget" name="ToolForm">
@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>63</width>
-    <height>537</height>
+    <height>590</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,6 +24,16 @@
     <widget class="QPushButton" name="groupControlBtn">
      <property name="toolTip">
       <string>group control</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="keymapBtn">
+     <property name="toolTip">
+      <string>keymap manager (Ctrl+K)</string>
      </property>
      <property name="text">
       <string/>

@@ -1,4 +1,4 @@
-// #include <QDesktopWidget>
+﻿// #include <QDesktopWidget>
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QLabel>
@@ -22,6 +22,7 @@
 #include "iconhelper.h"
 #include "qyuvopenglwidget.h"
 #include "toolform.h"
+#include "keymapeditor.h"
 #include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "videoform.h"
@@ -240,6 +241,7 @@ void VideoForm::showToolForm(bool show)
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
         m_toolForm->setSerial(m_serial);
+        connect(m_toolForm, &ToolForm::requestToggleKeymapEditor, this, &VideoForm::toggleKeymapEditor);
     }
     m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
     m_toolForm->setVisible(show);
@@ -988,5 +990,18 @@ void VideoForm::dropEvent(QDropEvent *event)
             continue;
         }
         emit device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
+    }
+}
+
+void VideoForm::toggleKeymapEditor()
+{
+    if (!m_keymapEditor) {
+        m_keymapEditor = new KeymapEditorController(m_serial, ui->keepRatioWidget, this, this);
+    }
+    
+    if (m_keymapEditor->isVisible()) {
+        m_keymapEditor->hide();
+    } else {
+        m_keymapEditor->show();
     }
 }

@@ -1,4 +1,4 @@
-#ifndef TOOLFORM_H
+﻿#ifndef TOOLFORM_H
 #define TOOLFORM_H
 
 #include <QPointer>
@@ -23,6 +23,9 @@ public:
 
     void setSerial(const QString& serial);
     bool isHost();
+
+signals:
+    void requestToggleKeymapEditor();
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -53,6 +56,8 @@ private slots:
     void on_groupControlBtn_clicked();
     void on_openScreenBtn_clicked();
     void on_clipboardBtn_clicked();
+    // NEW: keymap manager button
+    void on_keymapBtn_clicked();
 
 private:
     void initStyle();
