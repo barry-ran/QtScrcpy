@@ -1,16 +1,20 @@
-import sys
+﻿import sys
 import os
 
 if __name__ == '__main__':
     p = os.popen('git rev-list --tags --max-count=1')
-    commit = p.read()
+    commit = p.read().strip()
     p.close()
 
-    p = os.popen('git describe --tags ' + commit)
-    tag = p.read()
-    p.close()
+    if commit:
+        p = os.popen('git describe --tags ' + commit)
+        tag = p.read().strip()
+        p.close()
+    else:
+        tag = 'v4.1.1'
 
-    # print('get tag:', tag)
+    if not tag or len(tag) < 2:
+        tag = 'v4.1.1'
 
     version = str(tag[1:])
     version_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../QtScrcpy/appversion"))

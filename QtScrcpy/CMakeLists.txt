@@ -1,4 +1,4 @@
-# For VS2019 and Xcode 12+ support.
+﻿# For VS2019 and Xcode 12+ support.
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 #
@@ -13,6 +13,10 @@ set(QC_PROJECT_NAME "QtScrcpy")
 # Read version numbers from file
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/appversion QC_FILE_VERSION)
 set(QC_PROJECT_VERSION ${QC_FILE_VERSION})
+if(NOT QC_PROJECT_VERSION OR QC_PROJECT_VERSION STREQUAL "")
+    set(QC_PROJECT_VERSION "4.1.1")
+endif()
+
 
 # Project declare
 project(${QC_PROJECT_NAME} VERSION ${QC_PROJECT_VERSION} LANGUAGES CXX)
@@ -175,6 +179,8 @@ source_group(audio FILES ${QC_AUDIO_SOURCES})
 set(QC_UI_SOURCES
     ui/toolform.h
     ui/toolform.cpp
+    ui/keymapeditor.h
+    ui/keymapeditor.cpp
     ui/toolform.ui
     ui/videoform.h
     ui/videoform.cpp
@@ -229,7 +235,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         util/path.mm
     )
 
-    # MetalVideoWindow (Apple Silicon VideoToolbox + Metal 渲染)
+    # MetalVideoWindow (Apple Silicon VideoToolbox + Metal æ¸²æŸ“)
     set(QC_UI_SOURCES ${QC_UI_SOURCES}
         render/metalvideowindow.h
         render/metalvideowindow.mm
@@ -266,7 +272,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 endif()
 
-# 翻译相关（使用shell脚本替代cmake处理翻译）
+# ç¿»è¯‘ç›¸å…³ï¼ˆä½¿ç”¨shellè„šæœ¬æ›¿ä»£cmakeå¤„ç†ç¿»è¯‘ï¼‰
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/res/i18n)
 
 # all sources
@@ -311,10 +317,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE render)
 get_property(QC_IS_MUTIL_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 message(STATUS "multi config:" QC_IS_MUTIL_CONFIG)
 
-# $<0:> 使用生成器表达式为每个config设置RUNTIME_OUTPUT_DIRECTORY，这样multi config就不会自动追加CMAKE_BUILD_TYPE子目录了
-# 1. multi config介绍 https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
-# 2. multi config在不用表达式生成器时自动追加子目录说明 https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
-# 3. 使用表达式生成器禁止multi config自动追加子目录解决方案 https://stackoverflow.com/questions/7747857/in-cmake-how-do-i-work-around-the-debug-and-release-directories-visual-studio-2
+# $<0:> ä½¿ç”¨ç”Ÿæˆå™¨è¡¨è¾¾å¼ä¸ºæ¯ä¸ªconfigè®¾ç½®RUNTIME_OUTPUT_DIRECTORYï¼Œè¿™æ ·multi configå°±ä¸ä¼šè‡ªåŠ¨è¿½åŠ CMAKE_BUILD_TYPEå­ç›®å½•äº†
+# 1. multi configä»‹ç» https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
+# 2. multi configåœ¨ä¸ç”¨è¡¨è¾¾å¼ç”Ÿæˆå™¨æ—¶è‡ªåŠ¨è¿½åŠ å­ç›®å½•è¯´æ˜Ž https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
+# 3. ä½¿ç”¨è¡¨è¾¾å¼ç”Ÿæˆå™¨ç¦æ­¢multi configè‡ªåŠ¨è¿½åŠ å­ç›®å½•è§£å†³æ–¹æ¡ˆ https://stackoverflow.com/questions/7747857/in-cmake-how-do-i-work-around-the-debug-and-release-directories-visual-studio-2
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}/$<0:>"
 )
@@ -411,3 +417,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${LINK_LIBS}
     QtScrcpyCore
 )
+
+
+
+

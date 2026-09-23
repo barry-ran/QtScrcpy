@@ -7,7 +7,7 @@
 #include "toolform.h"
 #include "ui_toolform.h"
 #include "videoform.h"
-#include "keymapdialog.h"
+#include "keymapeditor.h"
 #include "../groupcontroller/groupcontroller.h"
 
 ToolForm::ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos) : MagneticWidget(adsorbWidget, adsorbPos), ui(new Ui::ToolForm)
@@ -322,13 +322,9 @@ void ToolForm::on_clipboardBtn_clicked()
 
 void ToolForm::on_keymapBtn_clicked()
 {
-    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
-    if (!device) {
-        return;
-    }
-    // Open the Keymap Manager dialog
-    KeymapDialog *dlg = new KeymapDialog(m_serial, this);
-    dlg->setAttribute(Qt::WA_DeleteOnClose);
-    dlg->setWindowModality(Qt::NonModal);
-    dlg->show();
+    KeymapEditor *editor = new KeymapEditor(m_serial, this);
+    editor->setAttribute(Qt::WA_DeleteOnClose);
+    editor->setWindowModality(Qt::NonModal);
+    editor->show();
 }
+

@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-2022
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
@@ -31,7 +31,7 @@ jobs:
         cmake --build . --config Release
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: QtScrcpy-Windows-Release
         path: |
@@ -39,3 +39,4 @@ jobs:
           output/x64/Release/*.dll
           output/x64/Release/sndcpy/
           output/x64/Release/keymap/
+
