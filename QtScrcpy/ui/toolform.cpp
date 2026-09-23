@@ -1,4 +1,4 @@
-#include <QDebug>
+﻿#include <QDebug>
 #include <QHideEvent>
 #include <QMouseEvent>
 #include <QShowEvent>
@@ -322,9 +322,7 @@ void ToolForm::on_clipboardBtn_clicked()
 
 void ToolForm::on_keymapBtn_clicked()
 {
-    KeymapEditor *editor = new KeymapEditor(m_serial, this);
-    editor->setAttribute(Qt::WA_DeleteOnClose);
-    editor->setWindowModality(Qt::NonModal);
-    editor->show();
+    // Trigger embedded overlay editor in VideoForm
+    emit requestToggleKeymapEditor();
 }
 

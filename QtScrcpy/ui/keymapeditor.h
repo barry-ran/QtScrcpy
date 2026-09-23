@@ -1,7 +1,6 @@
-#ifndef KEYMAPEDITOR_H
+﻿#ifndef KEYMAPEDITOR_H
 #define KEYMAPEDITOR_H
 
-#include <QDialog>
 #include <QWidget>
 #include <QList>
 #include <QString>
@@ -18,29 +17,21 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
-#include <QScrollArea>
-#include <QListWidget>
 #include <QDoubleSpinBox>
 #include <QCheckBox>
-#include <QSlider>
+#include <QScrollArea>
+#include <QFrame>
 
-// Helper to convert Qt Key to string and friendly name
 QString qtKeyToString(int key);
 QString friendlyKeyName(const QString &keyStr);
 
-// Data structure for one keymap node
 struct KeyNode {
     enum Type { Click, ClickTwice, ClickMulti, SteerWheel, Drag };
-
     Type    type        = Click;
     QString comment;
-
-    // Click / Double Click / Multi Click
     QString key         = "Key_Space";
-    QPointF pos         = QPointF(0.5, 0.5); // 0.0 - 1.0 ratio
+    QPointF pos         = QPointF(0.5, 0.5);
     bool    switchMap   = false;
-
-    // SteerWheel (Joystick WASD)
     QPointF centerPos   = QPointF(0.2, 0.7);
     double  leftOffset  = 0.1;
     double  rightOffset = 0.1;
@@ -50,66 +41,50 @@ struct KeyNode {
     QString rightKey    = "Key_D";
     QString upKey       = "Key_W";
     QString downKey     = "Key_S";
-
-    // Drag
     QPointF startPos    = QPointF(0.3, 0.5);
     QPointF endPos      = QPointF(0.7, 0.5);
-
     QJsonObject toJson() const;
     static KeyNode fromJson(const QJsonObject &o);
 };
 
-// Interactive Key Recording Button
-class KeyRecordButton : public QPushButton
-{
+class KeyRecordButton : public QPushButton {
     Q_OBJECT
 public:
     explicit KeyRecordButton(QWidget *parent = nullptr);
     void setRecordedKey(const QString &keyName);
     QString recordedKey() const { return m_keyName; }
-
 signals:
     void keyChanged(const QString &newKey);
-
 protected:
     void mousePressEvent(QMouseEvent *e) override;
     void keyPressEvent(QKeyEvent *e) override;
     void focusOutEvent(QFocusEvent *e) override;
-
 private:
     bool    m_recording = false;
     QString m_keyName   = "Key_Space";
     void updateButtonText();
 };
 
-// Canvas widget - draws phone screen, all keymap nodes, handles drag & drop
-class KeymapCanvas : public QWidget
-{
+// Transparent widget rendered ON TOP of the phone video display
+class KeymapOverlay : public QWidget {
     Q_OBJECT
 public:
-    enum Orientation { Landscape, Portrait };
-
-    explicit KeymapCanvas(QWidget *parent = nullptr);
-
+    explicit KeymapOverlay(QWidget *parent = nullptr);
     void setNodes(QList<KeyNode> *nodes);
     void setSelectedIndex(int idx);
     int  selectedIndex() const { return m_selIdx; }
-
-    void setOrientation(Orientation o);
-    Orientation orientation() const { return m_orientation; }
-
-    void setMouseMoveMap(bool enabled, QPointF startPos, double speedX, double speedY, const QString &eyeKey, QPointF eyePos);
-    bool hasMouseMoveMap() const { return m_hasMouseMove; }
+    void setMouseMoveMap(bool enabled, QPointF startPos, double speedX, double speedY,
+                         const QString &eyeKey, QPointF eyePos);
+    bool    hasMouseMove()      const { return m_hasMouseMove; }
     QPointF mouseMoveStartPos() const { return m_mouseStartPos; }
-    QPointF smallEyesPos() const { return m_eyePos; }
-
+    QPointF smallEyesPos()      const { return m_eyePos; }
 signals:
     void nodeSelected(int idx);
     void nodeMoved(int idx, QPointF newRatio);
     void mouseAimMoved(QPointF newRatio);
     void smallEyesMoved(QPointF newRatio);
-    void canvasDoubleClicked(QPointF ratio);
-
+    void overlayDoubleClicked(QPointF ratio);
+    void requestDelete(int idx);
 protected:
     void paintEvent(QPaintEvent *e) override;
     void mousePressEvent(QMouseEvent *e) override;
@@ -117,132 +92,133 @@ protected:
     void mouseReleaseEvent(QMouseEvent *e) override;
     void mouseDoubleClickEvent(QMouseEvent *e) override;
     void contextMenuEvent(QContextMenuEvent *e) override;
-    void resizeEvent(QResizeEvent *e) override;
-
 private:
-    QRect   canvasRect() const;
     QPoint  ratioToPixel(QPointF r) const;
-    QPointF pixelToRatio(QPoint p) const;
-    int     hitTest(QPoint p) const; // -1: none, 0+: node idx, -2: mouseAim, -3: smallEyes
-
-    QList<KeyNode> *m_nodes        = nullptr;
-    int             m_selIdx       = -1; // -1: none, 0+: node, -2: mouseAim, -3: smallEyes
-    bool            m_drag         = false;
+    QPointF pixelToRatio(QPoint p)  const;
+    int     hitTest(QPoint p)       const;
+    QList<KeyNode> *m_nodes         = nullptr;
+    int             m_selIdx        = -1;
+    bool            m_drag          = false;
     QPoint          m_dragOffset;
-    Orientation     m_orientation  = Landscape;
-
-    // Mouse Move & Small Eyes
-    bool            m_hasMouseMove = false;
-    QPointF         m_mouseStartPos= QPointF(0.5, 0.5);
-    double          m_speedX       = 3.0;
-    double          m_speedY       = 1.5;
-    QString         m_eyeKey       = "Key_Alt";
-    QPointF         m_eyePos       = QPointF(0.8, 0.3);
+    bool            m_hasMouseMove  = false;
+    QPointF         m_mouseStartPos = QPointF(0.5, 0.5);
+    double          m_speedX        = 3.0;
+    double          m_speedY        = 1.5;
+    QString         m_eyeKey        = "Key_Alt";
+    QPointF         m_eyePos        = QPointF(0.8, 0.3);
 };
 
-// Main Dialog - TC Games Style Keymap Editor
-class KeymapEditor : public QDialog
-{
+// Compact dark side panel with add-buttons + properties + save/apply
+class KeymapSidePanel : public QFrame {
     Q_OBJECT
 public:
-    explicit KeymapEditor(const QString &serial, QWidget *parent = nullptr);
-    ~KeymapEditor();
+    explicit KeymapSidePanel(QWidget *parent = nullptr);
+    void loadNode(int idx, QList<KeyNode> *nodes, bool hasMouseMove, QPointF mousePos,
+                  double speedX, double speedY, bool hasSmallEyes,
+                  const QString &eyeKey, QPointF eyePos);
+    void clearProps();
+    void saveNodeProps(int idx, QList<KeyNode> *nodes);
+    void readMouseAimProps(bool &hasMouseMove, QPointF &mousePos, double &speedX, double &speedY);
+    void readSmallEyesProps(bool &hasSmallEyes, QString &eyeKey, QPointF &eyePos);
+    QString currentFile() const { return m_currentFile; }
+    void setCurrentFile(const QString &f);
+signals:
+    void addClick();
+    void addClickTwice();
+    void addJoystick();
+    void addMouseAim();
+    void addSmallEyes();
+    void applyProps();
+    void deleteSelected();
+    void duplicateSelected();
+    void saveAndApply();
+    void saveAs();
+    void importFile();
+    void newLayout();
+    void closeOverlay();
+private:
+    void buildUI();
+    QLabel          *m_fileLabel    = nullptr;
+    QString          m_currentFile;
+    QScrollArea     *m_propsScroll  = nullptr;
+    QGroupBox       *m_propsGroup   = nullptr;
+    QLineEdit       *m_commentEdit  = nullptr;
+    QComboBox       *m_typeCombo    = nullptr;
+    QWidget         *m_clickWidget  = nullptr;
+    KeyRecordButton *m_keyBtn       = nullptr;
+    QCheckBox       *m_switchChk    = nullptr;
+    QWidget         *m_joyWidget    = nullptr;
+    KeyRecordButton *m_upBtn        = nullptr;
+    KeyRecordButton *m_downBtn      = nullptr;
+    KeyRecordButton *m_leftBtn      = nullptr;
+    KeyRecordButton *m_rightBtn     = nullptr;
+    QDoubleSpinBox  *m_offsetSpin   = nullptr;
+    QWidget         *m_aimWidget    = nullptr;
+    QDoubleSpinBox  *m_speedXSpin   = nullptr;
+    QDoubleSpinBox  *m_speedYSpin   = nullptr;
+    QWidget         *m_eyeWidget    = nullptr;
+    KeyRecordButton *m_eyeKeyBtn    = nullptr;
+    QPushButton     *m_applyBtn     = nullptr;
+    QPushButton     *m_deleteBtn    = nullptr;
+    QPushButton     *m_dupBtn       = nullptr;
+};
 
+// Controller: owns overlay + panel, attaches to VideoForm. Replaces old QDialog.
+class KeymapEditorController : public QObject {
+    Q_OBJECT
+public:
+    explicit KeymapEditorController(const QString &serial, QWidget *videoContainer,
+                                    QWidget *sideParent, QObject *parent = nullptr);
+    ~KeymapEditorController();
+    void show();
+    void hide();
+    bool isVisible() const;
+protected:
+    bool eventFilter(QObject *obj, QEvent *ev) override;
 private slots:
     void onNodeSelected(int idx);
-    void onNodeMoved(int idx, QPointF newRatio);
-    void onMouseAimMoved(QPointF newRatio);
-    void onSmallEyesMoved(QPointF newRatio);
-    void onCanvasDoubleClicked(QPointF ratio);
-
+    void onNodeMoved(int idx, QPointF r);
+    void onMouseAimMoved(QPointF r);
+    void onSmallEyesMoved(QPointF r);
+    void onOverlayDoubleClicked(QPointF r);
+    void onRequestDelete(int idx);
     void onAddClick();
     void onAddClickTwice();
     void onAddJoystick();
     void onAddMouseAim();
     void onAddSmallEyes();
+    void onApplyProps();
     void onDeleteSelected();
     void onDuplicateSelected();
-
-    void onApplyProps();
     void onSaveAndApply();
     void onSaveAs();
-    void onLoadPreset(int index);
     void onImportFile();
     void onNewLayout();
-    void onToggleOrientation();
-
-protected:
-    void keyPressEvent(QKeyEvent *e) override;
-
+    void onClose();
 private:
-    void buildUI();
-    void applyTheme();
-    void refreshPresetList();
-    void populateList();
-    void loadPropsToUI(int idx);
-    void savePropsFromUI(int idx);
-
-    QString defaultKeymapDir() const;
-    QString userKeymapDir() const;
-    QString currentFilePath() const;
+    void syncOverlay();
     bool loadJson(const QString &path);
     bool saveJson(const QString &path);
     void applyToDevice();
-
-    // State
+    QString defaultKeymapDir() const;
+    QString userKeymapDir()    const;
+    QString currentFilePath()  const;
     QString          m_serial;
+    QWidget         *m_videoContainer  = nullptr;
+    QWidget         *m_sideParent      = nullptr;
+    KeymapOverlay   *m_overlay         = nullptr;
+    KeymapSidePanel *m_panel           = nullptr;
     QList<KeyNode>   m_nodes;
-    QString          m_switchKey      = "Key_QuoteLeft";
-    bool             m_hasMouseMove   = true;
-    QPointF          m_mouseStartPos  = QPointF(0.55, 0.5);
-    double           m_mouseSpeedX    = 3.0;
-    double           m_mouseSpeedY    = 1.5;
-    bool             m_hasSmallEyes   = false;
-    QString          m_smallEyesKey   = "Key_Alt";
-    QPointF          m_smallEyesPos   = QPointF(0.8, 0.3);
-    double           m_smallEyesSpeed = 10.0;
+    int              m_selIdx          = -1;
+    bool             m_hasMouseMove    = true;
+    QPointF          m_mouseStartPos   = QPointF(0.55, 0.5);
+    double           m_mouseSpeedX     = 3.0;
+    double           m_mouseSpeedY     = 1.5;
+    bool             m_hasSmallEyes    = false;
+    QString          m_smallEyesKey    = "Key_Alt";
+    QPointF          m_smallEyesPos    = QPointF(0.8, 0.3);
+    QString          m_switchKey       = "Key_QuoteLeft";
     QString          m_currentFile;
-    int              m_selIdx         = -1;
-
-    // UI
-    KeymapCanvas    *m_canvas         = nullptr;
-    QListWidget     *m_nodeList       = nullptr;
-    QComboBox       *m_presetCombo    = nullptr;
-    QPushButton     *m_orientBtn      = nullptr;
-    QLabel          *m_fileStatusLbl  = nullptr;
-
-    // Properties Panel
-    QGroupBox       *m_propsGroup     = nullptr;
-    QLineEdit       *m_commentEdit    = nullptr;
-    QComboBox       *m_typeCombo      = nullptr;
-
-    // Click Widget
-    QWidget         *m_clickWidget    = nullptr;
-    KeyRecordButton *m_keyRecordBtn   = nullptr;
-    QLineEdit       *m_keyTextEdit    = nullptr;
-    QCheckBox       *m_switchChk      = nullptr;
-
-    // Joystick Widget
-    QWidget         *m_joyWidget      = nullptr;
-    KeyRecordButton *m_upKeyBtn       = nullptr;
-    KeyRecordButton *m_downKeyBtn     = nullptr;
-    KeyRecordButton *m_leftKeyBtn     = nullptr;
-    KeyRecordButton *m_rightKeyBtn    = nullptr;
-    QDoubleSpinBox  *m_offsetSpin     = nullptr;
-
-    // Mouse Aim Widget
-    QWidget         *m_aimWidget      = nullptr;
-    KeyRecordButton *m_switchKeyBtn   = nullptr;
-    QDoubleSpinBox  *m_aimSpeedXSpin  = nullptr;
-    QDoubleSpinBox  *m_aimSpeedYSpin  = nullptr;
-
-    // Small Eyes Widget
-    QWidget         *m_eyeWidget      = nullptr;
-    KeyRecordButton *m_eyeKeyBtn      = nullptr;
-
-    QPushButton     *m_deleteBtn      = nullptr;
-    QPushButton     *m_duplicateBtn   = nullptr;
-    QPushButton     *m_applyPropsBtn  = nullptr;
 };
 
 #endif // KEYMAPEDITOR_H

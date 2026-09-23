@@ -24,6 +24,9 @@ public:
     void setSerial(const QString& serial);
     bool isHost();
 
+signals:
+    void requestToggleKeymapEditor();
+
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

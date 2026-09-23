@@ -1,4 +1,4 @@
-#ifndef VIDEOFORM_H
+﻿#ifndef VIDEOFORM_H
 #define VIDEOFORM_H
 
 #include <QPointer>
@@ -13,6 +13,7 @@ namespace Ui
 }
 
 class ToolForm;
+class KeymapEditorController;
 class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
@@ -35,6 +36,9 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
     bool isHost();
+
+public slots:
+    void toggleKeymapEditor();
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
@@ -107,6 +111,7 @@ private:
 
     //Whether to display the toolbar when connecting a device.
     bool show_toolbar = true;
+    KeymapEditorController* m_keymapEditor = nullptr;
 };
 
 #endif // VIDEOFORM_H
