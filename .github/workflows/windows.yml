@@ -1,5 +1,5 @@
-﻿name: Windows
-# è§¦å‘è§„åˆ™è¯¦è§£ https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
+name: Windows
+# 触发规则详解 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
 on: 
   push:
     paths:
@@ -16,17 +16,17 @@ on:
 jobs:
   build:
     name: Build
-    # windows-latestç›®å‰æ˜¯windows server 2022
-    # windows server 2019å®‰è£…çš„æ˜¯vs2019ï¼Œwindows server 2016å®‰è£…çš„æ˜¯vs2017
+    # windows-latest目前是windows server 2022
+    # windows server 2019安装的是vs2019，windows server 2016安装的是vs2017
     # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
     runs-on: windows-2022
 
-    # çŸ©é˜µé…ç½® https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
+    # 矩阵配置 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
     strategy:
       matrix:
         qt-ver: [5.15.2]
         qt-arch: [win64_msvc2019_64, win32_msvc2019]
-        # é…ç½®qt-archçš„é¢å¤–è®¾ç½®msvc-archï¼Œqt-arch-install
+        # 配置qt-arch的额外设置msvc-arch，qt-arch-install
         include:
           - qt-arch: win64_msvc2019_64
             msvc-arch: x64
@@ -34,16 +34,16 @@ jobs:
           - qt-arch: win32_msvc2019
             msvc-arch: x86
             qt-arch-install: msvc2019
-    # job env,æ‰€æœ‰stepséƒ½å¯ä»¥è®¿é—®
-    # ä¸åŒçº§åˆ«envè¯¦è§£ https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#env
-    # ä½¿ç”¨è¡¨è¾¾å¼è¯­æ³•${{}}è®¿é—®ä¸Šä¸‹æ–‡ https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
+    # job env,所有steps都可以访问
+    # 不同级别env详解 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#env
+    # 使用表达式语法${{}}访问上下文 https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
     env:
       target-name: QtScrcpy
       vcvarsall-path: 'C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
       vcinstall-path: 'C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC'
       qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
       plantform-des: win
-    # æ­¥éª¤
+    # 步骤
     steps:
       - name: Cache Qt
         id: cache-qt
@@ -51,9 +51,9 @@ jobs:
         with:
           path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
           key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch }}        
-      # å®‰è£…Qt
+      # 安装Qt
       - name: Install Qt
-        # ä½¿ç”¨å¤–éƒ¨actionã€‚è¿™ä¸ªactionä¸“é—¨ç”¨æ¥å®‰è£…Qt
+        # 使用外部action。这个action专门用来安装Qt
         uses: jurplel/install-qt-action@v4.1.1
         with:
           # Version of Qt to install
@@ -63,15 +63,15 @@ jobs:
           # Architecture for Windows/Android
           arch: ${{ matrix.qt-arch }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-      # æ‹‰å–ä»£ç 
-      - uses: actions/checkout@v2
+      # 拉取代码
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: 'true'
           ssh-key: ${{ secrets.BOT_SSH_KEY }}
-      # ç¼–è¯‘msvc
+      # 编译msvc
       - name: Build MSVC
-        # shellä»‹ç» https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#using-a-specific-shell
+        # shell介绍 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#using-a-specific-shell
         shell: cmd
         env:
           ENV_VCVARSALL: ${{ env.vcvarsall-path }}
@@ -79,13 +79,13 @@ jobs:
         run: |
           call python ci\generate-version.py
           call "ci\win\build_for_win.bat" RelWithDebInfo ${{ matrix.msvc-arch }}
-      # èŽ·å–refæœ€åŽä¸€ä¸ª/åŽçš„å†…å®¹
+      # 获取ref最后一个/后的内容
       - name: Get the version
         shell: bash
         id: get-version
-        # ${ GITHUB_REF/refs\/tags\// }æ˜¯linux shell ${}çš„å˜é‡æ›¿æ¢è¯­æ³•
+        # ${ GITHUB_REF/refs\/tags\// }是linux shell ${}的变量替换语法
         run: echo ::set-output name=version::${GITHUB_REF##*/}
-      # tag æ‰“åŒ…
+      # tag 打包
       - name: Package
         id: package
         env:
@@ -95,10 +95,10 @@ jobs:
           publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.msvc-arch }}-${{ steps.get-version.outputs.version }}
         run: |
           cmd.exe /c ci\win\publish_for_win.bat ${{ matrix.msvc-arch }} ..\build\${{ env.publish_name }}
-          # æ‰“åŒ…zip
+          # 打包zip
           Compress-Archive -Path ci\build\${{ env.publish_name }} ci\build\${{ env.publish_name }}.zip
           echo "::set-output name=package-name::${{ env.publish_name }}"
-      # ä¸Šä¼ artifacts
+      # 上传artifacts
       # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
       - uses: actions/upload-artifact@v4
         with:

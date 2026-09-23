@@ -1,4 +1,4 @@
-﻿name: Build Windows (Release)
+name: Build Windows (Release)
 
 on:
   push:
@@ -39,4 +39,3 @@ jobs:
           output/x64/Release/*.dll
           output/x64/Release/sndcpy/
           output/x64/Release/keymap/
-

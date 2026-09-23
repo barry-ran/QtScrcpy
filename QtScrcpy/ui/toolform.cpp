@@ -1,4 +1,4 @@
-﻿#include <QDebug>
+#include <QDebug>
 #include <QHideEvent>
 #include <QMouseEvent>
 #include <QShowEvent>

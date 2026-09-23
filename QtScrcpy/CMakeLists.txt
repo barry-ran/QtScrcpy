@@ -1,4 +1,4 @@
-﻿# For VS2019 and Xcode 12+ support.
+# For VS2019 and Xcode 12+ support.
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 #

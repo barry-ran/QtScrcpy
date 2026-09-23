@@ -1,4 +1,4 @@
-﻿#ifndef KEYMAPEDITOR_H
+#ifndef KEYMAPEDITOR_H
 #define KEYMAPEDITOR_H
 
 #include <QDialog>

@@ -1,4 +1,4 @@
-﻿import sys
+import sys
 import os
 
 if __name__ == '__main__':
@@ -15,6 +15,8 @@ if __name__ == '__main__':
 
     if not tag or len(tag) < 2:
         tag = 'v4.1.1'
+
+    # print('get tag:', tag)
 
     version = str(tag[1:])
     version_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "../QtScrcpy/appversion"))

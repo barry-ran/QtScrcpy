@@ -1,4 +1,4 @@
-﻿#include "keymapeditor.h"
+#include "keymapeditor.h"
 
 #include <QApplication>
 #include <QDir>
