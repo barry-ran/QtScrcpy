@@ -1,4 +1,4 @@
-#include "keymapdialog.h"
+﻿#include "keymapdialog.h"
 
 #include <QApplication>
 #include <QCoreApplication>
@@ -37,7 +37,7 @@ QString KeymapDialog::getDefaultKeymapPath() const
     return p;
 }
 
-/** يحاول إيجاد الملف أولاً في مجلد المستخدم، ثم في المجلد الافتراضي */
+/**            */
 QString KeymapDialog::resolveKeymapPath(const QString &fileName) const
 {
     QString userPath = getUserKeymapPath() + "/" + fileName;
@@ -46,7 +46,7 @@ QString KeymapDialog::resolveKeymapPath(const QString &fileName) const
     return getDefaultKeymapPath() + "/" + fileName;
 }
 
-/** تحويل نوع الـ key إلى نص عربي / إنجليزي مقروء */
+/**    key    /   */
 QString KeymapDialog::keyTypeToString(const QString &type) const
 {
     if (type == "KMT_CLICK")       return tr("Click");
@@ -63,7 +63,7 @@ QString KeymapDialog::keyTypeToString(const QString &type) const
 KeymapDialog::KeymapDialog(const QString &serial, QWidget *parent)
     : QDialog(parent), m_serial(serial)
 {
-    setWindowTitle(tr("🎮 Keymap Manager"));
+    setWindowTitle(tr(" Keymap Manager"));
     setMinimumSize(860, 560);
     resize(960, 620);
     setupUI();
@@ -81,9 +81,9 @@ void KeymapDialog::setupUI()
     mainLayout->setContentsMargins(10, 10, 10, 6);
     mainLayout->setSpacing(8);
 
-    // ── Title bar info ──────────────────────────────────────────────────────
+    //  Title bar info 
     auto *titleBar = new QHBoxLayout();
-    auto *titleLabel = new QLabel(tr("<b>Keymap Manager</b> — device: <code>%1</code>").arg(m_serial));
+    auto *titleLabel = new QLabel(tr("<b>Keymap Manager</b>  device: <code>%1</code>").arg(m_serial));
     titleLabel->setStyleSheet("font-size: 13px; color: #ddd;");
     titleBar->addWidget(titleLabel);
     titleBar->addStretch();
@@ -93,17 +93,17 @@ void KeymapDialog::setupUI()
     titleBar->addWidget(m_statusLabel);
     mainLayout->addLayout(titleBar);
 
-    // ── Horizontal splitter: file list | details/editor ────────────────────
+    //  Horizontal splitter: file list | details/editor 
     auto *splitter = new QSplitter(Qt::Horizontal, this);
     splitter->setHandleWidth(4);
 
-    // ── LEFT: File list panel ───────────────────────────────────────────────
+    //  LEFT: File list panel 
     auto *leftWidget = new QWidget();
     auto *leftLayout = new QVBoxLayout(leftWidget);
     leftLayout->setContentsMargins(0, 0, 0, 0);
     leftLayout->setSpacing(4);
 
-    auto *listLabel = new QLabel(tr("📋 Keymap Files"));
+    auto *listLabel = new QLabel(tr(" Keymap Files"));
     listLabel->setStyleSheet("font-weight: bold; color: #ccc; padding: 2px 0;");
     leftLayout->addWidget(listLabel);
 
@@ -118,8 +118,8 @@ void KeymapDialog::setupUI()
 
     // Left action buttons
     auto *leftBtns = new QHBoxLayout();
-    m_newBtn    = new QPushButton(tr("＋ New"));
-    m_deleteBtn = new QPushButton(tr("🗑 Delete"));
+    m_newBtn    = new QPushButton(tr(" New"));
+    m_deleteBtn = new QPushButton(tr(" Delete"));
     m_newBtn->setFixedHeight(28);
     m_deleteBtn->setFixedHeight(28);
     m_newBtn->setStyleSheet("QPushButton{background:#313244;color:#a6e3a1;border:1px solid #45475a;border-radius:3px;}"
@@ -134,7 +134,7 @@ void KeymapDialog::setupUI()
     leftWidget->setMaximumWidth(260);
     splitter->addWidget(leftWidget);
 
-    // ── RIGHT: Tab widget (Details | JSON Editor) ──────────────────────────
+    //  RIGHT: Tab widget (Details | JSON Editor) 
     m_tabWidget = new QTabWidget();
     m_tabWidget->setStyleSheet(
         "QTabWidget::pane { border:1px solid #45475a; background:#1e1e2e; border-radius:4px; }"
@@ -147,7 +147,7 @@ void KeymapDialog::setupUI()
     detailsLayout->setContentsMargins(8, 8, 8, 8);
     detailsLayout->setSpacing(6);
 
-    m_switchKeyLabel = new QLabel(tr("Switch Key: —"));
+    m_switchKeyLabel = new QLabel(tr("Switch Key: "));
     m_switchKeyLabel->setStyleSheet("color:#f9e2af; font-weight:bold; font-size:12px;");
     detailsLayout->addWidget(m_switchKeyLabel);
 
@@ -171,7 +171,7 @@ void KeymapDialog::setupUI()
         "QHeaderView::section { background:#313244; color:#cba6f7; padding:4px; border:none; border-bottom:1px solid #45475a; }");
     detailsLayout->addWidget(m_detailsTable);
 
-    m_tabWidget->addTab(detailsWidget, tr("📊 Details"));
+    m_tabWidget->addTab(detailsWidget, tr(" Details"));
 
     // -- Tab 2: JSON Editor ---------------------------------------------------
     auto *editorWidget = new QWidget();
@@ -192,7 +192,7 @@ void KeymapDialog::setupUI()
     editorLayout->addWidget(m_jsonEditor);
 
     auto *editorBtns = new QHBoxLayout();
-    m_saveEditorBtn = new QPushButton(tr("💾 Save to Disk"));
+    m_saveEditorBtn = new QPushButton(tr(" Save to Disk"));
     m_saveEditorBtn->setFixedHeight(28);
     m_saveEditorBtn->setStyleSheet(
         "QPushButton{background:#313244;color:#a6e3a1;border:1px solid #45475a;border-radius:3px;}"
@@ -201,17 +201,17 @@ void KeymapDialog::setupUI()
     editorBtns->addWidget(m_saveEditorBtn);
     editorLayout->addLayout(editorBtns);
 
-    m_tabWidget->addTab(editorWidget, tr("✏️ JSON Editor"));
+    m_tabWidget->addTab(editorWidget, tr(" JSON Editor"));
     splitter->addWidget(m_tabWidget);
     splitter->setStretchFactor(1, 1);
 
     mainLayout->addWidget(splitter, 1);
 
-    // ── Bottom apply bar ─────────────────────────────────────────────────────
+    //  Bottom apply bar 
     auto *bottomBar = new QHBoxLayout();
     bottomBar->setSpacing(8);
 
-    m_applyBtn = new QPushButton(tr("✅  Apply to Device"));
+    m_applyBtn = new QPushButton(tr("  Apply to Device"));
     m_applyBtn->setFixedHeight(34);
     m_applyBtn->setEnabled(false);
     m_applyBtn->setStyleSheet(
@@ -230,10 +230,10 @@ void KeymapDialog::setupUI()
     bottomBar->addWidget(closeBtn);
     mainLayout->addLayout(bottomBar);
 
-    // ── Dark background ───────────────────────────────────────────────────────
+    //  Dark background 
     setStyleSheet("QDialog { background:#181825; } QLabel { color:#cdd6f4; }");
 
-    // ── Connections ───────────────────────────────────────────────────────────
+    //  Connections 
     connect(m_fileList,     &QListWidget::itemClicked,      this, &KeymapDialog::onKeymapSelected);
     connect(m_applyBtn,     &QPushButton::clicked,          this, &KeymapDialog::onApplyClicked);
     connect(m_newBtn,       &QPushButton::clicked,          this, &KeymapDialog::onNewClicked);
@@ -292,7 +292,7 @@ void KeymapDialog::onKeymapSelected(QListWidgetItem *item)
 void KeymapDialog::loadKeymapDetails(const QString &filePath)
 {
     m_detailsTable->setRowCount(0);
-    m_switchKeyLabel->setText(tr("Switch Key: —"));
+    m_switchKeyLabel->setText(tr("Switch Key: "));
     m_filePathLabel->setText(filePath);
 
     QFile f(filePath);
@@ -303,14 +303,14 @@ void KeymapDialog::loadKeymapDetails(const QString &filePath)
     f.close();
 
     if (err.error != QJsonParseError::NoError || !doc.isObject()) {
-        m_statusLabel->setText(tr("⚠️ JSON parse error: %1").arg(err.errorString()));
+        m_statusLabel->setText(tr(" JSON parse error: %1").arg(err.errorString()));
         return;
     }
 
     QJsonObject root = doc.object();
 
     // Switch key
-    m_switchKeyLabel->setText(tr("Switch Key: <b>%1</b>").arg(root["switchKey"].toString("—")));
+    m_switchKeyLabel->setText(tr("Switch Key: <b>%1</b>").arg(root["switchKey"].toString("")));
 
     // keyMapNodes
     QJsonArray nodes = root["keyMapNodes"].toArray();
@@ -323,7 +323,7 @@ void KeymapDialog::loadKeymapDetails(const QString &filePath)
 
         // For steer wheel, show arrow keys
         if (type == "KMT_STEER_WHEEL") {
-            key = QString("↑%1 ↓%2 ←%3 →%4")
+            key = QString("%1 %2 %3 %4")
                       .arg(node["upKey"].toString())
                       .arg(node["downKey"].toString())
                       .arg(node["leftKey"].toString())
@@ -337,9 +337,9 @@ void KeymapDialog::loadKeymapDetails(const QString &filePath)
         m_detailsTable->setItem(i, 0, new QTableWidgetItem(key));
         m_detailsTable->setItem(i, 1, new QTableWidgetItem(keyTypeToString(type)));
         m_detailsTable->setItem(i, 2, new QTableWidgetItem(
-            pos.contains("x") ? QString::number(pos["x"].toDouble(), 'f', 4) : "—"));
+            pos.contains("x") ? QString::number(pos["x"].toDouble(), 'f', 4) : ""));
         m_detailsTable->setItem(i, 3, new QTableWidgetItem(
-            pos.contains("y") ? QString::number(pos["y"].toDouble(), 'f', 4) : "—"));
+            pos.contains("y") ? QString::number(pos["y"].toDouble(), 'f', 4) : ""));
     }
 }
 
@@ -361,7 +361,7 @@ void KeymapDialog::loadKeymapToEditor(const QString &filePath)
 bool KeymapDialog::saveKeymapFromEditor()
 {
     if (m_currentFile.isEmpty()) {
-        m_statusLabel->setText(tr("⚠️ No file selected."));
+        m_statusLabel->setText(tr(" No file selected."));
         return false;
     }
 
@@ -388,7 +388,7 @@ bool KeymapDialog::saveKeymapFromEditor()
     out.close();
 
     m_currentFile = savePath;
-    m_statusLabel->setText(tr("✅ Saved to %1").arg(savePath));
+    m_statusLabel->setText(tr(" Saved to %1").arg(savePath));
     return true;
 }
 
@@ -399,20 +399,20 @@ void KeymapDialog::applyKeymap(const QString &filePath)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (!device) {
-        m_statusLabel->setText(tr("⚠️ Device not connected: %1").arg(m_serial));
+        m_statusLabel->setText(tr(" Device not connected: %1").arg(m_serial));
         return;
     }
 
     QFile f(filePath);
     if (!f.open(QIODevice::ReadOnly)) {
-        m_statusLabel->setText(tr("⚠️ Cannot read file: %1").arg(filePath));
+        m_statusLabel->setText(tr(" Cannot read file: %1").arg(filePath));
         return;
     }
     QString json = f.readAll();
     f.close();
 
     device->updateScript(json);
-    m_statusLabel->setText(tr("✅ Keymap applied: %1").arg(QFileInfo(filePath).fileName()));
+    m_statusLabel->setText(tr(" Keymap applied: %1").arg(QFileInfo(filePath).fileName()));
 }
 
 // ---------------------------------------------------------------------------
@@ -484,7 +484,7 @@ void KeymapDialog::onNewClicked()
     }
     // Switch to editor so user can start editing immediately
     m_tabWidget->setCurrentIndex(1);
-    m_statusLabel->setText(tr("✅ Created: %1").arg(name + ".json"));
+    m_statusLabel->setText(tr(" Created: %1").arg(name + ".json"));
 }
 
 void KeymapDialog::onDeleteClicked()
@@ -512,8 +512,8 @@ void KeymapDialog::onDeleteClicked()
     m_applyBtn->setEnabled(false);
     m_detailsTable->setRowCount(0);
     m_jsonEditor->clear();
-    m_switchKeyLabel->setText(tr("Switch Key: —"));
+    m_switchKeyLabel->setText(tr("Switch Key: "));
     m_filePathLabel->clear();
     refreshFileList();
-    m_statusLabel->setText(tr("🗑 Deleted: %1").arg(fileName));
+    m_statusLabel->setText(tr(" Deleted: %1").arg(fileName));
 }

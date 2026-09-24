@@ -1,4 +1,4 @@
-#ifndef OVERLAYPANEL_H
+﻿#ifndef OVERLAYPANEL_H
 #define OVERLAYPANEL_H
 
 #include <QWidget>
@@ -90,6 +90,8 @@ private slots:
     void onOpacitySliderChanged(int val);
     void onSaveAndApply();
     void onExportKeymap();
+    void onImportKeymap();
+    void onClearAll();
     void onToggleHUD();
     void onCloseEdit();
     void onDeleteSelected();
@@ -176,6 +178,8 @@ private:
     QPushButton *m_saveBtn        = nullptr;
     QPushButton *m_hudToggleBtn   = nullptr;
     QPushButton *m_closeBtn       = nullptr;
+    QPushButton *m_importBtn      = nullptr;
+    QPushButton *m_clearAllBtn    = nullptr;
 };
 
 #endif // OVERLAYPANEL_H

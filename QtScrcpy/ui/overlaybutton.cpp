@@ -1,4 +1,4 @@
-#include "overlaybutton.h"
+﻿#include "overlaybutton.h"
 
 #include <QContextMenuEvent>
 #include <QFont>
@@ -66,63 +66,63 @@ QString OverlayButton::mapArabicOrNumberToLatinKey(const QString &raw)
     if (s.startsWith("Key_")) s = s.mid(4);
 
     // Direct high-frequency game bindings
-    if (s == "1579" || s == "ث") return "Key_E";
-    if (s == "1602" || s == "ق") return "Key_R";
-    if (s == "1589" || s == "ص") return "Key_W";
-    if (s == "1588" || s == "ش") return "Key_A";
-    if (s == "1587" || s == "س") return "Key_S";
-    if (s == "1610" || s == "ي") return "Key_D";
-    if (s == "1590" || s == "ض") return "Key_Q";
-    if (s == "1601" || s == "ف") return "Key_T";
-    if (s == "1594" || s == "غ") return "Key_Y";
-    if (s == "1593" || s == "ع") return "Key_U";
-    if (s == "1607" || s == "ه") return "Key_I";
-    if (s == "1582" || s == "خ") return "Key_O";
-    if (s == "1581" || s == "ح") return "Key_P";
-    if (s == "1576" || s == "ب") return "Key_F";
-    if (s == "1604" || s == "ل") return "Key_G";
-    if (s == "1575" || s == "ا") return "Key_H";
-    if (s == "1578" || s == "ت") return "Key_J";
-    if (s == "1606" || s == "ن") return "Key_K";
-    if (s == "1605" || s == "م") return "Key_L";
-    if (s == "1574" || s == "ئ") return "Key_Z";
-    if (s == "1569" || s == "ء") return "Key_X";
-    if (s == "1572" || s == "ؤ") return "Key_C";
-    if (s == "1585" || s == "ر") return "Key_V";
-    if (s == "1609" || s == "ى") return "Key_N";
-    if (s == "1577" || s == "ة") return "Key_M";
-    if (s == "1584" || s == "ذ") return "Key_QuoteLeft";
+    if (s == "1579" || s == "") return "Key_E";
+    if (s == "1602" || s == "") return "Key_R";
+    if (s == "1589" || s == "") return "Key_W";
+    if (s == "1588" || s == "") return "Key_A";
+    if (s == "1587" || s == "") return "Key_S";
+    if (s == "1610" || s == "") return "Key_D";
+    if (s == "1590" || s == "") return "Key_Q";
+    if (s == "1601" || s == "") return "Key_T";
+    if (s == "1594" || s == "") return "Key_Y";
+    if (s == "1593" || s == "") return "Key_U";
+    if (s == "1607" || s == "") return "Key_I";
+    if (s == "1582" || s == "") return "Key_O";
+    if (s == "1581" || s == "") return "Key_P";
+    if (s == "1576" || s == "") return "Key_F";
+    if (s == "1604" || s == "") return "Key_G";
+    if (s == "1575" || s == "") return "Key_H";
+    if (s == "1578" || s == "") return "Key_J";
+    if (s == "1606" || s == "") return "Key_K";
+    if (s == "1605" || s == "") return "Key_L";
+    if (s == "1574" || s == "") return "Key_Z";
+    if (s == "1569" || s == "") return "Key_X";
+    if (s == "1572" || s == "") return "Key_C";
+    if (s == "1585" || s == "") return "Key_V";
+    if (s == "1609" || s == "") return "Key_N";
+    if (s == "1577" || s == "") return "Key_M";
+    if (s == "1584" || s == "") return "Key_QuoteLeft";
 
     bool ok = false;
     int code = s.toInt(&ok);
     if (ok) {
         switch (code) {
-        case 0x0636: return "Key_Q"; // ض
-        case 0x0635: return "Key_W"; // ص
-        case 0x062B: return "Key_E"; // ث (1579)
-        case 0x0642: return "Key_R"; // ق (1602)
-        case 0x0641: return "Key_T"; // ف (1601)
-        case 0x063A: return "Key_Y"; // غ
-        case 0x0639: return "Key_U"; // ع
-        case 0x0647: return "Key_I"; // ه
-        case 0x062E: return "Key_O"; // خ
-        case 0x062D: return "Key_P"; // ح
-        case 0x0634: return "Key_A"; // ش
-        case 0x0633: return "Key_S"; // س
-        case 0x064A: return "Key_D"; // ي
-        case 0x0628: return "Key_F"; // ب
-        case 0x0644: return "Key_G"; // ل
-        case 0x0627: return "Key_H"; // ا
-        case 0x062A: return "Key_J"; // ت
-        case 0x0646: return "Key_K"; // ن
-        case 0x0645: return "Key_L"; // م
-        case 0x0626: return "Key_Z"; // ئ
-        case 0x0621: return "Key_X"; // ء
-        case 0x0624: return "Key_C"; // ؤ
-        case 0x0631: return "Key_V"; // ر
-        case 0x0649: return "Key_N"; // ى
-        case 0x0629: return "Key_M"; // ة
-        case 0x0630: return "Key_QuoteLeft"; // ذ
+        case 0x0636: return "Key_Q"; // 
+        case 0x0635: return "Key_W"; // 
+        case 0x062B: return "Key_E"; //  (1579)
+        case 0x0642: return "Key_R"; //  (1602)
+        case 0x0641: return "Key_T"; //  (1601)
+        case 0x063A: return "Key_Y"; // 
+        case 0x0639: return "Key_U"; // 
+        case 0x0647: return "Key_I"; // 
+        case 0x062E: return "Key_O"; // 
+        case 0x062D: return "Key_P"; // 
+        case 0x0634: return "Key_A"; // 
+        case 0x0633: return "Key_S"; // 
+        case 0x064A: return "Key_D"; // 
+        case 0x0628: return "Key_F"; // 
+        case 0x0644: return "Key_G"; // 
+        case 0x0627: return "Key_H"; // 
+        case 0x062A: return "Key_J"; // 
+        case 0x0646: return "Key_K"; // 
+        case 0x0645: return "Key_L"; // 
+        case 0x0626: return "Key_Z"; // 
+        case 0x0621: return "Key_X"; // 
+        case 0x0624: return "Key_C"; // 
+        case 0x0631: return "Key_V"; // 
+        case 0x0649: return "Key_N"; // 
+        case 0x0629: return "Key_M"; // 
+        case 0x0630: return "Key_QuoteLeft"; // 
         default: break;
         }
     }
@@ -539,10 +539,10 @@ void OverlayButton::contextMenuEvent(QContextMenuEvent *e)
         "QMenu::item:selected { background-color: #3b82f6; }"
     );
 
-    QAction *actEdit = menu.addAction(tr("✏️ Edit Properties"));
-    QAction *actDup  = menu.addAction(tr("📋 Duplicate"));
+    QAction *actEdit = menu.addAction(tr(" Edit Properties"));
+    QAction *actDup  = menu.addAction(tr(" Duplicate"));
     menu.addSeparator();
-    QAction *actDel  = menu.addAction(tr("🗑️ Delete"));
+    QAction *actDel  = menu.addAction(tr(" Delete"));
 
     QAction *chosen = menu.exec(e->globalPos());
     if (chosen == actEdit) {

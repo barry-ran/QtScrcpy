@@ -1,4 +1,4 @@
-#include <QDebug>
+﻿#include <QDebug>
 #include <QHideEvent>
 #include <QMouseEvent>
 #include <QShowEvent>
@@ -82,7 +82,7 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->touchBtn, QChar(0xf111), 15);
     IconHelper::Instance()->SetIcon(ui->groupControlBtn, QChar(0xf0c0), 15);
     IconHelper::Instance()->SetIcon(ui->clipboardBtn, QChar(0xf0c5), 15);
-    // Keymap manager button — joystick icon (FontAwesome f11b)
+    // Keymap manager button  joystick icon (FontAwesome f11b)
     IconHelper::Instance()->SetIcon(ui->keymapBtn, QChar(0xf11b), 15);
     IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), 15);
     IconHelper::Instance()->SetIcon(ui->cameraZoomOutBtn, QChar(0xf010), 15);
