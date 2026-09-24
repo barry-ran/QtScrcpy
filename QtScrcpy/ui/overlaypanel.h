@@ -213,6 +213,7 @@ private:
     // HUD
     QSlider    *m_opacitySlider  = nullptr;
     float       m_hudOpacity     = 0.85f;
+    QLineEdit  *m_switchKeyEdit  = nullptr;
 
     // Action buttons
     QPushButton *m_deleteBtn     = nullptr;

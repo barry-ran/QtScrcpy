@@ -1155,6 +1155,7 @@ void VideoForm::toggleGamepad()
 }
 
 
+void VideoForm::toggleTurboMode()
 {
     if (!m_turboMode) {
         m_turboMode = new TurboMode(this);

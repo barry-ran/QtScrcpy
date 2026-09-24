@@ -21,6 +21,7 @@ class MetalVideoWidget;
 class DeviceInfoOverlay;
 class RecoilAssist;
 class TurboMode;
+class GamepadManager;
 
 class VideoForm : public QWidget, public qsc::DeviceObserver
 {
