@@ -33,6 +33,7 @@
  *  - Clear All / Duplicate / Delete
  *  - HUD opacity control
  */
+#include "../uibase/magneticwidget.h"
 class OverlayPanel : public QWidget
 {
     Q_OBJECT
@@ -162,7 +163,7 @@ private:
     OverlayButton         *m_selected = nullptr;
 
     // ---- Side Panel ----
-    QFrame     *m_sidePanel    = nullptr;
+    MagneticWidget *m_sidePanel = nullptr;
     QTabWidget *m_tabs         = nullptr;
     QComboBox  *m_presetCombo  = nullptr;
     QLineEdit  *m_profileEdit  = nullptr;

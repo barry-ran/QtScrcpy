@@ -74,8 +74,8 @@ static QPushButton *addBtn(const QString &text, const QString &color, QWidget *p
 OverlayPanel::OverlayPanel(const QString &serial, QWidget *parent)
     : QWidget(parent), m_serial(serial)
 {
-    setAttribute(Qt::WA_TranslucentBackground);
-    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+    setAttribute(Qt::WA_OpaquePaintEvent, false);
     setMouseTracking(true);
     setFocusPolicy(Qt::StrongFocus);
 
@@ -92,9 +92,14 @@ OverlayPanel::~OverlayPanel() {}
 // ============================================================================
 void OverlayPanel::buildSidePanel()
 {
-    m_sidePanel = new QFrame(this);
-    m_sidePanel->setObjectName("sidePanel");
-    m_sidePanel->setStyleSheet(
+    m_sidePanel = new MagneticWidget(parentWidget(), MagneticWidget::AP_OUTSIDE_RIGHT);
+    m_sidePanel->setFixedWidth(280);
+    QFrame *innerFrame = new QFrame(m_sidePanel);
+    innerFrame->setObjectName("sidePanel");
+    auto *outerLayout = new QVBoxLayout(m_sidePanel);
+    outerLayout->setContentsMargins(0,0,0,0);
+    outerLayout->addWidget(innerFrame);
+    innerFrame->setStyleSheet(
         "QFrame#sidePanel {"
         "  background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
         "    stop:0 #0f172a, stop:1 #1e293b);"
@@ -163,12 +168,12 @@ void OverlayPanel::buildSidePanel()
         "QListWidget::item:selected { background: #2563eb; }"
     );
 
-    auto *mainLayout = new QVBoxLayout(m_sidePanel);
+    auto *mainLayout = new QVBoxLayout(innerFrame);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setSpacing(0);
 
     // --- Header ---
-    auto *header = new QWidget(m_sidePanel);
+    auto *header = new QWidget(innerFrame);
     header->setFixedHeight(44);
     header->setStyleSheet("background: #020b18; border-bottom: 1px solid #334155;");
     auto *headerL = new QHBoxLayout(header);
@@ -189,7 +194,7 @@ void OverlayPanel::buildSidePanel()
     mainLayout->addWidget(header);
 
     // --- Profile selector ---
-    auto *profileBar = new QWidget(m_sidePanel);
+    auto *profileBar = new QWidget(innerFrame);
     profileBar->setStyleSheet("background: #0f172a; border-bottom: 1px solid #1e293b; padding: 6px;");
     auto *profileL = new QHBoxLayout(profileBar);
     profileL->setContentsMargins(8, 4, 8, 4);
@@ -210,7 +215,7 @@ void OverlayPanel::buildSidePanel()
     mainLayout->addWidget(profileBar);
 
     // --- Tabbed content ---
-    m_tabs = new QTabWidget(m_sidePanel);
+    m_tabs = new QTabWidget(innerFrame);
     m_tabs->setDocumentMode(true);
 
     // Tab 1: Basic Controls
@@ -260,7 +265,7 @@ void OverlayPanel::buildSidePanel()
     mainLayout->addWidget(m_tabs, 1);
 
     // --- Bottom action bar ---
-    auto *actionBar = new QWidget(m_sidePanel);
+    auto *actionBar = new QWidget(innerFrame);
     actionBar->setFixedHeight(88);
     actionBar->setStyleSheet("background: #020b18; border-top: 1px solid #334155; padding: 6px;");
     auto *actionL = new QVBoxLayout(actionBar);
@@ -718,6 +723,13 @@ void OverlayPanel::setEditMode(bool edit)
 
     if (edit) {
         setAttribute(Qt::WA_TransparentForMouseEvents, false);
+        
+        // Initial placement next to the video form (magnetic widget will handle snap)
+        if (parentWidget() && m_sidePanel) {
+            QWidget* pw = parentWidget();
+            m_sidePanel->move(pw->pos().x() + pw->width(), pw->pos().y() + 30);
+        }
+        
         m_sidePanel->show();
         updateSidePanelGeometry();
         setFocus();
@@ -761,15 +773,20 @@ void OverlayPanel::resizeEvent(QResizeEvent *e)
 
 void OverlayPanel::updateSidePanelGeometry()
 {
-    if (!m_sidePanel) return;
-    const int w = 220;
-    m_sidePanel->setGeometry(width() - w, 0, w, height());
+    if (!m_sidePanel || !parentWidget()) return;
+    
+    // Auto-resize the side panel height to match the main window
+    int h = parentWidget()->height();
+    if (m_sidePanel->height() != h) {
+        m_sidePanel->resize(m_sidePanel->width(), h);
+    }
 }
 
 QRect OverlayPanel::currentVideoGeometry() const
 {
+    // The panel is now external, so the video area is just the full rect
     if (parentWidget()) {
-        return QRect(0, 0, width() - (m_editMode ? 220 : 0), height());
+        return QRect(0, 0, width(), height());
     }
     return rect();
 }
@@ -1484,3 +1501,8 @@ QString OverlayPanel::keyToDisplayLabel(const QString &k)
     if (k.startsWith("Key_")) return k.mid(4);
     return k;
 }
+
+
+
+
+
