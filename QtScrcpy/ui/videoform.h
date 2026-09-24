@@ -13,6 +13,7 @@ namespace Ui
 }
 
 class ToolForm;
+class OverlayPanel;
 class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
@@ -34,12 +35,15 @@ public:
     void removeBlackRect();
     void showFPS(bool show);
     void switchFullScreen();
+    void toggleKeymapEdit(); ///< called by ToolForm keymapBtn
     bool isHost();
+    QWidget* videoWidget() const;
+    ToolForm* toolForm() const { return m_toolForm; }
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
                  int linesizeY, int linesizeU, int linesizeV) override;
-    // VideoToolbox Metal 路径帧回调（仅 macOS arm64）
+    // VideoToolbox Metal è·¯å¾„å¸§å›žè°ƒï¼ˆä»… macOS arm64ï¼‰
     void onFrameMetal(void* cvPixelBuffer, int width, int height) override;
     void updateFPS(quint32 fps) override;
     void onVideoSessionChanged(const QSize &size, bool clientResized) override;
@@ -74,9 +78,8 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
-    // 获取当前视频渲染 widget（OpenGL 或 Metal 容器）
-    QWidget* videoWidget() const;
-    // 是否使用 Metal 渲染路径
+    // èŽ·å–å½“å‰è§†é¢‘æ¸²æŸ“ widgetï¼ˆOpenGL æˆ– Metal å®¹å™¨ï¼‰
+    // æ˜¯å¦ä½¿ç”¨ Metal æ¸²æŸ“è·¯å¾„
     bool isMetalMode() const;
 
     // ui
@@ -85,7 +88,7 @@ private:
     QPointer<QWidget> m_loadingWidget;
     QPointer<QYUVOpenGLWidget> m_videoWidget;
 
-    // Metal 渲染路径（仅 macOS arm64）
+    // Metal æ¸²æŸ“è·¯å¾„ï¼ˆä»… macOS arm64ï¼‰
     QPointer<MetalVideoWidget> m_metalWidget;
 
     QPointer<QLabel> m_fpsLabel;
@@ -99,14 +102,17 @@ private:
     QPoint m_fullScreenBeforePos;
     QString m_serial;
     int m_decodeMode = 0;
-    bool m_metalFirstFrame = true;  // Metal 首次帧标记
+    bool m_metalFirstFrame = true;  // Metal é¦–æ¬¡å¸§æ ‡è®°
     bool m_flexDisplay = false;
     bool m_preventAutoResize = false;
     QTimer m_flexResizeTimer;
     QSize m_pendingDisplaySize;
+
+    QPointer<OverlayPanel> m_overlayPanel;
 
     //Whether to display the toolbar when connecting a device.
     bool show_toolbar = true;
 };
 
 #endif // VIDEOFORM_H
+

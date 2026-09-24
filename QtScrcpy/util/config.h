@@ -1,4 +1,4 @@
-﻿#ifndef CONFIG_H
+#ifndef CONFIG_H
 #define CONFIG_H
 
 #include <QObject>
@@ -10,7 +10,7 @@
 struct UserBootConfig
 {
     QString recordPath = "";
-    quint32 bitRate = 2000000;
+    quint32 bitRate = 8000000;  // Raised default: 8 Mbps for better quality
     int maxSizeIndex = 0;
     int recordFormatIndex = 0;
     int lockOrientationIndex = 0;
@@ -107,3 +107,4 @@ private:
 };
 
 #endif // CONFIG_H
+
