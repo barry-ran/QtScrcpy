@@ -336,6 +336,14 @@ void ToolForm::on_turboBtn_clicked()
     }
 }
 
+void ToolForm::on_gamepadBtn_clicked()
+{
+    VideoForm *vf = qobject_cast<VideoForm *>(parent());
+    if (vf) {
+        vf->toggleGamepad();
+    }
+}
+
 void ToolForm::on_deviceInfoBtn_clicked()
 {
     VideoForm *vf = qobject_cast<VideoForm *>(parent());
@@ -384,6 +392,7 @@ void ToolForm::autoResizeToParent()
     IconHelper::Instance()->SetIcon(ui->clipboardBtn, QChar(0xf0c5), iconSize);
     IconHelper::Instance()->SetIcon(ui->keymapBtn, QChar(0xf11b), iconSize);
     IconHelper::Instance()->SetIcon(ui->turboBtn, QChar(0xf0e7), iconSize); // lightning bolt
+    IconHelper::Instance()->SetIcon(ui->gamepadBtn, QChar(0xf11b), iconSize); // gamepad icon
     IconHelper::Instance()->SetIcon(ui->deviceInfoBtn, QChar(0xf240), iconSize); // battery
     IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), iconSize);
     IconHelper::Instance()->SetIcon(ui->cameraZoomOutBtn, QChar(0xf010), iconSize);

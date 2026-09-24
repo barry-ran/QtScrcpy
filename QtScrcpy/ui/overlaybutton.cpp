@@ -484,6 +484,10 @@ QJsonObject OverlayButton::toKeyMapNode() const
         node["rightKey"]  = m_rightKey;
         node["upKey"]     = m_upKey;
         node["downKey"]   = m_downKey;
+        node["leftOffset"]  = static_cast<double>(m_radiusRatio > 0 ? m_radiusRatio : 0.055f);
+        node["rightOffset"] = static_cast<double>(m_radiusRatio > 0 ? m_radiusRatio : 0.055f);
+        node["upOffset"]    = static_cast<double>(m_radiusRatio > 0 ? m_radiusRatio : 0.055f);
+        node["downOffset"]  = static_cast<double>(m_radiusRatio > 0 ? m_radiusRatio : 0.055f);
         break;
     }
     case OverlayButtonType::Aim:

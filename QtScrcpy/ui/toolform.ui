@@ -61,6 +61,19 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="gamepadBtn">
+     <property name="toolTip">
+      <string>Gamepad Support (Xbox/PS)</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="fullScreenBtn">
      <property name="toolTip">
       <string>full screen (Ctrl+F)</string>

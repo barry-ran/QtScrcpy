@@ -40,7 +40,8 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
     void toggleKeymapEdit();    ///< called by ToolForm keymapBtn
-    void toggleTurboMode();     ///< Turbo/Burst mode
+    void toggleTurboMode();
+    void toggleGamepad();     ///< Turbo/Burst mode
     void toggleDeviceInfo();    ///< Battery + Temp overlay
     bool isHost();
     QWidget* videoWidget() const;
@@ -119,6 +120,7 @@ private:
     QPointer<DeviceInfoOverlay> m_deviceInfoOverlay;
     QPointer<RecoilAssist>      m_recoilAssist;
     QPointer<TurboMode>         m_turboMode;
+    QPointer<GamepadManager>    m_gamepadManager;
 
     // Whether to display the toolbar when connecting a device.
     bool show_toolbar = true;

@@ -191,6 +191,8 @@ set(QC_UI_SOURCES
     ui/recoilassist.cpp
     ui/turbomode.h
     ui/turbomode.cpp
+    ui/gamepadmanager.h
+    ui/gamepadmanager.cpp
     ui/toolform.ui
     ui/videoform.h
     ui/videoform.cpp
@@ -427,6 +429,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${LINK_LIBS}
     QtScrcpyCore
 )
+
+if(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE xinput)
+endif()
 
 
 

@@ -61,6 +61,7 @@ private slots:
     void on_keymapBtn_clicked();
     void on_turboBtn_clicked();
     void on_deviceInfoBtn_clicked();
+    void on_gamepadBtn_clicked();
 
 private:
     void initStyle();

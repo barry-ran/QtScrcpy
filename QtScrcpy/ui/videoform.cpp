@@ -29,9 +29,8 @@
 #include "deviceinfooverlay.h"
 #include "recoilassist.h"
 #include "turbomode.h"
-#include "deviceinfooverlay.h"
-#include "recoilassist.h"
-#include "turbomode.h"
+#include "gamepadmanager.h"
+#include <QPushButton>
 
 #ifdef Q_OS_MACOS
 #include "metalvideowindow.h"
@@ -1125,7 +1124,37 @@ void VideoForm::toggleKeymapEdit()
     }
 }
 
-void VideoForm::toggleTurboMode()
+
+void VideoForm::toggleGamepad()
+{
+    if (!m_gamepadManager) {
+        m_gamepadManager = new GamepadManager(m_serial, this);
+        connect(m_gamepadManager, &GamepadManager::statusMessage, this, [this](const QString &msg) {
+            // Show a temporary overlay label (reuse the FPS label spot or a toast)
+            if (m_fpsLabel) {
+                m_fpsLabel->setText(msg);
+                QTimer::singleShot(3000, this, [this]() {
+                    m_fpsLabel->setText(QString());
+                });
+            }
+        });
+        // Default: map WASD center and Aim center based on any loaded keymap
+        if (m_overlayPanel) {
+            // Could read positions from the overlay panel – use defaults for now
+        }
+    }
+    bool en = !m_gamepadManager->isEnabled();
+    m_gamepadManager->setEnabled(en);
+    if (m_toolForm) {
+        auto *btn = m_toolForm->findChild<QPushButton*>("gamepadBtn");
+        if (btn) {
+            btn->setChecked(en);
+            btn->setToolTip(en ? "Gamepad ON – click to disable" : "Enable Gamepad");
+        }
+    }
+}
+
+
 {
     if (!m_turboMode) {
         m_turboMode = new TurboMode(this);

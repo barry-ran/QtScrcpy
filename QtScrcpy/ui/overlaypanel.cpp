@@ -698,9 +698,14 @@ void OverlayPanel::buildSettingsTab(QWidget *tab)
     auto *keyGroup = new QGroupBox("Keymap Settings", tab);
     auto *keyL = new QFormLayout(keyGroup);
     keyL->setContentsMargins(8, 8, 8, 8);
-    auto *switchKeyEdit = new QLineEdit("Key_QuoteLeft", keyGroup);
-    keyL->addRow("Switch Key:", switchKeyEdit);
+    m_switchKeyEdit = new QLineEdit("Key_QuoteLeft", keyGroup);
+    keyL->addRow("Switch Key:", m_switchKeyEdit);
     l->addWidget(keyGroup);
+    connect(m_labelEdit, &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
+    connect(m_keyEdit, &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
+    connect(m_sizeSlider, &QSlider::valueChanged, this, &OverlayPanel::onApplyProps);
+    connect(m_switchKeyEdit, &QLineEdit::textChanged, this, [this](const QString &text){ m_switchKey = text; });
+    connect(m_switchMapCheck, &QCheckBox::stateChanged, this, &OverlayPanel::onApplyProps);
 
     auto *resetBtn = addBtn("Reset Standard WASD", "#dc2626");
     l->addWidget(resetBtn);
@@ -1296,7 +1301,7 @@ void OverlayPanel::loadLayout(const QString &jsonPath)
     m_buttons.clear();
     selectButton(nullptr);
 
-    if (root.contains("switchKey")) m_switchKey = root["switchKey"].toString("Key_QuoteLeft");
+    if (root.contains("switchKey")) { m_switchKey = root["switchKey"].toString("Key_QuoteLeft"); if (m_switchKeyEdit) m_switchKeyEdit->setText(m_switchKey); }
 
     if (root.contains("_visualButtons")) {
         for (const auto &val : root["_visualButtons"].toArray()) {
