@@ -103,6 +103,7 @@ void initializeKeyMapDirectory()
 Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    initializeKeyMapDirectory();
     initUI();
 
     updateBootConfig(true);
