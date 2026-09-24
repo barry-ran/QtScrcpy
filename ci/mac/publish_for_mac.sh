@@ -64,7 +64,14 @@ cp -r $keymap_path $publish_path/QtScrcpy.app/Contents/MacOS
 # cp -r $config_path $publish_path/QtScrcpy.app/Contents/MacOS
 
 # 添加qt依赖包
-macdeployqt $publish_path/QtScrcpy.app
+app_path=$publish_path/QtScrcpy.app
+macdeployqt "$app_path"
+
+if [ ! -f "$app_path/Contents/Frameworks/QtCore.framework/QtCore" ]; then
+    echo "error: Qt frameworks were not deployed"
+    cd $old_cd
+    exit 1
+fi
 
 # 删除多余qt依赖包
 
@@ -101,7 +108,6 @@ rm -rf $publish_path/QtScrcpy.app/Contents/Frameworks/QtQuick.framework
 # It does not replace Developer ID signing/notarization, so Gatekeeper may
 # still require the user to explicitly allow an Internet-downloaded app.
 echo "ad-hoc code signing macOS app bundle"
-app_path=$publish_path/QtScrcpy.app
 frameworks_path=$app_path/Contents/Frameworks
 
 # Remove links targeting plugins deleted above; a dangling link prevents
@@ -132,6 +138,10 @@ if ! codesign --verify --deep --strict --verbose=2 "$app_path"; then
     cd $old_cd
     exit 1
 fi
+
+echo "macOS package size"
+du -sh "$app_path" "$frameworks_path"
+find "$frameworks_path" -mindepth 1 -maxdepth 1 -type d -name '*.framework' -exec du -sh {} \; | sort -h
 
 echo
 echo

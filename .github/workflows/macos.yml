@@ -13,10 +13,9 @@ on:
 jobs:
   build:
     name: Build
-    # macos-13 (Intel) runners are no longer supported by GitHub Actions.
-    # Use macos-14 (Apple Silicon) for all builds:
-    # - Qt6: native arm64 build on macos-14
-    # - Qt5: x86_64 build via Rosetta 2 on macos-14 (clang_64 Qt tools run under Rosetta)
+    # Qt 5's macdeployqt cannot deploy an x86_64 app reliably from an arm64
+    # runner: its otool invocation fails and produces a package without Qt.
+    # Build Qt 5/x64 on a native Intel runner; build Qt 6/arm64 natively.
     # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
     runs-on: ${{ matrix.runs-on }}
     strategy:
@@ -27,7 +26,7 @@ jobs:
           - qt-ver: 5.15.2
             qt-arch-install: clang_64
             build-arch: x64
-            runs-on: macos-14
+            runs-on: macos-15-intel
           - qt-ver: 6.5.3
             qt-arch-install: arm64
             build-arch: arm64
