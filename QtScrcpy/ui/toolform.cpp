@@ -1,4 +1,4 @@
-﻿#include <QDebug>
+#include <QDebug>
 #include <QHideEvent>
 #include <QMouseEvent>
 #include <QShowEvent>
@@ -7,7 +7,6 @@
 #include "toolform.h"
 #include "ui_toolform.h"
 #include "videoform.h"
-#include "keymapeditor.h"
 #include "../groupcontroller/groupcontroller.h"
 
 ToolForm::ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos) : MagneticWidget(adsorbWidget, adsorbPos), ui(new Ui::ToolForm)
@@ -322,7 +321,56 @@ void ToolForm::on_clipboardBtn_clicked()
 
 void ToolForm::on_keymapBtn_clicked()
 {
-    // Trigger embedded overlay editor in VideoForm
-    emit requestToggleKeymapEditor();
+    // Ask the parent VideoForm to toggle the Visual Keymap Edit overlay
+    VideoForm *vf = qobject_cast<VideoForm *>(parent());
+    if (vf) {
+        vf->toggleKeymapEdit();
+    }
+}
+
+void ToolForm::autoResizeToParent()
+{
+    QWidget *parentW = adsorbWidget() ? adsorbWidget() : parentWidget();
+    if (!parentW) return;
+    int parentH = parentW->height();
+    if (parentH <= 50) return;
+
+    int btnCount = 20;
+    int availableH = parentH - 24;
+    int desiredBtnH = qBound(18, availableH / btnCount, 30);
+    int desiredSpacing = (desiredBtnH < 24) ? 1 : 2;
+
+    ui->verticalLayout->setSpacing(desiredSpacing);
+    ui->verticalLayout->setContentsMargins(2, (desiredBtnH < 24) ? 4 : 8, 2, (desiredBtnH < 24) ? 4 : 8);
+
+    QString btnStyle = QString(
+        "QPushButton { min-width: %1px; min-height: %1px; max-height: %1px; padding: 0; }"
+    ).arg(desiredBtnH);
+    setStyleSheet(btnStyle);
+
+    int iconSize = qBound(9, desiredBtnH - 12, 15);
+    IconHelper::Instance()->SetIcon(ui->fullScreenBtn, QChar(0xf0b2), iconSize);
+    IconHelper::Instance()->SetIcon(ui->menuBtn, QChar(0xf096), iconSize);
+    IconHelper::Instance()->SetIcon(ui->homeBtn, QChar(0xf1db), iconSize);
+    IconHelper::Instance()->SetIcon(ui->returnBtn, QChar(0xf053), iconSize);
+    IconHelper::Instance()->SetIcon(ui->appSwitchBtn, QChar(0xf24d), iconSize);
+    IconHelper::Instance()->SetIcon(ui->volumeUpBtn, QChar(0xf028), iconSize);
+    IconHelper::Instance()->SetIcon(ui->volumeDownBtn, QChar(0xf027), iconSize);
+    IconHelper::Instance()->SetIcon(ui->openScreenBtn, QChar(0xf06e), iconSize);
+    IconHelper::Instance()->SetIcon(ui->closeScreenBtn, QChar(0xf070), iconSize);
+    IconHelper::Instance()->SetIcon(ui->powerBtn, QChar(0xf011), iconSize);
+    IconHelper::Instance()->SetIcon(ui->expandNotifyBtn, QChar(0xf103), iconSize);
+    IconHelper::Instance()->SetIcon(ui->expandSettingsBtn, QChar(0xf013), iconSize);
+    IconHelper::Instance()->SetIcon(ui->rotateBtn, QChar(0xf021), iconSize);
+    IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf0c4), iconSize);
+    IconHelper::Instance()->SetIcon(ui->touchBtn, QChar(0xf111), iconSize);
+    IconHelper::Instance()->SetIcon(ui->groupControlBtn, QChar(0xf0c0), iconSize);
+    IconHelper::Instance()->SetIcon(ui->clipboardBtn, QChar(0xf0c5), iconSize);
+    IconHelper::Instance()->SetIcon(ui->keymapBtn, QChar(0xf11b), iconSize);
+    IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), iconSize);
+    IconHelper::Instance()->SetIcon(ui->cameraZoomOutBtn, QChar(0xf010), iconSize);
+    IconHelper::Instance()->SetIcon(ui->cameraZoomInBtn, QChar(0xf00e), iconSize);
+
+    adjustSize();
 }
 

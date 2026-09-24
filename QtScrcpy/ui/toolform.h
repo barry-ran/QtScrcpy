@@ -23,6 +23,7 @@ public:
 
     void setSerial(const QString& serial);
     bool isHost();
+    void autoResizeToParent();
 
 signals:
     void requestToggleKeymapEditor();

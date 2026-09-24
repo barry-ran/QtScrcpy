@@ -33,6 +33,7 @@ public:
     ~MagneticWidget();
 
     bool isAdsorbed();
+    QWidget *adsorbWidget() const { return m_adsorbWidget; }
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;

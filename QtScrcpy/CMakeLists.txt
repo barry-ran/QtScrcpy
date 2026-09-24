@@ -1,4 +1,4 @@
-﻿# For VS2019 and Xcode 12+ support.
+# For VS2019 and Xcode 12+ support.
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 #
@@ -178,9 +178,13 @@ source_group(audio FILES ${QC_AUDIO_SOURCES})
 # ui
 set(QC_UI_SOURCES
     ui/toolform.h
+    ui/keymapdialog.h
     ui/toolform.cpp
-    ui/keymapeditor.h
-    ui/keymapeditor.cpp
+    ui/keymapdialog.cpp
+    ui/overlaybutton.h
+    ui/overlaybutton.cpp
+    ui/overlaypanel.h
+    ui/overlaypanel.cpp
     ui/toolform.ui
     ui/videoform.h
     ui/videoform.cpp

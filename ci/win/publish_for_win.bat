@@ -86,7 +86,7 @@ del %publish_path%\imageformats\qgif.dll
 del %publish_path%\imageformats\qicns.dll
 del %publish_path%\imageformats\qico.dll
 ::del %publish_path%\imageformats\qjpeg.dll
-del %publish_path%\imageformats\qsvg.dll
+::del %publish_path%\imageformats\qsvg.dll
 del %publish_path%\imageformats\qtga.dll
 del %publish_path%\imageformats\qtiff.dll
 del %publish_path%\imageformats\qwbmp.dll
