@@ -32,17 +32,31 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("QtScrcpy");
     QCoreApplication::setApplicationName("QtScrcpy");
 
-    // All platforms pass packaged defaults separately from mutable user data.
-    // AppImage AppRun overrides these because its resources live in usr/share.
     const QString executableDir = QFileInfo(QString::fromLocal8Bit(argv[0])).absolutePath();
+#ifdef Q_OS_MACOS
+    const QString repositoryRoot = QDir(executableDir).absoluteFilePath("../../../../../../");
+#else
+    const QString repositoryRoot = QDir(executableDir).absoluteFilePath("../../..");
+#endif
+    const QDir repositoryDir(repositoryRoot);
+    const QString defaultKeymapPath = repositoryDir.exists("keymap")
+        ? repositoryDir.filePath("keymap")
+        : QDir(executableDir).filePath("keymap");
+    const QString defaultConfigPath = QFileInfo(repositoryDir.filePath("config/config.ini")).isFile()
+        ? repositoryDir.filePath("config")
+        : QDir(executableDir).filePath("config");
+
+    // Keep packaged defaults separate from mutable user data. Development
+    // builds use the repository templates, while release packages use files
+    // beside the executable. AppImage AppRun may override these paths.
     if (qgetenv("QTSCRCPY_DEFAULT_KEYMAP_PATH").isEmpty()) {
-        qputenv("QTSCRCPY_DEFAULT_KEYMAP_PATH", QDir(executableDir).filePath("keymap").toLocal8Bit());
+        qputenv("QTSCRCPY_DEFAULT_KEYMAP_PATH", defaultKeymapPath.toLocal8Bit());
     }
     if (qgetenv("QTSCRCPY_DEFAULT_CONFIG_PATH").isEmpty()) {
-        qputenv("QTSCRCPY_DEFAULT_CONFIG_PATH", QDir(executableDir).filePath("config").toLocal8Bit());
+        qputenv("QTSCRCPY_DEFAULT_CONFIG_PATH", defaultConfigPath.toLocal8Bit());
     }
     if (qgetenv("QTSCRCPY_LEGACY_CONFIG_PATH").isEmpty()) {
-        qputenv("QTSCRCPY_LEGACY_CONFIG_PATH", QDir(executableDir).filePath("config").toLocal8Bit());
+        qputenv("QTSCRCPY_LEGACY_CONFIG_PATH", defaultConfigPath.toLocal8Bit());
     }
 
     // set env
