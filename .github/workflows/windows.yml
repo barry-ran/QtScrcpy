@@ -1,113 +1,93 @@
-name: Windows
-# 触发规则详解 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#on
-on: 
+name: Windows Build
+
+on:
   push:
+    branches: [ main ]
     paths:
       - 'QtScrcpy/**'
       - '!QtScrcpy/res/**'
       - '.github/workflows/windows.yml'
       - 'ci/win**'
   pull_request:
-    paths:
-      - 'QtScrcpy/**'
-      - '!QtScrcpy/res/**'
-      - '.github/workflows/windows.yml'
-      - 'ci/win**'
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
   build:
-    name: Build
-    # windows-latest目前是windows server 2022
-    # windows server 2019安装的是vs2019，windows server 2016安装的是vs2017
-    # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    name: Build Windows x64
     runs-on: windows-2022
 
-    # 矩阵配置 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idstrategymatrix
-    strategy:
-      matrix:
-        qt-ver: [5.15.2]
-        qt-arch: [win64_msvc2019_64, win32_msvc2019]
-        # 配置qt-arch的额外设置msvc-arch，qt-arch-install
-        include:
-          - qt-arch: win64_msvc2019_64
-            msvc-arch: x64
-            qt-arch-install: msvc2019_64
-          - qt-arch: win32_msvc2019
-            msvc-arch: x86
-            qt-arch-install: msvc2019
-    # job env,所有steps都可以访问
-    # 不同级别env详解 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#env
-    # 使用表达式语法${{}}访问上下文 https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions
     env:
       target-name: QtScrcpy
-      vcvarsall-path: 'C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
-      vcinstall-path: 'C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC'
-      qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
+      vcvarsall-path: 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat'
+      vcinstall-path: 'C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC'
+      qt-ver: '5.15.2'
+      qt-arch: 'win64_msvc2019_64'
+      qt-arch-install: 'msvc2019_64'
+      msvc-arch: 'x64'
+      qt-install-path: ${{ github.workspace }}/5.15.2
       plantform-des: win
-    # 步骤
+
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'recursive'
+
       - name: Cache Qt
         id: cache-qt
         uses: actions/cache@v4
         with:
-          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
-          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch }}        
-      # 安装Qt
+          path: ${{ env.qt-install-path }}/${{ env.qt-arch-install }}
+          key: ${{ runner.os }}/${{ env.qt-ver }}/${{ env.qt-arch }}
+
       - name: Install Qt
-        # 使用外部action。这个action专门用来安装Qt
         uses: jurplel/install-qt-action@v4.1.1
         with:
-          # Version of Qt to install
-          version: ${{ matrix.qt-ver }}
-          # Target platform for build
+          version: ${{ env.qt-ver }}
           target: desktop
-          # Architecture for Windows/Android
-          arch: ${{ matrix.qt-arch }}
+          arch: ${{ env.qt-arch }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-      # 拉取代码
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: 'true'
-          ssh-key: ${{ secrets.BOT_SSH_KEY }}
-      # 编译msvc
-      - name: Build MSVC
-        # shell介绍 https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#using-a-specific-shell
+
+      - name: Generate version
+        shell: cmd
+        run: python ci\generate-version.py
+
+      - name: Build MSVC x64
         shell: cmd
         env:
           ENV_VCVARSALL: ${{ env.vcvarsall-path }}
           ENV_QT_PATH: ${{ env.qt-install-path }}
-        run: |
-          call python ci\generate-version.py
-          call "ci\win\build_for_win.bat" RelWithDebInfo ${{ matrix.msvc-arch }}
-      # 获取ref最后一个/后的内容
-      - name: Get the version
+        run: call "ci\win\build_for_win.bat" RelWithDebInfo x64
+
+      - name: Get version tag
         shell: bash
         id: get-version
-        # ${ GITHUB_REF/refs\/tags\// }是linux shell ${}的变量替换语法
-        run: echo ::set-output name=version::${GITHUB_REF##*/}
-      # tag 打包
+        run: echo "version=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+
       - name: Package
         id: package
+        shell: powershell
         env:
           ENV_VCVARSALL: ${{ env.vcvarsall-path }}
           ENV_VCINSTALL: ${{ env.vcinstall-path }}
           ENV_QT_PATH: ${{ env.qt-install-path }}
-          publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.msvc-arch }}-${{ steps.get-version.outputs.version }}
         run: |
-          cmd.exe /c ci\win\publish_for_win.bat ${{ matrix.msvc-arch }} ..\build\${{ env.publish_name }}
-          # 打包zip
-          Compress-Archive -Path ci\build\${{ env.publish_name }} ci\build\${{ env.publish_name }}.zip
-          echo "::set-output name=package-name::${{ env.publish_name }}"
-      # 上传artifacts
-      # https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts
-      - uses: actions/upload-artifact@v4
+          $publish_name = "${{ env.target-name }}-${{ env.plantform-des }}-x64-${{ steps.get-version.outputs.version }}"
+          cmd.exe /c "ci\win\publish_for_win.bat x64 ..\build\$publish_name"
+          Compress-Archive -Path "ci\build\$publish_name" -DestinationPath "ci\build\$publish_name.zip" -Force
+          echo "package-name=$publish_name" >> $env:GITHUB_OUTPUT
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.package.outputs.package-name }}.zip
+          name: ${{ steps.package.outputs.package-name }}
           path: ci\build\${{ steps.package.outputs.package-name }}
-      # Upload to release
-      - name: Upload Release
+
+      - name: Upload Release Asset
         if: startsWith(github.ref, 'refs/tags/')
-        uses: svenstaro/upload-release-action@v1-release
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ci\build\${{ steps.package.outputs.package-name }}.zip
