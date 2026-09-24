@@ -39,7 +39,7 @@ class OverlayPanel : public QWidget
     Q_OBJECT
 
 public:
-    explicit OverlayPanel(const QString &serial, QWidget *parent = nullptr);
+    explicit OverlayPanel(const QString &serial, QWidget *parent = nullptr, QWidget *refWidget = nullptr);
     ~OverlayPanel();
 
     void onParentResized();
@@ -149,6 +149,7 @@ private:
     static QString keyToDisplayLabel(const QString &keyStr);
 
     // ---- State ----
+    QWidget *m_refWidget = nullptr;
     QString m_serial;
     QString m_currentJsonPath;
     QString m_currentProfileName = "custom_keymap";

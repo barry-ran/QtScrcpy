@@ -1099,7 +1099,7 @@ void VideoForm::toggleKeymapEdit()
     if (!m_overlayPanel) {
         // CRITICAL FIX: OverlayPanel is created as a TOP-LEVEL window with no parent.
         // This prevents it from sharing the OpenGL native window, which caused video to freeze.
-        m_overlayPanel = new OverlayPanel(m_serial, nullptr);
+        m_overlayPanel = new OverlayPanel(m_serial, nullptr, this);
         m_overlayPanel->setWindowFlags(
             Qt::Tool |
             Qt::FramelessWindowHint |

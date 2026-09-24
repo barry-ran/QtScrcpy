@@ -1,5 +1,6 @@
 ﻿#include "overlaypanel.h"
 #include "videoform.h"
+#include "toolform.h"
 
 #include <QApplication>
 #include <QPainter>
@@ -71,8 +72,8 @@ static QPushButton *addBtn(const QString &text, const QString &color, QWidget *p
 // ============================================================================
 //  CONSTRUCTOR
 // ============================================================================
-OverlayPanel::OverlayPanel(const QString &serial, QWidget *parent)
-    : QWidget(parent), m_serial(serial)
+OverlayPanel::OverlayPanel(const QString &serial, QWidget *parent, QWidget *refWidget)
+    : QWidget(parent), m_refWidget(refWidget), m_serial(serial)
 {
     setAttribute(Qt::WA_TranslucentBackground, true);
     setAttribute(Qt::WA_OpaquePaintEvent, false);
@@ -92,7 +93,12 @@ OverlayPanel::~OverlayPanel() {}
 // ============================================================================
 void OverlayPanel::buildSidePanel()
 {
-    m_sidePanel = new MagneticWidget(parentWidget(), MagneticWidget::AP_OUTSIDE_RIGHT);
+    QWidget *attachWidget = m_refWidget;
+    VideoForm *vf = qobject_cast<VideoForm *>(m_refWidget);
+    if (vf && vf->toolForm() && vf->toolForm()->isVisible()) {
+        attachWidget = vf->toolForm();
+    }
+    m_sidePanel = new MagneticWidget(attachWidget, MagneticWidget::AP_OUTSIDE_RIGHT);
     m_sidePanel->setFixedWidth(280);
     QFrame *innerFrame = new QFrame(m_sidePanel);
     innerFrame->setObjectName("sidePanel");
@@ -725,8 +731,8 @@ void OverlayPanel::setEditMode(bool edit)
         setAttribute(Qt::WA_TransparentForMouseEvents, false);
         
         // Initial placement next to the video form (magnetic widget will handle snap)
-        if (parentWidget() && m_sidePanel) {
-            QWidget* pw = parentWidget();
+        if (m_refWidget && m_sidePanel) {
+            QWidget* pw = m_refWidget;
             m_sidePanel->move(pw->pos().x() + pw->width(), pw->pos().y() + 30);
         }
         
@@ -759,7 +765,7 @@ void OverlayPanel::setOverlayVisible(bool v)
 
 void OverlayPanel::onParentResized()
 {
-    resize(parentWidget()->size());
+    resize(m_refWidget->size());
     updateSidePanelGeometry();
     QRect area = currentVideoGeometry();
     for (auto *b : m_buttons) b->reposition(area);
@@ -773,10 +779,10 @@ void OverlayPanel::resizeEvent(QResizeEvent *e)
 
 void OverlayPanel::updateSidePanelGeometry()
 {
-    if (!m_sidePanel || !parentWidget()) return;
+    if (!m_sidePanel || !m_refWidget) return;
     
     // Auto-resize the side panel height to match the main window
-    int h = parentWidget()->height();
+    int h = m_refWidget->height();
     if (m_sidePanel->height() != h) {
         m_sidePanel->resize(m_sidePanel->width(), h);
     }
@@ -785,7 +791,7 @@ void OverlayPanel::updateSidePanelGeometry()
 QRect OverlayPanel::currentVideoGeometry() const
 {
     // The panel is now external, so the video area is just the full rect
-    if (parentWidget()) {
+    if (m_refWidget) {
         return QRect(0, 0, width(), height());
     }
     return rect();
@@ -1245,9 +1251,9 @@ bool OverlayPanel::saveLayout()
 void OverlayPanel::applyToDevice()
 {
     if (m_currentJsonPath.isEmpty()) return;
-    if (!parentWidget()) return;
+    if (!m_refWidget) return;
 
-    VideoForm *vf = qobject_cast<VideoForm *>(parentWidget());
+    VideoForm *vf = qobject_cast<VideoForm *>(m_refWidget);
     if (!vf) return;
 
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
