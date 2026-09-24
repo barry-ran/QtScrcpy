@@ -76,7 +76,7 @@ fi
 # 删除多余qt依赖包
 
 # PlugIns
-rm -rf $publish_path/QtScrcpy.app/Contents/PlugIns/iconengines
+# Keep the SVG icon engine: stylesheet resources use SVG arrow icons.
 # 截图功能需要libqjpeg.dylib
 rm -f $publish_path/QtScrcpy.app/Contents/PlugIns/imageformats/libqgif.dylib
 rm -f $publish_path/QtScrcpy.app/Contents/PlugIns/imageformats/libqicns.dylib
@@ -91,7 +91,6 @@ rm -f $publish_path/QtScrcpy.app/Contents/PlugIns/imageformats/libqwebp.dylib
 rm -rf $publish_path/QtScrcpy.app/Contents/PlugIns/virtualkeyboard
 rm -rf $publish_path/QtScrcpy.app/Contents/PlugIns/printsupport
 rm -rf $publish_path/QtScrcpy.app/Contents/PlugIns/platforminputcontexts
-rm -rf $publish_path/QtScrcpy.app/Contents/PlugIns/iconengines
 rm -rf $publish_path/QtScrcpy.app/Contents/PlugIns/bearer
 
 # Frameworks
