@@ -98,7 +98,6 @@ private:
     const QString &getConfigPath();
     QString getDefaultConfigPath() const;
     void initializeConfig();
-    void migrateLegacyConfig(const QString &configPath) const;
 
 private:
     static QString s_configPath;

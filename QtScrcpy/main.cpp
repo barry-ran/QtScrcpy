@@ -55,9 +55,6 @@ int main(int argc, char *argv[])
     if (qgetenv("QTSCRCPY_DEFAULT_CONFIG_PATH").isEmpty()) {
         qputenv("QTSCRCPY_DEFAULT_CONFIG_PATH", defaultConfigPath.toLocal8Bit());
     }
-    if (qgetenv("QTSCRCPY_LEGACY_CONFIG_PATH").isEmpty()) {
-        qputenv("QTSCRCPY_LEGACY_CONFIG_PATH", defaultConfigPath.toLocal8Bit());
-    }
 
     // set env
 #ifdef Q_OS_WIN32

@@ -182,8 +182,6 @@ void Config::initializeConfig()
     const QString configFile = configPath + "/config.ini";
     const QString defaultConfigFile = getDefaultConfigPath() + "/config.ini";
 
-    migrateLegacyConfig(configPath);
-
     // The application bundle is read-only in AppImage and should be treated as
     // read-only on macOS. Seed a user-owned copy only once, preserving changes
     // across upgrades. If a package lacks the template, create a complete
@@ -213,39 +211,6 @@ void Config::initializeConfig()
             defaults.sync();
             if (defaults.status() != QSettings::NoError) {
                 qWarning() << "Failed to create default configuration:" << configFile;
-            }
-        }
-    }
-}
-
-void Config::migrateLegacyConfig(const QString &configPath) const
-{
-    // Older releases stored mutable files beside the executable. Copy them once
-    // so existing users retain their settings when switching to standard paths.
-    if (!qgetenv("QTSCRCPY_CONFIG_PATH").isEmpty()) {
-        return;
-    }
-
-    const QDir userDir(configPath);
-    QStringList legacyPaths;
-    legacyPaths << QString::fromLocal8Bit(qgetenv("QTSCRCPY_LEGACY_CONFIG_PATH"));
-    legacyPaths << QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-    QStringList fileNames;
-    fileNames << "config.ini" << "userdata.ini";
-
-    for (int legacyIndex = 0; legacyIndex < legacyPaths.size(); ++legacyIndex) {
-        const QString &legacyPath = legacyPaths.at(legacyIndex);
-        const QDir legacyDir(legacyPath);
-        if (!legacyDir.exists() || legacyDir.absolutePath() == userDir.absolutePath()) {
-            continue;
-        }
-        for (int fileIndex = 0; fileIndex < fileNames.size(); ++fileIndex) {
-            const QString &fileName = fileNames.at(fileIndex);
-            const QString sourceFile = legacyDir.filePath(fileName);
-            const QString targetFile = userDir.filePath(fileName);
-            if (QFileInfo(sourceFile).isFile() && !QFileInfo::exists(targetFile)
-                && !QFile::copy(sourceFile, targetFile)) {
-                qWarning() << "Failed to migrate configuration to:" << targetFile;
             }
         }
     }
