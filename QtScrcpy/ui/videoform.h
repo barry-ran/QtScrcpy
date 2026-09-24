@@ -1,4 +1,4 @@
-#ifndef VIDEOFORM_H
+﻿#ifndef VIDEOFORM_H
 #define VIDEOFORM_H
 
 #include <QPointer>
@@ -38,12 +38,12 @@ public:
     void toggleKeymapEdit(); ///< called by ToolForm keymapBtn
     bool isHost();
     QWidget* videoWidget() const;
-    ToolForm* toolForm() const { return m_toolForm; }
+    ToolForm* toolForm() const;
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
                  int linesizeY, int linesizeU, int linesizeV) override;
-    // VideoToolbox Metal è·¯å¾„å¸§å›žè°ƒï¼ˆä»… macOS arm64ï¼‰
+    // VideoToolbox Metal Ã¨Â·Â¯Ã¥Â¾â€žÃ¥Â¸Â§Ã¥â€ºÅ¾Ã¨Â°Æ’Ã¯Â¼Ë†Ã¤Â»â€¦ macOS arm64Ã¯Â¼â€°
     void onFrameMetal(void* cvPixelBuffer, int width, int height) override;
     void updateFPS(quint32 fps) override;
     void onVideoSessionChanged(const QSize &size, bool clientResized) override;
@@ -78,8 +78,8 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
-    // èŽ·å–å½“å‰è§†é¢‘æ¸²æŸ“ widgetï¼ˆOpenGL æˆ– Metal å®¹å™¨ï¼‰
-    // æ˜¯å¦ä½¿ç”¨ Metal æ¸²æŸ“è·¯å¾„
+    // Ã¨Å½Â·Ã¥Ââ€“Ã¥Â½â€œÃ¥â€°ÂÃ¨Â§â€ Ã©Â¢â€˜Ã¦Â¸Â²Ã¦Å¸â€œ widgetÃ¯Â¼Ë†OpenGL Ã¦Ë†â€“ Metal Ã¥Â®Â¹Ã¥â„¢Â¨Ã¯Â¼â€°
+    // Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¤Â½Â¿Ã§â€Â¨ Metal Ã¦Â¸Â²Ã¦Å¸â€œÃ¨Â·Â¯Ã¥Â¾â€ž
     bool isMetalMode() const;
 
     // ui
@@ -88,7 +88,7 @@ private:
     QPointer<QWidget> m_loadingWidget;
     QPointer<QYUVOpenGLWidget> m_videoWidget;
 
-    // Metal æ¸²æŸ“è·¯å¾„ï¼ˆä»… macOS arm64ï¼‰
+    // Metal Ã¦Â¸Â²Ã¦Å¸â€œÃ¨Â·Â¯Ã¥Â¾â€žÃ¯Â¼Ë†Ã¤Â»â€¦ macOS arm64Ã¯Â¼â€°
     QPointer<MetalVideoWidget> m_metalWidget;
 
     QPointer<QLabel> m_fpsLabel;
@@ -102,7 +102,7 @@ private:
     QPoint m_fullScreenBeforePos;
     QString m_serial;
     int m_decodeMode = 0;
-    bool m_metalFirstFrame = true;  // Metal é¦–æ¬¡å¸§æ ‡è®°
+    bool m_metalFirstFrame = true;  // Metal Ã©Â¦â€“Ã¦Â¬Â¡Ã¥Â¸Â§Ã¦Â â€¡Ã¨Â®Â°
     bool m_flexDisplay = false;
     bool m_preventAutoResize = false;
     QTimer m_flexResizeTimer;

@@ -1,4 +1,4 @@
-// #include <QDesktopWidget>
+﻿// #include <QDesktopWidget>
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QLabel>
@@ -88,31 +88,31 @@ void VideoForm::initUI()
         }
 
 #ifndef Q_OS_MACOS
-        // macä¸‹åŽ»æŽ‰æ ‡é¢˜æ å½±å“showfullscreen
-        // åŽ»æŽ‰æ ‡é¢˜æ 
+        // macÃ¤Â¸â€¹Ã¥Å½Â»Ã¦Å½â€°Ã¦Â â€¡Ã©Â¢ËœÃ¦Â ÂÃ¥Â½Â±Ã¥â€œÂshowfullscreen
+        // Ã¥Å½Â»Ã¦Å½â€°Ã¦Â â€¡Ã©Â¢ËœÃ¦Â Â
         setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-        // æ ¹æ®å›¾ç‰‡æž„é€ å¼‚å½¢çª—å£
+        // Ã¦Â Â¹Ã¦ÂÂ®Ã¥â€ºÂ¾Ã§â€°â€¡Ã¦Å¾â€žÃ©â‚¬Â Ã¥Â¼â€šÃ¥Â½Â¢Ã§Âªâ€”Ã¥ÂÂ£
         setAttribute(Qt::WA_TranslucentBackground);
 #endif
     }
 
 #ifdef Q_OS_MACOS
-    // Apple Silicon: ä½¿ç”¨ VideoToolbox + Metal æ¸²æŸ“
+    // Apple Silicon: Ã¤Â½Â¿Ã§â€Â¨ VideoToolbox + Metal Ã¦Â¸Â²Ã¦Å¸â€œ
     if (m_decodeMode == 1) {
         m_metalWidget = new MetalVideoWidget();
         ui->keepRatioWidget->setWidget(m_metalWidget);
 
-        // FPS label ä½œä¸º Metal widget çš„å­æŽ§ä»¶
+        // FPS label Ã¤Â½Å“Ã¤Â¸Âº Metal widget Ã§Å¡â€žÃ¥Â­ÂÃ¦Å½Â§Ã¤Â»Â¶
         m_fpsLabel = new QLabel(m_metalWidget);
     } else
 #endif
     {
-        // OpenGL è·¯å¾„ï¼ˆåŽŸæœ‰é€»è¾‘ï¼‰
+        // OpenGL Ã¨Â·Â¯Ã¥Â¾â€žÃ¯Â¼Ë†Ã¥Å½Å¸Ã¦Å“â€°Ã©â‚¬Â»Ã¨Â¾â€˜Ã¯Â¼â€°
         m_videoWidget = new QYUVOpenGLWidget();
         m_videoWidget->hide();
         ui->keepRatioWidget->setWidget(m_videoWidget);
 
-        // FPS label ä½œä¸º OpenGL widget çš„å­æŽ§ä»¶
+        // FPS label Ã¤Â½Å“Ã¤Â¸Âº OpenGL widget Ã§Å¡â€žÃ¥Â­ÂÃ¦Å½Â§Ã¤Â»Â¶
         m_fpsLabel = new QLabel(m_videoWidget);
     }
 
@@ -202,7 +202,7 @@ void VideoForm::showFPS(bool show)
 void VideoForm::updateRender(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV)
 {
     if (isMetalMode()) {
-        // Metal è·¯å¾„ä¸é€šè¿‡æ­¤æ–¹æ³•æ¸²æŸ“ï¼Œä½¿ç”¨ onFrameMetal
+        // Metal Ã¨Â·Â¯Ã¥Â¾â€žÃ¤Â¸ÂÃ©â‚¬Å¡Ã¨Â¿â€¡Ã¦Â­Â¤Ã¦â€“Â¹Ã¦Â³â€¢Ã¦Â¸Â²Ã¦Å¸â€œÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ onFrameMetal
         return;
     }
 
@@ -254,7 +254,7 @@ void VideoForm::moveCenter()
         qWarning() << "getScreenRect is empty";
         return;
     }
-    // çª—å£å±…ä¸­
+    // Ã§Âªâ€”Ã¥ÂÂ£Ã¥Â±â€¦Ã¤Â¸Â­
     move(screenRect.center() - QRect(0, 0, size().width(), size().height()).center());
 }
 
@@ -566,7 +566,7 @@ void VideoForm::onVideoSessionChanged(const QSize &size, bool clientResized)
 void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
-        // æ¨ªå±å…¨å±é“ºæ»¡å…¨å±ï¼Œæ¢å¤æ—¶ï¼Œæ¢å¤ä¿æŒå®½é«˜æ¯”
+        // Ã¦Â¨ÂªÃ¥Â±ÂÃ¥â€¦Â¨Ã¥Â±ÂÃ©â€œÂºÃ¦Â»Â¡Ã¥â€¦Â¨Ã¥Â±ÂÃ¯Â¼Å’Ã¦ÂÂ¢Ã¥Â¤ÂÃ¦â€”Â¶Ã¯Â¼Å’Ã¦ÂÂ¢Ã¥Â¤ÂÃ¤Â¿ÂÃ¦Å’ÂÃ¥Â®Â½Ã©Â«ËœÃ¦Â¯â€
         if (m_widthHeightRatio > 1.0f) {
             ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
         }
@@ -589,7 +589,7 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
-        // æ¨ªå±å…¨å±é“ºæ»¡å…¨å±ï¼Œä¸ä¿æŒå®½é«˜æ¯”
+        // Ã¦Â¨ÂªÃ¥Â±ÂÃ¥â€¦Â¨Ã¥Â±ÂÃ©â€œÂºÃ¦Â»Â¡Ã¥â€¦Â¨Ã¥Â±ÂÃ¯Â¼Å’Ã¤Â¸ÂÃ¤Â¿ÂÃ¦Å’ÂÃ¥Â®Â½Ã©Â«ËœÃ¦Â¯â€
         if (m_widthHeightRatio > 1.0f) {
             ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
         }
@@ -598,7 +598,7 @@ void VideoForm::switchFullScreen()
         m_normalSize = size();
 
         m_fullScreenBeforePos = pos();
-        // è¿™ç§ä¸´æ—¶å¢žåŠ æ ‡é¢˜æ å†å…¨å±çš„æ–¹æ¡ˆä¼šå¯¼è‡´æ”¶ä¸åˆ°mousemoveäº‹ä»¶ï¼Œå¯¼è‡´setmousetrackå¤±æ•ˆ
+        // Ã¨Â¿â„¢Ã§Â§ÂÃ¤Â¸Â´Ã¦â€”Â¶Ã¥Â¢Å¾Ã¥Å Â Ã¦Â â€¡Ã©Â¢ËœÃ¦Â ÂÃ¥â€ ÂÃ¥â€¦Â¨Ã¥Â±ÂÃ§Å¡â€žÃ¦â€“Â¹Ã¦Â¡Ë†Ã¤Â¼Å¡Ã¥Â¯Â¼Ã¨â€¡Â´Ã¦â€Â¶Ã¤Â¸ÂÃ¥Ë†Â°mousemoveÃ¤Âºâ€¹Ã¤Â»Â¶Ã¯Â¼Å’Ã¥Â¯Â¼Ã¨â€¡Â´setmousetrackÃ¥Â¤Â±Ã¦â€¢Ë†
         // mac fullscreen must show title bar
 #ifdef Q_OS_MACOS
         //setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
@@ -609,7 +609,7 @@ void VideoForm::switchFullScreen()
         }
         showFullScreen();
 
-        // å…¨å±çŠ¶æ€ç¦æ­¢ç”µè„‘ä¼‘çœ ã€æ¯å±
+        // Ã¥â€¦Â¨Ã¥Â±ÂÃ§Å Â¶Ã¦â‚¬ÂÃ§Â¦ÂÃ¦Â­Â¢Ã§â€ÂµÃ¨â€žâ€˜Ã¤Â¼â€˜Ã§Å“Â Ã£â‚¬ÂÃ¦ÂÂ¯Ã¥Â±Â
 #ifdef Q_OS_WIN32
         ::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
 #endif
@@ -979,7 +979,7 @@ void VideoForm::resizeEvent(QResizeEvent *event)
         return;
     }
     QSize curSize = size();
-    // é™åˆ¶VideoFormå°ºå¯¸ä¸èƒ½å°äºŽkeepRatioWidget good size
+    // Ã©â„¢ÂÃ¥Ë†Â¶VideoFormÃ¥Â°ÂºÃ¥Â¯Â¸Ã¤Â¸ÂÃ¨Æ’Â½Ã¥Â°ÂÃ¤ÂºÅ½keepRatioWidget good size
     if (m_widthHeightRatio > 1.0f) {
         // hor
         if (curSize.height() <= goodSize.height()) {
@@ -1073,3 +1073,5 @@ void VideoForm::toggleKeymapEdit()
         m_overlayPanel->setOverlayVisible(true);
     }
 }
+
+ToolForm* VideoForm::toolForm() const { return m_toolForm; }

@@ -1,4 +1,6 @@
-#include "overlaypanel.h"
+﻿#include "overlaypanel.h"
+#include <QFileDialog>
+#include <QMessageBox>
 #include "videoform.h"
 
 #include <QCoreApplication>
@@ -148,7 +150,7 @@ void OverlayPanel::setOverlayVisible(bool v)
         }
     }
     if (m_hudToggleBtn) {
-        m_hudToggleBtn->setText(m_overlayOn ? tr("👁️ HUD: ON") : tr("👁️ HUD: OFF"));
+        m_hudToggleBtn->setText(m_overlayOn ? tr("ðŸ‘ï¸ HUD: ON") : tr("ðŸ‘ï¸ HUD: OFF"));
     }
     update();
 }
@@ -266,7 +268,7 @@ void OverlayPanel::buildSidePanel()
     // --- Header ---
     auto *headerLayout = new QHBoxLayout();
     headerLayout->setContentsMargins(2, 2, 2, 2);
-    auto *titleLabel = new QLabel(tr("🎯 KEYMAP STUDIO"), m_sidePanel);
+    auto *titleLabel = new QLabel(tr("ðŸŽ¯ KEYMAP STUDIO"), m_sidePanel);
     titleLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #38bdf8; letter-spacing: 0.5px;");
     headerLayout->addWidget(titleLabel);
 
@@ -312,60 +314,60 @@ void OverlayPanel::buildSidePanel()
     addGrid->setSpacing(4);
 
     // Dedicated Fire button (Left Click)
-    auto *addFireBtn = new QPushButton(tr("🔫 Fire (L-Click)"), scrollContent);
+    auto *addFireBtn = new QPushButton(tr("ðŸ”« Fire (L-Click)"), scrollContent);
     addFireBtn->setStyleSheet("background-color: #991b1b; border-color: #ef4444; color: white;");
     addFireBtn->setToolTip(tr("Weapon fire button mapped to Mouse Left Click"));
     connect(addFireBtn, &QPushButton::clicked, this, &OverlayPanel::onAddFire);
 
     // Dedicated Scope button (Right Click)
-    auto *addScopeBtn = new QPushButton(tr("🎯 Scope (R-Click)"), scrollContent);
+    auto *addScopeBtn = new QPushButton(tr("ðŸŽ¯ Scope (R-Click)"), scrollContent);
     addScopeBtn->setStyleSheet("background-color: #0f766e; border-color: #14b8a6; color: white;");
     addScopeBtn->setToolTip(tr("Aim down sights (ADS) mapped to Mouse Right Click"));
     connect(addScopeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddScope);
 
     // WASD Joystick
-    auto *addJoyBtn = new QPushButton(tr("🕹️ WASD Move"), scrollContent);
+    auto *addJoyBtn = new QPushButton(tr("ðŸ•¹ï¸ WASD Move"), scrollContent);
     addJoyBtn->setStyleSheet("background-color: #0369a1; border-color: #38bdf8; color: white;");
     addJoyBtn->setToolTip(tr("360 degree virtual analog joystick"));
     connect(addJoyBtn, &QPushButton::clicked, this, &OverlayPanel::onAddJoystick);
 
     // Aim / Mouse Look
-    auto *addAimBtn = new QPushButton(tr("🔄 Aim / Look"), scrollContent);
+    auto *addAimBtn = new QPushButton(tr("ðŸ”„ Aim / Look"), scrollContent);
     addAimBtn->setStyleSheet("background-color: #b91c1c; border-color: #f87171; color: white;");
     addAimBtn->setToolTip(tr("FPS camera look and mouse aiming with customizable sensitivity"));
     connect(addAimBtn, &QPushButton::clicked, this, &OverlayPanel::onAddAim);
 
     // Free Look (Alt Eye)
-    auto *addEyeBtn = new QPushButton(tr("👀 Free Look (Alt)"), scrollContent);
+    auto *addEyeBtn = new QPushButton(tr("ðŸ‘€ Free Look (Alt)"), scrollContent);
     addEyeBtn->setStyleSheet("background-color: #854d0e; border-color: #eab308; color: white;");
     addEyeBtn->setToolTip(tr("360-degree observation look (Small Eye)"));
     connect(addEyeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddFreeLook);
 
     // Rapid Fire (Turbo Multi Click)
-    auto *addRapidBtn = new QPushButton(tr("⚡ Rapid Fire"), scrollContent);
+    auto *addRapidBtn = new QPushButton(tr("âš¡ Rapid Fire"), scrollContent);
     addRapidBtn->setStyleSheet("background-color: #6b21a8; border-color: #a855f7; color: white;");
     addRapidBtn->setToolTip(tr("Double / Rapid click for semi-automatic guns"));
     connect(addRapidBtn, &QPushButton::clicked, this, &OverlayPanel::onAddDoubleClick);
 
     // Map (M with switchMap)
-    auto *addMapBtn = new QPushButton(tr("🗺️ Map (M)"), scrollContent);
+    auto *addMapBtn = new QPushButton(tr("ðŸ—ºï¸ Map (M)"), scrollContent);
     addMapBtn->setStyleSheet("background-color: #1e3a8a; border-color: #3b82f6; color: white;");
     addMapBtn->setToolTip(tr("Map button with automatic cursor release (switchMap)"));
     connect(addMapBtn, &QPushButton::clicked, this, &OverlayPanel::onAddMap);
 
     // Bag (Tab with switchMap)
-    auto *addBagBtn = new QPushButton(tr("🎒 Bag (Tab)"), scrollContent);
+    auto *addBagBtn = new QPushButton(tr("ðŸŽ’ Bag (Tab)"), scrollContent);
     addBagBtn->setStyleSheet("background-color: #374151; border-color: #9ca3af; color: white;");
     addBagBtn->setToolTip(tr("Backpack / Inventory button with cursor release"));
     connect(addBagBtn, &QPushButton::clicked, this, &OverlayPanel::onAddBag);
 
     // Normal Click
-    auto *addClickBtn = new QPushButton(tr("🔘 Key Click"), scrollContent);
+    auto *addClickBtn = new QPushButton(tr("ðŸ”˜ Key Click"), scrollContent);
     addClickBtn->setToolTip(tr("Standard button click"));
     connect(addClickBtn, &QPushButton::clicked, this, &OverlayPanel::onAddClick);
 
     // Swipe / Slide
-    auto *addSwipeBtn = new QPushButton(tr("👆 Swipe"), scrollContent);
+    auto *addSwipeBtn = new QPushButton(tr("ðŸ‘† Swipe"), scrollContent);
     addSwipeBtn->setToolTip(tr("Drag gesture for sliding / dodging"));
     connect(addSwipeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddSwipe);
 
@@ -411,7 +413,7 @@ void OverlayPanel::buildSidePanel()
     // Interactive Key Recorder
     auto *keyRow = new QHBoxLayout();
     keyRow->addWidget(new QLabel(tr("Key:"), m_propsWidget));
-    m_recordKeyBtn = new QPushButton(tr("🎮 Bind Key"), m_propsWidget);
+    m_recordKeyBtn = new QPushButton(tr("ðŸŽ® Bind Key"), m_propsWidget);
     m_recordKeyBtn->setStyleSheet("background-color: #0284c7; color: white; font-weight: bold;");
     connect(m_recordKeyBtn, &QPushButton::clicked, this, &OverlayPanel::onRecordKeyClicked);
     keyRow->addWidget(m_recordKeyBtn);
@@ -426,15 +428,15 @@ void OverlayPanel::buildSidePanel()
     // Quick Mouse Buttons Selector (1-click assign Left / Right / Mid click)
     auto *mouseRow = new QHBoxLayout();
     mouseRow->setSpacing(3);
-    auto *setLeftBtn = new QPushButton(tr("🖱️ L-Click (Fire)"), m_propsWidget);
+    auto *setLeftBtn = new QPushButton(tr("ðŸ–±ï¸ L-Click (Fire)"), m_propsWidget);
     setLeftBtn->setStyleSheet("background-color: #991b1b; color: white; font-size: 10px; padding: 3px;");
     connect(setLeftBtn, &QPushButton::clicked, this, &OverlayPanel::onSetLeftClick);
 
-    auto *setRightBtn = new QPushButton(tr("🖱️ R-Click (Scope)"), m_propsWidget);
+    auto *setRightBtn = new QPushButton(tr("ðŸ–±ï¸ R-Click (Scope)"), m_propsWidget);
     setRightBtn->setStyleSheet("background-color: #0f766e; color: white; font-size: 10px; padding: 3px;");
     connect(setRightBtn, &QPushButton::clicked, this, &OverlayPanel::onSetRightClick);
 
-    auto *setMidBtn = new QPushButton(tr("🖱️ Mid"), m_propsWidget);
+    auto *setMidBtn = new QPushButton(tr("ðŸ–±ï¸ Mid"), m_propsWidget);
     setMidBtn->setStyleSheet("background-color: #334155; color: white; font-size: 10px; padding: 3px;");
     connect(setMidBtn, &QPushButton::clicked, this, &OverlayPanel::onSetMidClick);
 
@@ -486,7 +488,7 @@ void OverlayPanel::buildSidePanel()
     connect(m_joyLeftEdit,  &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
     connect(m_joyRightEdit, &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
 
-    auto *resetWasdBtn = new QPushButton(tr("🎯 Reset Standard WASD"), m_joyGroup);
+    auto *resetWasdBtn = new QPushButton(tr("ðŸŽ¯ Reset Standard WASD"), m_joyGroup);
     resetWasdBtn->setStyleSheet("background-color: #0369a1; border-color: #0284c7; padding: 4px; font-size: 11px;");
     connect(resetWasdBtn, &QPushButton::clicked, this, [this]() {
         if (!m_selected || m_selected->buttonType() != OverlayButtonType::Joystick) return;
@@ -519,7 +521,7 @@ void OverlayPanel::buildSidePanel()
 
     auto *aimPresetsLayout = new QHBoxLayout();
     aimPresetsLayout->setSpacing(4);
-    auto *rcBtn = new QPushButton(tr("🖱️ Right Click"), m_aimGroup);
+    auto *rcBtn = new QPushButton(tr("ðŸ–±ï¸ Right Click"), m_aimGroup);
     rcBtn->setStyleSheet("background-color: #1e3a8a; border-color: #3b82f6; font-size: 11px; padding: 4px;");
     connect(rcBtn, &QPushButton::clicked, this, [this]() {
         if (!m_selected) return;
@@ -560,12 +562,12 @@ void OverlayPanel::buildSidePanel()
 
     // Action buttons row (Duplicate / Delete)
     auto *actRow = new QHBoxLayout();
-    auto *dupBtn = new QPushButton(tr("📋 Duplicate"), m_propsWidget);
+    auto *dupBtn = new QPushButton(tr("ðŸ“‹ Duplicate"), m_propsWidget);
     dupBtn->setStyleSheet("background-color: #334155; color: white;");
     connect(dupBtn, &QPushButton::clicked, this, &OverlayPanel::onDuplicateSelected);
     actRow->addWidget(dupBtn);
 
-    m_deleteBtn = new QPushButton(tr("🗑️ Delete"), m_propsWidget);
+    m_deleteBtn = new QPushButton(tr("ðŸ—‘ï¸ Delete"), m_propsWidget);
     m_deleteBtn->setStyleSheet("background-color: #dc2626; color: white;");
     connect(m_deleteBtn, &QPushButton::clicked, this, &OverlayPanel::onDeleteSelected);
     actRow->addWidget(m_deleteBtn);
@@ -578,7 +580,7 @@ void OverlayPanel::buildSidePanel()
     mainLayout->addWidget(scrollArea, 1);
 
     // --- Bottom Action Bar (Fixed at bottom) ---
-    m_saveBtn = new QPushButton(tr("💾 Save & Apply"), m_sidePanel);
+    m_saveBtn = new QPushButton(tr("ðŸ’¾ Save & Apply"), m_sidePanel);
     m_saveBtn->setFixedHeight(36);
     m_saveBtn->setStyleSheet(
         "QPushButton {"
@@ -597,7 +599,7 @@ void OverlayPanel::buildSidePanel()
     mainLayout->addWidget(m_saveBtn);
 
     // Export JSON Button
-    auto *exportBtn = new QPushButton(tr("📤 Export JSON"), m_sidePanel);
+    auto *exportBtn = new QPushButton(tr("ðŸ“¤ Export JSON"), m_sidePanel);
     exportBtn->setFixedHeight(32);
     exportBtn->setStyleSheet(
         "QPushButton {"
@@ -615,11 +617,11 @@ void OverlayPanel::buildSidePanel()
     mainLayout->addWidget(exportBtn);
 
     auto *bottomRow = new QHBoxLayout();
-    m_hudToggleBtn = new QPushButton(tr("👁️ HUD: ON"), m_sidePanel);
+    m_hudToggleBtn = new QPushButton(tr("ðŸ‘ï¸ HUD: ON"), m_sidePanel);
     connect(m_hudToggleBtn, &QPushButton::clicked, this, &OverlayPanel::onToggleHUD);
     bottomRow->addWidget(m_hudToggleBtn);
 
-    m_closeBtn = new QPushButton(tr("✖ Close"), m_sidePanel);
+    m_closeBtn = new QPushButton(tr("âœ– Close"), m_sidePanel);
     connect(m_closeBtn, &QPushButton::clicked, this, &OverlayPanel::onCloseEdit);
     bottomRow->addWidget(m_closeBtn);
 
@@ -667,8 +669,8 @@ void OverlayPanel::paintEvent(QPaintEvent *)
         p.setFont(bFont);
         p.setPen(QColor(226, 232, 240));
         p.drawText(bannerRect, Qt::AlignCenter,
-                   m_recordingKey ? tr("🔴 RECORDING: Press any key on keyboard...")
-                                  : tr("💡 Double-click canvas to add  |  Drag nodes to move  |  Esc to exit"));
+                   m_recordingKey ? tr("ðŸ”´ RECORDING: Press any key on keyboard...")
+                                  : tr("ðŸ’¡ Double-click canvas to add  |  Drag nodes to move  |  Esc to exit"));
     }
 
     // Toast message (e.g. "Keymap Applied")
@@ -905,7 +907,7 @@ void OverlayPanel::selectButton(OverlayButton *btn)
         m_selTypeLabel->setText(tr("No button selected"));
         m_labelEdit->clear();
         m_keyEdit->clear();
-        m_recordKeyBtn->setText(tr("🎮 Bind Key"));
+        m_recordKeyBtn->setText(tr("ðŸŽ® Bind Key"));
         m_coordsLabel->setText("X: -- | Y: --");
     }
     update();
@@ -916,10 +918,10 @@ void OverlayPanel::populatePropsFromButton(OverlayButton *btn)
     if (!btn) return;
 
     QString typeStr = "Click Node";
-    if (btn->buttonType() == OverlayButtonType::DoubleClick) typeStr = "⚡ Double Tap Node";
-    else if (btn->buttonType() == OverlayButtonType::Joystick)    typeStr = "🕹️ WASD Movement Wheel";
-    else if (btn->buttonType() == OverlayButtonType::Aim)         typeStr = "🎯 FPS Aim & Look Node";
-    else if (btn->buttonType() == OverlayButtonType::Swipe)       typeStr = "👆 Swipe Gesture Node";
+    if (btn->buttonType() == OverlayButtonType::DoubleClick) typeStr = "âš¡ Double Tap Node";
+    else if (btn->buttonType() == OverlayButtonType::Joystick)    typeStr = "ðŸ•¹ï¸ WASD Movement Wheel";
+    else if (btn->buttonType() == OverlayButtonType::Aim)         typeStr = "ðŸŽ¯ FPS Aim & Look Node";
+    else if (btn->buttonType() == OverlayButtonType::Swipe)       typeStr = "ðŸ‘† Swipe Gesture Node";
 
     m_selTypeLabel->setText(typeStr);
     m_labelEdit->blockSignals(true);
@@ -928,7 +930,7 @@ void OverlayPanel::populatePropsFromButton(OverlayButton *btn)
 
     m_labelEdit->setText(btn->label());
     m_keyEdit->setText(btn->key());
-    m_recordKeyBtn->setText(QString("🎮 [%1]").arg(keyToDisplayLabel(btn->key())));
+    m_recordKeyBtn->setText(QString("ðŸŽ® [%1]").arg(keyToDisplayLabel(btn->key())));
     m_sizeSlider->setValue(static_cast<int>(btn->radiusRatio() * 1000));
     m_coordsLabel->setText(QString("X: %1 | Y: %2")
                            .arg(btn->posRatio().x(), 0, 'f', 2)
@@ -974,7 +976,7 @@ void OverlayPanel::onApplyProps()
         if (m_selected->buttonType() == OverlayButtonType::Aim) {
             m_switchKey = normKey;
         }
-        m_recordKeyBtn->setText(QString("🎮 [%1]").arg(keyToDisplayLabel(normKey)));
+        m_recordKeyBtn->setText(QString("ðŸŽ® [%1]").arg(keyToDisplayLabel(normKey)));
     }
 
     m_selected->setRadiusRatio(m_sizeSlider->value() / 1000.0f);
@@ -999,7 +1001,7 @@ void OverlayPanel::onRecordKeyClicked()
 {
     if (!m_selected) return;
     m_recordingKey = true;
-    m_recordKeyBtn->setText(tr("🔴 Press Key or Right-Click..."));
+    m_recordKeyBtn->setText(tr("ðŸ”´ Press Key or Right-Click..."));
     setFocus();
     update();
 }
@@ -1469,7 +1471,7 @@ void OverlayPanel::onSaveAndApply()
     setOverlayVisible(true);
 
     // Toast notification
-    m_toastMessage = tr("✅ Keymap Applied & Active! Controls are working.");
+    m_toastMessage = tr("âœ… Keymap Applied & Active! Controls are working.");
     update();
 
     QTimer::singleShot(3500, this, [this]() {
@@ -1495,9 +1497,9 @@ void OverlayPanel::onExportKeymap()
             QFile::remove(destPath);
         }
         if (QFile::copy(srcPath, destPath)) {
-            m_toastMessage = tr("✅ Keymap exported successfully!");
+            m_toastMessage = tr("âœ… Keymap exported successfully!");
         } else {
-            m_toastMessage = tr("❌ Failed to export keymap!");
+            m_toastMessage = tr("âŒ Failed to export keymap!");
         }
         update();
         QTimer::singleShot(3500, this, [this]() {
