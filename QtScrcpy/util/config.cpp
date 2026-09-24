@@ -52,10 +52,10 @@
 #define COMMON_RECORD_DEF ""
 
 #define COMMON_BITRATE_KEY "BitRate"
-#define COMMON_BITRATE_DEF 2000000
+#define COMMON_BITRATE_DEF 16000000 // 16 Mbps for high quality
 
 #define COMMON_MAX_SIZE_INDEX_KEY "MaxSizeIndex"
-#define COMMON_MAX_SIZE_INDEX_DEF 2
+#define COMMON_MAX_SIZE_INDEX_DEF 0 // Original resolution
 
 #define COMMON_RECORD_FORMAT_INDEX_KEY "RecordFormatIndex"
 #define COMMON_RECORD_FORMAT_INDEX_DEF 0
@@ -499,13 +499,13 @@ void Config::saveIpHistory(const QString &ip)
 {
     QStringList ipList = getIpHistory();
     
-    // 移除已存在的相同IP（避免重复）
+    // ç§»é™¤å·²å­˜åœ¨çš„ç›¸åŒIPï¼ˆé¿å…é‡å¤ï¼‰
     ipList.removeAll(ip);
     
-    // 将新IP添加到开头
+    // å°†æ–°IPæ·»åŠ åˆ°å¼€å¤´
     ipList.prepend(ip);
     
-    // 限制历史记录数量
+    // é™åˆ¶åŽ†å²è®°å½•æ•°é‡
     while (ipList.size() > IP_HISTORY_MAX) {
         ipList.removeLast();
     }
@@ -531,13 +531,13 @@ void Config::savePortHistory(const QString &port)
 {
     QStringList portList = getPortHistory();
     
-    // 移除已存在的相同Port（避免重复）
+    // ç§»é™¤å·²å­˜åœ¨çš„ç›¸åŒPortï¼ˆé¿å…é‡å¤ï¼‰
     portList.removeAll(port);
     
-    // 将新Port添加到开头
+    // å°†æ–°Portæ·»åŠ åˆ°å¼€å¤´
     portList.prepend(port);
     
-    // 限制历史记录数量
+    // é™åˆ¶åŽ†å²è®°å½•æ•°é‡
     while (portList.size() > PORT_HISTORY_MAX) {
         portList.removeLast();
     }
@@ -558,3 +558,4 @@ void Config::clearPortHistory()
     m_userData->remove(PORT_HISTORY_KEY);
     m_userData->sync();
 }
+

@@ -1,4 +1,4 @@
-#ifndef VIDEOFORM_H
+﻿#ifndef VIDEOFORM_H
 #define VIDEOFORM_H
 
 #include <QPointer>
@@ -13,10 +13,16 @@ namespace Ui
 }
 
 class ToolForm;
+class OverlayPanel;
 class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
 class MetalVideoWidget;
+class DeviceInfoOverlay;
+class RecoilAssist;
+class TurboMode;
+class GamepadManager;
+
 class VideoForm : public QWidget, public qsc::DeviceObserver
 {
     Q_OBJECT
@@ -34,12 +40,17 @@ public:
     void removeBlackRect();
     void showFPS(bool show);
     void switchFullScreen();
+    void toggleKeymapEdit();    ///< called by ToolForm keymapBtn
+    void toggleTurboMode();
+    void toggleGamepad();     ///< Turbo/Burst mode
+    void toggleDeviceInfo();    ///< Battery + Temp overlay
     bool isHost();
+    QWidget* videoWidget() const;
+    ToolForm* toolForm() const;
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
                  int linesizeY, int linesizeU, int linesizeV) override;
-    // VideoToolbox Metal 路径帧回调（仅 macOS arm64）
     void onFrameMetal(void* cvPixelBuffer, int width, int height) override;
     void updateFPS(quint32 fps) override;
     void onVideoSessionChanged(const QSize &size, bool clientResized) override;
@@ -54,6 +65,9 @@ private:
     void installShortcut();
     QRect getScreenRect();
 
+    // Recoil assist: apply WinAPI relative mouse move
+    void applyRecoilCompensation(int dx, int dy);
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -67,6 +81,7 @@ protected:
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
 
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
@@ -74,38 +89,41 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
-    // 获取当前视频渲染 widget（OpenGL 或 Metal 容器）
-    QWidget* videoWidget() const;
-    // 是否使用 Metal 渲染路径
     bool isMetalMode() const;
 
-    // ui
+    // UI
     Ui::videoForm *ui;
-    QPointer<ToolForm> m_toolForm;
-    QPointer<QWidget> m_loadingWidget;
-    QPointer<QYUVOpenGLWidget> m_videoWidget;
+    QPointer<ToolForm>          m_toolForm;
+    QPointer<QWidget>           m_loadingWidget;
+    QPointer<QYUVOpenGLWidget>  m_videoWidget;
+    QPointer<MetalVideoWidget>  m_metalWidget;
+    QPointer<QLabel>            m_fpsLabel;
 
-    // Metal 渲染路径（仅 macOS arm64）
-    QPointer<MetalVideoWidget> m_metalWidget;
-
-    QPointer<QLabel> m_fpsLabel;
-
-    //inside member
-    QSize m_frameSize;
-    QSize m_normalSize;
-    QPoint m_dragPosition;
-    float m_widthHeightRatio = 0.5f;
-    bool m_skin = true;
-    QPoint m_fullScreenBeforePos;
+    // Inside member
+    QSize   m_frameSize;
+    QSize   m_normalSize;
+    QPoint  m_dragPosition;
+    float   m_widthHeightRatio = 0.5f;
+    bool    m_skin             = true;
+    QPoint  m_fullScreenBeforePos;
     QString m_serial;
-    int m_decodeMode = 0;
-    bool m_metalFirstFrame = true;  // Metal 首次帧标记
-    bool m_flexDisplay = false;
-    bool m_preventAutoResize = false;
-    QTimer m_flexResizeTimer;
-    QSize m_pendingDisplaySize;
+    int     m_decodeMode       = 0;
+    bool    m_metalFirstFrame  = true;
+    bool    m_flexDisplay      = false;
+    bool    m_preventAutoResize = false;
+    QTimer  m_flexResizeTimer;
+    QSize   m_pendingDisplaySize;
 
-    //Whether to display the toolbar when connecting a device.
+    // Overlay: separate top-level window to avoid blocking OpenGL
+    QPointer<OverlayPanel>      m_overlayPanel;
+
+    // New features
+    QPointer<DeviceInfoOverlay> m_deviceInfoOverlay;
+    QPointer<RecoilAssist>      m_recoilAssist;
+    QPointer<TurboMode>         m_turboMode;
+    QPointer<GamepadManager>    m_gamepadManager;
+
+    // Whether to display the toolbar when connecting a device.
     bool show_toolbar = true;
 };
 

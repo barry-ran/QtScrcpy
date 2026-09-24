@@ -1,4 +1,4 @@
-﻿#include <QDebug>
+#include <QDebug>
 #include <QAbstractItemView>
 #include <QDesktopServices>
 #include <QCheckBox>

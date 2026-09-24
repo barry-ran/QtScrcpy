@@ -1,4 +1,4 @@
-// #include <QDesktopWidget>
+﻿// #include <QDesktopWidget>
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QLabel>
@@ -25,6 +25,12 @@
 #include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "videoform.h"
+#include "overlaypanel.h"
+#include "deviceinfooverlay.h"
+#include "recoilassist.h"
+#include "turbomode.h"
+#include "gamepadmanager.h"
+#include <QPushButton>
 
 #ifdef Q_OS_MACOS
 #include "metalvideowindow.h"
@@ -87,31 +93,31 @@ void VideoForm::initUI()
         }
 
 #ifndef Q_OS_MACOS
-        // mac下去掉标题栏影响showfullscreen
-        // 去掉标题栏
+        // macÃ¤Â¸â€¹Ã¥Å½Â»Ã¦Å½â€°Ã¦Â â€¡Ã©Â¢ËœÃ¦Â ÂÃ¥Â½Â±Ã¥â€œÂshowfullscreen
+        // Ã¥Å½Â»Ã¦Å½â€°Ã¦Â â€¡Ã©Â¢ËœÃ¦Â Â
         setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-        // 根据图片构造异形窗口
+        // Ã¦Â Â¹Ã¦ÂÂ®Ã¥â€ºÂ¾Ã§â€°â€¡Ã¦Å¾â€žÃ©â‚¬Â Ã¥Â¼â€šÃ¥Â½Â¢Ã§Âªâ€”Ã¥ÂÂ£
         setAttribute(Qt::WA_TranslucentBackground);
 #endif
     }
 
 #ifdef Q_OS_MACOS
-    // Apple Silicon: 使用 VideoToolbox + Metal 渲染
+    // Apple Silicon: Ã¤Â½Â¿Ã§â€Â¨ VideoToolbox + Metal Ã¦Â¸Â²Ã¦Å¸â€œ
     if (m_decodeMode == 1) {
         m_metalWidget = new MetalVideoWidget();
         ui->keepRatioWidget->setWidget(m_metalWidget);
 
-        // FPS label 作为 Metal widget 的子控件
+        // FPS label Ã¤Â½Å“Ã¤Â¸Âº Metal widget Ã§Å¡â€žÃ¥Â­ÂÃ¦Å½Â§Ã¤Â»Â¶
         m_fpsLabel = new QLabel(m_metalWidget);
     } else
 #endif
     {
-        // OpenGL 路径（原有逻辑）
+        // OpenGL Ã¨Â·Â¯Ã¥Â¾â€žÃ¯Â¼Ë†Ã¥Å½Å¸Ã¦Å“â€°Ã©â‚¬Â»Ã¨Â¾â€˜Ã¯Â¼â€°
         m_videoWidget = new QYUVOpenGLWidget();
         m_videoWidget->hide();
         ui->keepRatioWidget->setWidget(m_videoWidget);
 
-        // FPS label 作为 OpenGL widget 的子控件
+        // FPS label Ã¤Â½Å“Ã¤Â¸Âº OpenGL widget Ã§Å¡â€žÃ¥Â­ÂÃ¦Å½Â§Ã¤Â»Â¶
         m_fpsLabel = new QLabel(m_videoWidget);
     }
 
@@ -201,7 +207,7 @@ void VideoForm::showFPS(bool show)
 void VideoForm::updateRender(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV, int linesizeY, int linesizeU, int linesizeV)
 {
     if (isMetalMode()) {
-        // Metal 路径不通过此方法渲染，使用 onFrameMetal
+        // Metal Ã¨Â·Â¯Ã¥Â¾â€žÃ¤Â¸ÂÃ©â‚¬Å¡Ã¨Â¿â€¡Ã¦Â­Â¤Ã¦â€“Â¹Ã¦Â³â€¢Ã¦Â¸Â²Ã¦Å¸â€œÃ¯Â¼Å’Ã¤Â½Â¿Ã§â€Â¨ onFrameMetal
         return;
     }
 
@@ -228,6 +234,13 @@ void VideoForm::updateRender(int width, int height, uint8_t* dataY, uint8_t* dat
 void VideoForm::setSerial(const QString &serial)
 {
     m_serial = serial;
+
+    // Initialize recoil assist system
+    if (!m_recoilAssist) {
+        m_recoilAssist = new RecoilAssist(this);
+        connect(m_recoilAssist, &RecoilAssist::compensationMove,
+                this, &VideoForm::applyRecoilCompensation);
+    }
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     m_flexDisplay = device && device->isFlexDisplay();
     if (m_flexDisplay) {
@@ -242,6 +255,7 @@ void VideoForm::showToolForm(bool show)
         m_toolForm->setSerial(m_serial);
     }
     m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
+    m_toolForm->autoResizeToParent();
     m_toolForm->setVisible(show);
 }
 
@@ -252,7 +266,7 @@ void VideoForm::moveCenter()
         qWarning() << "getScreenRect is empty";
         return;
     }
-    // 窗口居中
+    // Ã§Âªâ€”Ã¥ÂÂ£Ã¥Â±â€¦Ã¤Â¸Â­
     move(screenRect.center() - QRect(0, 0, size().width(), size().height()).center());
 }
 
@@ -564,7 +578,7 @@ void VideoForm::onVideoSessionChanged(const QSize &size, bool clientResized)
 void VideoForm::switchFullScreen()
 {
     if (isFullScreen()) {
-        // 横屏全屏铺满全屏，恢复时，恢复保持宽高比
+        // Ã¦Â¨ÂªÃ¥Â±ÂÃ¥â€¦Â¨Ã¥Â±ÂÃ©â€œÂºÃ¦Â»Â¡Ã¥â€¦Â¨Ã¥Â±ÂÃ¯Â¼Å’Ã¦ÂÂ¢Ã¥Â¤ÂÃ¦â€”Â¶Ã¯Â¼Å’Ã¦ÂÂ¢Ã¥Â¤ÂÃ¤Â¿ÂÃ¦Å’ÂÃ¥Â®Â½Ã©Â«ËœÃ¦Â¯â€
         if (m_widthHeightRatio > 1.0f) {
             ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
         }
@@ -587,7 +601,7 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
-        // 横屏全屏铺满全屏，不保持宽高比
+        // Ã¦Â¨ÂªÃ¥Â±ÂÃ¥â€¦Â¨Ã¥Â±ÂÃ©â€œÂºÃ¦Â»Â¡Ã¥â€¦Â¨Ã¥Â±ÂÃ¯Â¼Å’Ã¤Â¸ÂÃ¤Â¿ÂÃ¦Å’ÂÃ¥Â®Â½Ã©Â«ËœÃ¦Â¯â€
         if (m_widthHeightRatio > 1.0f) {
             ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
         }
@@ -596,7 +610,7 @@ void VideoForm::switchFullScreen()
         m_normalSize = size();
 
         m_fullScreenBeforePos = pos();
-        // 这种临时增加标题栏再全屏的方案会导致收不到mousemove事件，导致setmousetrack失效
+        // Ã¨Â¿â„¢Ã§Â§ÂÃ¤Â¸Â´Ã¦â€”Â¶Ã¥Â¢Å¾Ã¥Å Â Ã¦Â â€¡Ã©Â¢ËœÃ¦Â ÂÃ¥â€ ÂÃ¥â€¦Â¨Ã¥Â±ÂÃ§Å¡â€žÃ¦â€“Â¹Ã¦Â¡Ë†Ã¤Â¼Å¡Ã¥Â¯Â¼Ã¨â€¡Â´Ã¦â€Â¶Ã¤Â¸ÂÃ¥Ë†Â°mousemoveÃ¤Âºâ€¹Ã¤Â»Â¶Ã¯Â¼Å’Ã¥Â¯Â¼Ã¨â€¡Â´setmousetrackÃ¥Â¤Â±Ã¦â€¢Ë†
         // mac fullscreen must show title bar
 #ifdef Q_OS_MACOS
         //setWindowFlags(windowFlags() & ~Qt::FramelessWindowHint);
@@ -607,7 +621,7 @@ void VideoForm::switchFullScreen()
         }
         showFullScreen();
 
-        // 全屏状态禁止电脑休眠、息屏
+        // Ã¥â€¦Â¨Ã¥Â±ÂÃ§Å Â¶Ã¦â‚¬ÂÃ§Â¦ÂÃ¦Â­Â¢Ã§â€ÂµÃ¨â€žâ€˜Ã¤Â¼â€˜Ã§Å“Â Ã£â‚¬ÂÃ¦ÂÂ¯Ã¥Â±Â
 #ifdef Q_OS_WIN32
         ::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
 #endif
@@ -634,6 +648,33 @@ void VideoForm::grabCursor(bool grab)
 {
     QRect rc = getGrabCursorRect();
     MouseTap::getInstance()->enableMouseEventTap(rc, grab);
+
+    QWidget *vw = videoWidget();
+    if (grab) {
+        if (vw) {
+            vw->setCursor(Qt::BlankCursor);
+        }
+        setCursor(Qt::BlankCursor);
+        if (m_overlayPanel) {
+            m_overlayPanel->setCursor(Qt::BlankCursor);
+        }
+    } else {
+        if (vw) {
+            vw->unsetCursor();
+            vw->setCursor(Qt::ArrowCursor);
+        }
+        unsetCursor();
+        setCursor(Qt::ArrowCursor);
+        if (m_overlayPanel) {
+            m_overlayPanel->unsetCursor();
+            m_overlayPanel->setCursor(Qt::ArrowCursor);
+        }
+        // Center the cursor inside the video area so user immediately sees and can use the mouse
+        if (vw && vw->isVisible()) {
+            QPoint centerPt = vw->mapToGlobal(vw->rect().center());
+            QCursor::setPos(centerPt);
+        }
+    }
 }
 
 void VideoForm::onFrame(int width, int height, uint8_t *dataY, uint8_t *dataU, uint8_t *dataV, int linesizeY, int linesizeU, int linesizeV)
@@ -683,6 +724,13 @@ void VideoForm::staysOnTop(bool top)
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+
+    if (event->button() == Qt::LeftButton && device && device->isCurrentCustomKeymap()) {
+        if (m_recoilAssist) {
+            m_recoilAssist->setEnabled(true); // TODO: maybe read from a setting
+            m_recoilAssist->onFirePressed();
+        }
+    }
     if (event->button() == Qt::MiddleButton) {
         if (device && !device->isCurrentCustomKeymap()) {
             device->postGoHome();
@@ -691,7 +739,11 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
     }
 
     if (event->button() == Qt::RightButton) {
-        if (device && !device->isCurrentCustomKeymap()) {
+        bool rightIsSwitch = false;
+        if (m_overlayPanel) {
+            rightIsSwitch = (m_overlayPanel->switchKey() == "RightButton" || m_overlayPanel->switchKey() == "Right");
+        }
+        if (!rightIsSwitch && device && !device->isCurrentCustomKeymap()) {
             device->postGoBack();
             return;
         }
@@ -732,6 +784,10 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+
+    if (event->button() == Qt::LeftButton && m_recoilAssist) {
+        m_recoilAssist->onFireReleased();
+    }
     if (m_dragPosition.isNull()) {
         if (!device) {
             return;
@@ -805,7 +861,11 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
         }
     }
 
-    if (event->button() == Qt::RightButton && device && !device->isCurrentCustomKeymap()) {
+    bool rightIsSwitch = false;
+    if (m_overlayPanel) {
+        rightIsSwitch = (m_overlayPanel->switchKey() == "RightButton" || m_overlayPanel->switchKey() == "Right");
+    }
+    if (!rightIsSwitch && event->button() == Qt::RightButton && device && !device->isCurrentCustomKeymap()) {
         emit device->postBackOrScreenOn(event->type() == QEvent::MouseButtonPress);
     }
 
@@ -858,12 +918,26 @@ void VideoForm::wheelEvent(QWheelEvent *event)
 
 void VideoForm::keyPressEvent(QKeyEvent *event)
 {
+    if (Qt::Key_Escape == event->key() && !event->isAutoRepeat()) {
+        if (m_overlayPanel && m_overlayPanel->isEditMode()) {
+            m_overlayPanel->setEditMode(false);
+            return;
+        }
+        if (isFullScreen()) {
+            switchFullScreen();
+            return;
+        }
+    }
+
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (!device) {
         return;
     }
-    if (Qt::Key_Escape == event->key() && !event->isAutoRepeat() && isFullScreen()) {
-        switchFullScreen();
+
+    // In game / custom keymap mode, ignore auto-repeated key presses to avoid touch stutter
+    if (event->isAutoRepeat() && device->isCurrentCustomKeymap()) {
+        event->accept();
+        return;
     }
 
     QWidget *vw = videoWidget();
@@ -873,6 +947,12 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
+    // Ignore OS auto-repeat release events so holding W or movement keys is continuous with zero delay!
+    if (event->isAutoRepeat()) {
+        event->accept();
+        return;
+    }
+
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (!device) {
         return;
@@ -906,6 +986,7 @@ void VideoForm::showEvent(QShowEvent *event)
 }
 
 void VideoForm::resizeEvent(QResizeEvent *event)
+// overlay panel resize handled below
 {
     Q_UNUSED(event)
     if (m_flexDisplay) {
@@ -921,7 +1002,7 @@ void VideoForm::resizeEvent(QResizeEvent *event)
         return;
     }
     QSize curSize = size();
-    // 限制VideoForm尺寸不能小于keepRatioWidget good size
+    // Ã©â„¢ÂÃ¥Ë†Â¶VideoFormÃ¥Â°ÂºÃ¥Â¯Â¸Ã¤Â¸ÂÃ¨Æ’Â½Ã¥Â°ÂÃ¤ÂºÅ½keepRatioWidget good size
     if (m_widthHeightRatio > 1.0f) {
         // hor
         if (curSize.height() <= goodSize.height()) {
@@ -937,11 +1018,32 @@ void VideoForm::resizeEvent(QResizeEvent *event)
             setMinimumWidth(0);
         }
     }
+
+    if (m_overlayPanel) {
+        m_overlayPanel->setGeometry(0, 0, width(), height());
+        m_overlayPanel->onParentResized();
+    }
+
+    if (m_toolForm && m_toolForm->isVisible()) {
+        m_toolForm->autoResizeToParent();
+    }
+}
+
+void VideoForm::moveEvent(QMoveEvent *event)
+{
+    QWidget::moveEvent(event);
+    // Keep overlay panel aligned when this window moves
+    if (m_overlayPanel && m_overlayPanel->isVisible()) {
+        QPoint globalPos = mapToGlobal(QPoint(0, 0));
+        m_overlayPanel->move(globalPos);
+    }
 }
 
 void VideoForm::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
+    if (m_overlayPanel) m_overlayPanel->close();
+    if (m_deviceInfoOverlay) m_deviceInfoOverlay->stopPolling();
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (!device) {
         return;
@@ -990,3 +1092,102 @@ void VideoForm::dropEvent(QDropEvent *event)
         emit device->pushFileRequest(file, Config::getInstance().getPushFilePath() + fileInfo.fileName());
     }
 }
+
+void VideoForm::toggleKeymapEdit()
+{
+    if (!m_overlayPanel) {
+        // CRITICAL FIX: OverlayPanel is created as a TOP-LEVEL window with no parent.
+        // This prevents it from sharing the OpenGL native window, which caused video to freeze.
+        m_overlayPanel = new OverlayPanel(m_serial, nullptr, this);
+        m_overlayPanel->setWindowFlags(
+            Qt::Tool |
+            Qt::FramelessWindowHint |
+            Qt::WindowStaysOnTopHint
+        );
+        m_overlayPanel->setAttribute(Qt::WA_TranslucentBackground, true);
+    }
+
+    bool entering = !m_overlayPanel->isEditMode();
+
+    if (entering) {
+        // Position overlay exactly over the VideoForm window
+        QPoint globalPos = mapToGlobal(QPoint(0, 0));
+        m_overlayPanel->setGeometry(globalPos.x(), globalPos.y(), width(), height());
+        m_overlayPanel->onParentResized();
+        m_overlayPanel->show();
+        m_overlayPanel->raise();
+        m_overlayPanel->activateWindow();
+        m_overlayPanel->setEditMode(true);
+        m_overlayPanel->setOverlayVisible(true);
+    } else {
+        m_overlayPanel->setEditMode(false);
+    }
+}
+
+
+void VideoForm::toggleGamepad()
+{
+    if (!m_gamepadManager) {
+        m_gamepadManager = new GamepadManager(m_serial, this);
+        connect(m_gamepadManager, &GamepadManager::statusMessage, this, [this](const QString &msg) {
+            // Show a temporary overlay label (reuse the FPS label spot or a toast)
+            if (m_fpsLabel) {
+                m_fpsLabel->setText(msg);
+                QTimer::singleShot(3000, this, [this]() {
+                    m_fpsLabel->setText(QString());
+                });
+            }
+        });
+        // Default: map WASD center and Aim center based on any loaded keymap
+        if (m_overlayPanel) {
+            // Could read positions from the overlay panel – use defaults for now
+        }
+    }
+    bool en = !m_gamepadManager->isEnabled();
+    m_gamepadManager->setEnabled(en);
+    if (m_toolForm) {
+        auto *btn = m_toolForm->findChild<QPushButton*>("gamepadBtn");
+        if (btn) {
+            btn->setChecked(en);
+            btn->setToolTip(en ? "Gamepad ON – click to disable" : "Enable Gamepad");
+        }
+    }
+}
+
+
+void VideoForm::toggleTurboMode()
+{
+    if (!m_turboMode) {
+        m_turboMode = new TurboMode(this);
+        m_turboMode->setSerial(m_serial);
+    }
+    m_turboMode->toggle();
+}
+
+void VideoForm::toggleDeviceInfo()
+{
+    if (!m_deviceInfoOverlay) {
+        m_deviceInfoOverlay = new DeviceInfoOverlay(m_serial, this);
+    }
+    if (m_deviceInfoOverlay->isVisible()) {
+        m_deviceInfoOverlay->stopPolling();
+    } else {
+        m_deviceInfoOverlay->startPolling();
+    }
+}
+
+void VideoForm::applyRecoilCompensation(int dx, int dy)
+{
+#if defined(Q_OS_WIN32)
+    INPUT input = {};
+    input.type = INPUT_MOUSE;
+    input.mi.dwFlags = MOUSEEVENTF_MOVE;
+    input.mi.dx = dx;
+    input.mi.dy = dy;
+    SendInput(1, &input, sizeof(INPUT));
+#else
+    Q_UNUSED(dx) Q_UNUSED(dy)
+#endif
+}
+
+ToolForm* VideoForm::toolForm() const { return m_toolForm; }

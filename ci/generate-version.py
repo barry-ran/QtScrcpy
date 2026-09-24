@@ -1,14 +1,20 @@
-import sys
+﻿import sys
 import os
 
 if __name__ == '__main__':
-    p = os.popen('git rev-list --tags --max-count=1')
-    commit = p.read()
+    p = os.popen('git rev-list --tags --max-count=1 2>NUL')
+    commit = p.read().strip()
     p.close()
 
-    p = os.popen('git describe --tags ' + commit)
-    tag = p.read()
-    p.close()
+    if commit:
+        p = os.popen('git describe --tags ' + commit + ' 2>NUL')
+        tag = p.read().strip()
+        p.close()
+    else:
+        tag = 'v4.2.0'
+
+    if not tag or len(tag) < 2:
+        tag = 'v4.2.0'
 
     # print('get tag:', tag)
 
