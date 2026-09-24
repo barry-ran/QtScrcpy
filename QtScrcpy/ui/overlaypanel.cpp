@@ -1,142 +1,729 @@
 ﻿#include "overlaypanel.h"
-#include <QFileDialog>
-#include <QMessageBox>
 #include "videoform.h"
 
-#include <QCoreApplication>
-#include <QDir>
-#include <QFile>
-#include <QFileInfo>
-#include <QGridLayout>
-#include <QGroupBox>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QKeyEvent>
-#include <QMetaEnum>
-#include <QMouseEvent>
+#include <QApplication>
 #include <QPainter>
 #include <QPainterPath>
-#include <QScrollArea>
-#include <QSet>
-#include <QStandardPaths>
+#include <QResizeEvent>
+#include <QMouseEvent>
+#include <QKeyEvent>
+#include <QFileInfo>
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QTimer>
+#include <QStandardPaths>
+#include <QScrollBar>
+#include <QGroupBox>
+#include <QFormLayout>
+#include <QFrame>
+
+#include "QtScrcpyCore/include/QtScrcpyCore.h"
 
 // ---------------------------------------------------------------------------
-// Construction & Destruction
+// Helper: styled section label
 // ---------------------------------------------------------------------------
+static QLabel *sectionLabel(const QString &text, QWidget *parent = nullptr) {
+    auto *lbl = new QLabel(text, parent);
+    lbl->setStyleSheet(
+        "color: #94a3b8;"
+        "font-size: 9px;"
+        "font-weight: bold;"
+        "letter-spacing: 1px;"
+        "padding: 4px 0 2px 4px;"
+    );
+    return lbl;
+}
+
+// ---------------------------------------------------------------------------
+// Helper: create a styled add-button
+// ---------------------------------------------------------------------------
+static QPushButton *addBtn(const QString &text, const QString &color, QWidget *parent = nullptr) {
+    auto *btn = new QPushButton(text, parent);
+    btn->setFixedHeight(30);
+    btn->setCursor(Qt::PointingHandCursor);
+    btn->setStyleSheet(QString(
+        "QPushButton {"
+        "  background: %1;"
+        "  color: white;"
+        "  border: none;"
+        "  border-radius: 5px;"
+        "  font-size: 10px;"
+        "  font-weight: bold;"
+        "  padding: 0 6px;"
+        "}"
+        "QPushButton:hover {"
+        "  background: %2;"
+        "}"
+        "QPushButton:pressed {"
+        "  background: %3;"
+        "}"
+    ).arg(color)
+     .arg(QColor(color).lighter(120).name())
+     .arg(QColor(color).darker(115).name()));
+    return btn;
+}
+
+// ============================================================================
+//  CONSTRUCTOR
+// ============================================================================
 OverlayPanel::OverlayPanel(const QString &serial, QWidget *parent)
-    : QWidget(parent)
-    , m_serial(serial)
+    : QWidget(parent), m_serial(serial)
 {
     setAttribute(Qt::WA_TranslucentBackground);
-    setWindowFlags(Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
 
     buildSidePanel();
-    setEditMode(false);
+    m_sidePanel->hide();
+    m_currentProfileName = "custom_keymap";
     refreshProfileList();
+}
 
-    // Default sample buttons if clean start
-    if (m_buttons.isEmpty()) {
-        createButton(OverlayButtonType::Joystick, "Move", "Key_W", QPointF(0.18, 0.72));
-        createButton(OverlayButtonType::Aim, "Aim", "Key_QuoteLeft", QPointF(0.65, 0.45));
-        createButton(OverlayButtonType::Click, "Fire", "Key_J", QPointF(0.82, 0.68));
-        createButton(OverlayButtonType::Click, "Jump", "Key_Space", QPointF(0.88, 0.82));
+OverlayPanel::~OverlayPanel() {}
+
+// ============================================================================
+//  BUILD SIDE PANEL (Main entry)
+// ============================================================================
+void OverlayPanel::buildSidePanel()
+{
+    m_sidePanel = new QFrame(this);
+    m_sidePanel->setObjectName("sidePanel");
+    m_sidePanel->setStyleSheet(
+        "QFrame#sidePanel {"
+        "  background: qlineargradient(x1:0,y1:0,x2:0,y2:1,"
+        "    stop:0 #0f172a, stop:1 #1e293b);"
+        "  border-left: 1px solid #334155;"
+        "  border-radius: 0px;"
+        "}"
+        "QScrollArea { background: transparent; border: none; }"
+        "QScrollBar:vertical { background: #1e293b; width: 6px; border-radius: 3px; }"
+        "QScrollBar::handle:vertical { background: #475569; border-radius: 3px; min-height: 20px; }"
+        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }"
+        "QTabWidget::pane { border: none; background: transparent; }"
+        "QTabBar::tab {"
+        "  background: #1e293b;"
+        "  color: #94a3b8;"
+        "  padding: 5px 8px;"
+        "  font-size: 9px;"
+        "  font-weight: bold;"
+        "  border: none;"
+        "  border-bottom: 2px solid transparent;"
+        "}"
+        "QTabBar::tab:selected { color: #38bdf8; border-bottom: 2px solid #38bdf8; background: #0f172a; }"
+        "QTabBar::tab:hover { color: #e2e8f0; }"
+        "QGroupBox {"
+        "  color: #94a3b8;"
+        "  font-size: 9px;"
+        "  font-weight: bold;"
+        "  border: 1px solid #334155;"
+        "  border-radius: 6px;"
+        "  margin-top: 8px;"
+        "  padding-top: 6px;"
+        "}"
+        "QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; padding: 0 4px; left: 8px; }"
+        "QLineEdit {"
+        "  background: #1e293b;"
+        "  color: #e2e8f0;"
+        "  border: 1px solid #334155;"
+        "  border-radius: 4px;"
+        "  padding: 3px 6px;"
+        "  font-size: 10px;"
+        "}"
+        "QLineEdit:focus { border: 1px solid #38bdf8; }"
+        "QComboBox {"
+        "  background: #1e293b;"
+        "  color: #e2e8f0;"
+        "  border: 1px solid #334155;"
+        "  border-radius: 4px;"
+        "  padding: 3px 6px;"
+        "  font-size: 10px;"
+        "}"
+        "QComboBox::drop-down { border: none; width: 16px; }"
+        "QSlider::groove:horizontal { background: #334155; height: 4px; border-radius: 2px; }"
+        "QSlider::handle:horizontal { background: #38bdf8; width: 14px; height: 14px; border-radius: 7px; margin: -5px 0; }"
+        "QSlider::sub-page:horizontal { background: #38bdf8; border-radius: 2px; }"
+        "QLabel { color: #cbd5e1; font-size: 10px; }"
+        "QCheckBox { color: #cbd5e1; font-size: 10px; }"
+        "QSpinBox {"
+        "  background: #1e293b; color: #e2e8f0;"
+        "  border: 1px solid #334155; border-radius: 4px; padding: 2px 4px;"
+        "  font-size: 10px;"
+        "}"
+        "QListWidget {"
+        "  background: #1e293b; color: #e2e8f0;"
+        "  border: 1px solid #334155; border-radius: 4px;"
+        "  font-size: 10px;"
+        "}"
+        "QListWidget::item:selected { background: #2563eb; }"
+    );
+
+    auto *mainLayout = new QVBoxLayout(m_sidePanel);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+    mainLayout->setSpacing(0);
+
+    // --- Header ---
+    auto *header = new QWidget(m_sidePanel);
+    header->setFixedHeight(44);
+    header->setStyleSheet("background: #020b18; border-bottom: 1px solid #334155;");
+    auto *headerL = new QHBoxLayout(header);
+    headerL->setContentsMargins(10, 0, 10, 0);
+
+    auto *titleLbl = new QLabel("KEYMAP STUDIO", header);
+    titleLbl->setStyleSheet("color: #38bdf8; font-size: 11px; font-weight: bold; letter-spacing: 2px;");
+
+    auto *proBadge = new QLabel("PRO", header);
+    proBadge->setStyleSheet(
+        "background: qlineargradient(x1:0,y1:0,x2:1,y2:0,stop:0 #2563eb,stop:1 #7c3aed);"
+        "color: white; font-size: 8px; font-weight: bold; padding: 2px 6px; border-radius: 3px;"
+    );
+
+    headerL->addWidget(titleLbl);
+    headerL->addStretch();
+    headerL->addWidget(proBadge);
+    mainLayout->addWidget(header);
+
+    // --- Profile selector ---
+    auto *profileBar = new QWidget(m_sidePanel);
+    profileBar->setStyleSheet("background: #0f172a; border-bottom: 1px solid #1e293b; padding: 6px;");
+    auto *profileL = new QHBoxLayout(profileBar);
+    profileL->setContentsMargins(8, 4, 8, 4);
+    profileL->setSpacing(6);
+
+    m_presetCombo = new QComboBox(profileBar);
+    m_presetCombo->setFixedHeight(28);
+    connect(m_presetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &OverlayPanel::onProfilePresetSelected);
+
+    m_profileEdit = new QLineEdit(profileBar);
+    m_profileEdit->setFixedHeight(28);
+    m_profileEdit->setPlaceholderText("Profile name...");
+    m_profileEdit->setText(m_currentProfileName);
+
+    profileL->addWidget(m_presetCombo, 2);
+    profileL->addWidget(m_profileEdit, 2);
+    mainLayout->addWidget(profileBar);
+
+    // --- Tabbed content ---
+    m_tabs = new QTabWidget(m_sidePanel);
+    m_tabs->setDocumentMode(true);
+
+    // Tab 1: Basic Controls
+    auto *basicTab = new QWidget;
+    auto *basicScroll = new QScrollArea;
+    basicScroll->setWidget(basicTab);
+    basicScroll->setWidgetResizable(true);
+    buildBasicTab(basicTab);
+    m_tabs->addTab(basicScroll, "Basic");
+
+    // Tab 2: Game Controls
+    auto *gameTab = new QWidget;
+    auto *gameScroll = new QScrollArea;
+    gameScroll->setWidget(gameTab);
+    gameScroll->setWidgetResizable(true);
+    buildGameTab(gameTab);
+    m_tabs->addTab(gameScroll, "Game");
+
+    // Tab 3: Advanced (Macro/Spray)
+    auto *advTab = new QWidget;
+    auto *advScroll = new QScrollArea;
+    advScroll->setWidget(advTab);
+    advScroll->setWidgetResizable(true);
+    buildAdvancedTab(advTab);
+    m_tabs->addTab(advScroll, "Advanced");
+
+    // Tab 4: Properties Inspector (dynamic)
+    auto *propsTab = new QWidget;
+    auto *propsScroll = new QScrollArea;
+    propsScroll->setWidget(propsTab);
+    propsScroll->setWidgetResizable(true);
+    auto *propsL = new QVBoxLayout(propsTab);
+    propsL->setContentsMargins(8, 8, 8, 8);
+    propsL->setSpacing(6);
+    buildPropsPanel(propsL);
+    propsL->addStretch();
+    m_tabs->addTab(propsScroll, "Props");
+
+    // Tab 5: Settings
+    auto *settingsTab = new QWidget;
+    auto *settingsScroll = new QScrollArea;
+    settingsScroll->setWidget(settingsTab);
+    settingsScroll->setWidgetResizable(true);
+    buildSettingsTab(settingsTab);
+    m_tabs->addTab(settingsScroll, "Settings");
+
+    mainLayout->addWidget(m_tabs, 1);
+
+    // --- Bottom action bar ---
+    auto *actionBar = new QWidget(m_sidePanel);
+    actionBar->setFixedHeight(88);
+    actionBar->setStyleSheet("background: #020b18; border-top: 1px solid #334155; padding: 6px;");
+    auto *actionL = new QVBoxLayout(actionBar);
+    actionL->setContentsMargins(8, 6, 8, 6);
+    actionL->setSpacing(4);
+
+    m_saveBtn = addBtn("Save & Apply", "#16a34a");
+    connect(m_saveBtn, &QPushButton::clicked, this, &OverlayPanel::onSaveAndApply);
+    actionL->addWidget(m_saveBtn);
+
+    auto *row2 = new QHBoxLayout;
+    row2->setSpacing(4);
+
+    m_hudToggleBtn = addBtn("HUD: ON", "#475569");
+    connect(m_hudToggleBtn, &QPushButton::clicked, this, &OverlayPanel::onToggleHUD);
+    row2->addWidget(m_hudToggleBtn);
+
+    m_closeBtn = addBtn("Close", "#64748b");
+    connect(m_closeBtn, &QPushButton::clicked, this, &OverlayPanel::onCloseEdit);
+    row2->addWidget(m_closeBtn);
+    actionL->addLayout(row2);
+    mainLayout->addWidget(actionBar);
+}
+
+// ============================================================================
+//  BASIC TAB - Click, R-Click, WASD, Aim, Swipe, FreeLook
+// ============================================================================
+void OverlayPanel::buildBasicTab(QWidget *tab)
+{
+    auto *l = new QVBoxLayout(tab);
+    l->setContentsMargins(8, 8, 8, 8);
+    l->setSpacing(6);
+
+    // --- Mouse Click section ---
+    auto *clickGroup = new QGroupBox("Mouse Clicks", tab);
+    auto *clickL = new QVBoxLayout(clickGroup);
+    clickL->setSpacing(4);
+
+    auto *r1 = new QHBoxLayout;
+    auto *lClickBtn = addBtn("L-Click (Fire)", OverlayButton::typeColor(OverlayButtonType::Click).name());
+    auto *rClickBtn = addBtn("R-Click (Scope)", OverlayButton::typeColor(OverlayButtonType::RightClick).name());
+    connect(lClickBtn, &QPushButton::clicked, this, &OverlayPanel::onAddClick);
+    connect(rClickBtn, &QPushButton::clicked, this, &OverlayPanel::onAddRightClick);
+    r1->addWidget(lClickBtn);
+    r1->addWidget(rClickBtn);
+    clickL->addLayout(r1);
+
+    auto *r2 = new QHBoxLayout;
+    auto *dblClickBtn = addBtn("Double Tap", OverlayButton::typeColor(OverlayButtonType::DoubleClick).name());
+    auto *midClickBtn = addBtn("Mid Click", OverlayButton::typeColor(OverlayButtonType::MiddleClick).name());
+    connect(dblClickBtn, &QPushButton::clicked, this, &OverlayPanel::onAddDoubleClick);
+    connect(midClickBtn, &QPushButton::clicked, this, &OverlayPanel::onAddMiddleClick);
+    r2->addWidget(dblClickBtn);
+    r2->addWidget(midClickBtn);
+    clickL->addLayout(r2);
+    l->addWidget(clickGroup);
+
+    // --- Movement section ---
+    auto *moveGroup = new QGroupBox("Movement", tab);
+    auto *moveL = new QVBoxLayout(moveGroup);
+    moveL->setSpacing(4);
+
+    auto *wasdBtn = addBtn("WASD Move", OverlayButton::typeColor(OverlayButtonType::Joystick).name());
+    connect(wasdBtn, &QPushButton::clicked, this, &OverlayPanel::onAddJoystick);
+    moveL->addWidget(wasdBtn);
+
+    auto *r3 = new QHBoxLayout;
+    auto *aimBtn = addBtn("Aim / Look", OverlayButton::typeColor(OverlayButtonType::Aim).name());
+    auto *freeLookBtn = addBtn("Free Look", OverlayButton::typeColor(OverlayButtonType::FreeLook).name());
+    connect(aimBtn, &QPushButton::clicked, this, &OverlayPanel::onAddAim);
+    connect(freeLookBtn, &QPushButton::clicked, this, &OverlayPanel::onAddFreeLook);
+    r3->addWidget(aimBtn);
+    r3->addWidget(freeLookBtn);
+    moveL->addLayout(r3);
+    l->addWidget(moveGroup);
+
+    // --- Gesture section ---
+    auto *gestureGroup = new QGroupBox("Gestures", tab);
+    auto *gestureL = new QVBoxLayout(gestureGroup);
+    gestureL->setSpacing(4);
+    auto *swipeBtn = addBtn("Swipe Gesture", OverlayButton::typeColor(OverlayButtonType::Swipe).name());
+    connect(swipeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddSwipe);
+    gestureL->addWidget(swipeBtn);
+    l->addWidget(gestureGroup);
+
+    // --- Management ---
+    auto *mgmtGroup = new QGroupBox("Layout", tab);
+    auto *mgmtL = new QVBoxLayout(mgmtGroup);
+    mgmtL->setSpacing(4);
+
+    auto *r4 = new QHBoxLayout;
+    m_importBtn = addBtn("Import JSON", "#7c3aed");
+    m_clearAllBtn = addBtn("Clear All", "#dc2626");
+    connect(m_importBtn, &QPushButton::clicked, this, &OverlayPanel::onImportKeymap);
+    connect(m_clearAllBtn, &QPushButton::clicked, this, &OverlayPanel::onClearAll);
+    r4->addWidget(m_importBtn);
+    r4->addWidget(m_clearAllBtn);
+    mgmtL->addLayout(r4);
+
+    auto *exportBtn2 = addBtn("Export JSON", "#2563eb");
+    connect(exportBtn2, &QPushButton::clicked, this, &OverlayPanel::onExportKeymap);
+    mgmtL->addWidget(exportBtn2);
+    l->addWidget(mgmtGroup);
+
+    l->addStretch();
+}
+
+// ============================================================================
+//  GAME TAB - FPS/Battle Royale/MOBA specific controls
+// ============================================================================
+void OverlayPanel::buildGameTab(QWidget *tab)
+{
+    auto *l = new QVBoxLayout(tab);
+    l->setContentsMargins(8, 8, 8, 8);
+    l->setSpacing(6);
+
+    // --- Combat ---
+    auto *combatGroup = new QGroupBox("Combat", tab);
+    auto *combatL = new QVBoxLayout(combatGroup);
+    combatL->setSpacing(4);
+
+    auto *r1 = new QHBoxLayout;
+    auto *fireBtn   = addBtn("Fire",   OverlayButton::typeColor(OverlayButtonType::Click).name());
+    auto *scopeBtn  = addBtn("Scope",  OverlayButton::typeColor(OverlayButtonType::Scope).name());
+    connect(fireBtn,  &QPushButton::clicked, this, &OverlayPanel::onAddFire);
+    connect(scopeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddScope);
+    r1->addWidget(fireBtn);
+    r1->addWidget(scopeBtn);
+    combatL->addLayout(r1);
+
+    auto *r2 = new QHBoxLayout;
+    auto *grenadeBtn = addBtn("Grenade", OverlayButton::typeColor(OverlayButtonType::Grenade).name());
+    auto *jumpBtn    = addBtn("Jump",    OverlayButton::typeColor(OverlayButtonType::Jump).name());
+    connect(grenadeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddGrenade);
+    connect(jumpBtn,    &QPushButton::clicked, this, &OverlayPanel::onAddJump);
+    r2->addWidget(grenadeBtn);
+    r2->addWidget(jumpBtn);
+    combatL->addLayout(r2);
+
+    auto *proneBtn = addBtn("Prone / Crouch", OverlayButton::typeColor(OverlayButtonType::Prone).name());
+    connect(proneBtn, &QPushButton::clicked, this, &OverlayPanel::onAddProne);
+    combatL->addWidget(proneBtn);
+    l->addWidget(combatGroup);
+
+    // --- MOBA / Skills ---
+    auto *skillGroup = new QGroupBox("Skills (MOBA / RPG)", tab);
+    auto *skillL = new QVBoxLayout(skillGroup);
+    skillL->setSpacing(4);
+
+    for (int i = 1; i <= 4; i++) {
+        auto *skBtn = addBtn(QString("Skill %1 (Q/W/E/R)").arg(i), "#9b59b6");
+        connect(skBtn, &QPushButton::clicked, this, &OverlayPanel::onAddSkill);
+        skillL->addWidget(skBtn);
     }
+    l->addWidget(skillGroup);
+
+    // --- Utility ---
+    auto *utilGroup = new QGroupBox("Utility", tab);
+    auto *utilL = new QVBoxLayout(utilGroup);
+    utilL->setSpacing(4);
+
+    auto *r3 = new QHBoxLayout;
+    auto *mapBtn = addBtn("Map (M)",   OverlayButton::typeColor(OverlayButtonType::Map).name());
+    auto *bagBtn = addBtn("Bag (Tab)", OverlayButton::typeColor(OverlayButtonType::Bag).name());
+    connect(mapBtn, &QPushButton::clicked, this, &OverlayPanel::onAddMap);
+    connect(bagBtn, &QPushButton::clicked, this, &OverlayPanel::onAddBag);
+    r3->addWidget(mapBtn);
+    r3->addWidget(bagBtn);
+    utilL->addLayout(r3);
+
+    auto *vehicleBtn = addBtn("Vehicle / Drive", OverlayButton::typeColor(OverlayButtonType::Vehicle).name());
+    connect(vehicleBtn, &QPushButton::clicked, this, &OverlayPanel::onAddVehicle);
+    utilL->addWidget(vehicleBtn);
+    l->addWidget(utilGroup);
+
+    l->addStretch();
 }
 
-OverlayPanel::~OverlayPanel()
+// ============================================================================
+//  ADVANCED TAB - Macros, Spray, Auto-fire
+// ============================================================================
+void OverlayPanel::buildAdvancedTab(QWidget *tab)
 {
-}
+    auto *l = new QVBoxLayout(tab);
+    l->setContentsMargins(8, 8, 8, 8);
+    l->setSpacing(6);
 
-// ---------------------------------------------------------------------------
-// Paths
-// ---------------------------------------------------------------------------
-QString OverlayPanel::userKeymapDirectory() const
-{
-    QString dir = QString::fromLocal8Bit(qgetenv("QTSCRCPY_KEYMAP_PATH"));
-    if (dir.isEmpty()) {
-        dir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/keymap";
+    // --- Macro ---
+    auto *macroGroup = new QGroupBox("Macro (Multi-key sequence)", tab);
+    auto *macroL = new QVBoxLayout(macroGroup);
+    macroL->setSpacing(4);
+
+    auto *macroHint = new QLabel("Record a timed sequence of key presses.", macroGroup);
+    macroHint->setWordWrap(true);
+    macroHint->setStyleSheet("color: #64748b; font-size: 9px;");
+    macroL->addWidget(macroHint);
+
+    auto *addMacroBtn = addBtn("+ Add Macro Button", OverlayButton::typeColor(OverlayButtonType::Macro).name());
+    connect(addMacroBtn, &QPushButton::clicked, this, &OverlayPanel::onAddMacro);
+    macroL->addWidget(addMacroBtn);
+    l->addWidget(macroGroup);
+
+    // --- Auto-fire / Spray ---
+    auto *sprayGroup = new QGroupBox("Auto-Fire / Spray", tab);
+    auto *sprayL = new QVBoxLayout(sprayGroup);
+    sprayL->setSpacing(4);
+
+    auto *sprayHint = new QLabel("Fires automatically while the key is held.", sprayGroup);
+    sprayHint->setWordWrap(true);
+    sprayHint->setStyleSheet("color: #64748b; font-size: 9px;");
+    sprayL->addWidget(sprayHint);
+
+    auto *addSprayBtn = addBtn("+ Add Auto-Fire Button", OverlayButton::typeColor(OverlayButtonType::Spray).name());
+    connect(addSprayBtn, &QPushButton::clicked, this, &OverlayPanel::onAddSpray);
+    sprayL->addWidget(addSprayBtn);
+    l->addWidget(sprayGroup);
+
+    // --- WASD+ presets ---
+    auto *presetGroup = new QGroupBox("WASD+ Presets", tab);
+    auto *presetL = new QVBoxLayout(presetGroup);
+    presetL->setSpacing(4);
+
+    struct Preset { QString name; QString color; };
+    QList<Preset> presets = {
+        {"FPS Full Setup",      "#e74c3c"},
+        {"Battle Royale Setup", "#e67e22"},
+        {"MOBA Setup",          "#9b59b6"},
+        {"Racing / Vehicle",    "#3498db"},
+    };
+
+    for (const auto &preset : presets) {
+        auto *pb = addBtn(preset.name, preset.color);
+        presetL->addWidget(pb);
     }
-    QDir().mkpath(dir);
-    return dir;
+    l->addWidget(presetGroup);
+
+    l->addStretch();
 }
 
-QString OverlayPanel::defaultKeymapDirectory() const
+// ============================================================================
+//  PROPERTIES PANEL
+// ============================================================================
+void OverlayPanel::buildPropsPanel(QVBoxLayout *l)
 {
-    return QCoreApplication::applicationDirPath() + "/keymap";
+    m_propsWidget = new QWidget;
+    auto *propsL = new QVBoxLayout(m_propsWidget);
+    propsL->setContentsMargins(0, 0, 0, 0);
+    propsL->setSpacing(6);
+
+    // Status label
+    m_selTypeLabel = new QLabel("No button selected", m_propsWidget);
+    m_selTypeLabel->setStyleSheet(
+        "color: #64748b; font-style: italic; font-size: 10px; padding: 8px 0;"
+    );
+    m_selTypeLabel->setAlignment(Qt::AlignCenter);
+    propsL->addWidget(m_selTypeLabel);
+
+    // --- Label & Key ---
+    auto *basicGroup = new QGroupBox("Button", m_propsWidget);
+    auto *basicL = new QFormLayout(basicGroup);
+    basicL->setSpacing(4);
+    basicL->setContentsMargins(8, 8, 8, 8);
+
+    m_labelEdit = new QLineEdit(m_propsWidget);
+    m_labelEdit->setPlaceholderText("Button label...");
+    basicL->addRow("Label:", m_labelEdit);
+
+    auto *keyRow = new QHBoxLayout;
+    m_keyEdit = new QLineEdit(m_propsWidget);
+    m_keyEdit->setPlaceholderText("Key_*");
+    m_keyEdit->setReadOnly(true);
+    m_recordKeyBtn = new QPushButton("Bind Key", m_propsWidget);
+    m_recordKeyBtn->setFixedSize(70, 24);
+    m_recordKeyBtn->setStyleSheet(
+        "background: #2563eb; color: white; border-radius: 4px; font-size: 9px; font-weight: bold;"
+    );
+    connect(m_recordKeyBtn, &QPushButton::clicked, this, &OverlayPanel::onRecordKeyClicked);
+    keyRow->addWidget(m_keyEdit);
+    keyRow->addWidget(m_recordKeyBtn);
+    basicL->addRow("Key:", keyRow);
+
+    auto *sizeRow = new QHBoxLayout;
+    m_sizeSlider = new QSlider(Qt::Horizontal, m_propsWidget);
+    m_sizeSlider->setRange(20, 150);
+    m_sizeSlider->setValue(55);
+    sizeRow->addWidget(m_sizeSlider);
+    basicL->addRow("Size:", sizeRow);
+
+    m_coordsLabel = new QLabel("X: -- | Y: --", m_propsWidget);
+    m_coordsLabel->setStyleSheet("color: #64748b; font-size: 9px;");
+    basicL->addRow("Pos:", m_coordsLabel);
+
+    propsL->addWidget(basicGroup);
+
+    // --- Joystick group ---
+    m_joyGroup = new QGroupBox("WASD Keys", m_propsWidget);
+    auto *joyL = new QFormLayout(m_joyGroup);
+    joyL->setSpacing(4);
+    joyL->setContentsMargins(8, 8, 8, 8);
+    m_joyUpEdit    = new QLineEdit("Key_W", m_joyGroup);
+    m_joyDownEdit  = new QLineEdit("Key_S", m_joyGroup);
+    m_joyLeftEdit  = new QLineEdit("Key_A", m_joyGroup);
+    m_joyRightEdit = new QLineEdit("Key_D", m_joyGroup);
+    joyL->addRow("Up:",    m_joyUpEdit);
+    joyL->addRow("Down:",  m_joyDownEdit);
+    joyL->addRow("Left:",  m_joyLeftEdit);
+    joyL->addRow("Right:", m_joyRightEdit);
+    propsL->addWidget(m_joyGroup);
+
+    // --- Aim group ---
+    m_aimGroup = new QGroupBox("Aim Sensitivity", m_propsWidget);
+    auto *aimL = new QFormLayout(m_aimGroup);
+    aimL->setSpacing(4);
+    aimL->setContentsMargins(8, 8, 8, 8);
+    m_speedXSlider = new QSlider(Qt::Horizontal, m_aimGroup);
+    m_speedXSlider->setRange(5, 100);
+    m_speedXSlider->setValue(25);
+    m_speedYSlider = new QSlider(Qt::Horizontal, m_aimGroup);
+    m_speedYSlider->setRange(5, 100);
+    m_speedYSlider->setValue(25);
+    m_speedValLabel = new QLabel("X: 2.5  Y: 2.5", m_aimGroup);
+    m_speedValLabel->setStyleSheet("color: #64748b; font-size: 9px;");
+    aimL->addRow("Speed X:", m_speedXSlider);
+    aimL->addRow("Speed Y:", m_speedYSlider);
+    aimL->addRow("", m_speedValLabel);
+    propsL->addWidget(m_aimGroup);
+
+    // --- Click group ---
+    m_clickGroup = new QGroupBox("Click Options", m_propsWidget);
+    auto *clickL2 = new QVBoxLayout(m_clickGroup);
+    clickL2->setContentsMargins(8, 8, 8, 8);
+    m_switchMapCheck = new QCheckBox("Hold to aim (switchMap)", m_clickGroup);
+    clickL2->addWidget(m_switchMapCheck);
+    propsL->addWidget(m_clickGroup);
+
+    // --- Spray group ---
+    m_sprayGroup = new QGroupBox("Auto-Fire Settings", m_propsWidget);
+    auto *sprayL2 = new QFormLayout(m_sprayGroup);
+    sprayL2->setContentsMargins(8, 8, 8, 8);
+    m_sprayInterval = new QSpinBox(m_sprayGroup);
+    m_sprayInterval->setRange(10, 500);
+    m_sprayInterval->setValue(80);
+    m_sprayInterval->setSuffix(" ms");
+    sprayL2->addRow("Interval:", m_sprayInterval);
+    propsL->addWidget(m_sprayGroup);
+
+    // --- Swipe group ---
+    m_swipeGroup = new QGroupBox("Swipe End Position", m_propsWidget);
+    auto *swipeL2 = new QFormLayout(m_swipeGroup);
+    swipeL2->setContentsMargins(8, 8, 8, 8);
+    m_swipeEndXEdit = new QLineEdit("0.50", m_swipeGroup);
+    m_swipeEndYEdit = new QLineEdit("0.30", m_swipeGroup);
+    swipeL2->addRow("End X (0-1):", m_swipeEndXEdit);
+    swipeL2->addRow("End Y (0-1):", m_swipeEndYEdit);
+    propsL->addWidget(m_swipeGroup);
+
+    // --- Macro group ---
+    m_macroGroup = new QGroupBox("Macro Steps", m_propsWidget);
+    auto *macroL2 = new QVBoxLayout(m_macroGroup);
+    macroL2->setContentsMargins(8, 8, 8, 8);
+    macroL2->setSpacing(4);
+
+    m_macroList = new QListWidget(m_macroGroup);
+    m_macroList->setFixedHeight(80);
+    macroL2->addWidget(m_macroList);
+
+    auto *stepRow = new QHBoxLayout;
+    m_macroKeyEdit = new QLineEdit(m_macroGroup);
+    m_macroKeyEdit->setPlaceholderText("Key_X");
+    m_macroKeyEdit->setFixedWidth(70);
+    m_macroDelay = new QSpinBox(m_macroGroup);
+    m_macroDelay->setRange(10, 2000);
+    m_macroDelay->setValue(50);
+    m_macroDelay->setSuffix("ms");
+    m_macroDelay->setFixedWidth(65);
+    auto *addStepBtn = addBtn("+", "#16a34a");
+    addStepBtn->setFixedSize(28, 24);
+    connect(addStepBtn, &QPushButton::clicked, this, &OverlayPanel::onMacroStepAdd);
+    auto *delStepBtn = addBtn("-", "#dc2626");
+    delStepBtn->setFixedSize(28, 24);
+    connect(delStepBtn, &QPushButton::clicked, this, &OverlayPanel::onMacroStepRemove);
+    stepRow->addWidget(m_macroKeyEdit);
+    stepRow->addWidget(m_macroDelay);
+    stepRow->addWidget(addStepBtn);
+    stepRow->addWidget(delStepBtn);
+    macroL2->addLayout(stepRow);
+    propsL->addWidget(m_macroGroup);
+
+    // --- Action buttons ---
+    auto *actRow = new QHBoxLayout;
+    auto *applyBtn = addBtn("Apply", "#16a34a");
+    connect(applyBtn, &QPushButton::clicked, this, &OverlayPanel::onApplyProps);
+    m_deleteBtn = addBtn("Delete", "#dc2626");
+    connect(m_deleteBtn, &QPushButton::clicked, this, &OverlayPanel::onDeleteSelected);
+    actRow->addWidget(applyBtn);
+    actRow->addWidget(m_deleteBtn);
+    propsL->addLayout(actRow);
+
+    // disable by default
+    m_propsWidget->setEnabled(false);
+    l->addWidget(m_propsWidget);
 }
 
-// ---------------------------------------------------------------------------
-// Video Geometry
-// ---------------------------------------------------------------------------
-QRect OverlayPanel::currentVideoGeometry() const
+// ============================================================================
+//  SETTINGS TAB
+// ============================================================================
+void OverlayPanel::buildSettingsTab(QWidget *tab)
 {
-    VideoForm *vf = qobject_cast<VideoForm *>(parentWidget());
-    if (vf && vf->videoWidget()) {
-        QWidget *vw = vf->videoWidget();
-        QPoint topLeft = mapFromGlobal(vw->mapToGlobal(QPoint(0, 0)));
-        return QRect(topLeft, vw->size());
-    }
-    return rect();
-}
+    auto *l = new QVBoxLayout(tab);
+    l->setContentsMargins(8, 8, 8, 8);
+    l->setSpacing(8);
 
-void OverlayPanel::onParentResized()
-{
-    if (parentWidget()) {
-        setGeometry(parentWidget()->rect());
-    }
-    updateSidePanelGeometry();
-    QRect videoArea = currentVideoGeometry();
-    for (auto *b : m_buttons) {
-        if (b) b->reposition(videoArea);
-    }
-    update();
-}
+    auto *hudGroup = new QGroupBox("HUD Settings", tab);
+    auto *hudL = new QFormLayout(hudGroup);
+    hudL->setContentsMargins(8, 8, 8, 8);
 
-void OverlayPanel::resizeEvent(QResizeEvent *)
-{
-    onParentResized();
-}
+    m_opacitySlider = new QSlider(Qt::Horizontal, hudGroup);
+    m_opacitySlider->setRange(10, 100);
+    m_opacitySlider->setValue(85);
+    connect(m_opacitySlider, &QSlider::valueChanged, this, &OverlayPanel::onOpacitySliderChanged);
+    hudL->addRow("Opacity:", m_opacitySlider);
+    l->addWidget(hudGroup);
 
-// ---------------------------------------------------------------------------
-// Edit vs Play Modes
-// ---------------------------------------------------------------------------
+    auto *keyGroup = new QGroupBox("Keymap Settings", tab);
+    auto *keyL = new QFormLayout(keyGroup);
+    keyL->setContentsMargins(8, 8, 8, 8);
+    auto *switchKeyEdit = new QLineEdit("Key_QuoteLeft", keyGroup);
+    keyL->addRow("Switch Key:", switchKeyEdit);
+    l->addWidget(keyGroup);
+
+    auto *resetBtn = addBtn("Reset Standard WASD", "#dc2626");
+    l->addWidget(resetBtn);
+
+    auto *hintLbl = new QLabel(
+        "Tips:\n"
+        "- Double-click on video to add button\n"
+        "- Drag buttons to reposition\n"
+        "- Right-click a button for options\n"
+        "- Press ESC to cancel key binding\n"
+        "- Save & Apply to activate",
+        tab
+    );
+    hintLbl->setWordWrap(true);
+    hintLbl->setStyleSheet("color: #475569; font-size: 9px; padding: 8px;");
+    l->addWidget(hintLbl);
+    l->addStretch();
+}
+// ============================================================================
+//  setEditMode / setOverlayVisible / resize / paint
+// ============================================================================
 void OverlayPanel::setEditMode(bool edit)
 {
     m_editMode = edit;
-    m_recordingKey = false;
-
-    // Critical: in Play mode, pass ALL mouse clicks directly to VideoForm
-    setAttribute(Qt::WA_TransparentForMouseEvents, !edit);
+    for (auto *b : m_buttons) b->setEditMode(edit);
 
     if (edit) {
-        setFocusPolicy(Qt::StrongFocus);
-        setFocus();
+        setAttribute(Qt::WA_TransparentForMouseEvents, false);
         m_sidePanel->show();
-        m_sidePanel->raise();
-        for (auto *b : m_buttons) {
-            if (b) {
-                b->setEditMode(true);
-                b->show();
-            }
-        }
+        updateSidePanelGeometry();
+        setFocus();
     } else {
-        setFocusPolicy(Qt::NoFocus);
-        clearFocus();
+        setAttribute(Qt::WA_TransparentForMouseEvents, !m_overlayOn);
         m_sidePanel->hide();
-        selectButton(nullptr);
-        for (auto *b : m_buttons) {
-            if (b) {
-                b->setEditMode(false);
-                b->setVisible(m_overlayOn);
-                // Also ensure buttons don't block mouse in play mode
-                b->setAttribute(Qt::WA_TransparentForMouseEvents, true);
-            }
-        }
-        if (parentWidget()) {
-            parentWidget()->setFocus();
-        }
     }
     update();
 }
@@ -144,28 +731,168 @@ void OverlayPanel::setEditMode(bool edit)
 void OverlayPanel::setOverlayVisible(bool v)
 {
     m_overlayOn = v;
-    if (!m_editMode) {
-        for (auto *b : m_buttons) {
-            if (b) b->setVisible(m_overlayOn);
-        }
+    if (!m_editMode) setAttribute(Qt::WA_TransparentForMouseEvents, !v);
+    for (auto *b : m_buttons) {
+        b->setVisible(v || m_editMode);
     }
     if (m_hudToggleBtn) {
-        m_hudToggleBtn->setText(m_overlayOn ? tr(" HUD: ON") : tr(" HUD: OFF"));
+        m_hudToggleBtn->setText(v ? "HUD: ON" : "HUD: OFF");
+        m_hudToggleBtn->setStyleSheet(v
+            ? "background:#16a34a;color:white;border-radius:5px;font-size:10px;font-weight:bold;"
+            : "background:#475569;color:white;border-radius:5px;font-size:10px;font-weight:bold;"
+        );
     }
     update();
 }
 
-// ---------------------------------------------------------------------------
-// Button Factory
-// ---------------------------------------------------------------------------
+void OverlayPanel::onParentResized()
+{
+    resize(parentWidget()->size());
+    updateSidePanelGeometry();
+    QRect area = currentVideoGeometry();
+    for (auto *b : m_buttons) b->reposition(area);
+}
+
+void OverlayPanel::resizeEvent(QResizeEvent *e)
+{
+    QWidget::resizeEvent(e);
+    updateSidePanelGeometry();
+}
+
+void OverlayPanel::updateSidePanelGeometry()
+{
+    if (!m_sidePanel) return;
+    const int w = 220;
+    m_sidePanel->setGeometry(width() - w, 0, w, height());
+}
+
+QRect OverlayPanel::currentVideoGeometry() const
+{
+    if (parentWidget()) {
+        return QRect(0, 0, width() - (m_editMode ? 220 : 0), height());
+    }
+    return rect();
+}
+
+// ============================================================================
+//  PAINT - Grid overlay + toast
+// ============================================================================
+void OverlayPanel::paintEvent(QPaintEvent *)
+{
+    if (!m_editMode && m_toastMessage.isEmpty()) return;
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+
+    if (m_editMode) {
+        // Dark vignette on video area
+        QRect vr = currentVideoGeometry();
+        p.fillRect(vr, QColor(0, 0, 0, 40));
+
+        // Grid
+        p.setPen(QPen(QColor(59, 130, 246, 25), 1));
+        int gx = 30, gy = 30;
+        for (int x = vr.left(); x < vr.right(); x += gx)
+            p.drawLine(x, vr.top(), x, vr.bottom());
+        for (int y = vr.top(); y < vr.bottom(); y += gy)
+            p.drawLine(vr.left(), y, vr.right(), y);
+
+        // Center crosshair
+        p.setPen(QPen(QColor(59, 130, 246, 60), 1, Qt::DashLine));
+        p.drawLine(vr.center().x(), vr.top(), vr.center().x(), vr.bottom());
+        p.drawLine(vr.left(), vr.center().y(), vr.right(), vr.center().y());
+
+        // Key recording indicator
+        if (m_recordingKey) {
+            QRect badge(vr.center().x() - 100, vr.top() + 10, 200, 28);
+            p.setBrush(QColor(239, 68, 68, 220));
+            p.setPen(Qt::NoPen);
+            p.drawRoundedRect(badge, 5, 5);
+            p.setPen(Qt::white);
+            p.setFont(QFont("Segoe UI", 9, QFont::Bold));
+            p.drawText(badge, Qt::AlignCenter, "Press any key to bind...");
+        }
+    }
+
+    // Toast
+    if (!m_toastMessage.isEmpty()) {
+        QFontMetrics fm(QFont("Segoe UI", 10, QFont::Bold));
+        int tw = fm.horizontalAdvance(m_toastMessage) + 30;
+        int th = 36;
+        QRect tr((width() - tw) / 2, height() - 60, tw, th);
+        p.setBrush(QColor(15, 23, 42, 230));
+        p.setPen(QPen(QColor(56, 189, 248), 1));
+        p.drawRoundedRect(tr, 8, 8);
+        p.setPen(Qt::white);
+        p.setFont(QFont("Segoe UI", 10, QFont::Bold));
+        p.drawText(tr, Qt::AlignCenter, m_toastMessage);
+    }
+}
+
+// ============================================================================
+//  Mouse / Key events on canvas
+// ============================================================================
+void OverlayPanel::mousePressEvent(QMouseEvent *e)
+{
+    if (!m_editMode) return;
+    if (e->button() == Qt::LeftButton) {
+        // Deselect if clicked on empty canvas
+        bool hitBtn = false;
+        for (auto *b : m_buttons) {
+            if (b->geometry().contains(e->pos())) { hitBtn = true; break; }
+        }
+        if (!hitBtn) selectButton(nullptr);
+    }
+}
+
+void OverlayPanel::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    if (!m_editMode) return;
+    if (e->button() == Qt::LeftButton) {
+        QRect vArea = currentVideoGeometry();
+        if (vArea.contains(e->pos())) {
+            double rx = static_cast<double>(e->pos().x() - vArea.left()) / vArea.width();
+            double ry = static_cast<double>(e->pos().y() - vArea.top())  / vArea.height();
+            createButton(OverlayButtonType::Click, "Fire", "Key_J", QPointF(rx, ry));
+        }
+    }
+}
+
+void OverlayPanel::keyPressEvent(QKeyEvent *e)
+{
+    if (!m_editMode) { QWidget::keyPressEvent(e); return; }
+    if (m_recordingKey) {
+        if (e->key() == Qt::Key_Escape) {
+            m_recordingKey = false;
+            if (m_recordKeyBtn) m_recordKeyBtn->setText("Bind Key");
+            update(); return;
+        }
+        QString keyStr = qtKeyToString(e->key());
+        if (!keyStr.isEmpty() && m_keyEdit) {
+            m_keyEdit->setText(keyStr);
+        }
+        m_recordingKey = false;
+        if (m_recordKeyBtn) m_recordKeyBtn->setText("Bind Key");
+        update(); return;
+    }
+    if (e->key() == Qt::Key_Delete && m_selected) onDeleteSelected();
+    QWidget::keyPressEvent(e);
+}
+
+void OverlayPanel::keyReleaseEvent(QKeyEvent *e) { QWidget::keyReleaseEvent(e); }
+
+// ============================================================================
+//  BUTTON FACTORY
+// ============================================================================
 OverlayButton *OverlayPanel::createButton(OverlayButtonType type,
-                                         const QString &label,
-                                         const QString &key,
-                                         QPointF posRatio)
+                                          const QString &label,
+                                          const QString &key,
+                                          QPointF posRatio)
 {
     auto *btn = new OverlayButton(type, label, key, posRatio, this);
+    btn->setHudOpacity(m_hudOpacity);
     btn->setEditMode(m_editMode);
     btn->reposition(currentVideoGeometry());
+    btn->show();
 
     connect(btn, &OverlayButton::editRequested,      this, &OverlayPanel::onButtonEditRequested);
     connect(btn, &OverlayButton::posRatioChanged,    this, &OverlayPanel::onButtonPosChanged);
@@ -173,948 +900,278 @@ OverlayButton *OverlayPanel::createButton(OverlayButtonType type,
     connect(btn, &OverlayButton::duplicateRequested, this, &OverlayPanel::onButtonDuplicateRequested);
 
     m_buttons.append(btn);
-    btn->show();
+    emit layoutChanged();
     return btn;
 }
 
-// ---------------------------------------------------------------------------
-// Side Panel UI Construction
-// ---------------------------------------------------------------------------
-void OverlayPanel::buildSidePanel()
+// ============================================================================
+//  ADD SLOTS - Basic
+// ============================================================================
+void OverlayPanel::onAddClick()      { createButton(OverlayButtonType::Click,       "Fire",       "Key_J",     {0.15, 0.65}); }
+void OverlayPanel::onAddDoubleClick(){ createButton(OverlayButtonType::DoubleClick, "Double",     "Key_H",     {0.85, 0.55}); }
+void OverlayPanel::onAddRightClick() { createButton(OverlayButtonType::RightClick,  "Scope",      "Key_L",     {0.85, 0.35}); }
+void OverlayPanel::onAddMiddleClick(){ createButton(OverlayButtonType::MiddleClick, "Mid",        "Key_M",     {0.50, 0.50}); }
+void OverlayPanel::onAddJoystick()   { createButton(OverlayButtonType::Joystick,   "WASD",       "WASD",      {0.25, 0.70}); }
+void OverlayPanel::onAddAim()        { createButton(OverlayButtonType::Aim,         "Aim",        "Key_QuoteLeft", {0.60, 0.40}); }
+void OverlayPanel::onAddSwipe()      { createButton(OverlayButtonType::Swipe,       "Swipe",      "Key_G",     {0.50, 0.50}); }
+void OverlayPanel::onAddFreeLook()   { createButton(OverlayButtonType::FreeLook,   "FreeLook",   "Key_F",     {0.65, 0.35}); }
+
+// --- Compat slots ---
+void OverlayPanel::onSetLeftClick()  { onAddClick(); }
+void OverlayPanel::onSetRightClick() { onAddRightClick(); }
+void OverlayPanel::onSetMidClick()   { onAddMiddleClick(); }
+
+// ============================================================================
+//  ADD SLOTS - Game Controls
+// ============================================================================
+void OverlayPanel::onAddFire()    { createButton(OverlayButtonType::Click,   "Fire",    "Key_J",     {0.15, 0.65}); }
+void OverlayPanel::onAddScope()   { createButton(OverlayButtonType::Scope,   "Scope",   "Key_L",     {0.85, 0.35}); }
+void OverlayPanel::onAddJump()    { createButton(OverlayButtonType::Jump,    "Jump",    "Key_Space", {0.50, 0.80}); }
+void OverlayPanel::onAddProne()   { createButton(OverlayButtonType::Prone,   "Prone",   "Key_Z",     {0.80, 0.80}); }
+void OverlayPanel::onAddGrenade() { createButton(OverlayButtonType::Grenade, "Grenade", "Key_G",     {0.30, 0.30}); }
+void OverlayPanel::onAddMap()     { createButton(OverlayButtonType::Map,     "Map",     "Key_M",     {0.90, 0.10}); }
+void OverlayPanel::onAddBag()     { createButton(OverlayButtonType::Bag,     "Bag",     "Key_Tab",   {0.90, 0.25}); }
+void OverlayPanel::onAddVehicle() { createButton(OverlayButtonType::Vehicle, "Drive",   "WASD",      {0.25, 0.75}); }
+void OverlayPanel::onAddSkill()   { createButton(OverlayButtonType::Skill,   "Skill",   "Key_Q",     {0.70, 0.70}); }
+
+// ============================================================================
+//  ADD SLOTS - Advanced
+// ============================================================================
+void OverlayPanel::onAddMacro()
 {
-    m_sidePanel = new QFrame(this);
-    m_sidePanel->setObjectName("sidePanel");
-
-    // Modern Deep Slate / Cyber Gaming Theme with sleek scrollbar
-    m_sidePanel->setStyleSheet(
-        "#sidePanel {"
-        "  background-color: rgba(15, 23, 42, 0.96);"
-        "  border-left: 2px solid #334155;"
-        "  border-top-left-radius: 12px;"
-        "  border-bottom-left-radius: 12px;"
-        "}"
-        "QLabel {"
-        "  color: #f1f5f9;"
-        "  font-family: 'Segoe UI', Arial, sans-serif;"
-        "}"
-        "QLineEdit, QComboBox {"
-        "  background-color: #1e293b;"
-        "  border: 1px solid #475569;"
-        "  border-radius: 6px;"
-        "  color: #f8fafc;"
-        "  padding: 4px 6px;"
-        "  font-size: 11px;"
-        "}"
-        "QLineEdit:focus, QComboBox:focus {"
-        "  border: 1px solid #38bdf8;"
-        "}"
-        "QPushButton {"
-        "  background-color: #334155;"
-        "  border: 1px solid #475569;"
-        "  border-radius: 6px;"
-        "  color: #f8fafc;"
-        "  padding: 5px 8px;"
-        "  font-weight: 600;"
-        "  font-size: 11px;"
-        "}"
-        "QPushButton:hover {"
-        "  background-color: #475569;"
-        "  border-color: #64748b;"
-        "}"
-        "QPushButton:pressed {"
-        "  background-color: #1e293b;"
-        "}"
-        "QSlider::groove:horizontal {"
-        "  height: 4px;"
-        "  background: #334155;"
-        "  border-radius: 2px;"
-        "}"
-        "QSlider::sub-page:horizontal {"
-        "  background: #38bdf8;"
-        "  border-radius: 2px;"
-        "}"
-        "QSlider::handle:horizontal {"
-        "  background: #f8fafc;"
-        "  width: 12px;"
-        "  margin-top: -4px;"
-        "  margin-bottom: -4px;"
-        "  border-radius: 6px;"
-        "}"
-        "QCheckBox { color: #cbd5e1; font-size: 11px; }"
-        "QScrollArea { background: transparent; border: none; }"
-        "QScrollBar:vertical {"
-        "  background: rgba(30, 41, 59, 0.4);"
-        "  width: 5px;"
-        "  margin: 0px;"
-        "  border-radius: 2px;"
-        "}"
-        "QScrollBar::handle:vertical {"
-        "  background: #475569;"
-        "  min-height: 20px;"
-        "  border-radius: 2px;"
-        "}"
-        "QScrollBar::handle:vertical:hover {"
-        "  background: #38bdf8;"
-        "}"
-        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
-        "  height: 0px;"
-        "}"
-    );
-
-    auto *mainLayout = new QVBoxLayout(m_sidePanel);
-    mainLayout->setContentsMargins(8, 8, 8, 8);
-    mainLayout->setSpacing(6);
-
-    // --- Header ---
-    auto *headerLayout = new QHBoxLayout();
-    headerLayout->setContentsMargins(2, 2, 2, 2);
-    auto *titleLabel = new QLabel(tr(" KEYMAP STUDIO"), m_sidePanel);
-    titleLabel->setStyleSheet("font-size: 14px; font-weight: bold; color: #38bdf8; letter-spacing: 0.5px;");
-    headerLayout->addWidget(titleLabel);
-
-    auto *badgeLabel = new QLabel(tr("PRO"), m_sidePanel);
-    badgeLabel->setStyleSheet("background-color: #0284c7; color: white; font-size: 9px; font-weight: bold; padding: 1px 5px; border-radius: 4px;");
-    headerLayout->addWidget(badgeLabel);
-    headerLayout->addStretch(1);
-    mainLayout->addLayout(headerLayout);
-
-    // Profile presets
-    auto *presetRow = new QHBoxLayout();
-    presetRow->setSpacing(4);
-    m_presetCombo = new QComboBox(m_sidePanel);
-    m_presetCombo->setToolTip(tr("Select an existing keymap preset"));
-    connect(m_presetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &OverlayPanel::onProfilePresetSelected);
-    presetRow->addWidget(m_presetCombo, 1);
-
-    m_profileEdit = new QLineEdit(m_currentProfileName, m_sidePanel);
-    m_profileEdit->setPlaceholderText(tr("Profile Name"));
-    presetRow->addWidget(m_profileEdit, 1);
-    mainLayout->addLayout(presetRow);
-
-    // --- Scroll Area for Dynamic Content Auto-Resize ---
-    auto *scrollArea = new QScrollArea(m_sidePanel);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setFrameShape(QFrame::NoFrame);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-
-    auto *scrollContent = new QWidget();
-    scrollContent->setStyleSheet("background: transparent;");
-    auto *contentLayout = new QVBoxLayout(scrollContent);
-    contentLayout->setContentsMargins(2, 4, 4, 4);
-    contentLayout->setSpacing(8);
-
-    // --- Quick Add Arsenal (TC Games & WASD+ Feature Set) ---
-    auto *addLabel = new QLabel(tr("ADD ELEMENTS (TC/WASD+ SYSTEM)"), scrollContent);
-    addLabel->setStyleSheet("font-size: 10px; font-weight: bold; color: #94a3b8; letter-spacing: 0.5px; margin-top: 2px;");
-    contentLayout->addWidget(addLabel);
-
-    auto *addGrid = new QGridLayout();
-    addGrid->setSpacing(4);
-
-    // Dedicated Fire button (Left Click)
-    auto *addFireBtn = new QPushButton(tr(" Fire (L-Click)"), scrollContent);
-    addFireBtn->setStyleSheet("background-color: #991b1b; border-color: #ef4444; color: white;");
-    addFireBtn->setToolTip(tr("Weapon fire button mapped to Mouse Left Click"));
-    connect(addFireBtn, &QPushButton::clicked, this, &OverlayPanel::onAddFire);
-
-    // Dedicated Scope button (Right Click)
-    auto *addScopeBtn = new QPushButton(tr(" Scope (R-Click)"), scrollContent);
-    addScopeBtn->setStyleSheet("background-color: #0f766e; border-color: #14b8a6; color: white;");
-    addScopeBtn->setToolTip(tr("Aim down sights (ADS) mapped to Mouse Right Click"));
-    connect(addScopeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddScope);
-
-    // WASD Joystick
-    auto *addJoyBtn = new QPushButton(tr(" WASD Move"), scrollContent);
-    addJoyBtn->setStyleSheet("background-color: #0369a1; border-color: #38bdf8; color: white;");
-    addJoyBtn->setToolTip(tr("360 degree virtual analog joystick"));
-    connect(addJoyBtn, &QPushButton::clicked, this, &OverlayPanel::onAddJoystick);
-
-    // Aim / Mouse Look
-    auto *addAimBtn = new QPushButton(tr(" Aim / Look"), scrollContent);
-    addAimBtn->setStyleSheet("background-color: #b91c1c; border-color: #f87171; color: white;");
-    addAimBtn->setToolTip(tr("FPS camera look and mouse aiming with customizable sensitivity"));
-    connect(addAimBtn, &QPushButton::clicked, this, &OverlayPanel::onAddAim);
-
-    // Free Look (Alt Eye)
-    auto *addEyeBtn = new QPushButton(tr(" Free Look (Alt)"), scrollContent);
-    addEyeBtn->setStyleSheet("background-color: #854d0e; border-color: #eab308; color: white;");
-    addEyeBtn->setToolTip(tr("360-degree observation look (Small Eye)"));
-    connect(addEyeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddFreeLook);
-
-    // Rapid Fire (Turbo Multi Click)
-    auto *addRapidBtn = new QPushButton(tr(" Rapid Fire"), scrollContent);
-    addRapidBtn->setStyleSheet("background-color: #6b21a8; border-color: #a855f7; color: white;");
-    addRapidBtn->setToolTip(tr("Double / Rapid click for semi-automatic guns"));
-    connect(addRapidBtn, &QPushButton::clicked, this, &OverlayPanel::onAddDoubleClick);
-
-    // Map (M with switchMap)
-    auto *addMapBtn = new QPushButton(tr(" Map (M)"), scrollContent);
-    addMapBtn->setStyleSheet("background-color: #1e3a8a; border-color: #3b82f6; color: white;");
-    addMapBtn->setToolTip(tr("Map button with automatic cursor release (switchMap)"));
-    connect(addMapBtn, &QPushButton::clicked, this, &OverlayPanel::onAddMap);
-
-    // Bag (Tab with switchMap)
-    auto *addBagBtn = new QPushButton(tr(" Bag (Tab)"), scrollContent);
-    addBagBtn->setStyleSheet("background-color: #374151; border-color: #9ca3af; color: white;");
-    addBagBtn->setToolTip(tr("Backpack / Inventory button with cursor release"));
-    connect(addBagBtn, &QPushButton::clicked, this, &OverlayPanel::onAddBag);
-
-    // Normal Click
-    auto *addClickBtn = new QPushButton(tr(" Key Click"), scrollContent);
-    addClickBtn->setToolTip(tr("Standard button click"));
-    connect(addClickBtn, &QPushButton::clicked, this, &OverlayPanel::onAddClick);
-
-    // Swipe / Slide
-    auto *addSwipeBtn = new QPushButton(tr(" Swipe"), scrollContent);
-    addSwipeBtn->setToolTip(tr("Drag gesture for sliding / dodging"));
-    connect(addSwipeBtn, &QPushButton::clicked, this, &OverlayPanel::onAddSwipe);
-
-    addGrid->addWidget(addFireBtn,  0, 0);
-    addGrid->addWidget(addScopeBtn, 0, 1);
-    addGrid->addWidget(addJoyBtn,   1, 0);
-    addGrid->addWidget(addAimBtn,   1, 1);
-    addGrid->addWidget(addEyeBtn,   2, 0);
-    addGrid->addWidget(addRapidBtn, 2, 1);
-    addGrid->addWidget(addMapBtn,   3, 0);
-    addGrid->addWidget(addBagBtn,   3, 1);
-    addGrid->addWidget(addClickBtn, 4, 0);
-    addGrid->addWidget(addSwipeBtn, 4, 1);
-    contentLayout->addLayout(addGrid);
-
-    // --- Properties Inspector ---
-    auto *sep = new QFrame(scrollContent);
-    sep->setFrameShape(QFrame::HLine);
-    sep->setStyleSheet("color: #334155; margin: 4px 0;");
-    contentLayout->addWidget(sep);
-
-    auto *propsLabel = new QLabel(tr("PROPERTIES INSPECTOR"), scrollContent);
-    propsLabel->setStyleSheet("font-size: 10px; font-weight: bold; color: #94a3b8; letter-spacing: 0.5px;");
-    contentLayout->addWidget(propsLabel);
-
-    m_propsWidget = new QWidget(scrollContent);
-    auto *pLayout = new QVBoxLayout(m_propsWidget);
-    pLayout->setContentsMargins(0, 0, 0, 0);
-    pLayout->setSpacing(6);
-
-    m_selTypeLabel = new QLabel(tr("No button selected"), m_propsWidget);
-    m_selTypeLabel->setStyleSheet("font-size: 11px; font-weight: bold; color: #38bdf8;");
-    pLayout->addWidget(m_selTypeLabel);
-
-    // Label edit
-    auto *labelRow = new QHBoxLayout();
-    labelRow->addWidget(new QLabel(tr("Label:"), m_propsWidget));
-    m_labelEdit = new QLineEdit(m_propsWidget);
-    connect(m_labelEdit, &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
-    labelRow->addWidget(m_labelEdit);
-    pLayout->addLayout(labelRow);
-
-    // Interactive Key Recorder
-    auto *keyRow = new QHBoxLayout();
-    keyRow->addWidget(new QLabel(tr("Key:"), m_propsWidget));
-    m_recordKeyBtn = new QPushButton(tr(" Bind Key"), m_propsWidget);
-    m_recordKeyBtn->setStyleSheet("background-color: #0284c7; color: white; font-weight: bold;");
-    connect(m_recordKeyBtn, &QPushButton::clicked, this, &OverlayPanel::onRecordKeyClicked);
-    keyRow->addWidget(m_recordKeyBtn);
-
-    m_keyEdit = new QLineEdit(m_propsWidget);
-    m_keyEdit->setFixedWidth(75);
-    m_keyEdit->setPlaceholderText(tr("Key_*"));
-    connect(m_keyEdit, &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
-    keyRow->addWidget(m_keyEdit);
-    pLayout->addLayout(keyRow);
-
-    // Quick Mouse Buttons Selector (1-click assign Left / Right / Mid click)
-    auto *mouseRow = new QHBoxLayout();
-    mouseRow->setSpacing(3);
-    auto *setLeftBtn = new QPushButton(tr(" L-Click (Fire)"), m_propsWidget);
-    setLeftBtn->setStyleSheet("background-color: #991b1b; color: white; font-size: 10px; padding: 3px;");
-    connect(setLeftBtn, &QPushButton::clicked, this, &OverlayPanel::onSetLeftClick);
-
-    auto *setRightBtn = new QPushButton(tr(" R-Click (Scope)"), m_propsWidget);
-    setRightBtn->setStyleSheet("background-color: #0f766e; color: white; font-size: 10px; padding: 3px;");
-    connect(setRightBtn, &QPushButton::clicked, this, &OverlayPanel::onSetRightClick);
-
-    auto *setMidBtn = new QPushButton(tr(" Mid"), m_propsWidget);
-    setMidBtn->setStyleSheet("background-color: #334155; color: white; font-size: 10px; padding: 3px;");
-    connect(setMidBtn, &QPushButton::clicked, this, &OverlayPanel::onSetMidClick);
-
-    mouseRow->addWidget(setLeftBtn);
-    mouseRow->addWidget(setRightBtn);
-    mouseRow->addWidget(setMidBtn);
-    pLayout->addLayout(mouseRow);
-
-    // Size slider
-    auto *sizeRow = new QHBoxLayout();
-    sizeRow->addWidget(new QLabel(tr("Size:"), m_propsWidget));
-    m_sizeSlider = new QSlider(Qt::Horizontal, m_propsWidget);
-    m_sizeSlider->setRange(20, 200);
-    m_sizeSlider->setValue(55);
-    connect(m_sizeSlider, &QSlider::valueChanged, this, &OverlayPanel::onApplyProps);
-    sizeRow->addWidget(m_sizeSlider);
-    pLayout->addLayout(sizeRow);
-
-    // HUD Opacity Slider
-    auto *opRow = new QHBoxLayout();
-    opRow->addWidget(new QLabel(tr("HUD Opacity:"), m_propsWidget));
-    m_opacitySlider = new QSlider(Qt::Horizontal, m_propsWidget);
-    m_opacitySlider->setRange(15, 100);
-    m_opacitySlider->setValue(85);
-    connect(m_opacitySlider, &QSlider::valueChanged, this, &OverlayPanel::onOpacitySliderChanged);
-    opRow->addWidget(m_opacitySlider);
-    pLayout->addLayout(opRow);
-
-    // Coords label
-    m_coordsLabel = new QLabel("X: 0.50 | Y: 0.50", m_propsWidget);
-    m_coordsLabel->setStyleSheet("color: #64748b; font-size: 10px;");
-    pLayout->addWidget(m_coordsLabel);
-
-    // Joystick keys group
-    m_joyGroup = new QWidget(m_propsWidget);
-    auto *jg = new QGridLayout(m_joyGroup);
-    jg->setContentsMargins(0, 4, 0, 4);
-    jg->setSpacing(4);
-    m_joyUpEdit    = new QLineEdit("Key_W", m_joyGroup);
-    m_joyDownEdit  = new QLineEdit("Key_S", m_joyGroup);
-    m_joyLeftEdit  = new QLineEdit("Key_A", m_joyGroup);
-    m_joyRightEdit = new QLineEdit("Key_D", m_joyGroup);
-    jg->addWidget(new QLabel("Up:"), 0, 0);    jg->addWidget(m_joyUpEdit, 0, 1);
-    jg->addWidget(new QLabel("Down:"), 0, 2);  jg->addWidget(m_joyDownEdit, 0, 3);
-    jg->addWidget(new QLabel("Left:"), 1, 0);  jg->addWidget(m_joyLeftEdit, 1, 1);
-    jg->addWidget(new QLabel("Right:"), 1, 2); jg->addWidget(m_joyRightEdit, 1, 3);
-    connect(m_joyUpEdit,    &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
-    connect(m_joyDownEdit,  &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
-    connect(m_joyLeftEdit,  &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
-    connect(m_joyRightEdit, &QLineEdit::textChanged, this, &OverlayPanel::onApplyProps);
-
-    auto *resetWasdBtn = new QPushButton(tr(" Reset Standard WASD"), m_joyGroup);
-    resetWasdBtn->setStyleSheet("background-color: #0369a1; border-color: #0284c7; padding: 4px; font-size: 11px;");
-    connect(resetWasdBtn, &QPushButton::clicked, this, [this]() {
-        if (!m_selected || m_selected->buttonType() != OverlayButtonType::Joystick) return;
-        m_joyUpEdit->setText("Key_W");
-        m_joyDownEdit->setText("Key_S");
-        m_joyLeftEdit->setText("Key_A");
-        m_joyRightEdit->setText("Key_D");
-        onApplyProps();
-    });
-    jg->addWidget(resetWasdBtn, 2, 0, 1, 4);
-    pLayout->addWidget(m_joyGroup);
-
-    // Aim sensitivity group
-    m_aimGroup = new QWidget(m_propsWidget);
-    auto *ag = new QVBoxLayout(m_aimGroup);
-    ag->setContentsMargins(0, 4, 0, 4);
-    ag->setSpacing(4);
-    m_speedValLabel = new QLabel(tr("Aim Sensitivity: 2.5x"), m_aimGroup);
-    m_speedValLabel->setStyleSheet("font-size: 11px; color: #cbd5e1;");
-    ag->addWidget(m_speedValLabel);
-    m_speedXSlider = new QSlider(Qt::Horizontal, m_aimGroup);
-    m_speedXSlider->setRange(5, 50);
-    m_speedXSlider->setValue(25);
-    connect(m_speedXSlider, &QSlider::valueChanged, this, &OverlayPanel::onApplyProps);
-    ag->addWidget(m_speedXSlider);
-
-    auto *aimPresetsLabel = new QLabel(tr("Aim Toggle Key (Lock/Unlock):"), m_aimGroup);
-    aimPresetsLabel->setStyleSheet("font-size: 11px; color: #94a3b8; font-weight: 600; margin-top: 4px;");
-    ag->addWidget(aimPresetsLabel);
-
-    auto *aimPresetsLayout = new QHBoxLayout();
-    aimPresetsLayout->setSpacing(4);
-    auto *rcBtn = new QPushButton(tr(" Right Click"), m_aimGroup);
-    rcBtn->setStyleSheet("background-color: #1e3a8a; border-color: #3b82f6; font-size: 11px; padding: 4px;");
-    connect(rcBtn, &QPushButton::clicked, this, [this]() {
-        if (!m_selected) return;
-        m_keyEdit->setText("RightButton");
-        m_switchKey = "RightButton";
-        onApplyProps();
-    });
-    auto *tildeBtn = new QPushButton(tr("~ Tilde"), m_aimGroup);
-    tildeBtn->setStyleSheet("background-color: #334155; border-color: #475569; font-size: 11px; padding: 4px;");
-    connect(tildeBtn, &QPushButton::clicked, this, [this]() {
-        if (!m_selected) return;
-        m_keyEdit->setText("Key_QuoteLeft");
-        m_switchKey = "Key_QuoteLeft";
-        onApplyProps();
-    });
-    auto *vBtn = new QPushButton(tr("V Key"), m_aimGroup);
-    vBtn->setStyleSheet("background-color: #334155; border-color: #475569; font-size: 11px; padding: 4px;");
-    connect(vBtn, &QPushButton::clicked, this, [this]() {
-        if (!m_selected) return;
-        m_keyEdit->setText("Key_V");
-        m_switchKey = "Key_V";
-        onApplyProps();
-    });
-    aimPresetsLayout->addWidget(rcBtn);
-    aimPresetsLayout->addWidget(tildeBtn);
-    aimPresetsLayout->addWidget(vBtn);
-    ag->addLayout(aimPresetsLayout);
-    pLayout->addWidget(m_aimGroup);
-
-    // Click switchMap group
-    m_clickGroup = new QWidget(m_propsWidget);
-    auto *cg = new QHBoxLayout(m_clickGroup);
-    cg->setContentsMargins(0, 2, 0, 2);
-    m_switchMapCheck = new QCheckBox(tr("Release mouse cursor (switchMap)"), m_clickGroup);
-    connect(m_switchMapCheck, &QCheckBox::toggled, this, &OverlayPanel::onApplyProps);
-    cg->addWidget(m_switchMapCheck);
-    pLayout->addWidget(m_clickGroup);
-
-    // Action buttons row (Duplicate / Delete)
-    auto *actRow = new QHBoxLayout();
-    auto *dupBtn = new QPushButton(tr(" Duplicate"), m_propsWidget);
-    dupBtn->setStyleSheet("background-color: #334155; color: white;");
-    connect(dupBtn, &QPushButton::clicked, this, &OverlayPanel::onDuplicateSelected);
-    actRow->addWidget(dupBtn);
-
-    m_deleteBtn = new QPushButton(tr(" Delete"), m_propsWidget);
-    m_deleteBtn->setStyleSheet("background-color: #dc2626; color: white;");
-    connect(m_deleteBtn, &QPushButton::clicked, this, &OverlayPanel::onDeleteSelected);
-    actRow->addWidget(m_deleteBtn);
-    pLayout->addLayout(actRow);
-
-    contentLayout->addWidget(m_propsWidget);
-    contentLayout->addStretch(1);
-
-    scrollArea->setWidget(scrollContent);
-    mainLayout->addWidget(scrollArea, 1);
-
-    // --- Bottom Action Bar (Fixed at bottom) ---
-    m_saveBtn = new QPushButton(tr(" Save & Apply"), m_sidePanel);
-    m_saveBtn->setFixedHeight(36);
-    m_saveBtn->setStyleSheet(
-        "QPushButton {"
-        "  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #059669, stop:1 #10b981);"
-        "  color: white;"
-        "  font-size: 13px;"
-        "  font-weight: bold;"
-        "  border: 1px solid #34d399;"
-        "  border-radius: 8px;"
-        "}"
-        "QPushButton:hover {"
-        "  background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #10b981, stop:1 #34d399);"
-        "}"
-    );
-    connect(m_saveBtn, &QPushButton::clicked, this, &OverlayPanel::onSaveAndApply);
-    mainLayout->addWidget(m_saveBtn);
-
-    // Export JSON Button
-        auto *fileBtnsLayout = new QHBoxLayout();
-    auto *exportBtn = new QPushButton(tr("Export JSON"), m_sidePanel);
-    exportBtn->setFixedHeight(32);
-    exportBtn->setStyleSheet("QPushButton { background: #3b82f6; color: white; border-radius: 4px; font-weight: bold; } QPushButton:hover { background: #2563eb; }");
-    connect(exportBtn, &QPushButton::clicked, this, &OverlayPanel::onExportKeymap);
-    
-    m_importBtn = new QPushButton(tr("Import JSON"), m_sidePanel);
-    m_importBtn->setFixedHeight(32);
-    m_importBtn->setStyleSheet("QPushButton { background: #8b5cf6; color: white; border-radius: 4px; font-weight: bold; } QPushButton:hover { background: #7c3aed; }");
-    connect(m_importBtn, &QPushButton::clicked, this, &OverlayPanel::onImportKeymap);
-    
-    fileBtnsLayout->addWidget(exportBtn);
-    fileBtnsLayout->addWidget(m_importBtn);
-    mainLayout->addLayout(fileBtnsLayout);
-    
-    m_clearAllBtn = new QPushButton(tr("Clear All"), m_sidePanel);
-    m_clearAllBtn->setFixedHeight(32);
-    m_clearAllBtn->setStyleSheet("QPushButton { background: #ef4444; color: white; border-radius: 4px; font-weight: bold; } QPushButton:hover { background: #dc2626; }");
-    connect(m_clearAllBtn, &QPushButton::clicked, this, &OverlayPanel::onClearAll);
-    mainLayout->addWidget(m_clearAllBtn);
-
-    auto *bottomRow = new QHBoxLayout();
-    m_hudToggleBtn = new QPushButton(tr(" HUD: ON"), m_sidePanel);
-    connect(m_hudToggleBtn, &QPushButton::clicked, this, &OverlayPanel::onToggleHUD);
-    bottomRow->addWidget(m_hudToggleBtn);
-
-    m_closeBtn = new QPushButton(tr(" Close"), m_sidePanel);
-    connect(m_closeBtn, &QPushButton::clicked, this, &OverlayPanel::onCloseEdit);
-    bottomRow->addWidget(m_closeBtn);
-
-    mainLayout->addLayout(bottomRow);
-
-    m_propsWidget->setEnabled(false);
+    auto *btn = createButton(OverlayButtonType::Macro, "Macro", "Key_X", {0.50, 0.50});
+    // Default macro: press, wait 50ms, release
+    btn->addMacroStep({"Key_X", 50, true});
+    btn->addMacroStep({"Key_X", 50, false});
 }
 
-void OverlayPanel::updateSidePanelGeometry()
+void OverlayPanel::onAddSpray()
 {
-    if (m_sidePanel) {
-        int panelW = qBound(280, int(width() * 0.32), 340);
-        m_sidePanel->setGeometry(width() - panelW, 0, panelW, height());
-    }
+    auto *btn = createButton(OverlayButtonType::Spray, "Auto-Fire", "Key_J", {0.15, 0.65});
+    btn->setSprayIntervalMs(80);
 }
 
-// ---------------------------------------------------------------------------
-// Painting Canvas
-// ---------------------------------------------------------------------------
-void OverlayPanel::paintEvent(QPaintEvent *)
+// ============================================================================
+//  BUTTON SELECTION & PROPERTIES
+// ============================================================================
+void OverlayPanel::onButtonEditRequested(OverlayButton *btn)
 {
-    QPainter p(this);
-    p.setRenderHint(QPainter::Antialiasing);
-
-    if (m_editMode) {
-        // Subtle dark translucent veil over screen
-        p.fillRect(rect(), QColor(15, 23, 42, 110));
-
-        // Phone Video Area Boundary Highlight
-        QRect vArea = currentVideoGeometry();
-        p.setPen(QPen(QColor(56, 189, 248, 180), 2, Qt::DashLine));
-        p.setBrush(Qt::NoBrush);
-        p.drawRoundedRect(vArea, 6, 6);
-
-        // Top Guide Banner
-        int bannerW = qMin(width() - 320, 520);
-        QRect bannerRect((width() - 290 - bannerW) / 2, 12, bannerW, 30);
-        p.setPen(QPen(QColor(51, 65, 85, 220), 1));
-        p.setBrush(QColor(15, 23, 42, 210));
-        p.drawRoundedRect(bannerRect, 6, 6);
-
-        QFont bFont = p.font();
-        bFont.setPointSize(9);
-        bFont.setBold(true);
-        p.setFont(bFont);
-        p.setPen(QColor(226, 232, 240));
-        p.drawText(bannerRect, Qt::AlignCenter,
-                   m_recordingKey ? tr(" RECORDING: Press any key on keyboard...")
-                                  : tr(" Double-click canvas to add  |  Drag nodes to move  |  Esc to exit"));
-    }
-
-    // Toast message (e.g. "Keymap Applied")
-    if (!m_toastMessage.isEmpty()) {
-        int tw = 340;
-        int th = 40;
-        QRect toastRect((width() - tw) / 2, height() - 70, tw, th);
-        p.setPen(QPen(QColor(16, 185, 129), 1.5));
-        p.setBrush(QColor(6, 78, 59, 230));
-        p.drawRoundedRect(toastRect, 8, 8);
-
-        QFont tFont = p.font();
-        tFont.setPointSize(10);
-        tFont.setBold(true);
-        p.setFont(tFont);
-        p.setPen(Qt::white);
-        p.drawText(toastRect, Qt::AlignCenter, m_toastMessage);
-    }
+    selectButton(btn);
+    m_tabs->setCurrentIndex(3); // go to Props tab
 }
 
-// ---------------------------------------------------------------------------
-// Canvas Mouse Events
-// ---------------------------------------------------------------------------
-void OverlayPanel::mousePressEvent(QMouseEvent *e)
-{
-    if (m_editMode) {
-        if (m_recordingKey && m_selected) {
-            if (e->button() == Qt::RightButton) {
-                m_selected->setKey("RightButton");
-                if (m_selected->buttonType() == OverlayButtonType::Aim) {
-                    m_switchKey = "RightButton";
-                }
-                m_recordingKey = false;
-                populatePropsFromButton(m_selected);
-                update();
-                e->accept();
-                return;
-            } else if (e->button() == Qt::MiddleButton) {
-                m_selected->setKey("MidButton");
-                if (m_selected->buttonType() == OverlayButtonType::Aim) {
-                    m_switchKey = "MidButton";
-                }
-                m_recordingKey = false;
-                populatePropsFromButton(m_selected);
-                update();
-                e->accept();
-                return;
-            }
-        }
-        if (e->button() == Qt::LeftButton) {
-            // Deselect button if clicking on background
-            selectButton(nullptr);
-            e->accept();
-            return;
-        }
-    }
-    QWidget::mousePressEvent(e);
-}
+void OverlayPanel::onButtonSelected(OverlayButton *btn) { selectButton(btn); }
 
-void OverlayPanel::mouseDoubleClickEvent(QMouseEvent *e)
-{
-    if (m_editMode && e->button() == Qt::LeftButton) {
-        QRect vArea = currentVideoGeometry();
-        if (vArea.contains(e->pos())) {
-            double rx = static_cast<double>(e->pos().x() - vArea.left()) / qMax(1, vArea.width());
-            double ry = static_cast<double>(e->pos().y() - vArea.top())  / qMax(1, vArea.height());
-            auto *btn = createButton(OverlayButtonType::Click, "Key", "Key_J", QPointF(rx, ry));
-            selectButton(btn);
-            e->accept();
-            return;
-        }
-    }
-    QWidget::mouseDoubleClickEvent(e);
-}
-
-// ---------------------------------------------------------------------------
-// Keyboard Handling
-// ---------------------------------------------------------------------------
-void OverlayPanel::keyPressEvent(QKeyEvent *e)
-{
-    if (m_editMode) {
-        // Key Recording Mode
-        if (m_recordingKey && m_selected) {
-            QString qtKeyName;
-            quint32 vk = e->nativeVirtualKey();
-            if (vk >= 'A' && vk <= 'Z') {
-                qtKeyName = QString("Key_%1").arg(QChar(vk));
-            } else if (vk >= '0' && vk <= '9') {
-                qtKeyName = QString("Key_%1").arg(QChar(vk));
-            } else if (vk == 0x20) { // VK_SPACE
-                qtKeyName = "Key_Space";
-            } else if (vk == 0x10) { // VK_SHIFT
-                qtKeyName = "Key_Shift";
-            } else if (vk == 0x11) { // VK_CONTROL
-                qtKeyName = "Key_Control";
-            } else if (vk == 0x12) { // VK_MENU (Alt)
-                qtKeyName = "Key_Alt";
-            } else if (vk == 0x09) { // VK_TAB
-                qtKeyName = "Key_Tab";
-            } else if (vk == 0xC0) { // VK_OEM_3 (`~)
-                qtKeyName = "Key_QuoteLeft";
-            }
-
-            if (qtKeyName.isEmpty()) {
-                qtKeyName = OverlayButton::mapArabicOrNumberToLatinKey(QString::number(e->key()));
-            }
-            if (qtKeyName.isEmpty()) {
-                qtKeyName = qtKeyToString(e->key());
-            }
-            QString mapped = OverlayButton::mapArabicOrNumberToLatinKey(qtKeyName);
-            if (!mapped.isEmpty()) {
-                qtKeyName = mapped;
-            }
-
-            m_selected->setKey(qtKeyName);
-            if (m_selected->buttonType() == OverlayButtonType::Aim) {
-                m_switchKey = qtKeyName;
-            }
-            m_recordingKey = false;
-            populatePropsFromButton(m_selected);
-            update();
-            e->accept();
-            return;
-        }
-
-        if (e->key() == Qt::Key_Escape) {
-            setEditMode(false);
-            e->accept();
-            return;
-        }
-
-        if ((e->key() == Qt::Key_Delete || e->key() == Qt::Key_Backspace) && m_selected) {
-            onDeleteSelected();
-            e->accept();
-            return;
-        }
-    }
-    QWidget::keyPressEvent(e);
-}
-
-void OverlayPanel::keyReleaseEvent(QKeyEvent *e)
-{
-    QWidget::keyReleaseEvent(e);
-}
-
-// ---------------------------------------------------------------------------
-// Key Conversions
-// ---------------------------------------------------------------------------
-QString OverlayPanel::qtKeyToString(int key)
-{
-    QString mapped = OverlayButton::mapArabicOrNumberToLatinKey(QString::number(key));
-    if (!mapped.isEmpty()) {
-        return mapped;
-    }
-
-    QMetaEnum meta = QMetaEnum::fromType<Qt::Key>();
-    const char *name = meta.valueToKey(key);
-    if (name) {
-        return QString::fromLatin1(name);
-    }
-    if (key >= Qt::Key_A && key <= Qt::Key_Z) {
-        return QString("Key_%1").arg(QChar('A' + (key - Qt::Key_A)));
-    }
-    if (key >= Qt::Key_0 && key <= Qt::Key_9) {
-        return QString("Key_%1").arg(QChar('0' + (key - Qt::Key_0)));
-    }
-    return QString("Key_%1").arg(key);
-}
-
-int OverlayPanel::stringToQtKey(const QString &keyStr)
-{
-    if (keyStr.isEmpty()) return Qt::Key_unknown;
-    QString norm = keyStr.trimmed();
-    if (!norm.startsWith("Key_")) {
-        norm = "Key_" + norm;
-    }
-    QMetaEnum meta = QMetaEnum::fromType<Qt::Key>();
-    int val = meta.keyToValue(norm.toUtf8().constData());
-    if (val != -1) return val;
-
-    if (norm == "Key_SPACE") return Qt::Key_Space;
-    if (norm == "Key_CTRL") return Qt::Key_Control;
-    if (norm == "Key_SHIFT") return Qt::Key_Shift;
-    if (norm == "Key_ALT") return Qt::Key_Alt;
-    if (norm == "Key_TAB") return Qt::Key_Tab;
-    if (norm == "Key_ESC") return Qt::Key_Escape;
-    if (norm == "Key_ENTER") return Qt::Key_Return;
-    if (norm == "Key_~" || norm == "Key_`") return Qt::Key_QuoteLeft;
-
-    return Qt::Key_unknown;
-}
-
-QString OverlayPanel::keyToDisplayLabel(const QString &keyStr)
-{
-    QString k = keyStr.trimmed();
-    if (k == "LeftButton" || k == "Left") return "L-CLICK";
-    if (k == "RightButton" || k == "Right") return "R-CLICK";
-    if (k == "MidButton" || k == "Middle") return "M-CLICK";
-
-    QString mapped = OverlayButton::mapArabicOrNumberToLatinKey(k);
-    if (!mapped.isEmpty()) {
-        return mapped.mid(4);
-    }
-
-    if (k.startsWith("Key_")) k = k.mid(4);
-    if (k == "QuoteLeft") return "~";
-    if (k == "Space")     return "SPACE";
-    if (k == "Return")    return "ENTER";
-    if (k == "Shift")     return "SHIFT";
-    if (k == "Control")   return "CTRL";
-    if (k == "Alt")       return "ALT";
-    if (k == "Tab")       return "TAB";
-    if (k == "Escape")    return "ESC";
-    return k.toUpper();
-}
-
-// ---------------------------------------------------------------------------
-// Node Selection & Inspector
-// ---------------------------------------------------------------------------
 void OverlayPanel::selectButton(OverlayButton *btn)
 {
-    if (m_selected && m_selected != btn) {
-        m_selected->setSelected(false);
-    }
+    if (m_selected) m_selected->setSelected(false);
     m_selected = btn;
-    m_recordingKey = false;
-
-    if (m_selected) {
-        m_selected->setSelected(true);
-        populatePropsFromButton(m_selected);
-        m_propsWidget->setEnabled(true);
-    } else {
-        m_propsWidget->setEnabled(false);
-        m_selTypeLabel->setText(tr("No button selected"));
-        m_labelEdit->clear();
-        m_keyEdit->clear();
-        m_recordKeyBtn->setText(tr(" Bind Key"));
-        m_coordsLabel->setText("X: -- | Y: --");
-    }
-    update();
+    if (m_selected) m_selected->setSelected(true);
+    populatePropsFromButton(m_selected);
 }
 
 void OverlayPanel::populatePropsFromButton(OverlayButton *btn)
 {
-    if (!btn) return;
+    if (!m_propsWidget) return;
 
-    QString typeStr = "Click Node";
-    if (btn->buttonType() == OverlayButtonType::DoubleClick) typeStr = " Double Tap Node";
-    else if (btn->buttonType() == OverlayButtonType::Joystick)    typeStr = " WASD Movement Wheel";
-    else if (btn->buttonType() == OverlayButtonType::Aim)         typeStr = " FPS Aim & Look Node";
-    else if (btn->buttonType() == OverlayButtonType::Swipe)       typeStr = " Swipe Gesture Node";
-
-    m_selTypeLabel->setText(typeStr);
-    m_labelEdit->blockSignals(true);
-    m_keyEdit->blockSignals(true);
-    m_sizeSlider->blockSignals(true);
-
-    m_labelEdit->setText(btn->label());
-    m_keyEdit->setText(btn->key());
-    m_recordKeyBtn->setText(QString(" [%1]").arg(keyToDisplayLabel(btn->key())));
-    m_sizeSlider->setValue(static_cast<int>(btn->radiusRatio() * 1000));
-    m_coordsLabel->setText(QString("X: %1 | Y: %2")
-                           .arg(btn->posRatio().x(), 0, 'f', 2)
-                           .arg(btn->posRatio().y(), 0, 'f', 2));
-
-    m_joyGroup->setVisible(btn->buttonType() == OverlayButtonType::Joystick);
-    m_aimGroup->setVisible(btn->buttonType() == OverlayButtonType::Aim);
-    m_clickGroup->setVisible(btn->buttonType() == OverlayButtonType::Click);
-
-    if (m_opacitySlider) {
-        m_opacitySlider->blockSignals(true);
-        m_opacitySlider->setValue(static_cast<int>(m_hudOpacity * 100));
-        m_opacitySlider->blockSignals(false);
+    if (!btn) {
+        m_propsWidget->setEnabled(false);
+        if (m_selTypeLabel) m_selTypeLabel->setText("No button selected");
+        return;
     }
 
-    if (btn->buttonType() == OverlayButtonType::Joystick) {
+    m_propsWidget->setEnabled(true);
+    if (m_selTypeLabel) {
+        m_selTypeLabel->setText(QString("[%1]  %2")
+            .arg(OverlayButton::typeIcon(btn->buttonType()))
+            .arg(OverlayButton::typeName(btn->buttonType())));
+        m_selTypeLabel->setStyleSheet("color: #38bdf8; font-weight: bold; font-size: 10px;");
+    }
+
+    if (m_labelEdit)  m_labelEdit->setText(btn->label());
+    if (m_keyEdit)    m_keyEdit->setText(btn->key());
+    if (m_sizeSlider) m_sizeSlider->setValue(static_cast<int>(btn->radiusRatio() * 1000));
+    if (m_coordsLabel) m_coordsLabel->setText(
+        QString("X: %1  Y: %2")
+        .arg(btn->posRatio().x(), 0, 'f', 3)
+        .arg(btn->posRatio().y(), 0, 'f', 3)
+    );
+
+    OverlayButtonType t = btn->buttonType();
+
+    // Joystick
+    bool isJoy = (t == OverlayButtonType::Joystick || t == OverlayButtonType::Vehicle);
+    if (m_joyGroup) m_joyGroup->setVisible(isJoy);
+    if (isJoy && m_joyUpEdit) {
         m_joyUpEdit->setText(btn->upKey());
         m_joyDownEdit->setText(btn->downKey());
         m_joyLeftEdit->setText(btn->leftKey());
         m_joyRightEdit->setText(btn->rightKey());
-    } else if (btn->buttonType() == OverlayButtonType::Aim) {
-        m_speedXSlider->setValue(static_cast<int>(btn->speedRatioX() * 10));
-        m_speedValLabel->setText(QString("Aim Sensitivity: %1x").arg(btn->speedRatioX(), 0, 'f', 1));
-    } else if (btn->buttonType() == OverlayButtonType::Click) {
-        m_switchMapCheck->setChecked(btn->switchMap());
     }
 
-    m_labelEdit->blockSignals(false);
-    m_keyEdit->blockSignals(false);
-    m_sizeSlider->blockSignals(false);
+    // Aim
+    bool isAim = (t == OverlayButtonType::Aim || t == OverlayButtonType::FreeLook);
+    if (m_aimGroup) m_aimGroup->setVisible(isAim);
+    if (isAim && m_speedXSlider) {
+        m_speedXSlider->setValue(static_cast<int>(btn->speedRatioX() * 10));
+        m_speedYSlider->setValue(static_cast<int>(btn->speedRatioY() * 10));
+        m_speedValLabel->setText(
+            QString("X: %1  Y: %2").arg(btn->speedRatioX(), 0, 'f', 1).arg(btn->speedRatioY(), 0, 'f', 1)
+        );
+    }
+
+    // Click
+    bool isClick = (t == OverlayButtonType::Click || t == OverlayButtonType::RightClick ||
+                    t == OverlayButtonType::MiddleClick || t == OverlayButtonType::DoubleClick);
+    if (m_clickGroup) m_clickGroup->setVisible(isClick);
+    if (isClick && m_switchMapCheck) m_switchMapCheck->setChecked(btn->switchMap());
+
+    // Spray
+    if (m_sprayGroup) m_sprayGroup->setVisible(t == OverlayButtonType::Spray);
+    if (t == OverlayButtonType::Spray && m_sprayInterval)
+        m_sprayInterval->setValue(btn->sprayIntervalMs());
+
+    // Swipe
+    bool isSwipe = (t == OverlayButtonType::Swipe || t == OverlayButtonType::Grenade);
+    if (m_swipeGroup) m_swipeGroup->setVisible(isSwipe);
+    if (isSwipe && m_swipeEndXEdit) {
+        m_swipeEndXEdit->setText(QString::number(btn->swipeEndRatio().x(), 'f', 2));
+        m_swipeEndYEdit->setText(QString::number(btn->swipeEndRatio().y(), 'f', 2));
+    }
+
+    // Macro
+    if (m_macroGroup) m_macroGroup->setVisible(t == OverlayButtonType::Macro);
+    if (t == OverlayButtonType::Macro && m_macroList) {
+        m_macroList->clear();
+        for (const auto &step : btn->macroSteps()) {
+            m_macroList->addItem(
+                QString("%1 %2  %3ms")
+                .arg(step.press ? "PRESS" : "REL")
+                .arg(step.key)
+                .arg(step.delayMs)
+            );
+        }
+    }
 }
 
 void OverlayPanel::onApplyProps()
 {
     if (!m_selected) return;
 
-    m_selected->setLabel(m_labelEdit->text());
+    if (m_labelEdit)  m_selected->setLabel(m_labelEdit->text());
+    if (m_keyEdit)    m_selected->setKey(m_keyEdit->text());
+    if (m_sizeSlider) m_selected->setRadiusRatio(m_sizeSlider->value() / 1000.0f);
 
-    QString rawKey = m_keyEdit->text().trimmed();
-    if (!rawKey.isEmpty()) {
-        QString normKey = OverlayButton::normalizeKeyName(rawKey, m_selected->key());
-        m_selected->setKey(normKey);
-        if (m_selected->buttonType() == OverlayButtonType::Aim) {
-            m_switchKey = normKey;
-        }
-        m_recordKeyBtn->setText(QString(" [%1]").arg(keyToDisplayLabel(normKey)));
-    }
+    OverlayButtonType t = m_selected->buttonType();
 
-    m_selected->setRadiusRatio(m_sizeSlider->value() / 1000.0f);
-
-    if (m_selected->buttonType() == OverlayButtonType::Joystick) {
+    if ((t == OverlayButtonType::Joystick || t == OverlayButtonType::Vehicle) && m_joyUpEdit) {
         m_selected->setJoystickKeys(
-            m_joyUpEdit->text(),
-            m_joyDownEdit->text(),
-            m_joyLeftEdit->text(),
-            m_joyRightEdit->text()
+            m_joyUpEdit->text(), m_joyDownEdit->text(),
+            m_joyLeftEdit->text(), m_joyRightEdit->text()
         );
-    } else if (m_selected->buttonType() == OverlayButtonType::Aim) {
-        float spd = m_speedXSlider->value() / 10.0f;
-        m_selected->setSpeedRatios(spd, spd);
-        m_speedValLabel->setText(QString("Aim Sensitivity: %1x").arg(spd, 0, 'f', 1));
-    } else if (m_selected->buttonType() == OverlayButtonType::Click) {
+    }
+    if ((t == OverlayButtonType::Aim || t == OverlayButtonType::FreeLook) && m_speedXSlider) {
+        m_selected->setSpeedRatios(m_speedXSlider->value() / 10.0f, m_speedYSlider->value() / 10.0f);
+    }
+    if (m_switchMapCheck && (t == OverlayButtonType::Click || t == OverlayButtonType::RightClick)) {
         m_selected->setSwitchMap(m_switchMapCheck->isChecked());
     }
+    if (t == OverlayButtonType::Spray && m_sprayInterval) {
+        m_selected->setSprayIntervalMs(m_sprayInterval->value());
+    }
+    if ((t == OverlayButtonType::Swipe || t == OverlayButtonType::Grenade) && m_swipeEndXEdit) {
+        m_selected->setSwipeEndRatio(QPointF(
+            m_swipeEndXEdit->text().toDouble(),
+            m_swipeEndYEdit->text().toDouble()
+        ));
+    }
+    m_selected->reposition(currentVideoGeometry());
+    m_selected->update();
+    emit layoutChanged();
 }
 
 void OverlayPanel::onRecordKeyClicked()
 {
-    if (!m_selected) return;
     m_recordingKey = true;
-    m_recordKeyBtn->setText(tr(" Press Key or Right-Click..."));
+    if (m_recordKeyBtn) m_recordKeyBtn->setText("Press key...");
     setFocus();
     update();
 }
 
-// ---------------------------------------------------------------------------
-// Add Node Slots
-// ---------------------------------------------------------------------------
-void OverlayPanel::onAddClick()
+void OverlayPanel::onMacroStepAdd()
 {
-    auto *btn = createButton(OverlayButtonType::Click, "Key", "Key_J", QPointF(0.75, 0.7));
-    selectButton(btn);
+    if (!m_selected || m_selected->buttonType() != OverlayButtonType::Macro) return;
+    if (!m_macroKeyEdit) return;
+    MacroStep step;
+    step.key     = m_macroKeyEdit->text().isEmpty() ? "Key_X" : m_macroKeyEdit->text();
+    step.delayMs = m_macroDelay ? m_macroDelay->value() : 50;
+    step.press   = true;
+    m_selected->addMacroStep(step);
+    if (m_macroList) {
+        m_macroList->addItem(
+            QString("PRESS %1  %2ms").arg(step.key).arg(step.delayMs)
+        );
+    }
 }
 
-void OverlayPanel::onAddDoubleClick()
+void OverlayPanel::onMacroStepRemove()
 {
-    auto *btn = createButton(OverlayButtonType::DoubleClick, "Rapid", "Key_Q", QPointF(0.25, 0.4));
-    selectButton(btn);
+    if (!m_selected || !m_macroList) return;
+    int row = m_macroList->currentRow();
+    if (row < 0) return;
+    auto steps = m_selected->macroSteps();
+    if (row < steps.size()) {
+        steps.removeAt(row);
+        m_selected->setMacroSteps(steps);
+        delete m_macroList->takeItem(row);
+    }
 }
 
-void OverlayPanel::onAddJoystick()
+void OverlayPanel::onButtonPosChanged(OverlayButton *btn)
 {
-    auto *btn = createButton(OverlayButtonType::Joystick, "Move", "WASD", QPointF(0.2, 0.72));
-    btn->setRadiusRatio(0.09f);
-    btn->setJoystickKeys("Key_W", "Key_S", "Key_A", "Key_D");
-    selectButton(btn);
+    if (btn == m_selected && m_coordsLabel) {
+        m_coordsLabel->setText(
+            QString("X: %1  Y: %2")
+            .arg(btn->posRatio().x(), 0, 'f', 3)
+            .arg(btn->posRatio().y(), 0, 'f', 3)
+        );
+    }
 }
 
-void OverlayPanel::onAddAim()
+void OverlayPanel::onButtonDeleteRequested(OverlayButton *btn)
 {
-    QString aimKey = m_switchKey.isEmpty() ? "RightButton" : m_switchKey;
-    auto *btn = createButton(OverlayButtonType::Aim, "Aim", aimKey, QPointF(0.65, 0.45));
-    m_switchKey = aimKey;
-    selectButton(btn);
+    if (m_selected == btn) selectButton(nullptr);
+    m_buttons.removeAll(btn);
+    btn->deleteLater();
+    emit layoutChanged();
 }
 
-void OverlayPanel::onAddSwipe()
+void OverlayPanel::onButtonDuplicateRequested(OverlayButton *btn)
 {
-    auto *btn = createButton(OverlayButtonType::Swipe, "Swipe", "Key_Up", QPointF(0.5, 0.6));
-    selectButton(btn);
+    QPointF newPos = QPointF(
+        qMin(btn->posRatio().x() + 0.05, 0.95),
+        qMin(btn->posRatio().y() + 0.05, 0.95)
+    );
+    auto *dup = createButton(btn->buttonType(), btn->label(), btn->key(), newPos);
+    dup->setJoystickKeys(btn->upKey(), btn->downKey(), btn->leftKey(), btn->rightKey());
+    dup->setSpeedRatios(btn->speedRatioX(), btn->speedRatioY());
+    dup->setSwitchMap(btn->switchMap());
+    dup->setRadiusRatio(btn->radiusRatio());
+    dup->setHudOpacity(btn->hudOpacity());
+    dup->setMacroSteps(btn->macroSteps());
+    dup->setSprayIntervalMs(btn->sprayIntervalMs());
 }
 
-void OverlayPanel::onAddFire()
-{
-    auto *btn = createButton(OverlayButtonType::Click, "Fire", "LeftButton", QPointF(0.86, 0.72));
-    selectButton(btn);
-}
-
-void OverlayPanel::onAddScope()
-{
-    auto *btn = createButton(OverlayButtonType::Click, "Scope", "RightButton", QPointF(0.95, 0.52));
-    selectButton(btn);
-}
-
-void OverlayPanel::onAddFreeLook()
-{
-    auto *btn = createButton(OverlayButtonType::Click, "Eye", "Key_Alt", QPointF(0.80, 0.31));
-    selectButton(btn);
-}
-
-void OverlayPanel::onAddMap()
-{
-    auto *btn = createButton(OverlayButtonType::Click, "Map", "Key_M", QPointF(0.96, 0.05));
-    btn->setSwitchMap(true);
-    selectButton(btn);
-}
-
-void OverlayPanel::onAddBag()
-{
-    auto *btn = createButton(OverlayButtonType::Click, "Bag", "Key_Tab", QPointF(0.06, 0.88));
-    btn->setSwitchMap(true);
-    selectButton(btn);
-}
-
-void OverlayPanel::onSetLeftClick()
+void OverlayPanel::onDeleteSelected()
 {
     if (!m_selected) return;
-    m_keyEdit->setText("LeftButton");
-    m_selected->setKey("LeftButton");
-    if (m_selected->label() == "Key" || m_selected->label().isEmpty()) {
-        m_labelEdit->setText("Fire");
-        m_selected->setLabel("Fire");
-    }
-    populatePropsFromButton(m_selected);
-    onApplyProps();
+    onButtonDeleteRequested(m_selected);
 }
 
-void OverlayPanel::onSetRightClick()
+void OverlayPanel::onDuplicateSelected()
 {
     if (!m_selected) return;
-    m_keyEdit->setText("RightButton");
-    m_selected->setKey("RightButton");
-    if (m_selected->label() == "Key" || m_selected->label().isEmpty()) {
-        m_labelEdit->setText("Scope");
-        m_selected->setLabel("Scope");
-    }
-    if (m_selected->buttonType() == OverlayButtonType::Aim) {
-        m_switchKey = "RightButton";
-    }
-    populatePropsFromButton(m_selected);
-    onApplyProps();
-}
-
-void OverlayPanel::onSetMidClick()
-{
-    if (!m_selected) return;
-    m_keyEdit->setText("MidButton");
-    m_selected->setKey("MidButton");
-    populatePropsFromButton(m_selected);
-    onApplyProps();
+    onButtonDuplicateRequested(m_selected);
 }
 
 void OverlayPanel::onOpacitySliderChanged(int val)
@@ -1122,233 +1179,81 @@ void OverlayPanel::onOpacitySliderChanged(int val)
     m_hudOpacity = val / 100.0f;
     for (auto *b : m_buttons) {
         b->setHudOpacity(m_hudOpacity);
-    }
-    update();
-}
-
-// ---------------------------------------------------------------------------
-// Node Interaction Slots
-// ---------------------------------------------------------------------------
-void OverlayPanel::onButtonEditRequested(OverlayButton *btn)
-{
-    selectButton(btn);
-}
-
-void OverlayPanel::onButtonPosChanged(OverlayButton *btn)
-{
-    if (m_selected == btn && m_coordsLabel) {
-        m_coordsLabel->setText(QString("X: %1 | Y: %2")
-                               .arg(btn->posRatio().x(), 0, 'f', 2)
-                               .arg(btn->posRatio().y(), 0, 'f', 2));
+        b->update();
     }
 }
 
-void OverlayPanel::onButtonDeleteRequested(OverlayButton *btn)
-{
-    if (!btn) return;
-    if (m_selected == btn) {
-        selectButton(nullptr);
-    }
-    m_buttons.removeAll(btn);
-    btn->deleteLater();
-    update();
-}
-
-void OverlayPanel::onButtonDuplicateRequested(OverlayButton *btn)
-{
-    if (!btn) return;
-    QPointF newPos(qMin(0.95, btn->posRatio().x() + 0.05),
-                   qMin(0.95, btn->posRatio().y() + 0.05));
-    auto *dup = createButton(btn->buttonType(), btn->label() + "_copy", btn->key(), newPos);
-    dup->setRadiusRatio(btn->radiusRatio());
-    dup->setJoystickKeys(btn->upKey(), btn->downKey(), btn->leftKey(), btn->rightKey());
-    dup->setSpeedRatios(btn->speedRatioX(), btn->speedRatioY());
-    dup->setSwitchMap(btn->switchMap());
-    selectButton(dup);
-}
-
-void OverlayPanel::onDeleteSelected()
-{
-    if (m_selected) {
-        onButtonDeleteRequested(m_selected);
-    }
-}
-
-void OverlayPanel::onDuplicateSelected()
-{
-    if (m_selected) {
-        onButtonDuplicateRequested(m_selected);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Preset Profile Management
-// ---------------------------------------------------------------------------
-void OverlayPanel::refreshProfileList()
-{
-    m_presetCombo->blockSignals(true);
-    m_presetCombo->clear();
-    m_presetCombo->addItem(tr("-- Select Preset --"));
-
-    QSet<QString> names;
-    const QList<QDir> dirs = { QDir(userKeymapDirectory()), QDir(defaultKeymapDirectory()) };
-    for (const auto &d : dirs) {
-        if (!d.exists()) continue;
-        const auto list = d.entryInfoList(QStringList() << "*.json", QDir::Files);
-        for (const auto &fi : list) {
-            if (!names.contains(fi.fileName())) {
-                names.insert(fi.fileName());
-                m_presetCombo->addItem(fi.fileName(), fi.absoluteFilePath());
-            }
-        }
-    }
-    m_presetCombo->blockSignals(false);
-}
-
-void OverlayPanel::onProfilePresetSelected(int index)
-{
-    if (index <= 0) return;
-    QString path = m_presetCombo->itemData(index).toString();
-    if (!path.isEmpty()) {
-        loadLayout(path);
-        QFileInfo fi(path);
-        m_profileEdit->setText(fi.baseName());
-        m_currentProfileName = fi.baseName();
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Serialization (Standard QtScrcpy JSON + Visual Metadata)
-// ---------------------------------------------------------------------------
+// ============================================================================
+//  SAVE / LOAD / APPLY
+// ============================================================================
 bool OverlayPanel::saveLayout()
 {
-    m_currentProfileName = m_profileEdit->text().trimmed();
-    if (m_currentProfileName.isEmpty()) {
-        m_currentProfileName = "custom_keymap";
-    }
+    QString dir  = userKeymapDirectory();
+    QDir().mkpath(dir);
+    QString path = dir + "/" + m_currentProfileName + ".json";
 
     QJsonObject root;
-    root["switchKey"] = m_switchKey.isEmpty() ? "Key_QuoteLeft" : m_switchKey;
+    root["switchKey"]      = m_switchKey;
+    root["formatVersion"]  = 2;
 
-    QJsonArray keyMapNodes;
+    // Visual data
+    QJsonArray vArr;
+    for (auto *b : m_buttons) vArr.append(b->toJson());
+    root["_visualButtons"] = vArr;
+
+    // Native QtScrcpy JSON format
+    QJsonArray nodes;
     QJsonObject mouseMoveMap;
-    bool hasAim = false;
-
-    // Build standard QtScrcpy keyMapNodes
-    for (auto *btn : m_buttons) {
-        if (!btn) continue;
-        if (btn->buttonType() == OverlayButtonType::Aim) {
-            hasAim = true;
-            mouseMoveMap["speedRatioX"] = static_cast<double>(btn->speedRatioX());
-            mouseMoveMap["speedRatioY"] = static_cast<double>(btn->speedRatioY());
-            mouseMoveMap["speedRatio"]  = 10;
-            QJsonObject startPos;
-            startPos["x"] = btn->posRatio().x();
-            startPos["y"] = btn->posRatio().y();
-            mouseMoveMap["startPos"] = startPos;
-            if (!btn->key().isEmpty()) {
-                m_switchKey = btn->key();
-            }
+    for (auto *b : m_buttons) {
+        if (b->buttonType() == OverlayButtonType::Aim || b->buttonType() == OverlayButtonType::FreeLook) {
+            QJsonObject sp; sp["x"] = b->posRatio().x(); sp["y"] = b->posRatio().y();
+            mouseMoveMap["startPos"]   = sp;
+            mouseMoveMap["speedRatioX"] = static_cast<double>(b->speedRatioX());
+            mouseMoveMap["speedRatioY"] = static_cast<double>(b->speedRatioY());
         } else {
-            keyMapNodes.append(btn->toKeyMapNode());
+            nodes.append(b->toKeyMapNode());
         }
     }
+    root["keyMapNodes"] = nodes;
+    if (!mouseMoveMap.isEmpty()) root["mouseMoveMap"] = mouseMoveMap;
 
-    root["switchKey"] = m_switchKey.isEmpty() ? "Key_QuoteLeft" : m_switchKey;
-
-    if (hasAim) {
-        root["mouseMoveMap"] = mouseMoveMap;
-    }
-    root["keyMapNodes"] = keyMapNodes;
-
-    // Visual configuration for pixel-perfect reload
-    QJsonArray visualArr;
-    for (auto *btn : m_buttons) {
-        if (btn) visualArr.append(btn->toJson());
-    }
-    root["_visualButtons"] = visualArr;
-
-    QString savePath = userKeymapDirectory() + "/" + m_currentProfileName + ".json";
-    QFile f(savePath);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        return false;
-    }
+    QFile f(path);
+    if (!f.open(QIODevice::WriteOnly)) return false;
     f.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
     f.close();
-
-    m_currentJsonPath = savePath;
-    emit layoutChanged();
+    m_currentJsonPath = path;
     return true;
 }
 
 void OverlayPanel::applyToDevice()
 {
-    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
-    if (!device) {
-        return;
-    }
+    if (m_currentJsonPath.isEmpty()) return;
+    if (!parentWidget()) return;
 
-    // Build standard compact script JSON for QtScrcpyCore
-    QJsonObject root;
-    QJsonArray keyMapNodes;
-    QJsonObject mouseMoveMap;
-    bool hasAim = false;
+    VideoForm *vf = qobject_cast<VideoForm *>(parentWidget());
+    if (!vf) return;
 
-    for (auto *btn : m_buttons) {
-        if (!btn) continue;
-        if (btn->buttonType() == OverlayButtonType::Aim) {
-            hasAim = true;
-            mouseMoveMap["speedRatioX"] = static_cast<double>(btn->speedRatioX());
-            mouseMoveMap["speedRatioY"] = static_cast<double>(btn->speedRatioY());
-            mouseMoveMap["speedRatio"]  = 10;
-            QJsonObject startPos;
-            startPos["x"] = btn->posRatio().x();
-            startPos["y"] = btn->posRatio().y();
-            mouseMoveMap["startPos"] = startPos;
-            if (!btn->key().isEmpty()) {
-                m_switchKey = btn->key();
-            }
-        } else {
-            keyMapNodes.append(btn->toKeyMapNode());
-        }
-    }
+    auto *device = vf->getDevice();
+    if (!device) return;
 
-    root["switchKey"] = m_switchKey.isEmpty() ? "Key_QuoteLeft" : m_switchKey;
+    QFile f(m_currentJsonPath);
+    if (!f.open(QIODevice::ReadOnly)) return;
+    QString script = QString::fromUtf8(f.readAll());
+    f.close();
 
-    if (hasAim) {
-        root["mouseMoveMap"] = mouseMoveMap;
-    }
-    root["keyMapNodes"] = keyMapNodes;
-
-    QString script = QString::fromUtf8(QJsonDocument(root).toJson(QJsonDocument::Compact));
     device->updateScript(script);
 
-    // CRITICAL: If custom keymap is not currently active on device, activate it immediately!
     if (!device->isCurrentCustomKeymap()) {
         QRect vArea = currentVideoGeometry();
         QSize widgetSize = vArea.size();
-        QSize frameSize = widgetSize;
-        if (VideoForm *vf = qobject_cast<VideoForm *>(parentWidget())) {
-            frameSize = vf->frameSize();
-        }
+        QSize frameSize  = vf->frameSize();
 
-        if (m_switchKey == "RightButton" || m_switchKey == "Right") {
-            QPointF localPt = vArea.center();
-            QPointF globalPt = mapToGlobal(vArea.center());
-            QMouseEvent pressEv(QEvent::MouseButtonPress, localPt, globalPt, Qt::RightButton, Qt::MouseButtons(Qt::RightButton), Qt::NoModifier);
-            QMouseEvent releaseEv(QEvent::MouseButtonRelease, localPt, globalPt, Qt::RightButton, Qt::NoButton, Qt::NoModifier);
-            emit device->mouseEvent(&pressEv, frameSize, widgetSize);
-            emit device->mouseEvent(&releaseEv, frameSize, widgetSize);
-        } else {
-            int switchQtKey = stringToQtKey(m_switchKey.isEmpty() ? "Key_QuoteLeft" : m_switchKey);
-            if (switchQtKey == Qt::Key_unknown) {
-                switchQtKey = Qt::Key_QuoteLeft;
-            }
-            QKeyEvent pressEv(QEvent::KeyPress, switchQtKey, Qt::NoModifier);
-            QKeyEvent releaseEv(QEvent::KeyRelease, switchQtKey, Qt::NoModifier);
-            emit device->keyEvent(&pressEv, frameSize, widgetSize);
-            emit device->keyEvent(&releaseEv, frameSize, widgetSize);
-        }
+        int switchQtKey = stringToQtKey(m_switchKey.isEmpty() ? "Key_QuoteLeft" : m_switchKey);
+        if (switchQtKey == Qt::Key_unknown) switchQtKey = Qt::Key_QuoteLeft;
+        QKeyEvent pressEv(QEvent::KeyPress, switchQtKey, Qt::NoModifier);
+        QKeyEvent relEv(QEvent::KeyRelease, switchQtKey, Qt::NoModifier);
+        emit device->keyEvent(&pressEv, frameSize, widgetSize);
+        emit device->keyEvent(&relEv, frameSize, widgetSize);
     }
 }
 
@@ -1364,22 +1269,15 @@ void OverlayPanel::loadLayout(const QString &jsonPath)
     QJsonObject root = doc.object();
     m_currentJsonPath = jsonPath;
 
-    // Clear existing buttons
-    for (auto *b : m_buttons) {
-        b->deleteLater();
-    }
+    for (auto *b : m_buttons) b->deleteLater();
     m_buttons.clear();
     selectButton(nullptr);
 
-    if (root.contains("switchKey")) {
-        m_switchKey = root["switchKey"].toString("Key_QuoteLeft");
-    }
+    if (root.contains("switchKey")) m_switchKey = root["switchKey"].toString("Key_QuoteLeft");
 
-    // Prefer visual companion data if present
     if (root.contains("_visualButtons")) {
-        QJsonArray arr = root["_visualButtons"].toArray();
-        for (const auto &val : arr) {
-            OverlayButton *b = OverlayButton::fromJson(val.toObject(), this);
+        for (const auto &val : root["_visualButtons"].toArray()) {
+            auto *b = OverlayButton::fromJson(val.toObject(), this);
             b->setEditMode(m_editMode);
             b->reposition(currentVideoGeometry());
             connect(b, &OverlayButton::editRequested,      this, &OverlayPanel::onButtonEditRequested);
@@ -1389,131 +1287,200 @@ void OverlayPanel::loadLayout(const QString &jsonPath)
             m_buttons.append(b);
             b->show();
         }
-    }
-    // Backward compatibility with legacy custom layout
-    else if (root.contains("buttons")) {
-        QJsonArray arr = root["buttons"].toArray();
-        for (const auto &val : arr) {
-            OverlayButton *b = OverlayButton::fromJson(val.toObject(), this);
-            b->setEditMode(m_editMode);
-            b->reposition(currentVideoGeometry());
-            connect(b, &OverlayButton::editRequested,      this, &OverlayPanel::onButtonEditRequested);
-            connect(b, &OverlayButton::posRatioChanged,    this, &OverlayPanel::onButtonPosChanged);
-            connect(b, &OverlayButton::deleteRequested,    this, &OverlayPanel::onButtonDeleteRequested);
-            connect(b, &OverlayButton::duplicateRequested, this, &OverlayPanel::onButtonDuplicateRequested);
-            m_buttons.append(b);
-            b->show();
-        }
-    }
-    // Load standard QtScrcpy keyMapNodes
-    else if (root.contains("keyMapNodes")) {
+    } else if (root.contains("keyMapNodes")) {
         if (root.contains("mouseMoveMap")) {
             QJsonObject mm = root["mouseMoveMap"].toObject();
             QJsonObject sp = mm["startPos"].toObject();
-            double sx = sp["x"].toDouble(0.65);
-            double sy = sp["y"].toDouble(0.45);
-            auto *aimBtn = createButton(OverlayButtonType::Aim, "Aim", m_switchKey, QPointF(sx, sy));
-            aimBtn->setSpeedRatios(
-                static_cast<float>(mm["speedRatioX"].toDouble(2.5)),
-                static_cast<float>(mm["speedRatioY"].toDouble(2.5))
-            );
+            auto *aimBtn = createButton(OverlayButtonType::Aim, "Aim", m_switchKey,
+                                        QPointF(sp["x"].toDouble(0.65), sp["y"].toDouble(0.45)));
+            aimBtn->setSpeedRatios(static_cast<float>(mm["speedRatioX"].toDouble(2.5)),
+                                   static_cast<float>(mm["speedRatioY"].toDouble(2.5)));
         }
-
-        QJsonArray nodes = root["keyMapNodes"].toArray();
-        for (const auto &val : nodes) {
+        for (const auto &val : root["keyMapNodes"].toArray()) {
             QJsonObject node = val.toObject();
             QString type = node["type"].toString();
             QString comment = node["comment"].toString();
-
             if (type == "KMT_CLICK") {
                 QJsonObject pos = node["pos"].toObject();
-                auto *btn = createButton(OverlayButtonType::Click, comment,
-                                         node["key"].toString(),
-                                         QPointF(pos["x"].toDouble(), pos["y"].toDouble()));
+                auto *btn = createButton(OverlayButtonType::Click, comment, node["key"].toString(),
+                                          QPointF(pos["x"].toDouble(), pos["y"].toDouble()));
                 btn->setSwitchMap(node["switchMap"].toBool(false));
-
             } else if (type == "KMT_CLICK_TWICE") {
                 QJsonObject pos = node["pos"].toObject();
-                createButton(OverlayButtonType::DoubleClick, comment,
-                             node["key"].toString(),
+                createButton(OverlayButtonType::DoubleClick, comment, node["key"].toString(),
                              QPointF(pos["x"].toDouble(), pos["y"].toDouble()));
-
             } else if (type == "KMT_STEER_WHEEL") {
                 QJsonObject cp = node["centerPos"].toObject();
                 auto *joy = createButton(OverlayButtonType::Joystick, comment, "WASD",
-                                         QPointF(cp["x"].toDouble(), cp["y"].toDouble()));
-                joy->setJoystickKeys(
-                    node["upKey"].toString("Key_W"),
-                    node["downKey"].toString("Key_S"),
-                    node["leftKey"].toString("Key_A"),
-                    node["rightKey"].toString("Key_D")
-                );
-
+                                          QPointF(cp["x"].toDouble(), cp["y"].toDouble()));
+                joy->setJoystickKeys(node["upKey"].toString("Key_W"), node["downKey"].toString("Key_S"),
+                                     node["leftKey"].toString("Key_A"), node["rightKey"].toString("Key_D"));
             } else if (type == "KMT_DRAG") {
                 QJsonObject sp = node["startPos"].toObject();
-                createButton(OverlayButtonType::Swipe, comment,
-                             node["key"].toString(),
+                createButton(OverlayButtonType::Swipe, comment, node["key"].toString(),
                              QPointF(sp["x"].toDouble(), sp["y"].toDouble()));
             }
         }
     }
-
     emit layoutChanged();
     update();
 }
 
-// ---------------------------------------------------------------------------
-// Action Bar Slots
-// ---------------------------------------------------------------------------
+// ============================================================================
+//  PROFILE MANAGEMENT
+// ============================================================================
+void OverlayPanel::refreshProfileList()
+{
+    if (!m_presetCombo) return;
+    m_presetCombo->blockSignals(true);
+    m_presetCombo->clear();
+
+    QString dir = userKeymapDirectory();
+    QDir d(dir);
+    QStringList files = d.entryList({"*.json"}, QDir::Files);
+    for (const auto &f : files) m_presetCombo->addItem(QFileInfo(f).baseName());
+
+    if (m_presetCombo->count() == 0) m_presetCombo->addItem("custom_keymap");
+    m_presetCombo->blockSignals(false);
+}
+
+void OverlayPanel::onProfilePresetSelected(int index)
+{
+    if (index < 0 || !m_presetCombo) return;
+    m_currentProfileName = m_presetCombo->itemText(index);
+    if (m_profileEdit) m_profileEdit->setText(m_currentProfileName);
+    QString path = userKeymapDirectory() + "/" + m_currentProfileName + ".json";
+    if (QFile::exists(path)) loadLayout(path);
+}
+
+// ============================================================================
+//  SAVE / IMPORT / EXPORT / CLEAR SLOTS
+// ============================================================================
 void OverlayPanel::onSaveAndApply()
 {
+    if (m_profileEdit && !m_profileEdit->text().isEmpty())
+        m_currentProfileName = m_profileEdit->text();
+
     saveLayout();
     applyToDevice();
-
-    // Switch to Play Mode with HUD enabled
     setEditMode(false);
     setOverlayVisible(true);
+    refreshProfileList();
 
-    // Toast notification
-    m_toastMessage = tr(" Keymap Applied & Active! Controls are working.");
+    m_toastMessage = "Keymap Applied & Active!";
     update();
-
-    QTimer::singleShot(3500, this, [this]() {
-        m_toastMessage.clear();
-        update();
-    });
+    QTimer::singleShot(3000, this, [this]() { m_toastMessage.clear(); update(); });
 }
 
-void OverlayPanel::onToggleHUD()
-{
-    setOverlayVisible(!m_overlayOn);
-}
+void OverlayPanel::onToggleHUD()  { setOverlayVisible(!m_overlayOn); }
+void OverlayPanel::onCloseEdit()  { setEditMode(false); }
 
 void OverlayPanel::onExportKeymap()
 {
     saveLayout();
-    QString srcPath = userKeymapDirectory() + "/" + m_currentProfileName + ".json";
-    QString destPath = QFileDialog::getSaveFileName(this, tr("Export Keymap JSON"),
-                                                    m_currentProfileName + ".json",
-                                                    tr("JSON Files (*.json)"));
-    if (!destPath.isEmpty()) {
-        if (QFile::exists(destPath)) {
-            QFile::remove(destPath);
-        }
-        if (QFile::copy(srcPath, destPath)) {
-            m_toastMessage = tr(" Keymap exported successfully!");
-        } else {
-            m_toastMessage = tr(" Failed to export keymap!");
-        }
+    QString src = userKeymapDirectory() + "/" + m_currentProfileName + ".json";
+    QString dest = QFileDialog::getSaveFileName(this, "Export Keymap", m_currentProfileName + ".json", "JSON (*.json)");
+    if (!dest.isEmpty()) {
+        if (QFile::exists(dest)) QFile::remove(dest);
+        bool ok = QFile::copy(src, dest);
+        m_toastMessage = ok ? "Exported successfully!" : "Export failed!";
         update();
-        QTimer::singleShot(3500, this, [this]() {
-            m_toastMessage.clear();
-            update();
-        });
+        QTimer::singleShot(3000, this, [this]() { m_toastMessage.clear(); update(); });
     }
 }
 
-void OverlayPanel::onCloseEdit()
+void OverlayPanel::onImportKeymap()
 {
-    setEditMode(false);
+    QString src = QFileDialog::getOpenFileName(this, "Import Keymap", "", "JSON (*.json)");
+    if (!src.isEmpty()) {
+        QString dest = userKeymapDirectory() + "/" + QFileInfo(src).baseName() + ".json";
+        if (QFile::exists(dest)) QFile::remove(dest);
+        if (QFile::copy(src, dest)) {
+            m_currentProfileName = QFileInfo(src).baseName();
+            refreshProfileList();
+            loadLayout(dest);
+            m_toastMessage = "Keymap imported!";
+        } else {
+            m_toastMessage = "Import failed!";
+        }
+        update();
+        QTimer::singleShot(3000, this, [this]() { m_toastMessage.clear(); update(); });
+    }
+}
+
+void OverlayPanel::onClearAll()
+{
+    if (QMessageBox::question(this, "Clear All", "Remove all buttons?") != QMessageBox::Yes) return;
+    for (auto *b : m_buttons) b->deleteLater();
+    m_buttons.clear();
+    selectButton(nullptr);
+    emit layoutChanged();
+}
+
+// ============================================================================
+//  HELPERS
+// ============================================================================
+QString OverlayPanel::userKeymapDirectory() const
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/keymap";
+}
+
+QString OverlayPanel::defaultKeymapDirectory() const
+{
+    return QCoreApplication::applicationDirPath() + "/keymap";
+}
+
+QString OverlayPanel::qtKeyToString(int key)
+{
+    if (key == Qt::Key_Space)      return "Key_Space";
+    if (key == Qt::Key_Tab)        return "Key_Tab";
+    if (key == Qt::Key_Escape)     return "Key_Escape";
+    if (key == Qt::Key_Return)     return "Key_Return";
+    if (key == Qt::Key_Backspace)  return "Key_Backspace";
+    if (key == Qt::Key_Shift)      return "Key_Shift";
+    if (key == Qt::Key_Control)    return "Key_Control";
+    if (key == Qt::Key_Alt)        return "Key_Alt";
+    if (key == Qt::Key_F1)         return "Key_F1";
+    if (key == Qt::Key_F2)         return "Key_F2";
+    if (key >= Qt::Key_A && key <= Qt::Key_Z)
+        return QString("Key_") + QChar(key);
+    if (key >= Qt::Key_0 && key <= Qt::Key_9)
+        return QString("Key_") + QChar(key);
+    if (key == Qt::Key_QuoteLeft)  return "Key_QuoteLeft";
+    if (key == Qt::Key_Minus)      return "Key_Minus";
+    if (key == Qt::Key_Equal)      return "Key_Equal";
+    if (key == Qt::Key_BracketLeft)return "Key_BracketLeft";
+    if (key == Qt::Key_BracketRight) return "Key_BracketRight";
+    if (key == Qt::Key_Semicolon)  return "Key_Semicolon";
+    if (key == Qt::Key_Apostrophe) return "Key_Apostrophe";
+    if (key == Qt::Key_Comma)      return "Key_Comma";
+    if (key == Qt::Key_Period)     return "Key_Period";
+    if (key == Qt::Key_Slash)      return "Key_Slash";
+    if (key == Qt::Key_Backslash)  return "Key_Backslash";
+    return QString("Key_%1").arg(key);
+}
+
+int OverlayPanel::stringToQtKey(const QString &s)
+{
+    if (s == "Key_Space")      return Qt::Key_Space;
+    if (s == "Key_Tab")        return Qt::Key_Tab;
+    if (s == "Key_Return")     return Qt::Key_Return;
+    if (s == "Key_Escape")     return Qt::Key_Escape;
+    if (s == "Key_Backspace")  return Qt::Key_Backspace;
+    if (s == "Key_Shift")      return Qt::Key_Shift;
+    if (s == "Key_Control")    return Qt::Key_Control;
+    if (s == "Key_Alt")        return Qt::Key_Alt;
+    if (s == "Key_QuoteLeft")  return Qt::Key_QuoteLeft;
+    if (s.startsWith("Key_") && s.length() == 5) {
+        QChar c = s[4];
+        if (c.isLetter()) return c.toUpper().unicode();
+        if (c.isDigit())  return c.unicode();
+    }
+    return Qt::Key_unknown;
+}
+
+QString OverlayPanel::keyToDisplayLabel(const QString &k)
+{
+    if (k.startsWith("Key_")) return k.mid(4);
+    return k;
 }

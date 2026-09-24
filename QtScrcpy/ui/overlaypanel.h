@@ -11,29 +11,27 @@
 #include <QLineEdit>
 #include <QSlider>
 #include <QCheckBox>
+#include <QSpinBox>
+#include <QTabWidget>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QRect>
+#include <QTimer>
+#include <QListWidget>
 
 #include "overlaybutton.h"
 
 /**
  * @brief Professional Embedded Overlay and Keymap Studio for VideoForm.
  *
- * In Edit Mode:
- *  - Displays transparent tactical grid over phone video.
- *  - Right-side docking panel with Add controls, Live Key Recorder, and Property Inspector.
- *  - Real-time drag & drop with boundary clamping.
- *  - Double-click on canvas creates a new button instantly.
- *
- * In Play Mode:
- *  - Overlay buttons remain visible as a clean semi-transparent gaming HUD.
- *  - WA_TransparentForMouseEvents is TRUE so all mouse clicks and movements
- *    pass directly through to VideoForm and the phone.
- *  - Focus is released to VideoForm so keyboard events are dispatched immediately.
- *  - Save & Apply compiles standard QtScrcpy JSON, applies it to the device via
- *    IDevice::updateScript(), and activates custom keymap mode automatically!
+ * Features:
+ *  - Full TC Gaming / WASD+ button set (Fire, Scope, WASD, Aim, Macro, Spray, etc.)
+ *  - Tabbed sidebar: Basic Controls | Advanced | Macros | Settings
+ *  - Live Properties Inspector per selected button
+ *  - Import / Export JSON profiles
+ *  - Clear All / Duplicate / Delete
+ *  - HUD opacity control
  */
 class OverlayPanel : public QWidget
 {
@@ -43,18 +41,14 @@ public:
     explicit OverlayPanel(const QString &serial, QWidget *parent = nullptr);
     ~OverlayPanel();
 
-    // Called on parent resize to keep overlay and buttons pixel-perfect
     void onParentResized();
 
-    // Edit vs Play mode
     void setEditMode(bool edit);
     bool isEditMode() const { return m_editMode; }
 
-    // Visual HUD display toggle
     void setOverlayVisible(bool v);
     bool isOverlayVisible() const { return m_overlayOn; }
 
-    // Load & Save
     void loadLayout(const QString &jsonPath);
     bool saveLayout();
     void applyToDevice();
@@ -66,27 +60,45 @@ signals:
     void layoutChanged();
 
 protected:
-    void resizeEvent(QResizeEvent *e)       override;
-    void paintEvent(QPaintEvent  *e)        override;
-    void mousePressEvent(QMouseEvent *e)    override;
-    void mouseDoubleClickEvent(QMouseEvent *e) override;
-    void keyPressEvent(QKeyEvent *e)        override;
-    void keyReleaseEvent(QKeyEvent *e)      override;
+    void resizeEvent(QResizeEvent *e)           override;
+    void paintEvent(QPaintEvent  *e)            override;
+    void mousePressEvent(QMouseEvent *e)        override;
+    void mouseDoubleClickEvent(QMouseEvent *e)  override;
+    void keyPressEvent(QKeyEvent *e)            override;
+    void keyReleaseEvent(QKeyEvent *e)          override;
 
 private slots:
+    // --- Add buttons (Basic tab) ---
     void onAddClick();
     void onAddDoubleClick();
+    void onAddRightClick();
+    void onAddMiddleClick();
     void onAddJoystick();
     void onAddAim();
     void onAddSwipe();
+    void onAddFreeLook();
+
+    // --- Add buttons (Game Controls tab) ---
     void onAddFire();
     void onAddScope();
-    void onAddFreeLook();
+    void onAddJump();
+    void onAddProne();
+    void onAddGrenade();
     void onAddMap();
     void onAddBag();
+    void onAddVehicle();
+    void onAddSkill();
+
+    // --- Add buttons (Advanced tab) ---
+    void onAddMacro();
+    void onAddSpray();
+
+    // --- Old compat slots ---
     void onSetLeftClick();
     void onSetRightClick();
     void onSetMidClick();
+
+    // --- Properties ---
     void onOpacitySliderChanged(int val);
     void onSaveAndApply();
     void onExportKeymap();
@@ -96,20 +108,33 @@ private slots:
     void onCloseEdit();
     void onDeleteSelected();
     void onDuplicateSelected();
+    void onApplyProps();
+    void onRecordKeyClicked();
+    void onProfilePresetSelected(int index);
+    void onMacroStepAdd();
+    void onMacroStepRemove();
+
+    // --- Button callbacks ---
     void onButtonEditRequested(OverlayButton *btn);
     void onButtonPosChanged(OverlayButton *btn);
     void onButtonDeleteRequested(OverlayButton *btn);
     void onButtonDuplicateRequested(OverlayButton *btn);
-    void onApplyProps();
-    void onRecordKeyClicked();
-    void onProfilePresetSelected(int index);
+    void onButtonSelected(OverlayButton *btn);
 
 private:
     void buildSidePanel();
+    void buildBasicTab(QWidget *tab);
+    void buildGameTab(QWidget *tab);
+    void buildAdvancedTab(QWidget *tab);
+    void buildPropsPanel(QVBoxLayout *layout);
+    void buildSettingsTab(QWidget *tab);
+
     void updateSidePanelGeometry();
     void selectButton(OverlayButton *btn);
     void refreshProfileList();
     void populatePropsFromButton(OverlayButton *btn);
+    void clearPropsPanel();
+    void showPropsForType(OverlayButtonType type);
     QString userKeymapDirectory() const;
     QString defaultKeymapDirectory() const;
 
@@ -118,68 +143,82 @@ private:
                                 const QString &key,
                                 QPointF posRatio);
 
-    // Helpers for key conversions
     static QString qtKeyToString(int key);
     static int stringToQtKey(const QString &keyStr);
     static QString keyToDisplayLabel(const QString &keyStr);
 
-    // State
+    // ---- State ----
     QString m_serial;
     QString m_currentJsonPath;
     QString m_currentProfileName = "custom_keymap";
-    QString m_switchKey = "Key_QuoteLeft";
-    bool    m_editMode    = false;
-    bool    m_overlayOn   = true;
-    bool    m_recordingKey = false;
+    QString m_switchKey          = "Key_QuoteLeft";
+    bool    m_editMode           = false;
+    bool    m_overlayOn          = true;
+    bool    m_recordingKey       = false;
     QString m_toastMessage;
-    int     m_toastTimer  = 0;
+    int     m_toastTimer         = 0;
 
-    // Buttons
     QList<OverlayButton *> m_buttons;
     OverlayButton         *m_selected = nullptr;
 
-    // UI Widgets in Side Panel
-    QFrame      *m_sidePanel      = nullptr;
-    QLineEdit   *m_profileEdit    = nullptr;
-    QComboBox   *m_presetCombo    = nullptr;
+    // ---- Side Panel ----
+    QFrame     *m_sidePanel    = nullptr;
+    QTabWidget *m_tabs         = nullptr;
+    QComboBox  *m_presetCombo  = nullptr;
+    QLineEdit  *m_profileEdit  = nullptr;
 
-    // Inspector widgets
-    QWidget     *m_propsWidget    = nullptr;
-    QLabel      *m_selTypeLabel   = nullptr;
-    QLineEdit   *m_labelEdit      = nullptr;
-    QPushButton *m_recordKeyBtn   = nullptr;
-    QLineEdit   *m_keyEdit        = nullptr;
-    QSlider     *m_sizeSlider     = nullptr;
-    QLabel      *m_coordsLabel    = nullptr;
+    // ---- Properties Inspector ----
+    QWidget    *m_propsWidget    = nullptr;
+    QLabel     *m_selTypeLabel   = nullptr;
+    QLineEdit  *m_labelEdit      = nullptr;
+    QPushButton*m_recordKeyBtn   = nullptr;
+    QLineEdit  *m_keyEdit        = nullptr;
+    QSlider    *m_sizeSlider     = nullptr;
+    QLabel     *m_coordsLabel    = nullptr;
 
-    // Joystick specific controls
-    QWidget     *m_joyGroup       = nullptr;
-    QLineEdit   *m_joyUpEdit      = nullptr;
-    QLineEdit   *m_joyDownEdit    = nullptr;
-    QLineEdit   *m_joyLeftEdit    = nullptr;
-    QLineEdit   *m_joyRightEdit   = nullptr;
+    // Joystick props
+    QWidget    *m_joyGroup       = nullptr;
+    QLineEdit  *m_joyUpEdit      = nullptr;
+    QLineEdit  *m_joyDownEdit    = nullptr;
+    QLineEdit  *m_joyLeftEdit    = nullptr;
+    QLineEdit  *m_joyRightEdit   = nullptr;
 
-    // Aim specific controls
-    QWidget     *m_aimGroup       = nullptr;
-    QSlider     *m_speedXSlider   = nullptr;
-    QSlider     *m_speedYSlider   = nullptr;
-    QLabel      *m_speedValLabel  = nullptr;
+    // Aim props
+    QWidget    *m_aimGroup       = nullptr;
+    QSlider    *m_speedXSlider   = nullptr;
+    QSlider    *m_speedYSlider   = nullptr;
+    QLabel     *m_speedValLabel  = nullptr;
 
-    // Click specific controls
-    QWidget     *m_clickGroup     = nullptr;
-    QCheckBox   *m_switchMapCheck = nullptr;
+    // Click props
+    QWidget    *m_clickGroup     = nullptr;
+    QCheckBox  *m_switchMapCheck = nullptr;
 
-    // HUD Opacity
-    QSlider     *m_opacitySlider  = nullptr;
-    float        m_hudOpacity     = 0.85f;
+    // Spray props
+    QWidget    *m_sprayGroup     = nullptr;
+    QSpinBox   *m_sprayInterval  = nullptr;
+
+    // Macro props
+    QWidget      *m_macroGroup   = nullptr;
+    QListWidget  *m_macroList    = nullptr;
+    QLineEdit    *m_macroKeyEdit = nullptr;
+    QSpinBox     *m_macroDelay   = nullptr;
+
+    // Swipe end
+    QWidget    *m_swipeGroup     = nullptr;
+    QLineEdit  *m_swipeEndXEdit  = nullptr;
+    QLineEdit  *m_swipeEndYEdit  = nullptr;
+
+    // HUD
+    QSlider    *m_opacitySlider  = nullptr;
+    float       m_hudOpacity     = 0.85f;
 
     // Action buttons
-    QPushButton *m_deleteBtn      = nullptr;
-    QPushButton *m_saveBtn        = nullptr;
-    QPushButton *m_hudToggleBtn   = nullptr;
-    QPushButton *m_closeBtn       = nullptr;
-    QPushButton *m_importBtn      = nullptr;
-    QPushButton *m_clearAllBtn    = nullptr;
+    QPushButton *m_deleteBtn     = nullptr;
+    QPushButton *m_saveBtn       = nullptr;
+    QPushButton *m_hudToggleBtn  = nullptr;
+    QPushButton *m_closeBtn      = nullptr;
+    QPushButton *m_importBtn     = nullptr;
+    QPushButton *m_clearAllBtn   = nullptr;
 };
 
 #endif // OVERLAYPANEL_H
