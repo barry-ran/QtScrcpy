@@ -1233,7 +1233,7 @@ void OverlayPanel::applyToDevice()
     VideoForm *vf = qobject_cast<VideoForm *>(parentWidget());
     if (!vf) return;
 
-    auto *device = vf->getDevice();
+    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (!device) return;
 
     QFile f(m_currentJsonPath);
