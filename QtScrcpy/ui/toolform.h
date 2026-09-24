@@ -59,6 +59,8 @@ private slots:
     void on_clipboardBtn_clicked();
     // NEW: keymap manager button
     void on_keymapBtn_clicked();
+    void on_turboBtn_clicked();
+    void on_deviceInfoBtn_clicked();
 
 private:
     void initStyle();

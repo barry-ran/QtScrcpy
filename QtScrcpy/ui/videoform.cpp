@@ -26,6 +26,12 @@
 #include "ui_videoform.h"
 #include "videoform.h"
 #include "overlaypanel.h"
+#include "deviceinfooverlay.h"
+#include "recoilassist.h"
+#include "turbomode.h"
+#include "deviceinfooverlay.h"
+#include "recoilassist.h"
+#include "turbomode.h"
 
 #ifdef Q_OS_MACOS
 #include "metalvideowindow.h"
@@ -229,6 +235,13 @@ void VideoForm::updateRender(int width, int height, uint8_t* dataY, uint8_t* dat
 void VideoForm::setSerial(const QString &serial)
 {
     m_serial = serial;
+
+    // Initialize recoil assist system
+    if (!m_recoilAssist) {
+        m_recoilAssist = new RecoilAssist(this);
+        connect(m_recoilAssist, &RecoilAssist::compensationMove,
+                this, &VideoForm::applyRecoilCompensation);
+    }
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     m_flexDisplay = device && device->isFlexDisplay();
     if (m_flexDisplay) {
@@ -712,6 +725,13 @@ void VideoForm::staysOnTop(bool top)
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+
+    if (event->button() == Qt::LeftButton && device && device->isCurrentCustomKeymap()) {
+        if (m_recoilAssist) {
+            m_recoilAssist->setEnabled(true); // TODO: maybe read from a setting
+            m_recoilAssist->onFirePressed();
+        }
+    }
     if (event->button() == Qt::MiddleButton) {
         if (device && !device->isCurrentCustomKeymap()) {
             device->postGoHome();
@@ -765,6 +785,10 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+
+    if (event->button() == Qt::LeftButton && m_recoilAssist) {
+        m_recoilAssist->onFireReleased();
+    }
     if (m_dragPosition.isNull()) {
         if (!device) {
             return;
@@ -1006,9 +1030,21 @@ void VideoForm::resizeEvent(QResizeEvent *event)
     }
 }
 
+void VideoForm::moveEvent(QMoveEvent *event)
+{
+    QWidget::moveEvent(event);
+    // Keep overlay panel aligned when this window moves
+    if (m_overlayPanel && m_overlayPanel->isVisible()) {
+        QPoint globalPos = mapToGlobal(QPoint(0, 0));
+        m_overlayPanel->move(globalPos);
+    }
+}
+
 void VideoForm::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
+    if (m_overlayPanel) m_overlayPanel->close();
+    if (m_deviceInfoOverlay) m_deviceInfoOverlay->stopPolling();
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (!device) {
         return;
@@ -1061,17 +1097,67 @@ void VideoForm::dropEvent(QDropEvent *event)
 void VideoForm::toggleKeymapEdit()
 {
     if (!m_overlayPanel) {
-        m_overlayPanel = new OverlayPanel(m_serial, this);
+        // CRITICAL FIX: OverlayPanel is created as a TOP-LEVEL window with no parent.
+        // This prevents it from sharing the OpenGL native window, which caused video to freeze.
+        m_overlayPanel = new OverlayPanel(m_serial, nullptr);
+        m_overlayPanel->setWindowFlags(
+            Qt::Tool |
+            Qt::FramelessWindowHint |
+            Qt::WindowStaysOnTopHint
+        );
+        m_overlayPanel->setAttribute(Qt::WA_TranslucentBackground, true);
     }
-    m_overlayPanel->setGeometry(0, 0, width(), height());
-    m_overlayPanel->onParentResized();
-    m_overlayPanel->show();
-    m_overlayPanel->raise();
+
     bool entering = !m_overlayPanel->isEditMode();
-    m_overlayPanel->setEditMode(entering);
+
     if (entering) {
+        // Position overlay exactly over the VideoForm window
+        QPoint globalPos = mapToGlobal(QPoint(0, 0));
+        m_overlayPanel->setGeometry(globalPos.x(), globalPos.y(), width(), height());
+        m_overlayPanel->onParentResized();
+        m_overlayPanel->show();
+        m_overlayPanel->raise();
+        m_overlayPanel->activateWindow();
+        m_overlayPanel->setEditMode(true);
         m_overlayPanel->setOverlayVisible(true);
+    } else {
+        m_overlayPanel->setEditMode(false);
     }
+}
+
+void VideoForm::toggleTurboMode()
+{
+    if (!m_turboMode) {
+        m_turboMode = new TurboMode(this);
+        m_turboMode->setSerial(m_serial);
+    }
+    m_turboMode->toggle();
+}
+
+void VideoForm::toggleDeviceInfo()
+{
+    if (!m_deviceInfoOverlay) {
+        m_deviceInfoOverlay = new DeviceInfoOverlay(m_serial, this);
+    }
+    if (m_deviceInfoOverlay->isVisible()) {
+        m_deviceInfoOverlay->stopPolling();
+    } else {
+        m_deviceInfoOverlay->startPolling();
+    }
+}
+
+void VideoForm::applyRecoilCompensation(int dx, int dy)
+{
+#if defined(Q_OS_WIN32)
+    INPUT input = {};
+    input.type = INPUT_MOUSE;
+    input.mi.dwFlags = MOUSEEVENTF_MOVE;
+    input.mi.dx = dx;
+    input.mi.dy = dy;
+    SendInput(1, &input, sizeof(INPUT));
+#else
+    Q_UNUSED(dx) Q_UNUSED(dy)
+#endif
 }
 
 ToolForm* VideoForm::toolForm() const { return m_toolForm; }

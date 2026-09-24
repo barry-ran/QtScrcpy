@@ -328,6 +328,22 @@ void ToolForm::on_keymapBtn_clicked()
     }
 }
 
+void ToolForm::on_turboBtn_clicked()
+{
+    VideoForm *vf = qobject_cast<VideoForm *>(parent());
+    if (vf) {
+        vf->toggleTurboMode();
+    }
+}
+
+void ToolForm::on_deviceInfoBtn_clicked()
+{
+    VideoForm *vf = qobject_cast<VideoForm *>(parent());
+    if (vf) {
+        vf->toggleDeviceInfo();
+    }
+}
+
 void ToolForm::autoResizeToParent()
 {
     QWidget *parentW = adsorbWidget() ? adsorbWidget() : parentWidget();
@@ -335,7 +351,7 @@ void ToolForm::autoResizeToParent()
     int parentH = parentW->height();
     if (parentH <= 50) return;
 
-    int btnCount = 20;
+    int btnCount = 22;
     int availableH = parentH - 24;
     int desiredBtnH = qBound(18, availableH / btnCount, 30);
     int desiredSpacing = (desiredBtnH < 24) ? 1 : 2;
@@ -367,6 +383,8 @@ void ToolForm::autoResizeToParent()
     IconHelper::Instance()->SetIcon(ui->groupControlBtn, QChar(0xf0c0), iconSize);
     IconHelper::Instance()->SetIcon(ui->clipboardBtn, QChar(0xf0c5), iconSize);
     IconHelper::Instance()->SetIcon(ui->keymapBtn, QChar(0xf11b), iconSize);
+    IconHelper::Instance()->SetIcon(ui->turboBtn, QChar(0xf0e7), iconSize); // lightning bolt
+    IconHelper::Instance()->SetIcon(ui->deviceInfoBtn, QChar(0xf240), iconSize); // battery
     IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), iconSize);
     IconHelper::Instance()->SetIcon(ui->cameraZoomOutBtn, QChar(0xf010), iconSize);
     IconHelper::Instance()->SetIcon(ui->cameraZoomInBtn, QChar(0xf00e), iconSize);

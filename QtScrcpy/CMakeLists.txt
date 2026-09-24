@@ -1,4 +1,4 @@
-# For VS2019 and Xcode 12+ support.
+﻿# For VS2019 and Xcode 12+ support.
 cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
 #
@@ -185,6 +185,12 @@ set(QC_UI_SOURCES
     ui/overlaybutton.cpp
     ui/overlaypanel.h
     ui/overlaypanel.cpp
+    ui/deviceinfooverlay.h
+    ui/deviceinfooverlay.cpp
+    ui/recoilassist.h
+    ui/recoilassist.cpp
+    ui/turbomode.h
+    ui/turbomode.cpp
     ui/toolform.ui
     ui/videoform.h
     ui/videoform.cpp
@@ -239,7 +245,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         util/path.mm
     )
 
-    # MetalVideoWindow (Apple Silicon VideoToolbox + Metal æ¸²æŸ“)
+    # MetalVideoWindow (Apple Silicon VideoToolbox + Metal Ã¦Â¸Â²Ã¦Å¸â€œ)
     set(QC_UI_SOURCES ${QC_UI_SOURCES}
         render/metalvideowindow.h
         render/metalvideowindow.mm
@@ -276,7 +282,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     )
 endif()
 
-# ç¿»è¯‘ç›¸å…³ï¼ˆä½¿ç”¨shellè„šæœ¬æ›¿ä»£cmakeå¤„ç†ç¿»è¯‘ï¼‰
+# Ã§Â¿Â»Ã¨Â¯â€˜Ã§â€ºÂ¸Ã¥â€¦Â³Ã¯Â¼Ë†Ã¤Â½Â¿Ã§â€Â¨shellÃ¨â€žÅ¡Ã¦Å“Â¬Ã¦â€ºÂ¿Ã¤Â»Â£cmakeÃ¥Â¤â€žÃ§Ââ€ Ã§Â¿Â»Ã¨Â¯â€˜Ã¯Â¼â€°
 # add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/res/i18n)
 
 # all sources
@@ -321,10 +327,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE render)
 get_property(QC_IS_MUTIL_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 message(STATUS "multi config:" QC_IS_MUTIL_CONFIG)
 
-# $<0:> ä½¿ç”¨ç”Ÿæˆå™¨è¡¨è¾¾å¼ä¸ºæ¯ä¸ªconfigè®¾ç½®RUNTIME_OUTPUT_DIRECTORYï¼Œè¿™æ ·multi configå°±ä¸ä¼šè‡ªåŠ¨è¿½åŠ CMAKE_BUILD_TYPEå­ç›®å½•äº†
-# 1. multi configä»‹ç» https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
-# 2. multi configåœ¨ä¸ç”¨è¡¨è¾¾å¼ç”Ÿæˆå™¨æ—¶è‡ªåŠ¨è¿½åŠ å­ç›®å½•è¯´æ˜Ž https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
-# 3. ä½¿ç”¨è¡¨è¾¾å¼ç”Ÿæˆå™¨ç¦æ­¢multi configè‡ªåŠ¨è¿½åŠ å­ç›®å½•è§£å†³æ–¹æ¡ˆ https://stackoverflow.com/questions/7747857/in-cmake-how-do-i-work-around-the-debug-and-release-directories-visual-studio-2
+# $<0:> Ã¤Â½Â¿Ã§â€Â¨Ã§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼ÂÃ¤Â¸ÂºÃ¦Â¯ÂÃ¤Â¸ÂªconfigÃ¨Â®Â¾Ã§Â½Â®RUNTIME_OUTPUT_DIRECTORYÃ¯Â¼Å’Ã¨Â¿â„¢Ã¦Â Â·multi configÃ¥Â°Â±Ã¤Â¸ÂÃ¤Â¼Å¡Ã¨â€¡ÂªÃ¥Å Â¨Ã¨Â¿Â½Ã¥Å Â CMAKE_BUILD_TYPEÃ¥Â­ÂÃ§â€ºÂ®Ã¥Â½â€¢Ã¤Âºâ€ 
+# 1. multi configÃ¤Â»â€¹Ã§Â»Â https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
+# 2. multi configÃ¥Å“Â¨Ã¤Â¸ÂÃ§â€Â¨Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼ÂÃ§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨Ã¦â€”Â¶Ã¨â€¡ÂªÃ¥Å Â¨Ã¨Â¿Â½Ã¥Å Â Ã¥Â­ÂÃ§â€ºÂ®Ã¥Â½â€¢Ã¨Â¯Â´Ã¦ËœÅ½ https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
+# 3. Ã¤Â½Â¿Ã§â€Â¨Ã¨Â¡Â¨Ã¨Â¾Â¾Ã¥Â¼ÂÃ§â€Å¸Ã¦Ë†ÂÃ¥â„¢Â¨Ã§Â¦ÂÃ¦Â­Â¢multi configÃ¨â€¡ÂªÃ¥Å Â¨Ã¨Â¿Â½Ã¥Å Â Ã¥Â­ÂÃ§â€ºÂ®Ã¥Â½â€¢Ã¨Â§Â£Ã¥â€ Â³Ã¦â€“Â¹Ã¦Â¡Ë† https://stackoverflow.com/questions/7747857/in-cmake-how-do-i-work-around-the-debug-and-release-directories-visual-studio-2
 set_target_properties(${PROJECT_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}/$<0:>"
 )

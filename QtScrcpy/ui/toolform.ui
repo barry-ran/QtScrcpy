@@ -41,6 +41,26 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="turboBtn">
+     <property name="toolTip">
+      <string>Turbo/Burst Mode</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="deviceInfoBtn">
+     <property name="toolTip">
+      <string>Device Info (Temp/Battery)</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="fullScreenBtn">
      <property name="toolTip">
       <string>full screen (Ctrl+F)</string>

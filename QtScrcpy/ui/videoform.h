@@ -18,6 +18,10 @@ class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
 class MetalVideoWidget;
+class DeviceInfoOverlay;
+class RecoilAssist;
+class TurboMode;
+
 class VideoForm : public QWidget, public qsc::DeviceObserver
 {
     Q_OBJECT
@@ -35,7 +39,9 @@ public:
     void removeBlackRect();
     void showFPS(bool show);
     void switchFullScreen();
-    void toggleKeymapEdit(); ///< called by ToolForm keymapBtn
+    void toggleKeymapEdit();    ///< called by ToolForm keymapBtn
+    void toggleTurboMode();     ///< Turbo/Burst mode
+    void toggleDeviceInfo();    ///< Battery + Temp overlay
     bool isHost();
     QWidget* videoWidget() const;
     ToolForm* toolForm() const;
@@ -43,7 +49,6 @@ public:
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
                  int linesizeY, int linesizeU, int linesizeV) override;
-    // VideoToolbox Metal Ã¨Â·Â¯Ã¥Â¾â€žÃ¥Â¸Â§Ã¥â€ºÅ¾Ã¨Â°Æ’Ã¯Â¼Ë†Ã¤Â»â€¦ macOS arm64Ã¯Â¼â€°
     void onFrameMetal(void* cvPixelBuffer, int width, int height) override;
     void updateFPS(quint32 fps) override;
     void onVideoSessionChanged(const QSize &size, bool clientResized) override;
@@ -58,6 +63,9 @@ private:
     void installShortcut();
     QRect getScreenRect();
 
+    // Recoil assist: apply WinAPI relative mouse move
+    void applyRecoilCompensation(int dx, int dy);
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -71,6 +79,7 @@ protected:
     void showEvent(QShowEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
 
     void dragEnterEvent(QDragEnterEvent *event) override;
     void dragMoveEvent(QDragMoveEvent *event) override;
@@ -78,41 +87,41 @@ protected:
     void dropEvent(QDropEvent *event) override;
 
 private:
-    // Ã¨Å½Â·Ã¥Ââ€“Ã¥Â½â€œÃ¥â€°ÂÃ¨Â§â€ Ã©Â¢â€˜Ã¦Â¸Â²Ã¦Å¸â€œ widgetÃ¯Â¼Ë†OpenGL Ã¦Ë†â€“ Metal Ã¥Â®Â¹Ã¥â„¢Â¨Ã¯Â¼â€°
-    // Ã¦ËœÂ¯Ã¥ÂÂ¦Ã¤Â½Â¿Ã§â€Â¨ Metal Ã¦Â¸Â²Ã¦Å¸â€œÃ¨Â·Â¯Ã¥Â¾â€ž
     bool isMetalMode() const;
 
-    // ui
+    // UI
     Ui::videoForm *ui;
-    QPointer<ToolForm> m_toolForm;
-    QPointer<QWidget> m_loadingWidget;
-    QPointer<QYUVOpenGLWidget> m_videoWidget;
+    QPointer<ToolForm>          m_toolForm;
+    QPointer<QWidget>           m_loadingWidget;
+    QPointer<QYUVOpenGLWidget>  m_videoWidget;
+    QPointer<MetalVideoWidget>  m_metalWidget;
+    QPointer<QLabel>            m_fpsLabel;
 
-    // Metal Ã¦Â¸Â²Ã¦Å¸â€œÃ¨Â·Â¯Ã¥Â¾â€žÃ¯Â¼Ë†Ã¤Â»â€¦ macOS arm64Ã¯Â¼â€°
-    QPointer<MetalVideoWidget> m_metalWidget;
-
-    QPointer<QLabel> m_fpsLabel;
-
-    //inside member
-    QSize m_frameSize;
-    QSize m_normalSize;
-    QPoint m_dragPosition;
-    float m_widthHeightRatio = 0.5f;
-    bool m_skin = true;
-    QPoint m_fullScreenBeforePos;
+    // Inside member
+    QSize   m_frameSize;
+    QSize   m_normalSize;
+    QPoint  m_dragPosition;
+    float   m_widthHeightRatio = 0.5f;
+    bool    m_skin             = true;
+    QPoint  m_fullScreenBeforePos;
     QString m_serial;
-    int m_decodeMode = 0;
-    bool m_metalFirstFrame = true;  // Metal Ã©Â¦â€“Ã¦Â¬Â¡Ã¥Â¸Â§Ã¦Â â€¡Ã¨Â®Â°
-    bool m_flexDisplay = false;
-    bool m_preventAutoResize = false;
-    QTimer m_flexResizeTimer;
-    QSize m_pendingDisplaySize;
+    int     m_decodeMode       = 0;
+    bool    m_metalFirstFrame  = true;
+    bool    m_flexDisplay      = false;
+    bool    m_preventAutoResize = false;
+    QTimer  m_flexResizeTimer;
+    QSize   m_pendingDisplaySize;
 
-    QPointer<OverlayPanel> m_overlayPanel;
+    // Overlay: separate top-level window to avoid blocking OpenGL
+    QPointer<OverlayPanel>      m_overlayPanel;
 
-    //Whether to display the toolbar when connecting a device.
+    // New features
+    QPointer<DeviceInfoOverlay> m_deviceInfoOverlay;
+    QPointer<RecoilAssist>      m_recoilAssist;
+    QPointer<TurboMode>         m_turboMode;
+
+    // Whether to display the toolbar when connecting a device.
     bool show_toolbar = true;
 };
 
 #endif // VIDEOFORM_H
-
