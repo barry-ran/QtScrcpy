@@ -366,6 +366,7 @@ void Dialog::initAdvancedDisplayUi()
     m_advancedDisplayGroup->setCheckable(true);
     m_advancedDisplayGroup->setChecked(false);
     auto *layout = new QFormLayout(m_advancedDisplayGroup);
+    layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
     m_displayModeBox = new QComboBox(m_advancedDisplayGroup);
     m_displayModeBox->addItem(tr("Primary display"));
@@ -435,6 +436,7 @@ void Dialog::initAdvancedConfigUi(QWidget *parent)
 
     auto *group = new QGroupBox(tr("Application configuration"), content);
     auto *layout = new QFormLayout(group);
+    layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
     m_configLanguageBox = new QComboBox(group);
     m_configLanguageBox->addItem(tr("Automatic"), "Auto");
