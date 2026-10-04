@@ -970,7 +970,13 @@ void VideoForm::showEvent(QShowEvent *event)
     Q_UNUSED(event)
     // 窗口每次显示时先做一次越界检查，处理"上次退出时窗口位于副屏、
     // 本次启动副屏已不存在"导致窗口出现在屏幕外的情况。
+    //
+    // Dialog::onDeviceConnected 会先 setGeometry(savedRect) 再 show()，
+    // 因此这里能捕获到从配置中恢复出来的屏外坐标。
     ensureOnScreen();
+    // 窗口显示后 Qt 仍可能根据尺寸/边框策略再做一次位置调整，
+    // 故稍后复查一次，确保最终位置落在屏内。
+    QTimer::singleShot(300, this, [this]() { ensureOnScreen(); });
     if (!isFullScreen() && this->show_toolbar) {
         QTimer::singleShot(500, this, [this](){
             showToolForm(this->show_toolbar);
