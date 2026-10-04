@@ -52,6 +52,22 @@ VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int deco
     if (framelessWindow) {
         setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     }
+
+    // 监听显示器增删：副屏被拔掉时，位于该屏幕上的窗口会变成"幽灵窗口"
+    // （坐标仍在已断开的屏幕区域）。这里在屏幕配置变化后做一次越界检查，
+    // 必要时把窗口移回主屏。延迟执行是为了等 Qt/系统完成屏幕布局更新。
+    //
+    // Windows 上 screenRemoved 的触发时机与屏幕布局更新并不完全同步，
+    // 因此做多次延迟重试，确保在布局稳定后仍能完成回收。
+    connect(qApp, &QGuiApplication::screenAdded, this, [this]() {
+        QTimer::singleShot(300, this, [this]() { ensureOnScreen(); });
+        QTimer::singleShot(1000, this, [this]() { ensureOnScreen(); });
+    });
+    connect(qApp, &QGuiApplication::screenRemoved, this, [this]() {
+        QTimer::singleShot(300, this, [this]() { ensureOnScreen(); });
+        QTimer::singleShot(1000, this, [this]() { ensureOnScreen(); });
+        QTimer::singleShot(2000, this, [this]() { ensureOnScreen(); });
+    });
 }
 
 VideoForm::~VideoForm()
@@ -254,6 +270,60 @@ void VideoForm::moveCenter()
     }
     // 窗口居中
     move(screenRect.center() - QRect(0, 0, size().width(), size().height()).center());
+}
+
+bool VideoForm::isRectOnAnyScreen(const QRect &rect) const
+{
+    const QList<QScreen *> screens = QGuiApplication::screens();
+    for (QScreen *screen : screens) {
+        if (!screen) {
+            continue;
+        }
+        // 用 intersects 而非 contains：窗口只要有一部分可见就认为在屏内，
+        // 允许用户把窗口放在屏幕边缘（部分露出）的情况。
+        if (screen->availableGeometry().intersects(rect)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void VideoForm::ensureOnScreen()
+{
+    // 全屏状态下由系统接管，不必干预
+    if (isFullScreen()) {
+        return;
+    }
+
+    // 使用 frameGeometry 而非 geometry：前者包含窗口边框，
+    // 更能反映窗口真实占用的屏幕区域。
+    const QRect curRect = frameGeometry();
+    if (isRectOnAnyScreen(curRect)) {
+        return;
+    }
+
+    // 当前窗口已完全落在所有屏幕之外（典型场景：副屏被拔掉后
+    // 窗口坐标仍停留在已断开的屏幕区域）。移回主屏并居中。
+    //
+    // 注意：此处不能直接调用 moveCenter()。因为 getScreenRect() 会优先
+    // 取窗口当前所属的 QScreen，而窗口此时正位于已失效的屏幕区域，
+    // 可能得到错误的目标位置。因此这里显式取主屏的可用区域来计算。
+    qWarning() << "window is off-screen, moving back to primary screen. rect =" << curRect;
+
+    QScreen *primary = QGuiApplication::primaryScreen();
+    if (!primary) {
+        qWarning() << "no primary screen available, skip off-screen recovery";
+        return;
+    }
+
+    const QRect avail = primary->availableGeometry();
+    if (avail.isEmpty()) {
+        return;
+    }
+
+    const QPoint target = avail.center() - QRect(0, 0, size().width(), size().height()).center();
+    move(target);
+    qWarning() << "window recovered to" << target;
 }
 
 void VideoForm::installShortcut()
@@ -898,6 +968,9 @@ void VideoForm::paintEvent(QPaintEvent *paint)
 void VideoForm::showEvent(QShowEvent *event)
 {
     Q_UNUSED(event)
+    // 窗口每次显示时先做一次越界检查，处理"上次退出时窗口位于副屏、
+    // 本次启动副屏已不存在"导致窗口出现在屏幕外的情况。
+    ensureOnScreen();
     if (!isFullScreen() && this->show_toolbar) {
         QTimer::singleShot(500, this, [this](){
             showToolForm(this->show_toolbar);

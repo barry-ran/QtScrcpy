@@ -53,6 +53,11 @@ private:
     void moveCenter();
     void installShortcut();
     QRect getScreenRect();
+    // 窗口越界回收：显示器插拔后，若窗口落在任何屏幕的可用区域之外，
+    // 将其移回主屏居中，避免成为看不见的"幽灵窗口"。
+    void ensureOnScreen();
+    // 是否与任一屏幕的可用区域有交集（含边界相交判定）
+    bool isRectOnAnyScreen(const QRect &rect) const;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
