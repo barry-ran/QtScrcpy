@@ -52,6 +52,7 @@ private slots:
     void on_cameraZoomInBtn_clicked();
     void on_groupControlBtn_clicked();
     void on_openScreenBtn_clicked();
+    void on_editKeymapBtn_clicked();
     void on_clipboardBtn_clicked();
 
 private:

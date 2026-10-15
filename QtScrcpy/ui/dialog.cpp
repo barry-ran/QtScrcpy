@@ -5,6 +5,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
+#include <QSaveFile>
 #include <QFrame>
 #include <QFileInfo>
 #include <QFormLayout>
@@ -25,7 +26,6 @@
 #include <QStyledItemDelegate>
 #include <QSpinBox>
 #include <QTabWidget>
-#include <QTime>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QUrl>
@@ -35,6 +35,7 @@
 #include "ui_dialog.h"
 #include "videoform.h"
 #include "../groupcontroller/groupcontroller.h"
+#include "../QtScrcpyCore/src/device/controller/inputconvert/keymap/keymap.h"
 
 #ifdef Q_OS_WIN32
 #include "../util/winutils.h"
@@ -187,6 +188,7 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
         if (!log.isEmpty()) {
             outLog(log, newLine);
         }
+        handleQuickConnectResult(processResult);
     });
 
     m_hideIcon = new QSystemTrayIcon(this);
@@ -713,15 +715,6 @@ void Dialog::execAdbCmd()
 #else
     m_adb.execute(ui->serialBox->currentText().trimmed(), cmd.split(" ", QString::SkipEmptyParts));
 #endif
-}
-
-void Dialog::delayMs(int ms)
-{
-    QTime dieTime = QTime::currentTime().addMSecs(ms);
-
-    while (QTime::currentTime() < dieTime) {
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-    }
 }
 
 QString Dialog::getGameScript(const QString &fileName)
@@ -1391,10 +1384,139 @@ void Dialog::on_applyScriptBtn_clicked()
     auto curSerial = ui->serialBox->currentText().trimmed();
     auto device = qsc::IDeviceManage::getInstance().getDevice(curSerial);
     if (!device) {
+        QMessageBox::warning(this, tr("Keymap"), tr("Connect to a device before applying a keymap."));
         return;
     }
 
-    device->updateScript(getGameScript(ui->gameBox->currentText()));
+    const QString script = getGameScript(ui->gameBox->currentText());
+    if (script.isEmpty()) {
+        QMessageBox::warning(this, tr("Keymap"), tr("The selected keymap could not be read."));
+        return;
+    }
+    device->updateScript(script);
+}
+
+void Dialog::on_importGameScriptBtn_clicked()
+{
+    const QString sourcePath = QFileDialog::getOpenFileName(
+        this, tr("Import keymap"), QString(), tr("Keymap files (*.json)"));
+    if (sourcePath.isEmpty()) {
+        return;
+    }
+
+    QFile source(sourcePath);
+    if (!source.open(QIODevice::ReadOnly)) {
+        QMessageBox::warning(this, tr("Import keymap"),
+                             tr("Could not read the selected file:\n%1").arg(source.errorString()));
+        return;
+    }
+    const QByteArray contents = source.readAll();
+    if (source.error() != QFileDevice::NoError) {
+        QMessageBox::warning(this, tr("Import keymap"),
+                             tr("Could not read the complete file:\n%1").arg(source.errorString()));
+        return;
+    }
+    source.close();
+
+    KeyMap keymapValidator;
+    if (!keymapValidator.loadKeyMap(QString::fromUtf8(contents), false)) {
+        QMessageBox::warning(this, tr("Import keymap"),
+                             tr("The selected file contains an invalid keymap. Check the application log for details."));
+        return;
+    }
+
+    const QFileInfo sourceInfo(sourcePath);
+    if (sourceInfo.suffix().compare(QStringLiteral("json"), Qt::CaseInsensitive) != 0) {
+        QMessageBox::warning(this, tr("Import keymap"), tr("Choose a file with a .json extension."));
+        return;
+    }
+    const QString targetPath = QDir(getKeyMapPath()).filePath(sourceInfo.fileName());
+    if (QFileInfo::exists(targetPath)) {
+        const auto answer = QMessageBox::question(
+            this, tr("Replace keymap"),
+            tr("A keymap named %1 already exists. Replace it?").arg(sourceInfo.fileName()),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (answer != QMessageBox::Yes) {
+            return;
+        }
+    }
+
+    if (!QDir().mkpath(getKeyMapPath())) {
+        QMessageBox::warning(this, tr("Import keymap"), tr("Could not create the keymap folder."));
+        return;
+    }
+    QSaveFile target(targetPath);
+    if (!target.open(QIODevice::WriteOnly)
+        || target.write(contents) != contents.size()
+        || !target.commit()) {
+        const QString error = target.errorString();
+        target.cancelWriting();
+        QMessageBox::warning(this, tr("Import keymap"),
+                             tr("Could not save the imported keymap:\n%1").arg(error));
+        return;
+    }
+
+    on_refreshGameScriptBtn_clicked();
+    const int importedIndex = ui->gameBox->findText(sourceInfo.fileName());
+    if (importedIndex >= 0) {
+        ui->gameBox->setCurrentIndex(importedIndex);
+    }
+    outLog(tr("Imported keymap: %1").arg(sourceInfo.fileName()), true);
+}
+
+void Dialog::on_exportGameScriptBtn_clicked()
+{
+    const QString fileName = ui->gameBox->currentText().trimmed();
+    if (fileName.isEmpty()) {
+        QMessageBox::warning(this, tr("Export keymap"), tr("Select a keymap to export."));
+        return;
+    }
+
+    QString sourcePath = QDir(getKeyMapPath()).filePath(fileName);
+    if (!QFileInfo::exists(sourcePath)) {
+        sourcePath = QDir(getDefaultKeyMapPath()).filePath(fileName);
+    }
+    QFile source(sourcePath);
+    if (!source.open(QIODevice::ReadOnly)) {
+        QMessageBox::warning(this, tr("Export keymap"),
+                             tr("Could not read the selected keymap:\n%1").arg(source.errorString()));
+        return;
+    }
+    const QByteArray contents = source.readAll();
+    if (source.error() != QFileDevice::NoError) {
+        QMessageBox::warning(this, tr("Export keymap"),
+                             tr("Could not read the complete keymap:\n%1").arg(source.errorString()));
+        return;
+    }
+    source.close();
+
+    QString targetPath = QFileDialog::getSaveFileName(
+        this, tr("Export keymap"), fileName, tr("Keymap files (*.json)"));
+    if (targetPath.isEmpty()) {
+        return;
+    }
+    if (QFileInfo(targetPath).suffix().isEmpty()) {
+        targetPath += QStringLiteral(".json");
+    } else if (QFileInfo(targetPath).suffix().compare(QStringLiteral("json"), Qt::CaseInsensitive) != 0) {
+        QMessageBox::warning(this, tr("Export keymap"), tr("Choose a destination with a .json extension."));
+        return;
+    }
+    if (QFileInfo(targetPath).canonicalFilePath() == QFileInfo(sourcePath).canonicalFilePath()) {
+        QMessageBox::information(this, tr("Export keymap"), tr("Choose a different destination file."));
+        return;
+    }
+
+    QSaveFile target(targetPath);
+    if (!target.open(QIODevice::WriteOnly)
+        || target.write(contents) != contents.size()
+        || !target.commit()) {
+        const QString error = target.errorString();
+        target.cancelWriting();
+        QMessageBox::warning(this, tr("Export keymap"),
+                             tr("Could not export the keymap:\n%1").arg(error));
+        return;
+    }
+    outLog(tr("Exported keymap to: %1").arg(targetPath), true);
 }
 
 void Dialog::on_recordScreenCheck_clicked(bool checked)
@@ -1412,19 +1534,13 @@ void Dialog::on_recordScreenCheck_clicked(bool checked)
 
 void Dialog::on_usbConnectBtn_clicked()
 {
-    on_stopAllServerBtn_clicked();
-    delayMs(200);
-    on_updateDevice_clicked();
-    delayMs(200);
-
-    int firstUsbDevice = findDeviceFromeSerialBox(false);
-    if (-1 == firstUsbDevice) {
-        qWarning() << "No use device is found!";
+    if (checkAdbRun()) {
         return;
     }
-    ui->serialBox->setCurrentIndex(firstUsbDevice);
-
-    on_startServerBtn_clicked();
+    on_stopAllServerBtn_clicked();
+    m_quickConnectStage = QuickConnectStage::RefreshUsb;
+    outLog(tr("refreshing USB devices..."));
+    m_adb.execute("", QStringList() << "devices");
 }
 
 int Dialog::findDeviceFromeSerialBox(bool wifi)
@@ -1452,39 +1568,92 @@ int Dialog::findDeviceFromeSerialBox(bool wifi)
 
 void Dialog::on_wifiConnectBtn_clicked()
 {
+    if (checkAdbRun()) {
+        return;
+    }
     on_stopAllServerBtn_clicked();
-    delayMs(200);
+    m_quickConnectSerial.clear();
+    m_quickConnectAddress.clear();
+    m_quickConnectStage = QuickConnectStage::RefreshUsb;
+    outLog(tr("refreshing USB devices for Wi-Fi setup..."));
+    m_adb.execute("", QStringList() << "devices");
+}
 
-    on_updateDevice_clicked();
-    delayMs(200);
-
-    int firstUsbDevice = findDeviceFromeSerialBox(false);
-    if (-1 == firstUsbDevice) {
-        qWarning() << "No use device is found!";
+void Dialog::handleQuickConnectResult(qsc::AdbProcess::ADB_EXEC_RESULT result)
+{
+    if (m_quickConnectStage == QuickConnectStage::Idle
+        || result == qsc::AdbProcess::AER_SUCCESS_START) {
         return;
     }
-    ui->serialBox->setCurrentIndex(firstUsbDevice);
 
-    on_getIPBtn_clicked();
-    delayMs(200);
-
-    on_startAdbdBtn_clicked();
-    delayMs(1000);
-
-    on_wirelessConnectBtn_clicked();
-    delayMs(2000);
-
-    on_updateDevice_clicked();
-    delayMs(200);
-
-    int firstWifiDevice = findDeviceFromeSerialBox(true);
-    if (-1 == firstWifiDevice) {
-        qWarning() << "No wifi device is found!";
+    if (result != qsc::AdbProcess::AER_SUCCESS_EXEC) {
+        const QString details = m_adb.getErrorOut().trimmed();
+        outLog(details.isEmpty()
+                   ? tr("Quick connection failed; check USB authorization and device network.")
+                   : tr("Quick connection failed: %1").arg(details));
+        m_quickConnectStage = QuickConnectStage::Idle;
         return;
     }
-    ui->serialBox->setCurrentIndex(firstWifiDevice);
 
-    on_startServerBtn_clicked();
+    switch (m_quickConnectStage) {
+    case QuickConnectStage::RefreshUsb: {
+        const int usbIndex = findDeviceFromeSerialBox(false);
+        if (usbIndex < 0) {
+            outLog(tr("No authorized USB device was found."));
+            m_quickConnectStage = QuickConnectStage::Idle;
+            return;
+        }
+        ui->serialBox->setCurrentIndex(usbIndex);
+        m_quickConnectSerial = ui->serialBox->currentText().trimmed();
+        m_quickConnectStage = QuickConnectStage::ReadWifiIp;
+        m_adb.execute(m_quickConnectSerial,
+                      QStringList() << "shell" << "ip" << "-4" << "-o"
+                                    << "addr" << "show" << "dev" << "wlan0");
+        break;
+    }
+    case QuickConnectStage::ReadWifiIp: {
+        static const QRegularExpression ipv4Pattern(
+            QStringLiteral("\\binet\\s+((?:\\d{1,3}\\.){3}\\d{1,3})/"));
+        const auto match = ipv4Pattern.match(m_adb.getStdOut());
+        if (!match.hasMatch()) {
+            outLog(tr("Could not read the device Wi-Fi address; connect it to Wi-Fi and retry."));
+            m_quickConnectStage = QuickConnectStage::Idle;
+            return;
+        }
+        m_quickConnectAddress = match.captured(1) + ":5555";
+        ui->deviceIpEdt->setEditText(match.captured(1));
+        ui->devicePortEdt->setCurrentText(QStringLiteral("5555"));
+        saveIpHistory(match.captured(1));
+        savePortHistory(QStringLiteral("5555"));
+        m_quickConnectStage = QuickConnectStage::EnableWifiAdb;
+        m_adb.execute(m_quickConnectSerial, QStringList() << "tcpip" << "5555");
+        break;
+    }
+    case QuickConnectStage::EnableWifiAdb:
+        m_quickConnectStage = QuickConnectStage::ConnectWifi;
+        outLog(tr("connecting over Wi-Fi..."));
+        m_adb.execute("", QStringList() << "connect" << m_quickConnectAddress);
+        break;
+    case QuickConnectStage::ConnectWifi:
+        m_quickConnectStage = QuickConnectStage::VerifyWifi;
+        m_adb.execute("", QStringList() << "devices");
+        break;
+    case QuickConnectStage::VerifyWifi: {
+        const int wifiIndex = ui->serialBox->findText(m_quickConnectAddress);
+        if (wifiIndex < 0) {
+            outLog(tr("ADB did not report the Wi-Fi device as connected."));
+            m_quickConnectStage = QuickConnectStage::Idle;
+            return;
+        }
+        ui->serialBox->setCurrentIndex(wifiIndex);
+        m_quickConnectStage = QuickConnectStage::Idle;
+        outLog(tr("Wi-Fi connected; starting the device stream..."));
+        on_startServerBtn_clicked();
+        break;
+    }
+    case QuickConnectStage::Idle:
+        break;
+    }
 }
 
 void Dialog::on_connectedPhoneList_itemDoubleClicked(QListWidgetItem *item)

@@ -223,6 +223,16 @@
      </property>
     </widget>
    </item>
+    <item>
+    <widget class="QPushButton" name="editKeymapBtn">
+     <property name="toolTip">
+      <string>edit custom keymap</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QPushButton" name="clipboardBtn">
      <property name="toolTip">

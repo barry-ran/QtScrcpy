@@ -57,7 +57,7 @@ if [ $cpu_arch == "x64" ]; then
     qt_cmake_path=$ENV_QT_PATH/clang_64/lib/cmake/Qt5
     cmake_arch=x86_64
 else
-    qt_cmake_path=$ENV_QT_PATH/macos/lib/cmake/Qt6
+    qt_cmake_path=$ENV_QT_PATH/arm64/lib/cmake/Qt6
     cmake_arch=arm64
 fi
 

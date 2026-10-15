@@ -1,7 +1,9 @@
 #ifndef VIDEOFORM_H
 #define VIDEOFORM_H
 
+#include <QList>
 #include <QPointer>
+#include <QShortcut>
 #include <QTimer>
 #include <QWidget>
 
@@ -17,6 +19,8 @@ class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
 class MetalVideoWidget;
+class KeymapOverlay;
+
 class VideoForm : public QWidget, public qsc::DeviceObserver
 {
     Q_OBJECT
@@ -35,6 +39,8 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
     bool isHost();
+
+    void toggleKeymapEditor();
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
@@ -94,6 +100,8 @@ private:
     QPointer<MetalVideoWidget> m_metalWidget;
 
     QPointer<QLabel> m_fpsLabel;
+    
+    QPointer<KeymapOverlay> m_keymapOverlay;
 
     //inside member
     QSize m_frameSize;
@@ -112,6 +120,9 @@ private:
 
     //Whether to display the toolbar when connecting a device.
     bool show_toolbar = true;
+
+    // All app shortcuts — disabled while game/keymap mode is active
+    QList<QShortcut *> m_shortcuts;
 };
 
 #endif // VIDEOFORM_H

@@ -186,6 +186,12 @@ set(QC_UI_SOURCES
     ui/encoderpreset.cpp
     ui/presetconfigdialog.h
     ui/presetconfigdialog.cpp
+    ui/keymapoverlay.h
+    ui/keymapoverlay.cpp
+    ui/keymapnodewidget.h
+    ui/keymapnodewidget.cpp
+    ui/keycapturedlg.h
+    ui/keycapturedlg.cpp
     render/qyuvopenglwidget.h
     render/qyuvopenglwidget.cpp
 )

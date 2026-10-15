@@ -1,4 +1,4 @@
-﻿#ifndef CONFIG_H
+#ifndef CONFIG_H
 #define CONFIG_H
 
 #include <QObject>
@@ -66,6 +66,7 @@ public:
     QString getCodecOptions();
     QString getCodecName();
     QString getConfigDirectory();
+    QString getKeyMapPath() { return getConfigDirectory() + "/keymap"; }
     bool updateCommonConfig(const QMap<QString, QVariant> &values);
     QStringList getConnectedGroups();
 

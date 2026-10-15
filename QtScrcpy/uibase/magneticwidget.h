@@ -38,6 +38,8 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
     void moveEvent(QMoveEvent *event) override;
 
+    QWidget* adsorbWidget() const { return m_adsorbWidget.data(); }
+
 private:
     void getGeometry(QRect &relativeWidgetRect, QRect &targetWidgetRect);
 

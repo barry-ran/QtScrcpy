@@ -39,7 +39,7 @@ echo current cpu mode: $cpu_arch
 if [ $cpu_arch == "x64" ]; then
     qt_clang_path=$ENV_QT_PATH/clang_64
 else
-    qt_clang_path=$ENV_QT_PATH/macos
+    qt_clang_path=$ENV_QT_PATH/arm64
 fi
 
 # 提示

@@ -60,6 +60,8 @@ private slots:
     void on_stopAllServerBtn_clicked();
     void on_refreshGameScriptBtn_clicked();
     void on_applyScriptBtn_clicked();
+    void on_importGameScriptBtn_clicked();
+    void on_exportGameScriptBtn_clicked();
     void on_recordScreenCheck_clicked(bool checked);
     void on_usbConnectBtn_clicked();
     void on_wifiConnectBtn_clicked();
@@ -85,11 +87,20 @@ private slots:
     void showIpEditMenu(const QPoint &pos);
 
 private:
+    enum class QuickConnectStage {
+        Idle,
+        RefreshUsb,
+        ReadWifiIp,
+        EnableWifiAdb,
+        ConnectWifi,
+        VerifyWifi
+    };
+
     bool checkAdbRun();
+    void handleQuickConnectResult(qsc::AdbProcess::ADB_EXEC_RESULT result);
     void initUI();
     void updateBootConfig(bool toView = true);
     void execAdbCmd();
-    void delayMs(int ms);
     QString getGameScript(const QString &fileName);
     void slotActivated(QSystemTrayIcon::ActivationReason reason);
     int findDeviceFromeSerialBox(bool wifi);
@@ -146,6 +157,9 @@ private:
     QAction *m_quit;
     AudioOutput m_audioOutput;
     QTimer m_autoUpdatetimer;
+    QuickConnectStage m_quickConnectStage = QuickConnectStage::Idle;
+    QString m_quickConnectSerial;
+    QString m_quickConnectAddress;
     quint32 m_prevBitRate = 2000000;
     int m_prevMaxSizeIndex = 0;
     QPointer<PresetConfigDialog> m_presetDialog;

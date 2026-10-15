@@ -56,6 +56,7 @@ void ToolForm::updateCameraMode()
     ui->homeBtn->setVisible(!camera);
     ui->returnBtn->setVisible(!camera);
     ui->clipboardBtn->setVisible(!camera);
+    ui->editKeymapBtn->setVisible(!camera);
     ui->cameraTorchBtn->setVisible(camera);
     ui->cameraZoomOutBtn->setVisible(camera);
     ui->cameraZoomInBtn->setVisible(camera);
@@ -84,6 +85,7 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), 15);
     IconHelper::Instance()->SetIcon(ui->cameraZoomOutBtn, QChar(0xf010), 15);
     IconHelper::Instance()->SetIcon(ui->cameraZoomInBtn, QChar(0xf00e), 15);
+    IconHelper::Instance()->SetIcon(ui->editKeymapBtn, QChar(0xf11b), 15);
 }
 
 void ToolForm::updateGroupControl()
@@ -315,3 +317,10 @@ void ToolForm::on_clipboardBtn_clicked()
     }
     device->requestDeviceClipboard();
 }
+
+void ToolForm::on_editKeymapBtn_clicked()
+{
+    if (VideoForm* videoForm = qobject_cast<VideoForm*>(adsorbWidget())) {
+        videoForm->toggleKeymapEditor();
+    }
+}

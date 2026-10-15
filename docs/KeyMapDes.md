@@ -76,6 +76,12 @@ Description of the unique attributes of different key mapping types:
 
 ## Visual Key Mapping Tool
 
+QtScrcpy also includes a built-in editor. Start a device session and click **Edit custom keymap** in the device toolbar. Choose a direction, fire button, aim/view, slide/drag, multi-tap, double-tap, or custom-key action in the editor palette, then click the video to place it. Multi-tap captures up to 50 screen positions in sequence; the default delay between taps is 120 ms. Slide/drag asks for a start and destination point. Drag nodes to reposition them and double-click a node to edit its key or settings. Camera-look settings provide independent horizontal and vertical sensitivity. Use **Save** to write and apply the map, **Clear keys** to remove all controls after confirmation, or **Close** to leave edit mode without writing the pending changes.
+
+The editor preserves unrecognized keymap actions and root-level settings when saving. Invalid keymap files and failed saves are reported without overwriting the original file.
+
+Use **Import keymap** to add a validated `.json` map to your user keymap library, or **Export keymap** to save the selected map for backup or sharing. Importing a file with an existing name asks before replacing your personal copy.
+
 1. Just use [QuickAssistant](https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh)
 
 ![game](../screenshot/game.png)
@@ -91,4 +97,3 @@ You can use this tool to:
 - Import existing mappings for editing
 
 Try it online: [ScrcpyKeyMapper Web App](https://w4po.github.io/ScrcpyKeyMapper)
-

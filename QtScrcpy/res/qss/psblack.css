@@ -228,6 +228,68 @@ QWidget#ToolForm QPushButton:disabled {
     border-color: #3f3f3f;
 }
 
+QFrame#keymapEditorPanel {
+    color: #f2f4ff;
+    background: #171b2b;
+    border: 1px solid #40496c;
+    border-radius: 10px;
+}
+
+QLabel#keymapEditorTitle {
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: bold;
+    background: transparent;
+}
+
+QLabel#keymapEditorHint, QLabel#keymapEditorStatus {
+    color: #b9c2df;
+    font-size: 10px;
+    background: transparent;
+}
+
+QPushButton#keymapActionButton {
+    min-height: 38px;
+    color: #e5e9ff;
+    background: #242a42;
+    border: 1px solid #414b73;
+    border-radius: 7px;
+    padding: 3px;
+}
+
+QPushButton#keymapActionButton:hover {
+    color: #ffffff;
+    background: #303a60;
+    border-color: #7287ff;
+}
+
+QPushButton#keymapEditorSave {
+    color: #ffffff;
+    background: #586ff2;
+}
+
+QPushButton#keymapEditorClear {
+    color: #ffdede;
+    background: #492b3a;
+}
+
+QPushButton#keymapEditorFinish {
+    color: #ffffff;
+    background: #3b5278;
+}
+
+QPushButton#keymapEditorClose {
+    min-width: 28px;
+    max-width: 28px;
+    min-height: 28px;
+    max-height: 28px;
+    color: #d7dcf4;
+    background: #242a42;
+    border: 1px solid #414b73;
+    border-radius: 6px;
+    padding: 0;
+}
+
 QToolButton {
     min-height: 26px;
     color: #ffffff;

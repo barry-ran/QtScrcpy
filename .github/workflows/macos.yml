@@ -1,27 +1,31 @@
-name: MacOS
-on: 
+﻿name: MacOS
+on:
   push:
     paths:
       - 'QtScrcpy/**'
-      - '!QtScrcpy/res/**'
+      - 'keymap/**'
+      - 'CMakeLists.txt'
+      - '.gitmodules'
       - '.github/workflows/macos.yml'
+      - 'ci/generate-version.py'
+      - 'ci/mac/**'
   pull_request:
     paths:
       - 'QtScrcpy/**'
-      - '!QtScrcpy/res/**'
+      - 'keymap/**'
+      - 'CMakeLists.txt'
+      - '.gitmodules'
       - '.github/workflows/macos.yml'
+      - 'ci/generate-version.py'
+      - 'ci/mac/**'
+
 jobs:
   build:
     name: Build
-    # Qt 5's macdeployqt cannot deploy an x86_64 app reliably from an arm64
-    # runner: its otool invocation fails and produces a package without Qt.
-    # Build Qt 5/x64 on a native Intel runner; build Qt 6/arm64 natively.
-    # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
     runs-on: ${{ matrix.runs-on }}
     strategy:
       matrix:
-        qt-ver: [5.15.2, 6.5.3]        
-        # 配置qt-ver的额外设置qt-arch-install，build-arch
+        qt-ver: [5.15.2, 6.5.3]
         include:
           - qt-ver: 5.15.2
             qt-arch-install: clang_64
@@ -33,66 +37,67 @@ jobs:
             runs-on: macos-14
     env:
       target-name: QtScrcpy
-      qt-install-path: ${{ github.workspace }}/${{ matrix.qt-ver }}
-      plantform-des: mac
+      qt-install-path: ${{ github.workspace }}/Qt/${{ matrix.qt-ver }}
+      platform-des: mac
+
     steps:
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.qt-install-path }}/${{ matrix.qt-arch-install }}
-          key: ${{ runner.os }}/${{ matrix.qt-ver }}/${{ matrix.qt-arch-install }}
       - name: Install Qt5
         if: startsWith(matrix.qt-ver, '5.')
         uses: jurplel/install-qt-action@v4.1.1
         with:
           version: ${{ matrix.qt-ver }}
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
-      - name: Install Qt6        
+          arch: ${{ matrix.qt-arch-install }}
+          dir: ${{ github.workspace }}/Qt
+          cache: true
+
+      - name: Install Qt6
         if: startsWith(matrix.qt-ver, '6.')
         uses: jurplel/install-qt-action@v4.1.1
         with:
           version: ${{ matrix.qt-ver }}
+          arch: ${{ matrix.qt-arch-install }}
+          dir: ${{ github.workspace }}/Qt
           modules: qtmultimedia
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
-      - uses: actions/checkout@v2
+          cache: true
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: 'true'
-          ssh-key: ${{ secrets.BOT_SSH_KEY }}
-      # 编译
+
       - name: Build MacOS
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
         run: |
           python ci/generate-version.py
           ci/mac/build_for_mac.sh RelWithDebInfo ${{ matrix.build-arch }}
-      # 获取ref最后一个/后的内容
+
       - name: Get the version
         shell: bash
         id: get-version
-        # ${ GITHUB_REF/refs\/tags\// }是linux shell ${}的变量替换语法
-        run: echo ::set-output name=version::${GITHUB_REF##*/}
-      # 打包
+        run: echo "version=${GITHUB_REF##*/}" >> $GITHUB_OUTPUT
+
       - name: Package
         id: package
         env:
           ENV_QT_PATH: ${{ env.qt-install-path }}
-          publish_name: ${{ env.target-name }}-${{ env.plantform-des }}-${{ matrix.build-arch }}-Qt${{matrix.qt-ver}}-${{ steps.get-version.outputs.version }}
         run: |
+          publish_name="${{ env.target-name }}-${{ env.platform-des }}-${{ matrix.build-arch }}-Qt${{ matrix.qt-ver }}-${{ steps.get-version.outputs.version }}"
           ci/mac/publish_for_mac.sh ../build ${{ matrix.build-arch }}
           ci/mac/package_for_mac.sh
-          mv ci/build/QtScrcpy.app ci/build/${{ env.publish_name }}.app
-          mv ci/build/QtScrcpy.dmg ci/build/${{ env.publish_name }}.dmg
-          echo "::set-output name=package-name::${{ env.publish_name }}"
+          mv ci/build/QtScrcpy.app "ci/build/${publish_name}.app"
+          mv ci/build/QtScrcpy.dmg "ci/build/${publish_name}.dmg"
+          echo "package-name=${publish_name}" >> $GITHUB_OUTPUT
+
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.package.outputs.package-name }}.zip
+          name: ${{ steps.package.outputs.package-name }}
           path: ci/build/${{ steps.package.outputs.package-name }}.dmg
-      # Upload to release
+
       - name: Upload Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: svenstaro/upload-release-action@v1-release
+        uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ci/build/${{ steps.package.outputs.package-name }}.dmg

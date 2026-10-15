@@ -766,6 +766,44 @@
           </widget>
          </item>
          <item>
+          <widget class="QWidget" name="keymapActionsWidget" native="true">
+           <layout class="QHBoxLayout" name="keymapActionsLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPushButton" name="importGameScriptBtn">
+              <property name="toolTip">
+               <string>Import a JSON keymap into your user keymap library</string>
+              </property>
+              <property name="text">
+               <string>Import keymap…</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="exportGameScriptBtn">
+              <property name="toolTip">
+               <string>Export the selected keymap as a JSON file</string>
+              </property>
+              <property name="text">
+               <string>Export keymap…</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
           <widget class="QWidget" name="configWidget3" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">

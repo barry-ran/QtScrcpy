@@ -77,11 +77,57 @@ EncoderPreset makeMtkPreset()
     return preset;
 }
 
+// Generic high-quality preset for any device. It deliberately sets NO
+// codec name and NO codec options, so it works on every encoder: the whole
+// improvement comes from a much higher bitrate (the 2 Mbps default is far too
+// low for 720p/1080p) together with the matching max-size.
+//
+// maxSizeIndex refers to the entries of the "max size" combo in Dialog::initUI:
+//   0=640, 1=720, 2=1080, 3=1280, 4=1920, 5=original
+EncoderPreset makeQualityPreset()
+{
+    auto tr = [](const char *sourceText) {
+        return QCoreApplication::translate("PresetConfigDialog", sourceText);
+    };
+
+    EncoderPreset preset;
+    preset.id = QStringLiteral("quality");
+    preset.displayName = tr("High Quality");
+    preset.warning = tr(
+        "High bitrates need a good USB cable or a strong 5GHz WiFi connection.\n"
+        "If the picture stutters or freezes, choose a lower tier.");
+
+    EncoderPresetLevel level0;
+    level0.label = tr("1080p Max (24Mbps)");
+    level0.tooltip = tr("Best picture quality at 1080p. Recommended over a USB cable.");
+    level0.description = tr("1080p at 24 Mbps. Sharpest image, highest bandwidth usage.");
+    level0.bitRate = 24000000;
+    level0.maxSizeIndex = 2;
+
+    EncoderPresetLevel level1;
+    level1.label = tr("1080p High (16Mbps)");
+    level1.tooltip = tr("Sharp 1080p with reasonable bandwidth. Good default for daily use.");
+    level1.description = tr("1080p at 16 Mbps. Good balance between sharpness and bandwidth.");
+    level1.bitRate = 16000000;
+    level1.maxSizeIndex = 2;
+
+    EncoderPresetLevel level2;
+    level2.label = tr("720p High (8Mbps)");
+    level2.tooltip = tr("Sharp 720p, light on bandwidth. Suitable for WiFi.");
+    level2.description = tr("720p at 8 Mbps. Much clearer than the default, and easy on WiFi.");
+    level2.bitRate = 8000000;
+    level2.maxSizeIndex = 1;
+
+    preset.levels = { level0, level1, level2 };
+    return preset;
+}
+
 } // namespace
 
 const QVector<EncoderPreset> &EncoderPresetRegistry::all()
 {
-    static const QVector<EncoderPreset> presets = { makeMtkPreset() };
+    // Keep new presets at the END: the saved CodecModeIndex is positional.
+    static const QVector<EncoderPreset> presets = { makeMtkPreset(), makeQualityPreset() };
     return presets;
 }
 
