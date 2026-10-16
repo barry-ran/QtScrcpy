@@ -5,91 +5,106 @@
 			"comment": "Search chats",
 			"type": "KMT_CLICK",
 			"key": "Key_F",
-			"pos": { "x": 0.80, "y": 0.09 }
+			"pos": { "x": 0.80, "y": 0.09 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open menu",
 			"type": "KMT_CLICK",
 			"key": "Key_M",
-			"pos": { "x": 0.92, "y": 0.09 }
+			"pos": { "x": 0.92, "y": 0.09 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open archived chats",
 			"type": "KMT_CLICK",
 			"key": "Key_A",
-			"pos": { "x": 0.10, "y": 0.16 }
+			"pos": { "x": 0.10, "y": 0.16 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open first visible chat",
 			"type": "KMT_CLICK",
 			"key": "Key_1",
-			"pos": { "x": 0.10, "y": 0.24 }
+			"pos": { "x": 0.10, "y": 0.24 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open second visible chat",
 			"type": "KMT_CLICK",
 			"key": "Key_2",
-			"pos": { "x": 0.10, "y": 0.33 }
+			"pos": { "x": 0.10, "y": 0.33 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open third visible chat",
 			"type": "KMT_CLICK",
 			"key": "Key_3",
-			"pos": { "x": 0.10, "y": 0.42 }
+			"pos": { "x": 0.10, "y": 0.42 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open fourth visible chat",
 			"type": "KMT_CLICK",
 			"key": "Key_4",
-			"pos": { "x": 0.10, "y": 0.51 }
+			"pos": { "x": 0.10, "y": 0.51 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open Saved Messages",
 			"type": "KMT_CLICK",
 			"key": "Key_5",
-			"pos": { "x": 0.10, "y": 0.59 }
+			"pos": { "x": 0.10, "y": 0.59 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open sixth visible chat",
 			"type": "KMT_CLICK",
 			"key": "Key_6",
-			"pos": { "x": 0.10, "y": 0.68 }
+			"pos": { "x": 0.10, "y": 0.68 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open seventh visible chat",
 			"type": "KMT_CLICK",
 			"key": "Key_7",
-			"pos": { "x": 0.10, "y": 0.76 }
+			"pos": { "x": 0.10, "y": 0.76 },
+			"switchMap": false
 		},
 		{
 			"comment": "Open eighth visible chat",
 			"type": "KMT_CLICK",
 			"key": "Key_8",
-			"pos": { "x": 0.10, "y": 0.85 }
+			"pos": { "x": 0.10, "y": 0.85 },
+			"switchMap": false
 		},
 		{
 			"comment": "Show Chats tab",
 			"type": "KMT_CLICK",
 			"key": "Key_Q",
-			"pos": { "x": 0.18, "y": 0.94 }
+			"pos": { "x": 0.18, "y": 0.94 },
+			"switchMap": false
 		},
 		{
 			"comment": "Show Contacts tab",
 			"type": "KMT_CLICK",
 			"key": "Key_W",
-			"pos": { "x": 0.39, "y": 0.94 }
+			"pos": { "x": 0.39, "y": 0.94 },
+			"switchMap": false
 		},
 		{
 			"comment": "Show Settings tab",
 			"type": "KMT_CLICK",
 			"key": "Key_E",
-			"pos": { "x": 0.60, "y": 0.94 }
+			"pos": { "x": 0.60, "y": 0.94 },
+			"switchMap": false
 		},
 		{
 			"comment": "Show Profile tab",
 			"type": "KMT_CLICK",
 			"key": "Key_R",
-			"pos": { "x": 0.82, "y": 0.94 }
+			"pos": { "x": 0.82, "y": 0.94 },
+			"switchMap": false
 		},
 		{
 			"comment": "Scroll chat list upward",
