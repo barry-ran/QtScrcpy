@@ -61,6 +61,7 @@ private:
     void ensureOnScreen();
     // 是否与任一屏幕的可用区域有交集（含边界相交判定）
     bool isRectOnAnyScreen(const QRect &rect) const;
+    void syncKeyOverlayWithKeymap(bool wasCustomKeymap);
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;

@@ -293,11 +293,33 @@ bool VideoForm::setKeyOverlayVisible(bool visible)
     return true;
 }
 
+void VideoForm::syncKeyOverlayWithKeymap(bool wasCustomKeymap)
+{
+    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+    if (!device) {
+        return;
+    }
+
+    const bool isCustomKeymap = device->isCurrentCustomKeymap();
+    if (wasCustomKeymap == isCustomKeymap) {
+        return;
+    }
+
+    const bool overlayVisible = isCustomKeymap && setKeyOverlayVisible(true);
+    if (!isCustomKeymap) {
+        setKeyOverlayVisible(false);
+    }
+    if (m_toolForm) {
+        m_toolForm->setKeyOverlayChecked(overlayVisible);
+    }
+}
+
 void VideoForm::showToolForm(bool show)
 {
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
         m_toolForm->setSerial(m_serial);
+        m_toolForm->setKeyOverlayChecked(m_keyOverlay && !m_keyOverlay->isHidden());
     }
     m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
     m_toolForm->setVisible(show);
@@ -980,7 +1002,9 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
 
     QWidget *vw = videoWidget();
     QSize widgetSize = vw ? vw->size() : m_frameSize;
+    const bool wasCustomKeymap = device->isCurrentCustomKeymap();
     emit device->keyEvent(event, m_frameSize, widgetSize);
+    syncKeyOverlayWithKeymap(wasCustomKeymap);
 }
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
