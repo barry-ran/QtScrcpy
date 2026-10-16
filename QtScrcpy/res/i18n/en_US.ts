@@ -361,6 +361,14 @@
         <translation>touch switch</translation>
     </message>
     <message>
+        <source>Toggle key overlay</source>
+        <translation>Toggle key overlay</translation>
+    </message>
+    <message>
+        <source>Apply a key map before showing the overlay</source>
+        <translation>Apply a key map before showing the overlay</translation>
+    </message>
+    <message>
         <source>screen shot</source>
         <translation>screen shot</translation>
     </message>

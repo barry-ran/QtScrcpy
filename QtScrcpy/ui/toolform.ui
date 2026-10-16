@@ -94,6 +94,19 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="keyOverlayBtn">
+     <property name="toolTip">
+      <string>Toggle key overlay</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="openScreenBtn">
      <property name="toolTip">
       <string>open screen</string>

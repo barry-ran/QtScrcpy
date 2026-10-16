@@ -929,6 +929,7 @@ void Dialog::on_startServerBtn_clicked()
 
     const bool needsVirtualDisplayCheck = !params.newDisplay.isEmpty();
     if (!camera && !needsVirtualDisplayCheck) {
+        m_gameScripts.insert(params.serial, params.gameScript);
         qsc::IDeviceManage::getInstance().connectDevice(params);
         return;
     }
@@ -941,6 +942,7 @@ void Dialog::on_startServerBtn_clicked()
             const int sdk = versionAdb->getStdOut().trimmed().toInt(&ok);
             const int minimumSdk = camera ? 31 : 29;
             if (ok && sdk >= minimumSdk) {
+                m_gameScripts.insert(params.serial, params.gameScript);
                 qsc::IDeviceManage::getInstance().connectDevice(params);
             } else {
                 outLog(camera ? tr("camera preview requires Android 12 or later")
@@ -1257,10 +1259,12 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
 {
     Q_UNUSED(deviceName);
     if (!success) {
+        m_gameScripts.remove(serial);
         return;
     }
     auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin(), ui->showToolbar->isChecked(), ui->decodeModeBox->currentIndex());
     videoForm->setSerial(serial);
+    videoForm->setKeyOverlayScript(m_gameScripts.value(serial));
 
     qsc::IDeviceManage::getInstance().getDevice(serial)->setUserData(static_cast<void*>(videoForm));
     qsc::IDeviceManage::getInstance().getDevice(serial)->registerDeviceObserver(videoForm);
@@ -1303,6 +1307,7 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
 
 void Dialog::onDeviceDisconnected(QString serial)
 {
+    m_gameScripts.remove(serial);
     GroupController::instance().removeDevice(serial);
     auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
     if (!device) {
@@ -1394,7 +1399,13 @@ void Dialog::on_applyScriptBtn_clicked()
         return;
     }
 
-    device->updateScript(getGameScript(ui->gameBox->currentText()));
+    const QString script = getGameScript(ui->gameBox->currentText());
+    device->updateScript(script);
+    m_gameScripts.insert(curSerial, script);
+    auto data = device->getUserData();
+    if (data) {
+        static_cast<VideoForm*>(data)->setKeyOverlayScript(script);
+    }
 }
 
 void Dialog::on_recordScreenCheck_clicked(bool checked)

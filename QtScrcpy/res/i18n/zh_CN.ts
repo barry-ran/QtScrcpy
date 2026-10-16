@@ -361,6 +361,14 @@
         <translation>触摸显示开关</translation>
     </message>
     <message>
+        <source>Toggle key overlay</source>
+        <translation>显示或隐藏按键提示</translation>
+    </message>
+    <message>
+        <source>Apply a key map before showing the overlay</source>
+        <translation>请先应用按键映射</translation>
+    </message>
+    <message>
         <source>screen shot</source>
         <translation>截图</translation>
     </message>

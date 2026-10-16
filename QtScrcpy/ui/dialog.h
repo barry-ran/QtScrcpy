@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QHash>
 #include <QMessageBox>
 #include <QMenu>
 #include <QSystemTrayIcon>
@@ -146,6 +147,7 @@ private:
     QAction *m_quit;
     AudioOutput m_audioOutput;
     QTimer m_autoUpdatetimer;
+    QHash<QString, QString> m_gameScripts;
     quint32 m_prevBitRate = 2000000;
     int m_prevMaxSizeIndex = 0;
     QPointer<PresetConfigDialog> m_presetDialog;

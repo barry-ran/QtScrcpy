@@ -76,6 +76,8 @@ Description of the unique attributes of different key mapping types:
 
 ## Visual Key Mapping Tool
 
+When a device is connected with a key map applied, use the keyboard icon in the device toolbar to show or hide a visual overlay of mapped keys. The overlay is click-through and marks the configured touch positions, including drag paths, multi-click targets, steering-wheel directions, and mouse-look position.
+
 1. Just use [QuickAssistant](https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh)
 
 ![game](../screenshot/game.png)

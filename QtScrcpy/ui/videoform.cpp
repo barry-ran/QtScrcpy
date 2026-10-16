@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "iconhelper.h"
+#include "keyoverlaywidget.h"
 #include "qyuvopenglwidget.h"
 #include "toolform.h"
 #include "mousetap/mousetap.h"
@@ -147,6 +148,13 @@ void VideoForm::initUI()
         m_videoWidget->setMouseTracking(true);
     }
     ui->keepRatioWidget->setMouseTracking(true);
+
+    QWidget *vw = videoWidget();
+    if (vw) {
+        m_keyOverlay = new KeyOverlayWidget(vw);
+        m_keyOverlay->setGeometry(vw->rect());
+        m_keyOverlay->hide();
+    }
 }
 
 QRect VideoForm::getGrabCursorRect()
@@ -249,6 +257,40 @@ void VideoForm::setSerial(const QString &serial)
     if (m_flexDisplay) {
         ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
     }
+}
+
+void VideoForm::setKeyOverlayScript(const QString &script)
+{
+    m_keyOverlayScript = script;
+    if (m_keyOverlay && !m_keyOverlay->isHidden() && !setKeyOverlayVisible(true) && m_toolForm) {
+        m_toolForm->setKeyOverlayChecked(false);
+    }
+}
+
+bool VideoForm::setKeyOverlayVisible(bool visible)
+{
+    if (!m_keyOverlay) {
+        return false;
+    }
+
+    if (!visible) {
+        m_keyOverlay->hide();
+        return true;
+    }
+
+    QWidget *vw = videoWidget();
+    if (!vw || !m_keyOverlay->setScript(m_keyOverlayScript)) {
+        m_keyOverlay->hide();
+        return false;
+    }
+
+    m_keyOverlay->setGeometry(vw->rect());
+    m_keyOverlay->show();
+    m_keyOverlay->raise();
+    if (m_fpsLabel) {
+        m_fpsLabel->raise();
+    }
+    return true;
 }
 
 void VideoForm::showToolForm(bool show)
