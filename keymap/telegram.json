@@ -1,0 +1,109 @@
+{
+	"switchKey": "Key_QuoteLeft",
+	"keyMapNodes": [
+		{
+			"comment": "Search chats",
+			"type": "KMT_CLICK",
+			"key": "Key_F",
+			"pos": { "x": 0.80, "y": 0.09 }
+		},
+		{
+			"comment": "Open menu",
+			"type": "KMT_CLICK",
+			"key": "Key_M",
+			"pos": { "x": 0.92, "y": 0.09 }
+		},
+		{
+			"comment": "Open archived chats",
+			"type": "KMT_CLICK",
+			"key": "Key_A",
+			"pos": { "x": 0.10, "y": 0.16 }
+		},
+		{
+			"comment": "Open first visible chat",
+			"type": "KMT_CLICK",
+			"key": "Key_1",
+			"pos": { "x": 0.10, "y": 0.24 }
+		},
+		{
+			"comment": "Open second visible chat",
+			"type": "KMT_CLICK",
+			"key": "Key_2",
+			"pos": { "x": 0.10, "y": 0.33 }
+		},
+		{
+			"comment": "Open third visible chat",
+			"type": "KMT_CLICK",
+			"key": "Key_3",
+			"pos": { "x": 0.10, "y": 0.42 }
+		},
+		{
+			"comment": "Open fourth visible chat",
+			"type": "KMT_CLICK",
+			"key": "Key_4",
+			"pos": { "x": 0.10, "y": 0.51 }
+		},
+		{
+			"comment": "Open Saved Messages",
+			"type": "KMT_CLICK",
+			"key": "Key_5",
+			"pos": { "x": 0.10, "y": 0.59 }
+		},
+		{
+			"comment": "Open sixth visible chat",
+			"type": "KMT_CLICK",
+			"key": "Key_6",
+			"pos": { "x": 0.10, "y": 0.68 }
+		},
+		{
+			"comment": "Open seventh visible chat",
+			"type": "KMT_CLICK",
+			"key": "Key_7",
+			"pos": { "x": 0.10, "y": 0.76 }
+		},
+		{
+			"comment": "Open eighth visible chat",
+			"type": "KMT_CLICK",
+			"key": "Key_8",
+			"pos": { "x": 0.10, "y": 0.85 }
+		},
+		{
+			"comment": "Show Chats tab",
+			"type": "KMT_CLICK",
+			"key": "Key_Q",
+			"pos": { "x": 0.18, "y": 0.94 }
+		},
+		{
+			"comment": "Show Contacts tab",
+			"type": "KMT_CLICK",
+			"key": "Key_W",
+			"pos": { "x": 0.39, "y": 0.94 }
+		},
+		{
+			"comment": "Show Settings tab",
+			"type": "KMT_CLICK",
+			"key": "Key_E",
+			"pos": { "x": 0.60, "y": 0.94 }
+		},
+		{
+			"comment": "Show Profile tab",
+			"type": "KMT_CLICK",
+			"key": "Key_R",
+			"pos": { "x": 0.82, "y": 0.94 }
+		},
+		{
+			"comment": "Scroll chat list upward",
+			"type": "KMT_DRAG",
+			"key": "Key_Up",
+			"startPos": { "x": 0.91, "y": 0.72 },
+			"endPos": { "x": 0.91, "y": 0.34 }
+		},
+		{
+			"comment": "Scroll chat list downward",
+			"type": "KMT_DRAG",
+			"key": "Key_Down",
+			"startPos": { "x": 0.91, "y": 0.34 },
+			"endPos": { "x": 0.91, "y": 0.72 }
+		}
+	]
+}
