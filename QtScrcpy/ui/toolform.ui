@@ -106,6 +106,16 @@
      </property>
     </widget>
    </item>
+  <item>
+   <widget class="QPushButton" name="keyOverlayEditBtn">
+    <property name="toolTip">
+     <string>Edit keymap on device</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+  </item>
    <item>
     <widget class="QPushButton" name="openScreenBtn">
      <property name="toolTip">

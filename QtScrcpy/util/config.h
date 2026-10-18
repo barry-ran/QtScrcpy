@@ -93,6 +93,18 @@ public:
     QStringList getPortHistory(); 
     void clearPortHistory();
 
+    // Reusable per-device launch settings and named synchronized-control groups.
+    void setDeviceProfile(const QString &serial, const QString &appPackage,
+                          const QMap<QString, QVariant> &profile);
+    QMap<QString, QVariant> getDeviceProfile(const QString &serial, const QString &appPackage);
+    void saveDeviceGroup(const QString &name, const QStringList &serials);
+    QStringList getDeviceGroupNames();
+    QStringList getDeviceGroup(const QString &name);
+
+    void setWifiReconnectTarget(bool enabled, const QString &address);
+    bool getWifiAutoReconnect();
+    QString getWifiReconnectTarget();
+
 private:
     explicit Config(QObject *parent = nullptr);
     const QString &getConfigPath();

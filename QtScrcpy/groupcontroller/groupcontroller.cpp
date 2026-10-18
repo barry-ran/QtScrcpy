@@ -127,6 +127,17 @@ void GroupController::keyEvent(const QKeyEvent *from, const QSize &frameSize, co
     }
 }
 
+void GroupController::releaseInput(const QSize &frameSize)
+{
+    Q_UNUSED(frameSize);
+    for (const auto &serial : m_devices) {
+        const auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
+        if (device && !isHost(serial)) {
+            device->releaseInput(getFrameSize(serial));
+        }
+    }
+}
+
 void GroupController::postGoBack()
 {
     for (const auto& serial : m_devices) {

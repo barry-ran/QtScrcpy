@@ -762,6 +762,16 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QPushButton" name="deleteGameScriptBtn">
+              <property name="toolTip">
+               <string>Delete the selected user keymap JSON</string>
+              </property>
+              <property name="text">
+               <string>delete</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </widget>
          </item>

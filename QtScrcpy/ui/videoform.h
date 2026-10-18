@@ -36,8 +36,13 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
     bool isHost();
+    void setGroupHost(bool host);
     void setKeyOverlayScript(const QString &script);
     bool setKeyOverlayVisible(bool visible);
+    bool setKeyOverlayEditMode(bool enabled);
+
+signals:
+    void keymapSaveRequested(const QString &script);
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
@@ -64,6 +69,8 @@ private:
     void syncKeyOverlayWithKeymap(bool wasCustomKeymap);
 
 protected:
+    bool event(QEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

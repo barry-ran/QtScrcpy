@@ -97,6 +97,7 @@ QWidget* VideoForm::videoWidget() const
 
 void VideoForm::initUI()
 {
+    setFocusPolicy(Qt::StrongFocus);
     if (m_skin) {
         QPixmap phone;
         if (phone.load(":/res/phone.png")) {
@@ -151,9 +152,73 @@ void VideoForm::initUI()
 
     QWidget *vw = videoWidget();
     if (vw) {
+        vw->installEventFilter(this);
+        if (m_fpsLabel) {
+            m_fpsLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+        }
         m_keyOverlay = new KeyOverlayWidget(vw);
         m_keyOverlay->setGeometry(vw->rect());
         m_keyOverlay->hide();
+        connect(m_keyOverlay, &KeyOverlayWidget::saveRequested,
+                this, &VideoForm::keymapSaveRequested);
+    }
+}
+
+bool VideoForm::event(QEvent *event)
+{
+    if (event && (event->type() == QEvent::WindowDeactivate
+                  || event->type() == QEvent::FocusOut || event->type() == QEvent::Hide)) {
+        const auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+        if (device) {
+            device->releaseInput(m_frameSize);
+        }
+        m_dragPosition = QPoint();
+    }
+    return QWidget::event(event);
+}
+
+bool VideoForm::eventFilter(QObject *watched, QEvent *event)
+{
+    QWidget *vw = videoWidget();
+    if (watched != vw || !vw || !event) {
+        return QWidget::eventFilter(watched, event);
+    }
+
+    switch (event->type()) {
+    case QEvent::MouseButtonPress:
+    case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonDblClick:
+    case QEvent::MouseMove: {
+        auto *mouseEvent = static_cast<QMouseEvent *>(event);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        const QPointF globalPosition = mouseEvent->globalPos();
+        const QPointF localPosition = vw->mapTo(this, mouseEvent->localPos().toPoint());
+#else
+        const QPointF globalPosition = mouseEvent->globalPosition();
+        const QPointF localPosition = vw->mapTo(this, mouseEvent->position().toPoint());
+#endif
+        QMouseEvent forwarded(mouseEvent->type(), localPosition, globalPosition,
+                              mouseEvent->button(), mouseEvent->buttons(), mouseEvent->modifiers());
+        switch (event->type()) {
+        case QEvent::MouseButtonPress:
+            mousePressEvent(&forwarded);
+            break;
+        case QEvent::MouseButtonRelease:
+            mouseReleaseEvent(&forwarded);
+            break;
+        case QEvent::MouseButtonDblClick:
+            mouseDoubleClickEvent(&forwarded);
+            break;
+        case QEvent::MouseMove:
+            mouseMoveEvent(&forwarded);
+            break;
+        default:
+            break;
+        }
+        return true;
+    }
+    default:
+        return QWidget::eventFilter(watched, event);
     }
 }
 
@@ -274,6 +339,7 @@ bool VideoForm::setKeyOverlayVisible(bool visible)
     }
 
     if (!visible) {
+        m_keyOverlay->cancelEditing();
         m_keyOverlay->hide();
         return true;
     }
@@ -289,6 +355,28 @@ bool VideoForm::setKeyOverlayVisible(bool visible)
     m_keyOverlay->raise();
     if (m_fpsLabel) {
         m_fpsLabel->raise();
+    }
+    return true;
+}
+
+bool VideoForm::setKeyOverlayEditMode(bool enabled)
+{
+    if (!m_keyOverlay) {
+        return false;
+    }
+    if (!enabled) {
+        m_keyOverlay->cancelEditing();
+        return true;
+    }
+
+    if (m_keyOverlayScript.trimmed().isEmpty()) {
+        m_keyOverlayScript = QStringLiteral("{\n  \"switchKey\": \"Key_QuoteLeft\",\n  \"keyMapNodes\": []\n}\n");
+    }
+    if (!setKeyOverlayVisible(true) || !m_keyOverlay->setEditMode(true)) {
+        return false;
+    }
+    if (m_toolForm) {
+        m_toolForm->setKeyOverlayChecked(true);
     }
     return true;
 }
@@ -756,6 +844,13 @@ bool VideoForm::isHost()
     return m_toolForm->isHost();
 }
 
+void VideoForm::setGroupHost(bool host)
+{
+    if (m_toolForm) {
+        m_toolForm->setHost(host);
+    }
+}
+
 void VideoForm::updateFPS(quint32 fps)
 {
     if (!m_fpsLabel) {
@@ -840,19 +935,21 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 #endif
 
     QWidget *vw = videoWidget();
-    if (vw && vw->geometry().contains(event->pos())) {
+    const QPoint mappedPoint = vw ? vw->mapFrom(this, localPos.toPoint()) : QPoint();
+    if (vw && vw->rect().contains(mappedPoint)) {
         if (!device) {
             return;
         }
-        QPointF mappedPos = vw->mapFrom(this, localPos.toPoint());
+        const QPointF mappedPos(mappedPoint);
         QMouseEvent newEvent(event->type(), mappedPos, globalPos, event->button(), event->buttons(), event->modifiers());
         emit device->mouseEvent(&newEvent, m_frameSize, vw->size());
 
-        // debug keymap pos
+        // Log the point in the video widget's coordinate space, matching the injected touch.
         if (event->button() == Qt::LeftButton) {
-            qreal x = localPos.x() / vw->size().width();
-            qreal y = localPos.y() / vw->size().height();
-            QString posTip = QString(R"("pos": {"x": %1, "y": %2})").arg(x).arg(y);
+            const qreal x = mappedPos.x() / vw->size().width();
+            const qreal y = mappedPos.y() / vw->size().height();
+            const QString posTip = QString(R"("phase": "down", "pos": {"x": %1, "y": %2})")
+                                       .arg(x, 0, 'f', 6).arg(y, 0, 'f', 6);
             qInfo() << posTip.toStdString().c_str();
         }
     } else {
@@ -866,6 +963,13 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+    if ((event->button() == Qt::RightButton || event->button() == Qt::MiddleButton)
+            && device && !device->isCurrentCustomKeymap()) {
+        if (!(event->buttons() & Qt::LeftButton)) {
+            m_dragPosition = QPoint();
+        }
+        return;
+    }
     if (m_dragPosition.isNull()) {
         if (!device) {
             return;
@@ -898,6 +1002,12 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
         }
         QMouseEvent newEvent(event->type(), local, globalPos, event->button(), event->buttons(), event->modifiers());
         emit device->mouseEvent(&newEvent, m_frameSize, vw->size());
+        if (event->button() == Qt::LeftButton) {
+            const QString posTip = QString(R"("phase": "up", "pos": {"x": %1, "y": %2})")
+                                       .arg(local.x() / vw->size().width(), 0, 'f', 6)
+                                       .arg(local.y() / vw->size().height(), 0, 'f', 6);
+            qInfo() << posTip.toStdString().c_str();
+        }
     } else {
         m_dragPosition = QPoint(0, 0);
     }
@@ -906,19 +1016,20 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-        QPointF localPos = event->localPos();
-        QPointF globalPos = event->globalPos();
+    const QPointF localPos = event->localPos();
+    const QPointF globalPos = event->globalPos();
 #else
-        QPointF localPos = event->position();
-        QPointF globalPos = event->globalPosition();
+    const QPointF localPos = event->position();
+    const QPointF globalPos = event->globalPosition();
 #endif
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     QWidget *vw = videoWidget();
-    if (vw && vw->geometry().contains(event->pos())) {
+    const QPoint mappedPoint = vw ? vw->mapFrom(this, localPos.toPoint()) : QPoint();
+    if (vw && vw->rect().contains(mappedPoint)) {
         if (!device) {
             return;
         }
-        QPointF mappedPos = vw->mapFrom(this, localPos.toPoint());
+        const QPointF mappedPos(mappedPoint);
         QMouseEvent newEvent(event->type(), mappedPos, globalPos, event->button(), event->buttons(), event->modifiers());
         emit device->mouseEvent(&newEvent, m_frameSize, vw->size());
     } else if (!m_dragPosition.isNull()) {
@@ -932,29 +1043,32 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+    if ((event->button() == Qt::RightButton || event->button() == Qt::MiddleButton)
+            && device && !device->isCurrentCustomKeymap()) {
+        mousePressEvent(event);
+        return;
+    }
     QWidget *vw = videoWidget();
-    if (event->button() == Qt::LeftButton && vw && !vw->geometry().contains(event->pos())) {
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    const QPointF localPos = event->localPos();
+    const QPointF globalPos = event->globalPos();
+#else
+    const QPointF localPos = event->position();
+    const QPointF globalPos = event->globalPosition();
+#endif
+    const QPoint mappedPoint = vw ? vw->mapFrom(this, localPos.toPoint()) : QPoint();
+    const bool insideVideo = vw && vw->rect().contains(mappedPoint);
+    if (event->button() == Qt::LeftButton && vw && !insideVideo) {
         if (!isMaximized()) {
             removeBlackRect();
         }
     }
 
-    if (event->button() == Qt::RightButton && device && !device->isCurrentCustomKeymap()) {
-        emit device->postBackOrScreenOn(event->type() == QEvent::MouseButtonPress);
-    }
-
-    if (vw && vw->geometry().contains(event->pos())) {
+    if (insideVideo) {
         if (!device) {
             return;
         }
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-        QPointF localPos = event->localPos();
-        QPointF globalPos = event->globalPos();
-#else
-        QPointF localPos = event->position();
-        QPointF globalPos = event->globalPosition();
-#endif
-        QPointF mappedPos = vw->mapFrom(this, localPos.toPoint());
+        const QPointF mappedPos(mappedPoint);
         QMouseEvent newEvent(event->type(), mappedPos, globalPos, event->button(), event->buttons(), event->modifiers());
         emit device->mouseEvent(&newEvent, m_frameSize, vw->size());
     }

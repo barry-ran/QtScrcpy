@@ -558,3 +558,90 @@ void Config::clearPortHistory()
     m_userData->remove(PORT_HISTORY_KEY);
     m_userData->sync();
 }
+
+void Config::setDeviceProfile(const QString &serial, const QString &appPackage,
+                              const QMap<QString, QVariant> &profile)
+{
+    if (serial.trimmed().isEmpty()) {
+        return;
+    }
+    m_userData->beginGroup("DeviceProfiles");
+    m_userData->beginGroup(QString::fromLatin1(serial.toUtf8().toHex()));
+    const QString appKey = appPackage.trimmed().isEmpty()
+            ? QStringLiteral("_default") : QString::fromLatin1(appPackage.trimmed().toUtf8().toHex());
+    m_userData->beginGroup(appKey);
+    for (auto it = profile.constBegin(); it != profile.constEnd(); ++it) {
+        m_userData->setValue(it.key(), it.value());
+    }
+    m_userData->endGroup();
+    m_userData->endGroup();
+    m_userData->endGroup();
+    m_userData->sync();
+}
+
+QMap<QString, QVariant> Config::getDeviceProfile(const QString &serial, const QString &appPackage)
+{
+    QMap<QString, QVariant> profile;
+    if (serial.trimmed().isEmpty()) {
+        return profile;
+    }
+    m_userData->beginGroup("DeviceProfiles");
+    m_userData->beginGroup(QString::fromLatin1(serial.toUtf8().toHex()));
+    const QString appKey = appPackage.trimmed().isEmpty()
+            ? QStringLiteral("_default") : QString::fromLatin1(appPackage.trimmed().toUtf8().toHex());
+    m_userData->beginGroup(appKey);
+    const QStringList keys = m_userData->childKeys();
+    for (const QString &key : keys) {
+        profile.insert(key, m_userData->value(key));
+    }
+    m_userData->endGroup();
+    m_userData->endGroup();
+    m_userData->endGroup();
+    return profile;
+}
+
+void Config::saveDeviceGroup(const QString &name, const QStringList &serials)
+{
+    const QString trimmedName = name.trimmed();
+    if (trimmedName.isEmpty() || serials.isEmpty()) {
+        return;
+    }
+    const QString key = QString::fromLatin1(trimmedName.toUtf8().toHex());
+    QStringList names = m_userData->value("SavedDeviceGroupNames").toStringList();
+    if (!names.contains(trimmedName)) {
+        names.append(trimmedName);
+    }
+    m_userData->setValue("SavedDeviceGroupNames", names);
+    m_userData->setValue("SavedDeviceGroups/" + key, serials);
+    m_userData->sync();
+}
+
+QStringList Config::getDeviceGroupNames()
+{
+    return m_userData->value("SavedDeviceGroupNames").toStringList();
+}
+
+QStringList Config::getDeviceGroup(const QString &name)
+{
+    const QString key = QString::fromLatin1(name.trimmed().toUtf8().toHex());
+    return m_userData->value("SavedDeviceGroups/" + key).toStringList();
+}
+
+void Config::setWifiReconnectTarget(bool enabled, const QString &address)
+{
+    m_userData->setValue("WifiAutoReconnect", enabled);
+    if (!address.trimmed().isEmpty()) {
+        m_userData->setValue("WifiReconnectTarget", address.trimmed());
+    }
+    m_userData->sync();
+}
+
+bool Config::getWifiAutoReconnect()
+{
+    return m_userData->value("WifiAutoReconnect", false).toBool();
+}
+
+QString Config::getWifiReconnectTarget()
+{
+    return m_userData->value("WifiReconnectTarget").toString();
+}

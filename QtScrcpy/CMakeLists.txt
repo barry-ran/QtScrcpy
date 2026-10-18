@@ -317,8 +317,11 @@ message(STATUS "multi config:" QC_IS_MUTIL_CONFIG)
 # 1. multi config介绍 https://cmake.org/cmake/help/latest/prop_gbl/GENERATOR_IS_MULTI_CONFIG.html
 # 2. multi config在不用表达式生成器时自动追加子目录说明 https://cmake.org/cmake/help/latest/prop_tgt/RUNTIME_OUTPUT_DIRECTORY.html
 # 3. 使用表达式生成器禁止multi config自动追加子目录解决方案 https://stackoverflow.com/questions/7747857/in-cmake-how-do-i-work-around-the-debug-and-release-directories-visual-studio-2
+set(QSC_OUTPUT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../output" CACHE PATH "Root directory for build output")
+set(QSC_OUTPUT_DIRECTORY "${QSC_OUTPUT_ROOT}/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}")
+file(MAKE_DIRECTORY "${QSC_OUTPUT_DIRECTORY}")
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../output/${QC_CPU_ARCH}/${CMAKE_BUILD_TYPE}/$<0:>"
+    RUNTIME_OUTPUT_DIRECTORY "${QSC_OUTPUT_DIRECTORY}/$<0:>"
 )
 
 #
@@ -329,6 +332,28 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
+
+    # Deploy the Qt runtime next to the executable so build output can run
+    # directly without a separate publish step.
+    set(QSC_QT_CORE_PACKAGE_DIR "Qt${QT_DESIRED_VERSION}Core_DIR")
+    get_filename_component(QSC_QT_ROOT "${${QSC_QT_CORE_PACKAGE_DIR}}/../../.." ABSOLUTE)
+    find_program(QSC_WINDEPLOYQT_EXECUTABLE
+        NAMES windeployqt.exe windeployqt
+        HINTS "${QSC_QT_ROOT}/bin"
+    )
+
+    if(QSC_WINDEPLOYQT_EXECUTABLE)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+            COMMAND "${QSC_WINDEPLOYQT_EXECUTABLE}"
+                --no-translations
+                --no-compiler-runtime
+                "$<TARGET_FILE:${PROJECT_NAME}>"
+            COMMENT "Deploying Qt runtime dependencies"
+            VERBATIM
+        )
+    else()
+        message(WARNING "windeployqt was not found; the Windows build output will require manual Qt runtime deployment")
+    endif()
 
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/sndcpy/sndcpy.bat" "${QSC_BIN_OUTPUT_PATH}"
