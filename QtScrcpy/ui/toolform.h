@@ -23,6 +23,8 @@ public:
 
     void setSerial(const QString& serial);
     bool isHost();
+    void setHost(bool host);
+    void setKeyOverlayChecked(bool checked);
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -47,6 +49,8 @@ private slots:
     void on_expandSettingsBtn_clicked();
     void on_rotateBtn_clicked();
     void on_touchBtn_clicked();
+    void on_keyOverlayBtn_toggled(bool checked);
+    void on_keyOverlayEditBtn_clicked();
     void on_cameraTorchBtn_clicked();
     void on_cameraZoomOutBtn_clicked();
     void on_cameraZoomInBtn_clicked();

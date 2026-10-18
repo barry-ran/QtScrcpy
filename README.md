@@ -88,6 +88,10 @@ You can control all your phones at the same time.
 
 ![group-control-demo](docs/image/group-control.gif)
 
+In Simple Mode, select multiple connected devices and save them as a named control group. Applying a group makes its first available device the controller and the remaining group members follow it. Groups are saved in user settings.
+
+The Advanced Config page can reconnect to the last Wi-Fi target automatically. The recording path row shows available disk space and includes a shortcut to open the output folder. Copy Diagnostics creates a local summary of app, OS, ADB, device-count, keymap-count, and recording-space details without copying device serial numbers.
+
 ## Star History
 
 [![Star History Chart](https://star-history.dera.page/svg?repos=barry-ran/QtScrcpy&type=Date)](https://star-history.dera.page/#barry-ran/QtScrcpy&Date)

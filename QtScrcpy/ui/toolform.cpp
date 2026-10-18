@@ -1,7 +1,10 @@
 #include <QDebug>
+#include <QCursor>
 #include <QHideEvent>
 #include <QMouseEvent>
+#include <QSignalBlocker>
 #include <QShowEvent>
+#include <QToolTip>
 
 #include "iconhelper.h"
 #include "toolform.h"
@@ -36,6 +39,22 @@ bool ToolForm::isHost()
     return m_isHost;
 }
 
+void ToolForm::setHost(bool host)
+{
+    if (m_isHost == host) {
+        return;
+    }
+    m_isHost = host;
+    updateGroupControl();
+}
+
+void ToolForm::setKeyOverlayChecked(bool checked)
+{
+    QSignalBlocker blocker(ui->keyOverlayBtn);
+    ui->keyOverlayBtn->setChecked(checked);
+    ui->keyOverlayBtn->setStyleSheet(checked ? "color: #f0c419" : "");
+}
+
 void ToolForm::updateCameraMode()
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
@@ -46,6 +65,8 @@ void ToolForm::updateCameraMode()
     ui->expandSettingsBtn->setVisible(!camera);
     ui->rotateBtn->setVisible(!camera);
     ui->touchBtn->setVisible(!camera);
+    ui->keyOverlayBtn->setVisible(!camera);
+    ui->keyOverlayEditBtn->setVisible(!camera);
     ui->openScreenBtn->setVisible(!camera);
     ui->closeScreenBtn->setVisible(!camera);
     ui->powerBtn->setVisible(!camera);
@@ -79,6 +100,9 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->rotateBtn, QChar(0xf021), 15);
     IconHelper::Instance()->SetIcon(ui->screenShotBtn, QChar(0xf0c4), 15);
     IconHelper::Instance()->SetIcon(ui->touchBtn, QChar(0xf111), 15);
+    IconHelper::Instance()->SetIcon(ui->keyOverlayBtn, QChar(0xf11c), 15);
+    IconHelper::Instance()->SetIcon(ui->keyOverlayEditBtn, QChar(0xf044), 15);
+    ui->keyOverlayEditBtn->setToolTip(tr("Edit keymap"));
     IconHelper::Instance()->SetIcon(ui->groupControlBtn, QChar(0xf0c0), 15);
     IconHelper::Instance()->SetIcon(ui->clipboardBtn, QChar(0xf0c5), 15);
     IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), 15);
@@ -263,6 +287,32 @@ void ToolForm::on_touchBtn_clicked()
 
     m_showTouch = !m_showTouch;
     device->showTouch(m_showTouch);
+}
+
+void ToolForm::on_keyOverlayBtn_toggled(bool checked)
+{
+    auto videoForm = dynamic_cast<VideoForm*>(parent());
+    if (videoForm && videoForm->setKeyOverlayVisible(checked)) {
+        ui->keyOverlayBtn->setToolTip(tr("Toggle key overlay"));
+        setKeyOverlayChecked(checked);
+        return;
+    }
+
+    setKeyOverlayChecked(false);
+    ui->keyOverlayBtn->setToolTip(tr("Apply a key map before showing the overlay"));
+    QToolTip::showText(QCursor::pos(), ui->keyOverlayBtn->toolTip(), ui->keyOverlayBtn);
+}
+
+void ToolForm::on_keyOverlayEditBtn_clicked()
+{
+    auto videoForm = dynamic_cast<VideoForm*>(parent());
+    if (videoForm && videoForm->setKeyOverlayEditMode(true)) {
+        return;
+    }
+
+    const QString tip = tr("Start a device session before editing its keymap");
+    ui->keyOverlayEditBtn->setToolTip(tip);
+    QToolTip::showText(QCursor::pos(), tip, ui->keyOverlayEditBtn);
 }
 
 void ToolForm::on_cameraTorchBtn_clicked()

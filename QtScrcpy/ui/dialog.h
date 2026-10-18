@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QPointer>
+#include <QHash>
 #include <QMessageBox>
 #include <QMenu>
 #include <QSystemTrayIcon>
@@ -25,6 +26,7 @@ class QComboBox;
 class QLineEdit;
 class QCheckBox;
 class QGroupBox;
+class QLabel;
 class QPushButton;
 class QSpinBox;
 class Dialog : public QWidget
@@ -59,6 +61,7 @@ private slots:
     void on_clearOut_clicked();
     void on_stopAllServerBtn_clicked();
     void on_refreshGameScriptBtn_clicked();
+    void on_deleteGameScriptBtn_clicked();
     void on_applyScriptBtn_clicked();
     void on_recordScreenCheck_clicked(bool checked);
     void on_usbConnectBtn_clicked();
@@ -110,6 +113,10 @@ private:
 
     void showPortEditMenu(const QPoint &pos);
     void syncPresetLevelToUi();
+    void saveSelectedDeviceProfile();
+    void loadDeviceProfile(const QString &serial);
+    void applySavedDeviceGroup(const QString &name);
+    void updateRecordingSpaceLabel(const QString &path);
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -130,6 +137,9 @@ private:
     QLineEdit *m_configCodecOptionsEdit = nullptr;
     QLineEdit *m_configCodecNameEdit = nullptr;
     QComboBox *m_configLogLevelBox = nullptr;
+    QCheckBox *m_configAutoReconnectCheck = nullptr;
+    QLabel *m_recordSpaceLabel = nullptr;
+    QComboBox *m_savedGroupBox = nullptr;
     QComboBox *m_displayModeBox = nullptr;
     QLineEdit *m_displayIdEdit = nullptr;
     QLineEdit *m_newDisplayEdit = nullptr;
@@ -146,9 +156,15 @@ private:
     QAction *m_quit;
     AudioOutput m_audioOutput;
     QTimer m_autoUpdatetimer;
+    QTimer m_wifiReconnectTimer;
+    QHash<QString, QString> m_gameScripts;
+    QHash<QString, QString> m_gameScriptFiles;
     quint32 m_prevBitRate = 2000000;
     int m_prevMaxSizeIndex = 0;
     QPointer<PresetConfigDialog> m_presetDialog;
+    qint64 m_lastWifiReconnectAttemptMs = 0;
+    bool m_loadingDeviceProfile = false;
+    QString m_activeDeviceGroup;
 };
 
 #endif // DIALOG_H

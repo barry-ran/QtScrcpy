@@ -76,6 +76,8 @@ Description of the unique attributes of different key mapping types:
 
 ## Visual Key Mapping Tool
 
+When a device is connected with a key map applied, use the keyboard icon in the device toolbar to show or hide a visual overlay of mapped keys. The overlay is click-through and marks the configured touch positions, including drag paths, multi-click targets, steering-wheel directions, and mouse-look position.
+
 1. Just use [QuickAssistant](https://lrbnfell4p.feishu.cn/drive/folder/Hqckfxj5el1Wjpd9uezcX71lnBh)
 
 ![game](../screenshot/game.png)
@@ -91,4 +93,21 @@ You can use this tool to:
 - Import existing mappings for editing
 
 Try it online: [ScrcpyKeyMapper Web App](https://w4po.github.io/ScrcpyKeyMapper)
+
+### Keymap editing and device profiles in QtScrcpy
+
+In the main window, choose a keymap and select **Edit / validate** to edit its JSON. The editor checks the JSON structure and mapping types before enabling Save. New maps are written to the user keymap directory. Use **Apply** to load the selected map on the connected device; the visual overlay can then be toggled from the device toolbar or by switching custom keymap mode with the map's `switchKey` (the default is `~`).
+
+You can also edit a map visually on the mirrored device. Start a device session, open the device toolbar, and choose **Edit keymap on device** (the pencil icon). In edit mode:
+
+- Press a keyboard key, then click its touch position on the mirrored device image to add a tap mapping. The selected key follows the pointer; press Escape to clear it. You can also click an empty spot first and enter a key in the prompt.
+- Drag a marker to change its touch position. Drag either end of a drag mapping to adjust its path.
+- Right-click a marker to change its key or remove the mapping. Multi-click mappings let you remove individual touch points.
+- Drag steering-wheel directions and mouse-look anchors to reposition them; steering directions can also be rebound.
+- Choose **Aa** in the overlay toolbar to adjust the size (50–200%) and opacity (20–100%) of all key markers in this keymap. These values are stored in the keymap JSON under `keyOverlayStyle`, for example `{"keyOverlayStyle":{"keySize":1.25,"opacity":0.7}}`.
+- Choose **Save** in the overlay toolbar to write the changes to the selected keymap JSON and apply it to the connected device. **Cancel** discards unsaved edits.
+
+The editor keeps the rest of the selected JSON intact. A new map can be created from the device toolbar when no map is selected; the first save asks for a file name.
+
+Use **Save profile** to save resolution, bitrate, encoder preset, video source, camera, orientation, and keymap for the selected device and launch app. Selecting another device or launch app loads its saved profile. **Apply** also saves the active device/app profile after applying the map.
 

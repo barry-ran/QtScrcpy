@@ -1,12 +1,23 @@
 ﻿#include <QDebug>
 #include <QAbstractItemView>
+#include <QApplication>
 #include <QDesktopServices>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QCheckBox>
+#include <QClipboard>
 #include <QDir>
 #include <QFile>
 #include <QFileDialog>
 #include <QFrame>
 #include <QFileInfo>
+#include <QInputDialog>
+#include <QLabel>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonParseError>
+#include <QPlainTextEdit>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -17,8 +28,11 @@
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QSaveFile>
 #include <QSizePolicy>
 #include <QScreen>
+#include <QStorageInfo>
+#include <QSysInfo>
 #include <QScrollArea>
 #include <QSet>
 #include <QStandardPaths>
@@ -44,6 +58,172 @@ QString s_keyMapPath = "";
 QString s_defaultKeyMapPath = "";
 
 namespace {
+bool validatePosition(const QJsonObject &object, const QString &field, int mappingIndex, QString *error)
+{
+    const QJsonValue value = object.value(field);
+    if (!value.isObject()) {
+        if (error) *error = QObject::tr("Mapping %1 needs a %2 position.").arg(mappingIndex).arg(field);
+        return false;
+    }
+    const QJsonObject position = value.toObject();
+    const QJsonValue x = position.value("x");
+    const QJsonValue y = position.value("y");
+    if (!x.isDouble() || !y.isDouble()
+            || x.toDouble() < 0.0 || x.toDouble() > 1.0
+            || y.toDouble() < 0.0 || y.toDouble() > 1.0) {
+        if (error) *error = QObject::tr("Mapping %1 has an invalid %2 position; x and y must be between 0 and 1.")
+                                 .arg(mappingIndex).arg(field);
+        return false;
+    }
+    return true;
+}
+
+bool validateKeyValue(const QJsonObject &object, const QString &field, int mappingIndex,
+                      QSet<QString> *usedKeys, QString *error)
+{
+    const QString key = object.value(field).toString().trimmed();
+    if (!object.value(field).isString() || key.isEmpty()) {
+        if (error) *error = QObject::tr("Mapping %1 needs a %2 key name.").arg(mappingIndex).arg(field);
+        return false;
+    }
+    const QString canonicalKey = key.toCaseFolded();
+    if (usedKeys && usedKeys->contains(canonicalKey)) {
+        if (error) *error = QObject::tr("Mapping %1 repeats the key %2.").arg(mappingIndex).arg(key);
+        return false;
+    }
+    if (usedKeys) usedKeys->insert(canonicalKey);
+    return true;
+}
+
+bool validateKeymap(const QByteArray &json, QString *error)
+{
+    QJsonParseError parseError;
+    const QJsonDocument document = QJsonDocument::fromJson(json, &parseError);
+    if (parseError.error != QJsonParseError::NoError) {
+        if (error) {
+            *error = QObject::tr("JSON error near byte %1: %2")
+                         .arg(static_cast<qlonglong>(parseError.offset)).arg(parseError.errorString());
+        }
+        return false;
+    }
+    if (!document.isObject()) {
+        if (error) *error = QObject::tr("The keymap root must be a JSON object.");
+        return false;
+    }
+
+    const QJsonObject root = document.object();
+    if (root.contains("switchKey")
+            && (!root.value("switchKey").isString() || root.value("switchKey").toString().trimmed().isEmpty())) {
+        if (error) *error = QObject::tr("switchKey must be a non-empty Qt key name.");
+        return false;
+    }
+    if (!root.value("keyMapNodes").isArray()) {
+        if (error) *error = QObject::tr("keyMapNodes must be an array.");
+        return false;
+    }
+
+    const QJsonArray nodes = root.value("keyMapNodes").toArray();
+    QSet<QString> supportedTypes;
+    supportedTypes << "KMT_CLICK" << "KMT_CLICK_TWICE" << "KMT_CLICK_MULTI" << "KMT_DRAG" << "KMT_STEER_WHEEL";
+    QSet<QString> usedKeys;
+    for (int i = 0; i < nodes.size(); ++i) {
+        const int mappingIndex = i + 1;
+        if (!nodes.at(i).isObject()) {
+            if (error) *error = QObject::tr("Mapping %1 must be an object.").arg(mappingIndex);
+            return false;
+        }
+        const QJsonObject node = nodes.at(i).toObject();
+        const QString type = node.value("type").toString();
+        if (!supportedTypes.contains(type)) {
+            if (error) *error = QObject::tr("Mapping %1 uses an unsupported type: %2").arg(mappingIndex).arg(type);
+            return false;
+        }
+        if (node.contains("switchMap") && !node.value("switchMap").isBool()) {
+            if (error) *error = QObject::tr("Mapping %1 switchMap must be true or false.").arg(mappingIndex);
+            return false;
+        }
+
+        if (type == "KMT_STEER_WHEEL") {
+            if (!validatePosition(node, "centerPos", mappingIndex, error)) return false;
+            const QStringList directionKeys {"leftKey", "rightKey", "upKey", "downKey"};
+            for (const QString &field : directionKeys) {
+                if (!validateKeyValue(node, field, mappingIndex, &usedKeys, error)) return false;
+            }
+            const QStringList offsets {"leftOffset", "rightOffset", "upOffset", "downOffset"};
+            for (const QString &field : offsets) {
+                if (!node.value(field).isDouble() || node.value(field).toDouble() < 0.0) {
+                    if (error) *error = QObject::tr("Mapping %1 needs a non-negative %2.").arg(mappingIndex).arg(field);
+                    return false;
+                }
+            }
+        } else {
+            if (!validateKeyValue(node, "key", mappingIndex, &usedKeys, error)) return false;
+            if (type == "KMT_CLICK" || type == "KMT_CLICK_TWICE") {
+                if (!validatePosition(node, "pos", mappingIndex, error)) return false;
+            } else if (type == "KMT_CLICK_MULTI") {
+                const QJsonValue clickNodesValue = node.value("clickNodes");
+                if (!clickNodesValue.isArray() || clickNodesValue.toArray().isEmpty()) {
+                    if (error) *error = QObject::tr("Mapping %1 needs at least one click node.").arg(mappingIndex);
+                    return false;
+                }
+                const QJsonArray clickNodes = clickNodesValue.toArray();
+                for (int clickIndex = 0; clickIndex < clickNodes.size(); ++clickIndex) {
+                    const QJsonObject clickNode = clickNodes.at(clickIndex).toObject();
+                    if (!clickNodes.at(clickIndex).isObject() || !clickNode.value("delay").isDouble()
+                            || clickNode.value("delay").toDouble() < 0.0
+                            || !validatePosition(clickNode, "pos", mappingIndex, error)) {
+                        if (error && error->isEmpty()) *error = QObject::tr("Mapping %1 click node %2 needs a non-negative delay and a valid position.")
+                                                                 .arg(mappingIndex).arg(clickIndex + 1);
+                        return false;
+                    }
+                }
+            } else if (type == "KMT_DRAG") {
+                if (!validatePosition(node, "startPos", mappingIndex, error)
+                        || !validatePosition(node, "endPos", mappingIndex, error)) return false;
+                if (node.contains("dragSpeed")
+                        && (!node.value("dragSpeed").isDouble() || node.value("dragSpeed").toDouble() < 0.0
+                            || node.value("dragSpeed").toDouble() > 1.0)) {
+                    if (error) *error = QObject::tr("Mapping %1 dragSpeed must be between 0 and 1.").arg(mappingIndex);
+                    return false;
+                }
+                if (node.contains("startDelay")
+                        && (!node.value("startDelay").isDouble() || node.value("startDelay").toDouble() < 0.0)) {
+                    if (error) *error = QObject::tr("Mapping %1 startDelay must be non-negative.").arg(mappingIndex);
+                    return false;
+                }
+            }
+        }
+    }
+
+    if (root.contains("mouseMoveMap")) {
+        if (!root.value("mouseMoveMap").isObject()) {
+            if (error) *error = QObject::tr("mouseMoveMap must be an object.");
+            return false;
+        }
+        const QJsonObject mouseMoveMap = root.value("mouseMoveMap").toObject();
+        if (!validatePosition(mouseMoveMap, "startPos", 0, error)) return false;
+        if (mouseMoveMap.contains("speedRatio")
+                && (!mouseMoveMap.value("speedRatio").isDouble() || mouseMoveMap.value("speedRatio").toDouble() <= 0.0)) {
+            if (error) *error = QObject::tr("mouseMoveMap speedRatio must be positive.");
+            return false;
+        }
+        for (const QString &field : QStringList {"speedRatioX", "speedRatioY"}) {
+            if (mouseMoveMap.contains(field)
+                    && (!mouseMoveMap.value(field).isDouble() || mouseMoveMap.value(field).toDouble() <= 0.0)) {
+                if (error) *error = QObject::tr("mouseMoveMap %1 must be positive.").arg(field);
+                return false;
+            }
+        }
+        if (mouseMoveMap.contains("smallEyes")) {
+            const QJsonObject smallEyes = mouseMoveMap.value("smallEyes").toObject();
+            if (!mouseMoveMap.value("smallEyes").isObject()
+                    || !validateKeyValue(smallEyes, "key", 0, nullptr, error)
+                    || !validatePosition(smallEyes, "pos", 0, error)) return false;
+        }
+    }
+    return true;
+}
+
 class ComboBoxItemDelegate final : public QStyledItemDelegate
 {
 public:
@@ -128,6 +308,11 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
     if (ui->autoUpdatecheckBox->isChecked()) {
         m_autoUpdatetimer.start(5000);
     }
+    connect(&m_wifiReconnectTimer, &QTimer::timeout, this, &Dialog::on_updateDevice_clicked);
+    m_wifiReconnectTimer.setInterval(15000);
+    if (Config::getInstance().getWifiAutoReconnect() && !Config::getInstance().getWifiReconnectTarget().isEmpty()) {
+        m_wifiReconnectTimer.start();
+    }
 
     connect(&m_adb, &qsc::AdbProcess::adbProcessResult, this, [this](qsc::AdbProcess::ADB_EXEC_RESULT processResult) {
         QString log = "";
@@ -154,11 +339,29 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
             //log = m_adb.getStdOut();
             if (args.contains("devices")) {
                 QStringList devices = m_adb.getDevicesSerialFromStdOut();
+                QSet<QString> selectedSerials;
+                for (QListWidgetItem *item : ui->connectedPhoneList->selectedItems()) {
+                    selectedSerials.insert(item->data(Qt::UserRole).toString());
+                }
                 ui->serialBox->clear();
                 ui->connectedPhoneList->clear();
                 for (auto &item : devices) {
                     ui->serialBox->addItem(item);
-                    ui->connectedPhoneList->addItem(Config::getInstance().getNickName(item) + "-" + item);
+                    auto *deviceItem = new QListWidgetItem(Config::getInstance().getNickName(item) + "-" + item,
+                                                           ui->connectedPhoneList);
+                    deviceItem->setData(Qt::UserRole, item);
+                    deviceItem->setSelected(selectedSerials.contains(item));
+                }
+                const QString reconnectTarget = Config::getInstance().getWifiReconnectTarget();
+                if (Config::getInstance().getWifiAutoReconnect() && !reconnectTarget.isEmpty()
+                        && !devices.contains(reconnectTarget)
+                        && QDateTime::currentMSecsSinceEpoch() - m_lastWifiReconnectAttemptMs > 15000) {
+                    m_lastWifiReconnectAttemptMs = QDateTime::currentMSecsSinceEpoch();
+                    QTimer::singleShot(0, this, [this, reconnectTarget] {
+                        if (!m_adb.isRuning()) {
+                            m_adb.execute(QString(), QStringList() << "connect" << reconnectTarget);
+                        }
+                    });
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
@@ -238,6 +441,10 @@ void Dialog::initUI()
 #endif
 
     ui->bitRateEdit->setValidator(new QIntValidator(1, 99999, this));
+    connect(ui->gameBox, &QComboBox::currentTextChanged, this, [this](const QString &text) {
+        const bool camera = ui->videoSourceBox->currentIndex() == qsc::VIDEO_SOURCE_CAMERA;
+        ui->deleteGameScriptBtn->setEnabled(!camera && !text.trimmed().isEmpty());
+    });
 
     ui->presetConfigBtn->setVisible(false);
 
@@ -288,6 +495,131 @@ void Dialog::initUI()
     // 加载端口历史记录
     loadPortHistory();
 
+    on_refreshGameScriptBtn_clicked();
+
+    ui->connectedPhoneList->setSelectionMode(QAbstractItemView::ExtendedSelection);
+    m_savedGroupBox = new QComboBox(ui->simpleGroupBox);
+    m_savedGroupBox->setToolTip(tr("Saved synchronized-control groups"));
+    m_savedGroupBox->addItems(Config::getInstance().getDeviceGroupNames());
+    auto *groupRow = new QHBoxLayout();
+    auto *saveGroupButton = new QPushButton(tr("Save group"), ui->simpleGroupBox);
+    auto *applyGroupButton = new QPushButton(tr("Apply group"), ui->simpleGroupBox);
+    groupRow->addWidget(m_savedGroupBox, 1);
+    groupRow->addWidget(saveGroupButton);
+    groupRow->addWidget(applyGroupButton);
+    ui->verticalLayout_4->addLayout(groupRow);
+    connect(saveGroupButton, &QPushButton::clicked, this, [this] {
+        QStringList serials;
+        const QList<QListWidgetItem *> selected = ui->connectedPhoneList->selectedItems();
+        for (QListWidgetItem *item : selected) {
+            const QString serial = item->data(Qt::UserRole).toString();
+            if (!serial.isEmpty()) serials.append(serial);
+        }
+        if (serials.isEmpty()) {
+            QMessageBox::information(this, tr("Save group"), tr("Select one or more devices first."));
+            return;
+        }
+        bool accepted = false;
+        const QString name = QInputDialog::getText(this, tr("Save group"), tr("Group name:"),
+                                                   QLineEdit::Normal, QString(), &accepted).trimmed();
+        if (!accepted || name.isEmpty()) return;
+        Config::getInstance().saveDeviceGroup(name, serials);
+        const int index = m_savedGroupBox->findText(name);
+        if (index < 0) m_savedGroupBox->addItem(name);
+        m_savedGroupBox->setCurrentText(name);
+    });
+    connect(applyGroupButton, &QPushButton::clicked, this, [this] {
+        applySavedDeviceGroup(m_savedGroupBox->currentText());
+    });
+
+    auto *editorButton = new QPushButton(tr("Edit / validate"), ui->configWidget4);
+    auto *saveProfileButton = new QPushButton(tr("Save profile"), ui->configWidget4);
+    auto *loadProfileButton = new QPushButton(tr("Load profile"), ui->configWidget4);
+    ui->horizontalLayout_8->addWidget(editorButton);
+    ui->horizontalLayout_8->addWidget(saveProfileButton);
+    ui->horizontalLayout_8->addWidget(loadProfileButton);
+    connect(editorButton, &QPushButton::clicked, this, [this] {
+        QString fileName = ui->gameBox->currentText().trimmed();
+        if (fileName.isEmpty()) {
+            bool accepted = false;
+            fileName = QInputDialog::getText(this, tr("New keymap"), tr("Name (without .json):"),
+                                             QLineEdit::Normal, QString(), &accepted).trimmed();
+            if (!accepted || fileName.isEmpty()) return;
+            fileName.replace(QRegularExpression("[^A-Za-z0-9_. -]"), "_");
+            if (!fileName.endsWith(".json", Qt::CaseInsensitive)) fileName += ".json";
+        }
+        if (QFileInfo(fileName).fileName() != fileName) {
+            QMessageBox::warning(this, tr("Invalid keymap name"), tr("Use a file name without a directory path."));
+            return;
+        }
+        const QString path = QDir(getKeyMapPath()).filePath(fileName);
+        QFile file(path);
+        QString initial = "{\n  \"switchKey\": \"Key_QuoteLeft\",\n  \"keyMapNodes\": []\n}\n";
+        if (file.exists()) {
+            if (!file.open(QIODevice::ReadOnly)) {
+                QMessageBox::warning(this, tr("Open keymap failed"), path);
+                return;
+            }
+            initial = QString::fromUtf8(file.readAll());
+            file.close();
+        }
+
+        QDialog editor(this);
+        editor.setWindowTitle(tr("Edit keymap - %1").arg(fileName));
+        editor.resize(700, 520);
+        auto *layout = new QVBoxLayout(&editor);
+        auto *textEdit = new QPlainTextEdit(&editor);
+        textEdit->setPlainText(initial);
+        auto *status = new QLabel(&editor);
+        auto *buttons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel, &editor);
+        auto *saveButton = buttons->button(QDialogButtonBox::Save);
+        layout->addWidget(textEdit, 1);
+        layout->addWidget(status);
+        layout->addWidget(buttons);
+        auto validate = [textEdit, status, saveButton] {
+            QString error;
+            const bool valid = validateKeymap(textEdit->toPlainText().toUtf8(), &error);
+            status->setText(valid ? QObject::tr("Valid keymap JSON and mapping structure.") : error);
+            status->setStyleSheet(valid ? "color: #16833b" : "color: #c0392b");
+            saveButton->setEnabled(valid);
+        };
+        connect(textEdit, &QPlainTextEdit::textChanged, &editor, validate);
+        validate();
+        connect(buttons, &QDialogButtonBox::rejected, &editor, &QDialog::reject);
+        connect(buttons, &QDialogButtonBox::accepted, &editor, [&editor, &file, textEdit, path, fileName, this] {
+            if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                QMessageBox::warning(&editor, tr("Save keymap failed"), path);
+                return;
+            }
+            file.write(textEdit->toPlainText().toUtf8());
+            file.close();
+            on_refreshGameScriptBtn_clicked();
+            ui->gameBox->setCurrentText(fileName);
+            on_applyScriptBtn_clicked();
+            editor.accept();
+        });
+        editor.exec();
+    });
+    connect(saveProfileButton, &QPushButton::clicked, this, &Dialog::saveSelectedDeviceProfile);
+    connect(loadProfileButton, &QPushButton::clicked, this, [this] {
+        loadDeviceProfile(ui->serialBox->currentText().trimmed());
+    });
+
+    if (ui->recordPathEdt->parentWidget() && ui->recordPathEdt->parentWidget()->layout()) {
+        auto *pathLayout = qobject_cast<QHBoxLayout *>(ui->recordPathEdt->parentWidget()->layout());
+        if (pathLayout) {
+            m_recordSpaceLabel = new QLabel(ui->recordPathEdt->parentWidget());
+            auto *openRecordFolderButton = new QPushButton(tr("Open"), ui->recordPathEdt->parentWidget());
+            pathLayout->addWidget(m_recordSpaceLabel);
+            pathLayout->addWidget(openRecordFolderButton);
+            connect(openRecordFolderButton, &QPushButton::clicked, this, [this] {
+                openUserDirectory(ui->recordPathEdt->text().trimmed());
+            });
+            connect(ui->recordPathEdt, &QLineEdit::textChanged, this, &Dialog::updateRecordingSpaceLabel);
+            updateRecordingSpaceLabel(ui->recordPathEdt->text());
+        }
+    }
+
     // 为deviceIpEdt添加右键菜单
     if (ui->deviceIpEdt->lineEdit()) {
         ui->deviceIpEdt->lineEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -302,6 +634,12 @@ void Dialog::initUI()
                 this, &Dialog::showPortEditMenu);
     }
     initAdvancedDisplayUi();
+    connect(m_startAppBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int) {
+        loadDeviceProfile(ui->serialBox->currentText().trimmed());
+    });
+    connect(m_startAppBox, &QComboBox::currentTextChanged, this, [this](const QString &) {
+        loadDeviceProfile(ui->serialBox->currentText().trimmed());
+    });
 
     auto *configTabs = new QTabWidget(ui->rightWidget);
     auto *startConfigPage = new QWidget(configTabs);
@@ -493,12 +831,27 @@ void Dialog::initAdvancedConfigUi(QWidget *parent)
     m_configLogLevelBox->addItem("error", "error");
     layout->addRow(tr("Log level"), m_configLogLevelBox);
 
+    m_configAutoReconnectCheck = new QCheckBox(tr("Reconnect to the last Wi-Fi device automatically"), group);
+    layout->addRow(m_configAutoReconnectCheck);
+    connect(m_configAutoReconnectCheck, &QCheckBox::toggled, this, [](bool checked) {
+        Config::getInstance().setWifiReconnectTarget(checked, Config::getInstance().getWifiReconnectTarget());
+    });
+    connect(m_configAutoReconnectCheck, &QCheckBox::toggled, this, [this](bool checked) {
+        if (checked && !Config::getInstance().getWifiReconnectTarget().isEmpty()) {
+            m_wifiReconnectTimer.start();
+        } else {
+            m_wifiReconnectTimer.stop();
+        }
+    });
+
     auto *buttons = new QHBoxLayout();
     auto *openConfigButton = new QPushButton(tr("Open Config Directory"), group);
     auto *openKeymapButton = new QPushButton(tr("Open Keymap Directory"), group);
+    auto *copyDiagnosticsButton = new QPushButton(tr("Copy Diagnostics"), group);
     auto *saveButton = new QPushButton(tr("Save"), group);
     buttons->addWidget(openConfigButton);
     buttons->addWidget(openKeymapButton);
+    buttons->addWidget(copyDiagnosticsButton);
     buttons->addStretch();
     buttons->addWidget(saveButton);
     layout->addRow(buttons);
@@ -513,6 +866,30 @@ void Dialog::initAdvancedConfigUi(QWidget *parent)
     });
     connect(openKeymapButton, &QPushButton::clicked, this, [this] {
         openUserDirectory(getKeyMapPath());
+    });
+    connect(copyDiagnosticsButton, &QPushButton::clicked, this, [this] {
+        const QString adbPath = Config::getInstance().getAdbPath();
+        const QString effectiveAdbPath = adbPath.trimmed().isEmpty()
+                ? QDir(QCoreApplication::applicationDirPath()).filePath("adb.exe") : adbPath;
+        int wifiCount = 0;
+        for (int i = 0; i < ui->serialBox->count(); ++i) {
+            if (ui->serialBox->itemText(i).contains(':')) ++wifiCount;
+        }
+        const QStorageInfo storage(ui->recordPathEdt->text().trimmed());
+        const QString freeSpace = storage.isValid() && storage.isReady()
+                ? QString::number(storage.bytesAvailable() / (1024.0 * 1024.0 * 1024.0), 'f', 1) + " GiB"
+                : tr("unavailable");
+        const QString report = QStringList {
+            QStringLiteral("QtScrcpy %1").arg(QCoreApplication::applicationVersion()),
+            QStringLiteral("Qt %1").arg(QString::fromLatin1(qVersion())),
+            QStringLiteral("OS %1 (%2)").arg(QSysInfo::prettyProductName(), QSysInfo::currentCpuArchitecture()),
+            QStringLiteral("ADB executable present: %1").arg(QFileInfo::exists(effectiveAdbPath) ? tr("yes") : tr("no")),
+            QStringLiteral("Connected devices: %1 (Wi-Fi: %2)").arg(ui->serialBox->count()).arg(wifiCount),
+            QStringLiteral("Keymap files: %1").arg(QDir(getKeyMapPath()).entryList(QStringList() << "*.json", QDir::Files).size()),
+            QStringLiteral("Recording directory free space: %1").arg(freeSpace)
+        }.join('\n');
+        QApplication::clipboard()->setText(report);
+        QMessageBox::information(this, tr("Diagnostics copied"), tr("A privacy-conscious diagnostics summary was copied to the clipboard."));
     });
     connect(saveButton, &QPushButton::clicked, this, &Dialog::saveAdvancedConfig);
     loadAdvancedConfig();
@@ -532,6 +909,7 @@ void Dialog::loadAdvancedConfig()
     m_configCodecOptionsEdit->setText(config.getCodecOptions());
     m_configCodecNameEdit->setText(config.getCodecName());
     m_configLogLevelBox->setCurrentIndex(qMax(0, m_configLogLevelBox->findData(config.getLogLevel())));
+    m_configAutoReconnectCheck->setChecked(config.getWifiAutoReconnect());
 }
 
 void Dialog::saveAdvancedConfig()
@@ -808,6 +1186,7 @@ void Dialog::updateVideoSourceUi()
     ui->gameBox->setEnabled(!camera);
     ui->refreshGameScriptBtn->setEnabled(!camera);
     ui->applyScriptBtn->setEnabled(!camera);
+    ui->deleteGameScriptBtn->setEnabled(!camera && !ui->gameBox->currentText().trimmed().isEmpty());
     ui->installSndcpyBtn->setEnabled(!camera);
     ui->startAudioBtn->setEnabled(!camera);
     if (m_advancedDisplayGroup) {
@@ -859,7 +1238,15 @@ void Dialog::on_startServerBtn_clicked()
     params.serverLocalPath = getServerPath();
     params.serverRemotePath = Config::getInstance().getServerPath();
     params.pushFilePath = Config::getInstance().getPushFilePath();
-    params.gameScript = camera ? QString() : getGameScript(ui->gameBox->currentText());
+    const QString selectedKeymapFile = camera ? QString() : ui->gameBox->currentText().trimmed();
+    params.gameScript = camera ? QString() : getGameScript(selectedKeymapFile);
+    if (!camera && !params.gameScript.isEmpty()) {
+        QString validationError;
+        if (!validateKeymap(params.gameScript.toUtf8(), &validationError)) {
+            QMessageBox::warning(this, tr("Invalid keymap"), validationError);
+            return;
+        }
+    }
     params.logLevel = Config::getInstance().getLogLevel();
     // Apply an encoder preset (when a preset mode is selected) or the ini default.
     const int codecModeIndex = ui->codecModeBox->currentIndex();
@@ -929,18 +1316,22 @@ void Dialog::on_startServerBtn_clicked()
 
     const bool needsVirtualDisplayCheck = !params.newDisplay.isEmpty();
     if (!camera && !needsVirtualDisplayCheck) {
+        m_gameScripts.insert(params.serial, params.gameScript);
+        m_gameScriptFiles.insert(params.serial, selectedKeymapFile);
         qsc::IDeviceManage::getInstance().connectDevice(params);
         return;
     }
 
     auto *versionAdb = new qsc::AdbProcess(this);
     connect(versionAdb, &qsc::AdbProcess::adbProcessResult, this,
-            [this, versionAdb, camera, params](qsc::AdbProcess::ADB_EXEC_RESULT result) {
+            [this, versionAdb, camera, params, selectedKeymapFile](qsc::AdbProcess::ADB_EXEC_RESULT result) {
         if (result == qsc::AdbProcess::AER_SUCCESS_EXEC) {
             bool ok = false;
             const int sdk = versionAdb->getStdOut().trimmed().toInt(&ok);
             const int minimumSdk = camera ? 31 : 29;
             if (ok && sdk >= minimumSdk) {
+                m_gameScripts.insert(params.serial, params.gameScript);
+                m_gameScriptFiles.insert(params.serial, selectedKeymapFile);
                 qsc::IDeviceManage::getInstance().connectDevice(params);
             } else {
                 outLog(camera ? tr("camera preview requires Android 12 or later")
@@ -1161,6 +1552,10 @@ void Dialog::on_wirelessConnectBtn_clicked()
     if (!port.isEmpty() && port != ip) {
         savePortHistory(port);
     }
+    Config::getInstance().setWifiReconnectTarget(Config::getInstance().getWifiAutoReconnect(), addr);
+    if (Config::getInstance().getWifiAutoReconnect()) {
+        m_wifiReconnectTimer.start();
+    }
 
     outLog("wireless connect...", false);
     QStringList adbArgs;
@@ -1257,10 +1652,70 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
 {
     Q_UNUSED(deviceName);
     if (!success) {
+        m_gameScripts.remove(serial);
+        m_gameScriptFiles.remove(serial);
         return;
     }
     auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin(), ui->showToolbar->isChecked(), ui->decodeModeBox->currentIndex());
     videoForm->setSerial(serial);
+    videoForm->setKeyOverlayScript(m_gameScripts.value(serial));
+    connect(videoForm, &VideoForm::keymapSaveRequested, this,
+            [this, videoForm, serial](const QString &script) {
+        QString validationError;
+        if (!validateKeymap(script.toUtf8(), &validationError)) {
+            QMessageBox::warning(videoForm, tr("Invalid keymap"), validationError);
+            return;
+        }
+
+        QString fileName = m_gameScriptFiles.value(serial).trimmed();
+        if (fileName.isEmpty()) {
+            bool accepted = false;
+            fileName = QInputDialog::getText(videoForm, tr("Save new keymap"),
+                                             tr("Name (without .json):"), QLineEdit::Normal,
+                                             QString(), &accepted).trimmed();
+            if (!accepted || fileName.isEmpty()) {
+                return;
+            }
+            fileName.replace(QRegularExpression("[^A-Za-z0-9_. -]"), "_");
+            if (!fileName.endsWith(".json", Qt::CaseInsensitive)) {
+                fileName += ".json";
+            }
+        }
+        if (QFileInfo(fileName).fileName() != fileName || fileName == "." || fileName == "..") {
+            QMessageBox::warning(videoForm, tr("Invalid keymap name"),
+                                 tr("Use a file name without a directory path."));
+            return;
+        }
+
+        initializeKeyMapDirectory();
+        const QString path = QDir(getKeyMapPath()).filePath(fileName);
+        QSaveFile file(path);
+        if (!file.open(QIODevice::WriteOnly)) {
+            QMessageBox::warning(videoForm, tr("Save keymap failed"), path);
+            return;
+        }
+        const QByteArray bytes = script.toUtf8();
+        if (file.write(bytes) != bytes.size() || !file.commit()) {
+            QMessageBox::warning(videoForm, tr("Save keymap failed"), path);
+            return;
+        }
+
+        m_gameScriptFiles.insert(serial, fileName);
+        m_gameScripts.insert(serial, script);
+        auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
+        if (device) {
+            device->updateScript(script);
+        }
+        if (ui->gameBox->findText(fileName) < 0) {
+            ui->gameBox->addItem(fileName);
+        }
+        if (ui->serialBox->currentText().trimmed() == serial) {
+            ui->gameBox->setCurrentText(fileName);
+            saveSelectedDeviceProfile();
+        }
+        videoForm->setKeyOverlayScript(script);
+        outLog(tr("Saved visual keymap: %1").arg(fileName));
+    });
 
     qsc::IDeviceManage::getInstance().getDevice(serial)->setUserData(static_cast<void*>(videoForm));
     qsc::IDeviceManage::getInstance().getDevice(serial)->registerDeviceObserver(videoForm);
@@ -1299,10 +1754,15 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
 #endif
 
     GroupController::instance().addDevice(serial);
+    if (!m_activeDeviceGroup.isEmpty()) {
+        applySavedDeviceGroup(m_activeDeviceGroup);
+    }
 }
 
 void Dialog::onDeviceDisconnected(QString serial)
 {
+    m_gameScripts.remove(serial);
+    m_gameScriptFiles.remove(serial);
     GroupController::instance().removeDevice(serial);
     auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
     if (!device) {
@@ -1386,6 +1846,58 @@ void Dialog::on_refreshGameScriptBtn_clicked()
     }
 }
 
+void Dialog::on_deleteGameScriptBtn_clicked()
+{
+    const QString fileName = ui->gameBox->currentText().trimmed();
+    if (fileName.isEmpty() || QFileInfo(fileName).fileName() != fileName) {
+        return;
+    }
+
+    const QString userPath = QDir(getKeyMapPath()).filePath(fileName);
+    const QString defaultPath = QDir(getDefaultKeyMapPath()).filePath(fileName);
+    if (QFileInfo::exists(defaultPath)) {
+        QMessageBox::information(this, tr("Delete keymap"),
+                                 tr("%1 is a bundled keymap and cannot be deleted. Save a copy with a different name first.").arg(fileName));
+        return;
+    }
+    if (!QFileInfo::exists(userPath)) {
+        QMessageBox::information(this, tr("Delete keymap"),
+                                 tr("Only keymaps saved in your user keymap folder can be deleted."));
+        return;
+    }
+
+    if (QMessageBox::question(this, tr("Delete keymap"),
+                              tr("Delete %1 permanently?").arg(fileName),
+                              QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes) {
+        return;
+    }
+    if (!QFile::remove(userPath)) {
+        QMessageBox::warning(this, tr("Delete keymap failed"), userPath);
+        return;
+    }
+
+    const QStringList affectedSerials = m_gameScriptFiles.keys(fileName);
+    for (const QString &serial : affectedSerials) {
+        m_gameScriptFiles.remove(serial);
+        m_gameScripts.remove(serial);
+        auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
+        if (!device) {
+            continue;
+        }
+        device->updateScript(QString());
+        if (void *userData = device->getUserData()) {
+            auto *videoForm = static_cast<VideoForm*>(userData);
+            videoForm->setKeyOverlayScript(QString());
+            videoForm->setKeyOverlayVisible(false);
+        }
+    }
+
+    on_refreshGameScriptBtn_clicked();
+    ui->gameBox->setCurrentIndex(-1);
+    saveSelectedDeviceProfile();
+    outLog(tr("Deleted keymap: %1").arg(fileName));
+}
+
 void Dialog::on_applyScriptBtn_clicked()
 {
     auto curSerial = ui->serialBox->currentText().trimmed();
@@ -1394,7 +1906,20 @@ void Dialog::on_applyScriptBtn_clicked()
         return;
     }
 
-    device->updateScript(getGameScript(ui->gameBox->currentText()));
+    const QString script = getGameScript(ui->gameBox->currentText());
+    QString validationError;
+    if (script.isEmpty() || !validateKeymap(script.toUtf8(), &validationError)) {
+        QMessageBox::warning(this, tr("Invalid keymap"), script.isEmpty() ? tr("The selected keymap could not be read.") : validationError);
+        return;
+    }
+    device->updateScript(script);
+    m_gameScripts.insert(curSerial, script);
+    m_gameScriptFiles.insert(curSerial, ui->gameBox->currentText().trimmed());
+    auto data = device->getUserData();
+    if (data) {
+        static_cast<VideoForm*>(data)->setKeyOverlayScript(script);
+    }
+    saveSelectedDeviceProfile();
 }
 
 void Dialog::on_recordScreenCheck_clicked(bool checked)
@@ -1525,6 +2050,111 @@ void Dialog::on_useSingleModeCheck_clicked()
 void Dialog::on_serialBox_currentIndexChanged(const QString &arg1)
 {
     ui->userNameEdt->setText(Config::getInstance().getNickName(arg1));
+    loadDeviceProfile(arg1);
+}
+
+void Dialog::saveSelectedDeviceProfile()
+{
+    const QString serial = ui->serialBox->currentText().trimmed();
+    if (serial.isEmpty()) {
+        QMessageBox::information(this, tr("Device profile"), tr("Select a device first."));
+        return;
+    }
+    QString appPackage = m_startAppBox ? m_startAppBox->currentData().toString().trimmed() : QString();
+    if (appPackage.isEmpty() && m_startAppBox) {
+        const QString appText = m_startAppBox->currentText().trimmed();
+        const QRegularExpression packageSuffix("\\(([^()]+)\\)$");
+        const QRegularExpressionMatch match = packageSuffix.match(appText);
+        appPackage = match.hasMatch() ? match.captured(1) : appText;
+    }
+
+    QMap<QString, QVariant> profile;
+    profile.insert("maxSizeIndex", ui->maxSizeBox->currentIndex());
+    profile.insert("bitRate", getBitRate());
+    profile.insert("codecModeIndex", ui->codecModeBox->currentIndex());
+    profile.insert("presetLevel", m_presetDialog ? m_presetDialog->selectedLevel()
+                                                  : Config::getInstance().getUserBootConfig().presetLevel);
+    profile.insert("videoSource", ui->videoSourceBox->currentIndex());
+    profile.insert("cameraFacing", ui->cameraFacingBox->currentIndex());
+    profile.insert("orientationIndex", ui->lockOrientationBox->currentIndex());
+    profile.insert("keymap", ui->gameBox->currentText().trimmed());
+    Config::getInstance().setDeviceProfile(serial, appPackage, profile);
+    outLog(tr("Saved profile for %1 on %2").arg(appPackage.isEmpty() ? tr("default app") : appPackage, serial));
+}
+
+void Dialog::loadDeviceProfile(const QString &serial)
+{
+    if (m_loadingDeviceProfile || serial.trimmed().isEmpty() || !m_startAppBox) {
+        return;
+    }
+    QString appPackage = m_startAppBox->currentData().toString().trimmed();
+    if (appPackage.isEmpty()) {
+        const QString appText = m_startAppBox->currentText().trimmed();
+        const QRegularExpressionMatch match = QRegularExpression("\\(([^()]+)\\)$").match(appText);
+        appPackage = match.hasMatch() ? match.captured(1) : appText;
+    }
+    const QMap<QString, QVariant> profile = Config::getInstance().getDeviceProfile(serial, appPackage);
+    if (profile.isEmpty()) {
+        return;
+    }
+
+    m_loadingDeviceProfile = true;
+    ui->maxSizeBox->setCurrentIndex(qBound(0, profile.value("maxSizeIndex", ui->maxSizeBox->currentIndex()).toInt(), ui->maxSizeBox->count() - 1));
+    ui->videoSourceBox->setCurrentIndex(qBound(0, profile.value("videoSource", ui->videoSourceBox->currentIndex()).toInt(), ui->videoSourceBox->count() - 1));
+    ui->cameraFacingBox->setCurrentIndex(qBound(0, profile.value("cameraFacing", ui->cameraFacingBox->currentIndex()).toInt(), ui->cameraFacingBox->count() - 1));
+    ui->lockOrientationBox->setCurrentIndex(qBound(0, profile.value("orientationIndex", ui->lockOrientationBox->currentIndex()).toInt(), ui->lockOrientationBox->count() - 1));
+    ui->codecModeBox->setCurrentIndex(qBound(0, profile.value("codecModeIndex", ui->codecModeBox->currentIndex()).toInt(), ui->codecModeBox->count() - 1));
+    const quint32 bitRate = profile.value("bitRate", getBitRate()).toUInt();
+    if (bitRate > 0 && bitRate % 1000000 == 0) {
+        ui->bitRateBox->setCurrentText("Mbps");
+        ui->bitRateEdit->setText(QString::number(bitRate / 1000000));
+    } else if (bitRate > 0) {
+        ui->bitRateBox->setCurrentText("Kbps");
+        ui->bitRateEdit->setText(QString::number(bitRate / 1000));
+    }
+    const int presetLevel = qBound(0, profile.value("presetLevel", 1).toInt(), 2);
+    if (m_presetDialog) m_presetDialog->setLevel(presetLevel);
+    const QString keymap = profile.value("keymap").toString();
+    if (!keymap.isEmpty()) ui->gameBox->setCurrentText(keymap);
+    m_loadingDeviceProfile = false;
+}
+
+void Dialog::applySavedDeviceGroup(const QString &name)
+{
+    if (name.trimmed().isEmpty()) return;
+    const QStringList serials = Config::getInstance().getDeviceGroup(name);
+    if (serials.isEmpty()) return;
+    m_activeDeviceGroup = name;
+    QString hostSerial;
+    for (const QString &serial : serials) {
+        if (qsc::IDeviceManage::getInstance().getDevice(serial)) {
+            hostSerial = serial;
+            break;
+        }
+    }
+    for (int i = 0; i < ui->serialBox->count(); ++i) {
+        const QString serial = ui->serialBox->itemText(i);
+        auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
+        if (!device || !device->getUserData()) continue;
+        const bool member = serials.contains(serial);
+        const bool isHost = !member || serial == hostSerial;
+        static_cast<VideoForm *>(device->getUserData())->setGroupHost(isHost);
+    }
+    outLog(tr("Applied synchronized-control group: %1").arg(name));
+}
+
+void Dialog::updateRecordingSpaceLabel(const QString &path)
+{
+    if (!m_recordSpaceLabel) return;
+    const QStorageInfo storage(path.trimmed());
+    if (path.trimmed().isEmpty() || !storage.isValid() || !storage.isReady()) {
+        m_recordSpaceLabel->setText(tr("free space unavailable"));
+        m_recordSpaceLabel->setToolTip(path.trimmed());
+        return;
+    }
+    const double gib = static_cast<double>(storage.bytesAvailable()) / (1024.0 * 1024.0 * 1024.0);
+    m_recordSpaceLabel->setText(tr("%1 GiB free").arg(gib, 0, 'f', 1));
+    m_recordSpaceLabel->setToolTip(QDir::toNativeSeparators(path.trimmed()));
 }
 
 quint32 Dialog::getBitRate()

@@ -17,6 +17,7 @@ class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
 class MetalVideoWidget;
+class KeyOverlayWidget;
 class VideoForm : public QWidget, public qsc::DeviceObserver
 {
     Q_OBJECT
@@ -35,6 +36,13 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
     bool isHost();
+    void setGroupHost(bool host);
+    void setKeyOverlayScript(const QString &script);
+    bool setKeyOverlayVisible(bool visible);
+    bool setKeyOverlayEditMode(bool enabled);
+
+signals:
+    void keymapSaveRequested(const QString &script);
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
@@ -58,8 +66,11 @@ private:
     void ensureOnScreen();
     // 是否与任一屏幕的可用区域有交集（含边界相交判定）
     bool isRectOnAnyScreen(const QRect &rect) const;
+    void syncKeyOverlayWithKeymap(bool wasCustomKeymap);
 
 protected:
+    bool event(QEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
@@ -94,6 +105,7 @@ private:
     QPointer<MetalVideoWidget> m_metalWidget;
 
     QPointer<QLabel> m_fpsLabel;
+    QPointer<KeyOverlayWidget> m_keyOverlay;
 
     //inside member
     QSize m_frameSize;
@@ -103,6 +115,7 @@ private:
     bool m_skin = true;
     QPoint m_fullScreenBeforePos;
     QString m_serial;
+    QString m_keyOverlayScript;
     int m_decodeMode = 0;
     bool m_metalFirstFrame = true;  // Metal 首次帧标记
     bool m_flexDisplay = false;

@@ -113,10 +113,17 @@ int main(int argc, char *argv[])
 
     g_oldMessageHandler = qInstallMessageHandler(myMessageOutput);
     QApplication a(argc, argv);
+#if defined(VERSION_MAJOR) && defined(VERSION_MINOR) && defined(VERSION_PATCH)
+    a.setApplicationVersion(QString("%1.%2.%3")
+                                .arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH));
+#endif
 
     // Only one QtScrcpy per user. If one is already running (possibly hidden in
     // the system tray), ask it to show its window and exit.
-    SingleInstance singleInstance(QStringLiteral("QtScrcpy"));
+    // A private instance ID lets development or side-by-side builds run without
+    // stealing focus from the user's regular QtScrcpy session.
+    const QString instanceId = qEnvironmentVariable("QTSCRCPY_INSTANCE_ID", QStringLiteral("QtScrcpy"));
+    SingleInstance singleInstance(instanceId);
     if (!singleInstance.isPrimary()) {
         singleInstance.notifyPrimary();
         return 0;
