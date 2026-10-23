@@ -133,7 +133,14 @@ set(LINK_LIBS
 
 if (QT_DESIRED_VERSION MATCHES 6)
     # list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::Core5Compat)
-    list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::GuiPrivate)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        # Qt 6.10 packages private modules separately; earlier versions load
+        # this target from QtGui automatically.
+        if(NOT TARGET Qt${QT_DESIRED_VERSION}::GuiPrivate)
+            find_package(Qt${QT_DESIRED_VERSION}GuiPrivate REQUIRED)
+        endif()
+        list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::GuiPrivate)
+    endif()
     list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::OpenGL)
     list(APPEND LINK_LIBS Qt${QT_DESIRED_VERSION}::OpenGLWidgets)
 else()
@@ -161,6 +168,8 @@ set(QC_UIBASE_SOURCES
     uibase/keepratiowidget.cpp
     uibase/magneticwidget.h
     uibase/magneticwidget.cpp
+    uibase/windowvisibilitycontroller.h
+    uibase/windowvisibilitycontroller.cpp
 )
 source_group(uibase FILES ${QC_UIBASE_SOURCES})
 
@@ -253,7 +262,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
         VERSION_MINOR=${PROJECT_VERSION_MINOR}
         VERSION_PATCH=${PROJECT_VERSION_PATCH}
-        VERSION_RC_STR="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
     )
     set(QC_PLANTFORM_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.rc"
@@ -325,6 +333,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # windows
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    target_link_libraries(${PROJECT_NAME} PRIVATE dwmapi user32)
     get_target_property(QSC_BIN_OUTPUT_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
     set(QSC_DEPLOY_PATH ${QSC_BIN_OUTPUT_PATH})
 
@@ -411,3 +420,30 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${LINK_LIBS}
     QtScrcpyCore
 )
+
+if(QTSCRCPY_BUILD_VISIBILITY_TESTS)
+    find_package(Qt${QT_DESIRED_VERSION} REQUIRED COMPONENTS Test)
+    set(QC_VISIBILITY_TEST_SOURCES ${QC_PROJECT_SOURCES})
+    list(REMOVE_ITEM QC_VISIBILITY_TEST_SOURCES main.cpp)
+    add_executable(QtScrcpyVisibilityTests
+        ${QC_VISIBILITY_TEST_SOURCES}
+        tests/visibility_ui_test.cpp
+    )
+    get_target_property(QC_APP_INCLUDE_DIRECTORIES ${PROJECT_NAME} INCLUDE_DIRECTORIES)
+    target_include_directories(QtScrcpyVisibilityTests PRIVATE ${QC_APP_INCLUDE_DIRECTORIES})
+    target_link_libraries(QtScrcpyVisibilityTests PRIVATE
+        ${LINK_LIBS}
+        QtScrcpyCore
+        Qt${QT_DESIRED_VERSION}::Test
+    )
+    if(WIN32)
+        target_link_libraries(QtScrcpyVisibilityTests PRIVATE dwmapi user32)
+    endif()
+    # Share the application directory so the FFmpeg/ADB post-build files are
+    # available. Qt/MinGW runtime DLLs are resolved from the build environment.
+    set_target_properties(QtScrcpyVisibilityTests PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${QSC_DEPLOY_PATH}"
+    )
+    add_test(NAME QtScrcpyVisibilityUi COMMAND QtScrcpyVisibilityTests -o -,txt)
+    set_tests_properties(QtScrcpyVisibilityUi PROPERTIES TIMEOUT 60)
+endif()

@@ -17,9 +17,36 @@
    <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="topMargin">
-    <number>30</number>
-   </property>
+   <item>
+    <widget class="QPushButton" name="opacityBtn">
+     <property name="toolTip">
+      <string>手动调节透明度，同时调整投屏窗口与右侧工具栏</string>
+     </property>
+     <property name="accessibleName">
+      <string>调节透明度</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="autoHideBtn">
+     <property name="toolTip">
+      <string>鼠标离开自动隐身：离开 300ms 后隐身，移回停留 300ms 后恢复。
+隐藏区域保留鼠标占位；拖动或操作菜单时保持显示。</string>
+     </property>
+     <property name="accessibleName">
+      <string>鼠标离开自动隐身</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QPushButton" name="groupControlBtn">
      <property name="toolTip">

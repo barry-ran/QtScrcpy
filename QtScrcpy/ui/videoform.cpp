@@ -25,6 +25,7 @@
 #include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "videoform.h"
+#include "windowvisibilitycontroller.h"
 
 #ifdef Q_OS_MACOS
 #include "metalvideowindow.h"
@@ -33,6 +34,20 @@
 VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int decodeMode, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin), m_decodeMode(decodeMode)
 {
     ui->setupUi(this);
+    m_visibilityController = new WindowVisibilityController(this);
+    m_windowVisibilitySaveTimer.setSingleShot(true);
+    m_windowVisibilitySaveTimer.setInterval(250);
+    connect(&m_windowVisibilitySaveTimer, &QTimer::timeout, this, &VideoForm::saveWindowVisibility);
+    connect(m_visibilityController, &WindowVisibilityController::opacityPercentChanged,
+            this, &VideoForm::opacityPercentChanged);
+    connect(m_visibilityController, &WindowVisibilityController::autoHideEnabledChanged,
+            this, &VideoForm::autoHideEnabledChanged);
+    connect(this, &VideoForm::opacityPercentChanged, this, [this]() {
+        m_windowVisibilitySaveTimer.start();
+    });
+    connect(this, &VideoForm::autoHideEnabledChanged, this, [this]() {
+        m_windowVisibilitySaveTimer.start();
+    });
     m_flexResizeTimer.setSingleShot(true);
     m_flexResizeTimer.setInterval(300);
     connect(&m_flexResizeTimer, &QTimer::timeout, this, [this]() {
@@ -72,7 +87,38 @@ VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int deco
 
 VideoForm::~VideoForm()
 {
+    if (m_windowVisibilitySaveTimer.isActive()) {
+        saveWindowVisibility();
+    }
     delete ui;
+}
+
+int VideoForm::opacityPercent() const
+{
+    return m_visibilityController->opacityPercent();
+}
+
+void VideoForm::setOpacityPercent(int percent)
+{
+    m_visibilityController->setOpacityPercent(percent);
+}
+
+bool VideoForm::autoHideEnabled() const
+{
+    return m_visibilityController->autoHideEnabled();
+}
+
+void VideoForm::setAutoHideEnabled(bool enabled)
+{
+    m_visibilityController->setAutoHideEnabled(enabled);
+}
+
+void VideoForm::saveWindowVisibility()
+{
+    WindowVisibilityConfig config;
+    config.opacityPercent = opacityPercent();
+    config.autoHideEnabled = autoHideEnabled();
+    Config::getInstance().setWindowVisibility(m_serial, config);
 }
 
 bool VideoForm::isMetalMode() const
@@ -244,6 +290,9 @@ void VideoForm::updateRender(int width, int height, uint8_t* dataY, uint8_t* dat
 void VideoForm::setSerial(const QString &serial)
 {
     m_serial = serial;
+    const WindowVisibilityConfig visibility = Config::getInstance().getWindowVisibility(serial);
+    setOpacityPercent(visibility.opacityPercent);
+    setAutoHideEnabled(visibility.autoHideEnabled);
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     m_flexDisplay = device && device->isFlexDisplay();
     if (m_flexDisplay) {
@@ -255,6 +304,7 @@ void VideoForm::showToolForm(bool show)
 {
     if (!m_toolForm) {
         m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
+        m_visibilityController->addWindow(m_toolForm);
         m_toolForm->setSerial(m_serial);
     }
     m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);

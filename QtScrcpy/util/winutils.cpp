@@ -1,7 +1,6 @@
 #include <QDebug>
-#include <Windows.h>
+#include <windows.h>
 #include <dwmapi.h>
-#pragma comment(lib, "dwmapi")
 
 #include "winutils.h"
 
