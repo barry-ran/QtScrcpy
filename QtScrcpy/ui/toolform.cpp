@@ -1,7 +1,13 @@
 #include <QDebug>
 #include <QHideEvent>
+#include <QLabel>
+#include <QMenu>
 #include <QMouseEvent>
 #include <QShowEvent>
+#include <QSignalBlocker>
+#include <QSlider>
+#include <QVBoxLayout>
+#include <QWidgetAction>
 
 #include "iconhelper.h"
 #include "toolform.h"
@@ -18,6 +24,7 @@ ToolForm::ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos) : MagneticW
     updateGroupControl();
 
     initStyle();
+    initPrivacyControls();
 }
 
 ToolForm::~ToolForm()
@@ -63,6 +70,9 @@ void ToolForm::updateCameraMode()
 
 void ToolForm::initStyle()
 {
+    IconHelper::Instance()->SetIcon(ui->opacityBtn, QChar(0xf042), 15);
+    IconHelper::Instance()->SetIcon(ui->autoHideBtn, QChar(0xf21b), 15);
+    ui->autoHideBtn->setStyleSheet("QPushButton:checked { color: #55aaff; background: #173247; border-color: #0078d4; }");
     IconHelper::Instance()->SetIcon(ui->fullScreenBtn, QChar(0xf0b2), 15);
     IconHelper::Instance()->SetIcon(ui->menuBtn, QChar(0xf096), 15);
     IconHelper::Instance()->SetIcon(ui->homeBtn, QChar(0xf1db), 15);
@@ -84,6 +94,84 @@ void ToolForm::initStyle()
     IconHelper::Instance()->SetIcon(ui->cameraTorchBtn, QChar(0xf0eb), 15);
     IconHelper::Instance()->SetIcon(ui->cameraZoomOutBtn, QChar(0xf010), 15);
     IconHelper::Instance()->SetIcon(ui->cameraZoomInBtn, QChar(0xf00e), 15);
+}
+
+void ToolForm::initPrivacyControls()
+{
+    m_videoForm = qobject_cast<VideoForm *>(parent());
+    ui->opacityBtn->setEnabled(m_videoForm);
+    ui->autoHideBtn->setEnabled(m_videoForm);
+    if (!m_videoForm) {
+        return;
+    }
+
+    // Keep the popup owned by this toolbar so it is part of the auto-hide
+    // interaction area, including while the pointer is over the slider.
+    m_opacityMenu = new QMenu(this);
+    m_opacityMenu->setObjectName("opacityMenu");
+    auto action = new QWidgetAction(m_opacityMenu);
+    auto content = new QWidget(m_opacityMenu);
+    content->setMinimumWidth(240);
+    auto layout = new QVBoxLayout(content);
+    layout->setContentsMargins(14, 12, 14, 12);
+    layout->setSpacing(10);
+
+    m_opacityLabel = new QLabel(content);
+    m_opacityLabel->setObjectName("opacityValueLabel");
+    layout->addWidget(m_opacityLabel);
+
+    m_opacitySlider = new QSlider(Qt::Horizontal, content);
+    m_opacitySlider->setObjectName("opacitySlider");
+    m_opacitySlider->setRange(10, 100);
+    m_opacitySlider->setSingleStep(1);
+    m_opacitySlider->setPageStep(10);
+    m_opacitySlider->setTracking(true);
+    m_opacitySlider->setAccessibleName(tr("窗口不透明度"));
+    m_opacityLabel->setBuddy(m_opacitySlider);
+    layout->addWidget(m_opacitySlider);
+
+    auto hint = new QLabel(tr("10% 更透明，100% 完全不透明"), content);
+    layout->addWidget(hint);
+    action->setDefaultWidget(content);
+    m_opacityMenu->addAction(action);
+
+    updateOpacityControls(m_videoForm->opacityPercent());
+    connect(m_opacitySlider, &QSlider::valueChanged, m_videoForm, &VideoForm::setOpacityPercent);
+    connect(m_videoForm, &VideoForm::opacityPercentChanged, this, &ToolForm::updateOpacityControls);
+    connect(m_videoForm, &VideoForm::autoHideEnabledChanged, this, [this](bool enabled) {
+        const QSignalBlocker blocker(ui->autoHideBtn);
+        ui->autoHideBtn->setChecked(enabled);
+    });
+    const QSignalBlocker blocker(ui->autoHideBtn);
+    ui->autoHideBtn->setChecked(m_videoForm->autoHideEnabled());
+}
+
+void ToolForm::updateOpacityControls(int percent)
+{
+    if (!m_opacitySlider || !m_opacityLabel) {
+        return;
+    }
+    const QSignalBlocker blocker(m_opacitySlider);
+    m_opacitySlider->setValue(percent);
+    m_opacityLabel->setText(tr("窗口不透明度：%1%").arg(percent));
+    ui->opacityBtn->setToolTip(tr("手动调节透明度（当前不透明度：%1%）\n同时调整投屏窗口与右侧工具栏").arg(percent));
+}
+
+void ToolForm::on_opacityBtn_clicked()
+{
+    if (!m_opacityMenu || !m_videoForm) {
+        return;
+    }
+    updateOpacityControls(m_videoForm->opacityPercent());
+    m_opacityMenu->popup(ui->opacityBtn->mapToGlobal(QPoint(-m_opacityMenu->sizeHint().width(), 0)));
+    m_opacitySlider->setFocus(Qt::PopupFocusReason);
+}
+
+void ToolForm::on_autoHideBtn_toggled(bool enabled)
+{
+    if (m_videoForm) {
+        m_videoForm->setAutoHideEnabled(enabled);
+    }
 }
 
 void ToolForm::updateGroupControl()

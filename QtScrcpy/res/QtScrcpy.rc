@@ -1,5 +1,9 @@
 #include "winres.h"
 
+#define VERSION_STRINGIFY_IMPL(value) #value
+#define VERSION_STRINGIFY(value) VERSION_STRINGIFY_IMPL(value)
+#define VERSION_RC_STR VERSION_STRINGIFY(VERSION_MAJOR) "." VERSION_STRINGIFY(VERSION_MINOR) "." VERSION_STRINGIFY(VERSION_PATCH)
+
 IDI_ICON1       ICON      "QtScrcpy.ico"
 // GB2312编码的话，在中文系统上打包FileDescription可以显示中文
 // 在github action（英文系统）打包后FileDescription是乱码，utf8编码也不行。。

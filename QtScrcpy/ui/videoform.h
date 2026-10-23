@@ -17,6 +17,7 @@ class FileHandler;
 class QYUVOpenGLWidget;
 class QLabel;
 class MetalVideoWidget;
+class WindowVisibilityController;
 class VideoForm : public QWidget, public qsc::DeviceObserver
 {
     Q_OBJECT
@@ -35,6 +36,14 @@ public:
     void showFPS(bool show);
     void switchFullScreen();
     bool isHost();
+    int opacityPercent() const;
+    void setOpacityPercent(int percent);
+    bool autoHideEnabled() const;
+    void setAutoHideEnabled(bool enabled);
+
+signals:
+    void opacityPercentChanged(int percent);
+    void autoHideEnabledChanged(bool enabled);
 
 private:
     void onFrame(int width, int height, uint8_t* dataY, uint8_t* dataU, uint8_t* dataV,
@@ -52,6 +61,7 @@ private:
     void showToolForm(bool show = true);
     void moveCenter();
     void installShortcut();
+    void saveWindowVisibility();
     QRect getScreenRect();
     // 窗口越界回收：显示器插拔后，若窗口落在任何屏幕的可用区域之外，
     // 将其移回主屏居中，避免成为看不见的"幽灵窗口"。
@@ -87,6 +97,8 @@ private:
     // ui
     Ui::videoForm *ui;
     QPointer<ToolForm> m_toolForm;
+    WindowVisibilityController *m_visibilityController = nullptr;
+    QTimer m_windowVisibilitySaveTimer;
     QPointer<QWidget> m_loadingWidget;
     QPointer<QYUVOpenGLWidget> m_videoWidget;
 

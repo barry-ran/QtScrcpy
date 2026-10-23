@@ -44,6 +44,12 @@ struct UserBootConfig
     QString startApp;
 };
 
+struct WindowVisibilityConfig
+{
+    int opacityPercent = 100;
+    bool autoHideEnabled = false;
+};
+
 class QSettings;
 class Config : public QObject
 {
@@ -80,6 +86,8 @@ public:
     QString getNickName(const QString &serial);
     void setRect(const QString &serial, const QRect &rc);
     QRect getRect(const QString &serial);
+    void setWindowVisibility(const QString &serial, const WindowVisibilityConfig &config);
+    WindowVisibilityConfig getWindowVisibility(const QString &serial);
 
     void deleteGroup(const QString &serial);
 
