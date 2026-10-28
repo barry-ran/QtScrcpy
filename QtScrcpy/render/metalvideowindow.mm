@@ -1,3 +1,6 @@
+#include <QTimer>
+#include <QResizeEvent>
+#include <QShowEvent>
 #include "metalvideowindow.h"
 
 #ifdef Q_OS_MACOS
@@ -7,6 +10,7 @@
 #import <Metal/Metal.h>
 #import <CoreVideo/CoreVideo.h>
 #import <QuartzCore/CAMetalLayer.h>
+#import <QuartzCore/CATransaction.h>
 #import <AppKit/AppKit.h>
 
 static NSString *shaderSource = @R"(
@@ -31,6 +35,8 @@ fragment float4 fs(VertexOut in [[stage_in]],
 )";
 
 struct MetalVideoWidget::Impl {
+    CVPixelBufferRef lastBuffer=nullptr;
+    int lastWidth=0,lastHeight=0;
     id<MTLDevice> device = nil;
     id<MTLCommandQueue> cq = nil;
     id<MTLRenderPipelineState> ps = nil;
@@ -79,14 +85,32 @@ MetalVideoWidget::MetalVideoWidget(QWidget *parent)
 
 MetalVideoWidget::~MetalVideoWidget()
 {
+    if(d->lastBuffer)CVPixelBufferRelease(d->lastBuffer);
     if (d->tc) { CVMetalTextureCacheFlush(d->tc, 0); CFRelease(d->tc); }
     delete d;
+}
+
+void MetalVideoWidget::paintEvent(QPaintEvent *)
+{
+    if(d->lastBuffer)renderFrame(d->lastBuffer,d->lastWidth,d->lastHeight);
+}
+void MetalVideoWidget::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    QTimer::singleShot(0,this,[this](){if(d->lastBuffer)renderFrame(d->lastBuffer,d->lastWidth,d->lastHeight);});
+}
+void MetalVideoWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    QTimer::singleShot(0,this,[this](){if(d->lastBuffer)renderFrame(d->lastBuffer,d->lastWidth,d->lastHeight);});
 }
 
 void MetalVideoWidget::renderFrame(CVPixelBufferRef pixelBuffer, int width, int height)
 {
     if (!m_metalReady || !pixelBuffer || width <= 0 || height <= 0) return;
 
+    if(d->lastBuffer!=pixelBuffer){CVPixelBufferRetain(pixelBuffer);if(d->lastBuffer)CVPixelBufferRelease(d->lastBuffer);d->lastBuffer=pixelBuffer;}
+    d->lastWidth=width;d->lastHeight=height;
     QSize sz = size();
     if (sz.width() <= 0 || sz.height() <= 0) return;
 
@@ -94,12 +118,9 @@ void MetalVideoWidget::renderFrame(CVPixelBufferRef pixelBuffer, int width, int 
         NSView *view = (__bridge NSView *)reinterpret_cast<void *>(winId());
         if (!view) return;
 
-        // 同步 NSView frame（仅在尺寸变化时）
+        // Qt owns this NSView's frame, including aspect-fit centering. Never
+        // reset it to (0,0): only the Metal layer uses view-local bounds.
         CGFloat newW = (CGFloat)sz.width(), newH = (CGFloat)sz.height();
-        if (newW != d->lastFrameW || newH != d->lastFrameH) {
-            view.frame = NSMakeRect(0, 0, newW, newH);
-            d->lastFrameW = newW; d->lastFrameH = newH;
-        }
 
         if (!d->layer) {
             view.wantsLayer = YES;
@@ -108,9 +129,21 @@ void MetalVideoWidget::renderFrame(CVPixelBufferRef pixelBuffer, int width, int 
             d->layer.pixelFormat = MTLPixelFormatBGRA8Unorm;
             d->layer.opaque = YES;
             d->layer.framebufferOnly = YES;
-            view.layer = d->layer;
+
         }
 
+        // Keep Qt's backing layer intact; fullscreen may replace/reparent it.
+        // Our drawable layer is a child, reattached whenever the backing changes.
+        view.wantsLayer=YES;
+        if(d->layer.superlayer!=view.layer){[d->layer removeFromSuperlayer];[view.layer addSublayer:d->layer];}
+        [CATransaction begin];[CATransaction setDisableActions:YES];
+        d->layer.frame=NSMakeRect(0,0,newW,newH);
+        [CATransaction commit];
+        const QPoint origin=pos();
+        const double expectedY=view.superview.isFlipped?origin.y():view.superview.bounds.size.height-origin.y()-newH;
+        setProperty("nativeGeometryMatchesQt",qAbs(view.frame.origin.x-origin.x())<1&&qAbs(view.frame.origin.y-expectedY)<1);
+        setProperty("nativeFrameX", double(view.frame.origin.x));
+        setProperty("nativeFrameY", double(view.frame.origin.y));
         CGFloat scale = view.window ? view.window.backingScaleFactor : 1.0;
         if (scale <= 0) scale = 1.0;
         d->layer.drawableSize = CGSizeMake(newW * scale, newH * scale);
@@ -126,6 +159,7 @@ void MetalVideoWidget::renderFrame(CVPixelBufferRef pixelBuffer, int width, int 
             return;
         }
         d->drawableTotalCount++;
+        setProperty("renderedFrames",d->drawableTotalCount);
 
         CVMetalTextureRef yR = nil, uvR = nil;
         if (CVMetalTextureCacheCreateTextureFromImage(kCFAllocatorDefault, d->tc, pixelBuffer, nil,
@@ -177,6 +211,9 @@ void MetalVideoWidget::renderFrame(CVPixelBufferRef pixelBuffer, int width, int 
 #else
 MetalVideoWidget::MetalVideoWidget(QWidget *parent) : QWidget(parent), d(nullptr) {}
 MetalVideoWidget::~MetalVideoWidget() {}
+void MetalVideoWidget::paintEvent(QPaintEvent *) {}
+void MetalVideoWidget::resizeEvent(QResizeEvent *e) { QWidget::resizeEvent(e); }
+void MetalVideoWidget::showEvent(QShowEvent *e) { QWidget::showEvent(e); }
 bool MetalVideoWidget::initMetal() { return false; }
 void MetalVideoWidget::renderFrame(CVPixelBufferRef, int, int) {}
 #endif

@@ -1,5 +1,13 @@
 // #include <QDesktopWidget>
 #include <QCoreApplication>
+#include <QApplication>
+#include <QCursor>
+#include <QClipboard>
+#include <QInputMethod>
+#include <QInputMethodEvent>
+#include <QFocusEvent>
+#include <QHideEvent>
+#include <QSizeGrip>
 #include <QFileInfo>
 #include <QLabel>
 #include <QMessageBox>
@@ -12,6 +20,8 @@
 #include <QStyleOption>
 #include <QTimer>
 #include <QWindow>
+#include <QRegion>
+#include <QSettings>
 #include <QtWidgets/QHBoxLayout>
 
 #if defined(Q_OS_WIN32)
@@ -25,14 +35,88 @@
 #include "mousetap/mousetap.h"
 #include "ui_videoform.h"
 #include "videoform.h"
+#include <QAction>
+#include <QProcess>
+#include <QPushButton>
+#include <QRegularExpression>
 
 #ifdef Q_OS_MACOS
 #include "metalvideowindow.h"
 #endif
 
-VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int decodeMode, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(skin), m_decodeMode(decodeMode)
+namespace {
+// QWidget::isAncestorOf stops at the native window boundaries used by chrome.
+bool belongsToProjection(const QObject *object, const QObject *projection)
 {
+    for (auto *owner = object; owner; owner = owner->parent())
+        if (owner == projection) return true;
+    return false;
+}
+class ProjectionCornerGrip final : public QWidget {
+public:
+    explicit ProjectionCornerGrip(VideoForm *target):QWidget(target),m_target(target) {
+        setObjectName("ProjectionTopLeftGrip");setFixedSize(14,14);
+        setCursor(Qt::SizeFDiagCursor);setToolTip(QStringLiteral("拖动左上角等比例缩放"));
+    }
+protected:
+    void mousePressEvent(QMouseEvent *e) override {
+        if(e->button()!=Qt::LeftButton)return;
+        m_start=m_target->geometry();m_press=e->globalPosition().toPoint();m_resizing=true;
+        m_target->setChromeDragging(true);e->accept();
+    }
+    void mouseMoveEvent(QMouseEvent *e) override {
+        if(!m_resizing||!(e->buttons()&Qt::LeftButton))return;
+        const QPoint delta=e->globalPosition().toPoint()-m_press;
+        const QSize originalPhone=m_target->phoneSizeForWindow(m_start.size());
+        const qreal ratio=qreal(originalPhone.width())/originalPhone.height();
+        int w=qRound(qAbs(delta.x())>=qAbs(delta.y())*ratio?originalPhone.width()-delta.x():(originalPhone.height()-delta.y())*ratio);
+        int maxHeight=m_start.bottom()-40;
+        if(auto *screen=QGuiApplication::screenAt(m_start.center()))maxHeight=m_start.bottom()-screen->availableGeometry().top()-(m_start.height()-originalPhone.height());
+        w=qBound(qMin(160,qRound(maxHeight*ratio)),w,qMax(1,qRound(maxHeight*ratio)));
+        const QSize size=m_target->windowSizeForPhone(QSize(w,qMax(1,qRound(w/ratio))));
+        m_target->setGeometry(QRect(m_start.bottomRight()-QPoint(size.width()-1,size.height()-1),size));e->accept();
+    }
+    void mouseReleaseEvent(QMouseEvent *e) override {m_resizing=false;m_target->setChromeDragging(false);e->accept();}
+private:
+    VideoForm *m_target;QRect m_start;QPoint m_press;bool m_resizing=false;
+};
+class ProjectionTitle final : public QWidget {
+public:
+    explicit ProjectionTitle(VideoForm *target):QWidget(target),m_target(target){
+        setObjectName(QStringLiteral("ProjectionTitle"));setAttribute(Qt::WA_ShowWithoutActivating);
+        setStyleSheet(QStringLiteral("#ProjectionTitle{background:#f4f3ee;border:1px solid #d8ddd1;border-radius:7px;} QLabel{color:#52604f;background:transparent;}"));
+    }
+protected:
+    void mousePressEvent(QMouseEvent *e) override {
+        if(e->button()==Qt::LeftButton){m_pressGlobal=e->globalPosition().toPoint();m_offset=m_pressGlobal-m_target->frameGeometry().topLeft();m_dragging=true;m_started=false;m_target->setChromeDragging(true);e->accept();}
+    }
+    void mouseMoveEvent(QMouseEvent *e) override {
+        if(!m_dragging||!(e->buttons()&Qt::LeftButton)||m_target->isFullScreen())return;
+        const QPoint global=e->globalPosition().toPoint();
+        if(!m_started){
+            if((global-m_pressGlobal).manhattanLength()<QApplication::startDragDistance())return;
+            m_target->restoreExpandedForDrag(global);m_started=true;
+        }
+        m_target->move(global-m_offset);e->accept();
+    }
+    void mouseReleaseEvent(QMouseEvent*) override {m_dragging=false;m_started=false;m_target->setChromeDragging(false);}
+    void mouseDoubleClickEvent(QMouseEvent *e) override {
+        if(e->button()!=Qt::LeftButton)return;
+        m_dragging=false;m_started=false;m_target->setChromeDragging(false);m_target->toggleExpanded();e->accept();
+    }
+private:VideoForm *m_target;QPoint m_offset,m_pressGlobal;bool m_dragging=false,m_started=false;
+};
+}
+
+VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int decodeMode, QWidget *parent) : QWidget(parent), ui(new Ui::videoForm), m_skin(false), m_decodeMode(decodeMode)
+{
+    Q_UNUSED(skin)
+    Q_UNUSED(framelessWindow)
+    setWindowFlag(Qt::FramelessWindowHint, true);
+    setWindowFlag(Qt::NoDropShadowWindowHint,true);
+    setAttribute(Qt::WA_TranslucentBackground);
     ui->setupUi(this);
+    setStyleSheet(QStringLiteral("#videoForm { background: transparent; border: none; border-image: none; }"));
     m_flexResizeTimer.setSingleShot(true);
     m_flexResizeTimer.setInterval(300);
     connect(&m_flexResizeTimer, &QTimer::timeout, this, [this]() {
@@ -42,16 +126,70 @@ VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int deco
         }
     });
     initUI();
+    setAttribute(Qt::WA_InputMethodEnabled);
+    setFocusPolicy(Qt::StrongFocus);
+    if (videoWidget()) videoWidget()->setFocusProxy(this);
+    layout()->setContentsMargins(0,0,0,0);
+    layout()->removeWidget(ui->keepRatioWidget);
+    createProjectionChrome();
     installShortcut();
     updateShowSize(size());
     bool vertical = size().height() > size().width();
     this->show_toolbar = showToolbar;
+    m_holdToMove.setSingleShot(true);m_holdToMove.setInterval(400);
+    connect(&m_holdToMove,&QTimer::timeout,this,[this](){
+        if(!m_pendingPhonePress||m_cursorGrabbed||isFullScreen())return;
+        m_pendingPhonePress=false;restoreExpandedForDrag(m_holdGlobal.toPoint());m_windowDragActive=true;
+        m_dragPosition=m_holdGlobal.toPoint()-frameGeometry().topLeft();
+        setCursor(Qt::ClosedHandCursor);
+    });
+    qApp->installEventFilter(this);
+    m_toolIdleTime.start();
+    m_lastToolCursor = QCursor::pos();
+    m_aspectResizeTimer.setSingleShot(true);m_aspectResizeTimer.setInterval(0);
+    connect(&m_aspectResizeTimer,&QTimer::timeout,this,[this](){
+        if(isFullScreen()||m_fullscreenTransition||m_flexDisplay||m_pendingAspectSize.isEmpty())return;
+        m_adjustingAspect=true;resize(m_pendingAspectSize);m_adjustingAspect=false;
+    });
+    m_toolVisibilityTimer.setInterval(100);
+    connect(&m_toolVisibilityTimer, &QTimer::timeout, this, [this]() {
+        if (m_sessionEnding || !isVisible() || isMinimized() || m_projectionMinimizing || m_cursorGrabbed) { hideProjectionControls(); return; }
+        if (!videoWidget()) return;
+        placeProjectionChrome();
+        if(m_toolForm&&m_toolForm->isVisible())placeToolForm();
+        const QPoint cursor=QCursor::pos();
+        const bool moved=cursor!=m_lastToolCursor;m_lastToolCursor=cursor;
+        const QRect viewport(videoWidget()->mapToGlobal(QPoint()),videoWidget()->size());
+        const bool overTitle=m_titleChrome&&m_titleChrome->isVisible()&&QRect(m_titleChrome->mapToGlobal(QPoint()),m_titleChrome->size()).contains(cursor);
+        const bool overTools=m_toolForm&&m_toolForm->isVisible()&&QRect(m_toolForm->mapToGlobal(QPoint()),m_toolForm->size()).contains(cursor);
+        auto *popup=QApplication::activePopupWidget();
+        const bool menu=popup&&belongsToProjection(popup,this);
+        if(isFullScreen()) {
+            const QPoint local=mapFromGlobal(cursor);
+            const bool edge=rect().contains(local)&&(local.x()<12||local.x()>=width()-12||local.y()<12||local.y()>=height()-12);
+            if(menu||overTools||(moved&&edge&&belongsToProjection(QApplication::activeWindow(),this)))showProjectionControls();
+            else if(m_toolIdleTime.elapsed()>=2000)hideProjectionControls();
+            return;
+        }
+        const bool interacting=m_chromeDragging||m_windowDragActive||menu||
+            ((viewport.contains(cursor)||overTitle||overTools)&&QApplication::mouseButtons()!=Qt::NoButton);
+        if(interacting||(moved&&belongsToProjection(QApplication::activeWindow(),this)&&(viewport.adjusted(-5,-34,5,0).contains(cursor)||overTitle||overTools))) {
+            if(moved&&!interacting&&!overTools&&viewport.width()<viewport.height()) {
+                if(cursor.x()<=viewport.left()+8)m_toolsOnRight=false;
+                else if(cursor.x()>=viewport.right()-8)m_toolsOnRight=true;
+            }
+            showProjectionControls();
+        }
+        setProperty("chromeIdleMs",m_toolIdleTime.isValid()?m_toolIdleTime.elapsed():-1);
+        setProperty("chromeInteraction",interacting);
+        setProperty("chromeMoved",moved);setProperty("chromeCursor",cursor);
+        if(m_toolIdleTime.isValid()&&m_toolIdleTime.elapsed()>=5000&&!interacting)hideProjectionControls();
+    });
+    m_toolVisibilityTimer.start();
     if (m_skin) {
         updateStyleSheet(vertical);
     }
-    if (framelessWindow) {
-        setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-    }
+
 
     // 监听显示器增删：副屏被拔掉时，位于该屏幕上的窗口会变成"幽灵窗口"
     // （坐标仍在已断开的屏幕区域）。这里在屏幕配置变化后做一次越界检查，
@@ -72,6 +210,7 @@ VideoForm::VideoForm(bool framelessWindow, bool skin, bool showToolbar, int deco
 
 VideoForm::~VideoForm()
 {
+    m_toolVisibilityTimer.stop();
     delete ui;
 }
 
@@ -203,7 +342,7 @@ void VideoForm::resizeSquare()
 
 void VideoForm::removeBlackRect()
 {
-    resize(ui->keepRatioWidget->goodSize());
+    resize(windowSizeForPhone(ui->keepRatioWidget->goodSize()));
 }
 
 void VideoForm::showFPS(bool show)
@@ -251,14 +390,188 @@ void VideoForm::setSerial(const QString &serial)
     }
 }
 
+void VideoForm::createProjectionChrome()
+{
+    auto *title=new ProjectionTitle(this);m_titleChrome=title;
+    auto *bar=new QHBoxLayout(title);bar->setContentsMargins(10,4,10,4);bar->setSpacing(7);
+    auto dot=[&](const QString &name,const QString &color){auto *b=new QPushButton; b->setFixedSize(13,13);b->setAccessibleName(name);b->setToolTip(name);
+        b->setStyleSheet(QStringLiteral("QPushButton{background:%1;border:none;border-radius:6px;padding:0;} QPushButton:hover{border:1px solid #65725c;}").arg(color));bar->addWidget(b);return b;};
+    auto *close=dot(QStringLiteral("结束此投屏"),QStringLiteral("#db8d80"));
+    auto *minimize=dot(QStringLiteral("最小化投屏"),QStringLiteral("#cfb16b"));
+    auto *full=dot(QStringLiteral("切换全屏"),QStringLiteral("#8eaa85"));
+    connect(close,&QPushButton::clicked,this,&QWidget::close);connect(minimize,&QPushButton::clicked,this,&VideoForm::minimizeProjection);
+    connect(full,&QPushButton::clicked,this,&VideoForm::switchFullScreen);
+    auto *caption=new QLabel(QStringLiteral("投屏"));m_chromeTitle=caption;caption->setAlignment(Qt::AlignCenter);caption->setAttribute(Qt::WA_TransparentForMouseEvents);bar->addWidget(caption,1);
+    connect(this,&QWidget::windowTitleChanged,caption,&QLabel::setText);
+    title->setFixedHeight(34);
+    m_topLeftGrip=new ProjectionCornerGrip(this);
+    m_resizeGrip=new QSizeGrip(this);m_resizeGrip->setFixedSize(22,22);m_resizeGrip->setToolTip(QStringLiteral("拖动调整投屏窗口大小"));
+    auto *reveal=new QShortcut(QKeySequence(QStringLiteral("Ctrl+Alt+T")),this);
+    connect(reveal,&QShortcut::activated,this,[this](){if(m_cursorGrabbed)grabCursor(false);showProjectionControls();});
+}
+
+QMargins VideoForm::projectionInsets() const
+{
+    if(isFullScreen())return QMargins();
+    const bool landscape=m_frameSize.width()>m_frameSize.height();
+    return QMargins(46,landscape?80:34,46,0);
+}
+
+QSize VideoForm::windowSizeForPhone(const QSize &size) const
+{
+    const auto margins=projectionInsets();
+    return size+QSize(margins.left()+margins.right(),margins.top()+margins.bottom());
+}
+
+QSize VideoForm::phoneSizeForWindow(const QSize &size) const
+{
+    const auto margins=projectionInsets();
+    return QSize(qMax(1,size.width()-margins.left()-margins.right()),qMax(1,size.height()-margins.top()-margins.bottom()));
+}
+
+QRect VideoForm::phoneRect() const
+{
+    if(auto *widget=videoWidget())return QRect(widget->mapTo(const_cast<VideoForm*>(this),QPoint()),widget->size());
+    return rect().marginsRemoved(projectionInsets());
+}
+
+void VideoForm::updateProjectionMask()
+{
+    if(!videoWidget())return;
+    if(isFullScreen()){if(!mask().isEmpty()){clearMask();update();}return;}
+    QRegion visible(phoneRect());
+    if(m_titleChrome&&m_titleChrome->isVisible())visible+=m_titleChrome->geometry();
+    if(m_toolForm&&m_toolForm->isVisible())visible+=m_toolForm->geometry();
+    if(mask()!=visible){setMask(visible);update();}
+}
+
+void VideoForm::placeProjectionChrome()
+{
+    if(!m_titleChrome||!videoWidget())return;
+    ui->keepRatioWidget->setGeometry(rect().marginsRemoved(projectionInsets()));
+    const QRect phone=phoneRect();
+    m_titleChrome->setGeometry(phone.x(),phone.y()-34,phone.width(),34);
+    if(m_topLeftGrip){m_topLeftGrip->move(phone.topLeft());m_topLeftGrip->raise();}
+    if(m_resizeGrip){m_resizeGrip->move(phone.bottomRight()-QPoint(21,21));m_resizeGrip->raise();}
+    if(isFullScreen()){m_titleChrome->hide();if(m_resizeGrip)m_resizeGrip->hide();if(m_topLeftGrip)m_topLeftGrip->hide();}
+    updateProjectionMask();
+}
+
+void VideoForm::placeToolForm()
+{
+    if(!m_toolForm||!videoWidget())return;
+    const QRect phone=phoneRect();
+    m_toolForm->setFullscreenMode(isFullScreen());
+    if(isFullScreen()) {
+        // Prefer a black side bar, then a top/bottom letterbox; otherwise overlay
+        // the top edge without reducing or shifting the phone image.
+        const int side=qMax(phone.left(),width()-phone.right()-1);
+        const bool vertical=side>=62;
+        m_toolForm->setHorizontal(!vertical);
+        int x=(width()-m_toolForm->width())/2,y=12;
+        if(vertical){x=phone.left()>=62?(phone.left()-m_toolForm->width())/2:phone.right()+1+(width()-phone.right()-1-m_toolForm->width())/2;y=(height()-m_toolForm->height())/2;}
+        else if(phone.top()>=62)y=(phone.top()-m_toolForm->height())/2;
+        else if(height()-phone.bottom()-1>=62)y=phone.bottom()+1+(height()-phone.bottom()-1-m_toolForm->height())/2;
+        m_toolForm->move(qBound(8,x,qMax(8,width()-m_toolForm->width()-8)),qBound(8,y,qMax(8,height()-m_toolForm->height()-8)));
+        m_toolForm->raise();updateProjectionMask();return;
+    }
+    const bool landscape=phone.width()>phone.height();m_toolForm->setHorizontal(landscape);
+    const int x=landscape?phone.center().x()-m_toolForm->width()/2:(m_toolsOnRight?phone.right()+1:phone.left()-m_toolForm->width());
+    const int y=landscape?(isFullScreen()?phone.top():phone.top()-80):phone.top();
+    m_toolForm->move(qBound(0,x,qMax(0,width()-m_toolForm->width())),qBound(0,y,qMax(0,height()-m_toolForm->height())));
+    m_toolForm->raise();
+    updateProjectionMask();
+}
+
 void VideoForm::showToolForm(bool show)
 {
-    if (!m_toolForm) {
-        m_toolForm = new ToolForm(this, ToolForm::AP_OUTSIDE_RIGHT);
-        m_toolForm->setSerial(m_serial);
-    }
-    m_toolForm->move(pos().x() + geometry().width(), pos().y() + 30);
+    if(show&&(m_sessionEnding||!isVisible()||isMinimized()||m_projectionMinimizing||m_cursorGrabbed))show=false;
+    if(!m_toolForm){m_toolForm=new ToolForm(this,MagneticWidget::AP_OUTSIDE_LEFT);m_toolForm->setSerial(m_serial);m_toolForm->setAudioState(m_audioActive,m_audioStarting);connect(m_toolForm,&ToolForm::audioToggleRequested,this,&VideoForm::audioToggleRequested);}
+    if(show){placeToolForm();}
     m_toolForm->setVisible(show);
+    updateProjectionMask();
+}
+
+void VideoForm::setAudioState(bool active,bool starting)
+{
+    m_audioActive=active;m_audioStarting=starting;
+    if(m_toolForm)m_toolForm->setAudioState(active,starting);
+}
+
+void VideoForm::showProjectionControls()
+{
+    if(m_sessionEnding||m_cursorGrabbed||!isVisible()||isMinimized()||m_projectionMinimizing)return;
+    m_toolIdleTime.restart();
+    placeProjectionChrome();showToolForm(show_toolbar);
+    if(m_titleChrome)m_titleChrome->setVisible(!isFullScreen());
+    if(m_resizeGrip)m_resizeGrip->setVisible(!isFullScreen());
+    if(m_topLeftGrip)m_topLeftGrip->setVisible(!isFullScreen());
+    if(m_titleChrome)m_titleChrome->raise();
+    if(m_toolForm)m_toolForm->raise();
+    updateProjectionMask();
+}
+
+void VideoForm::hideProjectionControls()
+{
+    if(m_toolForm)m_toolForm->hide();
+    if(m_titleChrome)m_titleChrome->hide();
+    if(m_resizeGrip)m_resizeGrip->hide();
+    // Keep the transparent corner hit target usable even when toolbar chrome is idle-hidden.
+    if(m_topLeftGrip)m_topLeftGrip->setVisible(isVisible()&&!isMinimized()&&!m_projectionMinimizing&&!isFullScreen()&&!m_cursorGrabbed);
+    updateProjectionMask();
+}
+
+void VideoForm::minimizeProjection()
+{
+    m_projectionMinimizing=true;
+    m_chromeDragging=false;
+    m_holdToMove.stop();m_pendingPhonePress=false;m_windowDragActive=false;
+    hideProjectionControls();
+    showMinimized();
+}
+
+void VideoForm::setChromeDragging(bool dragging)
+{
+    m_chromeDragging=dragging;
+    showProjectionControls();
+}
+
+bool VideoForm::eventFilter(QObject *watched,QEvent *event)
+{
+    if(event->type()==QEvent::ApplicationDeactivate ||
+       (event->type()==QEvent::WindowDeactivate&&belongsToProjection(watched,this))) {
+        // macOS can briefly change activation while native tool windows exchange focus.
+        QTimer::singleShot(0,this,[this](){
+            if(!m_chromeDragging&&(QGuiApplication::applicationState()!=Qt::ApplicationActive ||
+               !belongsToProjection(QApplication::activeWindow(),this)))
+                hideProjectionControls();
+        });
+    }
+    // Native QWindow mouse delivery precedes QWidget delivery. It has a separate
+    // ownership tree: treating it as an outside widget hides then immediately
+    // shows chrome again on every phone click.
+    auto *widget=qobject_cast<QWidget*>(watched);
+    if(!widget)return QWidget::eventFilter(watched,event);
+    const bool own=belongsToProjection(widget,this);
+    if(event->type()==QEvent::MouseButtonPress) {
+        if(own) {
+            // User interaction raises the whole projection group; hover never steals focus.
+            if(!QApplication::activePopupWidget()&&!belongsToProjection(QApplication::activeWindow(),this)) {
+                raise();activateWindow();
+                if(m_titleChrome&&m_titleChrome->isVisible())m_titleChrome->raise();
+                if(m_toolForm&&m_toolForm->isVisible())m_toolForm->raise();
+            }
+            if(!isFullScreen()||belongsToProjection(widget,m_toolForm))showProjectionControls();
+        }
+        else if(!QApplication::activePopupWidget()&&!m_chromeDragging)hideProjectionControls();
+    } else if(own&&!isFullScreen()&&(event->type()==QEvent::KeyPress||event->type()==QEvent::Wheel))showProjectionControls();
+    return QWidget::eventFilter(watched,event);
+}
+
+void VideoForm::moveEvent(QMoveEvent *event)
+{
+    QWidget::moveEvent(event);
+    // Chrome is child content: native window movement carries it atomically.
 }
 
 void VideoForm::moveCenter()
@@ -290,40 +603,19 @@ bool VideoForm::isRectOnAnyScreen(const QRect &rect) const
 
 void VideoForm::ensureOnScreen()
 {
-    // 全屏状态下由系统接管，不必干预
-    if (isFullScreen()) {
-        return;
-    }
-
-    // 使用 frameGeometry 而非 geometry：前者包含窗口边框，
-    // 更能反映窗口真实占用的屏幕区域。
-    const QRect curRect = frameGeometry();
-    if (isRectOnAnyScreen(curRect)) {
-        return;
-    }
-
-    // 当前窗口已完全落在所有屏幕之外（典型场景：副屏被拔掉后
-    // 窗口坐标仍停留在已断开的屏幕区域）。移回主屏并居中。
-    //
-    // 注意：此处不能直接调用 moveCenter()。因为 getScreenRect() 会优先
-    // 取窗口当前所属的 QScreen，而窗口此时正位于已失效的屏幕区域，
-    // 可能得到错误的目标位置。因此这里显式取主屏的可用区域来计算。
-    qWarning() << "window is off-screen, moving back to primary screen. rect =" << curRect;
-
-    QScreen *primary = QGuiApplication::primaryScreen();
-    if (!primary) {
-        qWarning() << "no primary screen available, skip off-screen recovery";
-        return;
-    }
-
-    const QRect avail = primary->availableGeometry();
-    if (avail.isEmpty()) {
-        return;
-    }
-
-    const QPoint target = avail.center() - QRect(0, 0, size().width(), size().height()).center();
-    move(target);
-    qWarning() << "window recovered to" << target;
+    if(isFullScreen()||m_fullscreenTransition)return;
+    auto *target=QGuiApplication::screenAt(frameGeometry().center());
+    if(!target)target=QGuiApplication::screenAt(QCursor::pos());
+    if(!target)target=QGuiApplication::primaryScreen();
+    if(!target)return;
+    const QRect safe=target->availableGeometry().adjusted(8,8,-8,-8);
+    const QSize limit=phoneSizeForWindow(safe.size());
+    QSize phone=phoneSizeForWindow(size());
+    if(!m_frameSize.isEmpty())phone.setHeight(qMax(1,qRound(phone.width()/m_widthHeightRatio)));
+    if(phone.width()>limit.width()||phone.height()>limit.height())phone.scale(limit,Qt::KeepAspectRatio);
+    m_aspectResizeTimer.stop();m_adjustingAspect=true;resize(windowSizeForPhone(phone));m_adjustingAspect=false;
+    if(!safe.contains(geometry()))move(safe.center()-rect().center());
+    placeProjectionChrome();placeToolForm();
 }
 
 void VideoForm::installShortcut()
@@ -593,8 +885,9 @@ void VideoForm::updateShowSize(const QSize &newSize)
             showSize.setHeight(showSize.width() / m_widthHeightRatio);
         }
 
-        if (isFullScreen() && qsc::IDeviceManage::getInstance().getDevice(m_serial)) {
-            switchFullScreen();
+        if(isFullScreen()) {
+            // Rotation updates aspect-fit content inside the same fullscreen host.
+            placeProjectionChrome();placeToolForm();update();return;
         }
 
         if (isMaximized()) {
@@ -607,6 +900,7 @@ void VideoForm::updateShowSize(const QSize &newSize)
             showSize.setHeight(showSize.height() + m.top() + m.bottom());
         }
 
+        showSize=windowSizeForPhone(showSize);
         if (showSize != size()) {
             resize(showSize);
             if (m_skin) {
@@ -622,7 +916,7 @@ void VideoForm::onVideoSessionChanged(const QSize &size, bool clientResized)
     if (m_flexDisplay) {
         m_frameSize = size;
         m_preventAutoResize = clientResized;
-        ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
+        ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
         return;
     }
     // clientResized is only meaningful for flex display. Normal display
@@ -631,14 +925,34 @@ void VideoForm::onVideoSessionChanged(const QSize &size, bool clientResized)
     updateShowSize(size);
 }
 
+void VideoForm::toggleExpanded()
+{
+    m_holdToMove.stop();m_pendingPhonePress=false;m_windowDragActive=false;unsetCursor();
+    switchFullScreen();
+}
+
+void VideoForm::restoreExpandedForDrag(const QPoint &global)
+{
+    if(!isFullScreen())return;
+    const qreal fraction=qBound(0.0,qreal(global.x()-x())/qMax(1,width()),1.0);
+    toggleExpanded();
+    move(global-QPoint(qRound(width()*fraction),-20));
+}
+
 void VideoForm::switchFullScreen()
 {
+    if(m_fullscreenTransition){m_pendingFullscreenToggle=!m_pendingFullscreenToggle;return;}
+    m_fullscreenTransition=true;
+    const int transitionId=++m_fullscreenTransitionId;
+    m_aspectResizeTimer.stop();
+    setMinimumSize(0,0);
     if (isFullScreen()) {
         // 横屏全屏铺满全屏，恢复时，恢复保持宽高比
         if (m_widthHeightRatio > 1.0f) {
             ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
         }
 
+        layout()->setContentsMargins(0,0,0,0);
         showNormal();
         // back to normal size.
         resize(m_normalSize);
@@ -657,10 +971,8 @@ void VideoForm::switchFullScreen()
         ::SetThreadExecutionState(ES_CONTINUOUS);
 #endif
     } else {
-        // 横屏全屏铺满全屏，不保持宽高比
-        if (m_widthHeightRatio > 1.0f) {
-            ui->keepRatioWidget->setWidthHeightRatio(-1.0f);
-        }
+        // Fullscreen must preserve the source aspect ratio, including landscape.
+        ui->keepRatioWidget->setWidthHeightRatio(m_widthHeightRatio);
 
         // record current size before fullscreen, it will be used to rollback size after exit fullscreen.
         m_normalSize = size();
@@ -675,13 +987,25 @@ void VideoForm::switchFullScreen()
         if (m_skin) {
             layout()->setContentsMargins(0, 0, 0, 0);
         }
+        layout()->setContentsMargins(0,0,0,0);
+        hideProjectionControls();
         showFullScreen();
+        placeProjectionChrome();placeToolForm();
 
         // 全屏状态禁止电脑休眠、息屏
 #ifdef Q_OS_WIN32
         ::SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
 #endif
     }
+    m_aspectResizeTimer.stop();
+    const QRect restore(m_fullScreenBeforePos,m_normalSize);
+    QTimer::singleShot(1500,this,[this,transitionId,restore](){
+        if(transitionId!=m_fullscreenTransitionId)return;
+        if(!isFullScreen()){setGeometry(restore);placeProjectionChrome();showProjectionControls();}
+        else {placeProjectionChrome();placeToolForm();updateProjectionMask();}
+        m_aspectResizeTimer.stop();m_fullscreenTransition=false;
+        if(m_pendingFullscreenToggle){m_pendingFullscreenToggle=false;switchFullScreen();}
+    });
 }
 
 bool VideoForm::isHost()
@@ -702,6 +1026,10 @@ void VideoForm::updateFPS(quint32 fps)
 
 void VideoForm::grabCursor(bool grab)
 {
+    m_cursorGrabbed = grab;
+    setAttribute(Qt::WA_InputMethodEnabled, desktopImeEnabled());
+    QGuiApplication::inputMethod()->update(Qt::ImEnabled);
+    if (grab) hideProjectionControls();
     QRect rc = getGrabCursorRect();
     MouseTap::getInstance()->enableMouseEventTap(rc, grab);
 }
@@ -742,9 +1070,7 @@ void VideoForm::staysOnTop(bool top)
         needShow = true;
     }
     setWindowFlag(Qt::WindowStaysOnTopHint, top);
-    if (m_toolForm) {
-        m_toolForm->setWindowFlag(Qt::WindowStaysOnTopHint, top);
-    }
+
     if (needShow) {
         show();
     }
@@ -752,6 +1078,11 @@ void VideoForm::staysOnTop(bool top)
 
 void VideoForm::mousePressEvent(QMouseEvent *event)
 {
+    if (desktopImeEnabled()) {
+        setFocus(Qt::MouseFocusReason);
+        m_imeAnchor = event->position().toPoint();
+        QGuiApplication::inputMethod()->update(Qt::ImCursorRectangle | Qt::ImEnabled);
+    }
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (event->button() == Qt::MiddleButton) {
         if (device && !device->isCurrentCustomKeymap()) {
@@ -776,7 +1107,11 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 #endif
 
     QWidget *vw = videoWidget();
-    if (vw && vw->geometry().contains(event->pos())) {
+    if(event->button()==Qt::LeftButton&&!m_cursorGrabbed&&!isFullScreen()
+       &&vw&&QRect(vw->mapTo(this,QPoint()),vw->size()).contains(event->pos())&&device&&!device->isCurrentCustomKeymap()){
+        m_pendingPhonePress=true;m_holdLocal=localPos;m_holdGlobal=globalPos;m_holdToMove.start();event->accept();return;
+    }
+    if (vw && QRect(vw->mapTo(this,QPoint()),vw->size()).contains(event->pos())) {
         if (!device) {
             return;
         }
@@ -784,13 +1119,6 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
         QMouseEvent newEvent(event->type(), mappedPos, globalPos, event->button(), event->buttons(), event->modifiers());
         emit device->mouseEvent(&newEvent, m_frameSize, vw->size());
 
-        // debug keymap pos
-        if (event->button() == Qt::LeftButton) {
-            qreal x = localPos.x() / vw->size().width();
-            qreal y = localPos.y() / vw->size().height();
-            QString posTip = QString(R"("pos": {"x": %1, "y": %2})").arg(x).arg(y);
-            qInfo() << posTip.toStdString().c_str();
-        }
     } else {
         if (event->button() == Qt::LeftButton) {
             m_dragPosition = globalPos.toPoint() - frameGeometry().topLeft();
@@ -801,6 +1129,9 @@ void VideoForm::mousePressEvent(QMouseEvent *event)
 
 void VideoForm::mouseReleaseEvent(QMouseEvent *event)
 {
+    m_holdToMove.stop();
+    if(m_windowDragActive){m_windowDragActive=false;m_dragPosition=QPoint();unsetCursor();event->accept();return;}
+    if(m_pendingPhonePress){m_pendingPhonePress=false;forwardHeldPhonePress();}
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (m_dragPosition.isNull()) {
         if (!device) {
@@ -839,8 +1170,21 @@ void VideoForm::mouseReleaseEvent(QMouseEvent *event)
     }
 }
 
+void VideoForm::forwardHeldPhonePress()
+{
+    auto device=qsc::IDeviceManage::getInstance().getDevice(m_serial);auto *vw=videoWidget();
+    if(!device||!vw)return;
+    QMouseEvent press(QEvent::MouseButtonPress,vw->mapFrom(this,m_holdLocal.toPoint()),m_holdGlobal,Qt::LeftButton,Qt::LeftButton,Qt::NoModifier);
+    emit device->mouseEvent(&press,m_frameSize,vw->size());
+}
+
 void VideoForm::mouseMoveEvent(QMouseEvent *event)
 {
+    if(m_windowDragActive){if(event->buttons()&Qt::LeftButton)move(event->globalPosition().toPoint()-m_dragPosition);event->accept();return;}
+    if(m_pendingPhonePress){
+        if((event->globalPosition()-m_holdGlobal).manhattanLength()<QApplication::startDragDistance()){event->accept();return;}
+        m_holdToMove.stop();m_pendingPhonePress=false;forwardHeldPhonePress();
+    }
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         QPointF localPos = event->localPos();
         QPointF globalPos = event->globalPos();
@@ -850,7 +1194,7 @@ void VideoForm::mouseMoveEvent(QMouseEvent *event)
 #endif
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     QWidget *vw = videoWidget();
-    if (vw && vw->geometry().contains(event->pos())) {
+    if (vw && QRect(vw->mapTo(this,QPoint()),vw->size()).contains(event->pos())) {
         if (!device) {
             return;
         }
@@ -869,17 +1213,15 @@ void VideoForm::mouseDoubleClickEvent(QMouseEvent *event)
 {
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     QWidget *vw = videoWidget();
-    if (event->button() == Qt::LeftButton && vw && !vw->geometry().contains(event->pos())) {
-        if (!isMaximized()) {
-            removeBlackRect();
-        }
+    if (event->button() == Qt::LeftButton && vw && !QRect(vw->mapTo(this,QPoint()),vw->size()).contains(event->pos())) {
+        toggleExpanded();event->accept();return;
     }
 
     if (event->button() == Qt::RightButton && device && !device->isCurrentCustomKeymap()) {
         emit device->postBackOrScreenOn(event->type() == QEvent::MouseButtonPress);
     }
 
-    if (vw && vw->geometry().contains(event->pos())) {
+    if (vw && QRect(vw->mapTo(this,QPoint()),vw->size()).contains(event->pos())) {
         if (!device) {
             return;
         }
@@ -904,7 +1246,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         return;
     }
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    if (vw->geometry().contains(event->position().toPoint())) {
+    if (phoneRect().contains(event->position().toPoint())) {
         if (!device) {
             return;
         }
@@ -912,7 +1254,7 @@ void VideoForm::wheelEvent(QWheelEvent *event)
         QWheelEvent wheelEvent(
             pos, event->globalPosition(), event->pixelDelta(), event->angleDelta(), event->buttons(), event->modifiers(), event->phase(), event->inverted());
 #else
-    if (vw->geometry().contains(event->pos())) {
+    if (QRect(vw->mapTo(this,QPoint()),vw->size()).contains(event->pos())) {
         if (!device) {
             return;
         }
@@ -926,15 +1268,75 @@ void VideoForm::wheelEvent(QWheelEvent *event)
     }
 }
 
+bool VideoForm::desktopImeEnabled() const
+{
+    const auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+    return !m_cursorGrabbed && (!device || !device->isCurrentCustomKeymap());
+}
+
+QVariant VideoForm::inputMethodQuery(Qt::InputMethodQuery query) const
+{
+    if (query == Qt::ImEnabled) return desktopImeEnabled();
+    if (query == Qt::ImCursorRectangle) return QRect(m_imeAnchor, QSize(2, 24));
+    if (query == Qt::ImHints) return int(Qt::ImhNoPredictiveText);
+    if (query == Qt::ImSurroundingText || query == Qt::ImCurrentSelection) return QString();
+    if (query == Qt::ImCursorPosition || query == Qt::ImAnchorPosition) return 0;
+    return QWidget::inputMethodQuery(query);
+}
+
+void VideoForm::inputMethodEvent(QInputMethodEvent *event)
+{
+    if (!desktopImeEnabled()) { event->ignore(); return; }
+    const QString text = event->commitString();
+    if (!text.isEmpty()) {
+        auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+        if (device) {
+            // The existing Unicode clipboard protocol supports Chinese unlike key injection.
+            // Never log committed text: it may contain private messages.
+            QApplication::clipboard()->setText(text);
+            device->setDeviceClipboard(true);
+        }
+    }
+    m_imePreedit = event->preeditString();
+    // macOS owns the candidate UI; a second label overlaps its popup.
+    event->accept();
+}
+
+void VideoForm::focusOutEvent(QFocusEvent *event)
+{
+    QGuiApplication::inputMethod()->reset();
+    m_imePreedit.clear();
+    QWidget::focusOutEvent(event);
+}
+
+bool VideoForm::event(QEvent *event)
+{
+    if(event->type()==QEvent::WindowStateChange) {
+        m_projectionMinimizing=isMinimized();
+        if(m_projectionMinimizing)hideProjectionControls();
+        else if(isVisible())showProjectionControls();
+    }
+    // QWidget otherwise consumes Tab for focus traversal before keyPressEvent.
+    if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+        auto *key = static_cast<QKeyEvent *>(event);
+        auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
+        if (device && device->isCurrentCustomKeymap() && key->key() == Qt::Key_Tab) {
+            if (event->type() == QEvent::KeyPress) keyPressEvent(key);
+            else keyReleaseEvent(key);
+            event->accept();
+            return true;
+        }
+    }
+    return QWidget::event(event);
+}
+
 void VideoForm::keyPressEvent(QKeyEvent *event)
 {
+    if (desktopImeEnabled() && !m_imePreedit.isEmpty()) { event->accept(); return; }
+    m_forwardedKeys.insert(event->key());
+    if(Qt::Key_Escape==event->key()&&!event->isAutoRepeat()&&isFullScreen()){switchFullScreen();event->accept();return;}
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
-    if (!device) {
-        return;
-    }
-    if (Qt::Key_Escape == event->key() && !event->isAutoRepeat() && isFullScreen()) {
-        switchFullScreen();
-    }
+    if(!device)return;
 
     QWidget *vw = videoWidget();
     QSize widgetSize = vw ? vw->size() : m_frameSize;
@@ -943,6 +1345,8 @@ void VideoForm::keyPressEvent(QKeyEvent *event)
 
 void VideoForm::keyReleaseEvent(QKeyEvent *event)
 {
+    if (desktopImeEnabled() && !m_forwardedKeys.contains(event->key())) { event->accept(); return; }
+    if (!event->isAutoRepeat()) m_forwardedKeys.remove(event->key());
     auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
     if (!device) {
         return;
@@ -955,18 +1359,21 @@ void VideoForm::keyReleaseEvent(QKeyEvent *event)
 void VideoForm::paintEvent(QPaintEvent *paint)
 {
     Q_UNUSED(paint)
-    QStyleOption opt;
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    opt.init(this);
-#else
-    opt.initFrom(this);
-#endif
-    QPainter p(this);
-    style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
+    QPainter painter(this);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.fillRect(rect(),Qt::transparent);
+    painter.fillRect(isFullScreen()?rect():phoneRect(),Qt::black);
+}
+
+void VideoForm::hideEvent(QHideEvent *event)
+{
+    hideProjectionControls();
+    QWidget::hideEvent(event);
 }
 
 void VideoForm::showEvent(QShowEvent *event)
 {
+    if(!isMinimized())m_projectionMinimizing=false;
     Q_UNUSED(event)
     // 窗口每次显示时先做一次越界检查，处理"上次退出时窗口位于副屏、
     // 本次启动副屏已不存在"导致窗口出现在屏幕外的情况。
@@ -977,6 +1384,7 @@ void VideoForm::showEvent(QShowEvent *event)
     // 窗口显示后 Qt 仍可能根据尺寸/边框策略再做一次位置调整，
     // 故稍后复查一次，确保最终位置落在屏内。
     QTimer::singleShot(300, this, [this]() { ensureOnScreen(); });
+    if (m_titleChrome) showProjectionControls();
     if (!isFullScreen() && this->show_toolbar) {
         QTimer::singleShot(500, this, [this](){
             showToolForm(this->show_toolbar);
@@ -986,6 +1394,8 @@ void VideoForm::showEvent(QShowEvent *event)
 
 void VideoForm::resizeEvent(QResizeEvent *event)
 {
+    placeProjectionChrome();
+    placeToolForm();
     Q_UNUSED(event)
     if (m_flexDisplay) {
         m_pendingDisplaySize = ui->keepRatioWidget->size();
@@ -995,38 +1405,42 @@ void VideoForm::resizeEvent(QResizeEvent *event)
         return;
     }
 
-    QSize goodSize = ui->keepRatioWidget->goodSize();
-    if (goodSize.isEmpty()) {
-        return;
-    }
-    QSize curSize = size();
-    // 限制VideoForm尺寸不能小于keepRatioWidget good size
-    if (m_widthHeightRatio > 1.0f) {
-        // hor
-        if (curSize.height() <= goodSize.height()) {
-            setMinimumHeight(goodSize.height());
-        } else {
-            setMinimumHeight(0);
-        }
-    } else {
-        // ver
-        if (curSize.width() <= goodSize.width()) {
-            setMinimumWidth(goodSize.width());
-        } else {
-            setMinimumWidth(0);
+    if(!m_adjustingAspect&&!m_fullscreenTransition&&!isFullScreen()&&m_widthHeightRatio>0.0f){
+        const QSize requested=phoneSizeForWindow(event->size());
+        if(qAbs(requested.width()-requested.height()*m_widthHeightRatio)>1.5){
+            const QSize previous=phoneSizeForWindow(event->oldSize());
+            const bool changedWidth=previous.isEmpty()||qAbs(requested.width()-previous.width())>=qAbs(requested.height()-previous.height())*m_widthHeightRatio;
+            m_pendingAspectSize=changedWidth?QSize(requested.width(),qRound(requested.width()/m_widthHeightRatio)):QSize(qRound(requested.height()*m_widthHeightRatio),requested.height());
+            m_pendingAspectSize=windowSizeForPhone(m_pendingAspectSize);
+            m_aspectResizeTimer.start();
         }
     }
 }
 
+void VideoForm::saveWindowGeometry()
+{
+    if(m_serial.isEmpty())return;
+    const QRect bounds=isFullScreen()?QRect(m_fullScreenBeforePos,m_normalSize):geometry();
+    Config::getInstance().setRect(m_serial,bounds);
+    QSettings().setValue("projection/geometryVersion/"+m_serial,2);
+}
+
+void VideoForm::finishSession()
+{
+    saveWindowGeometry();
+    m_sessionEnding=true;
+    hideProjectionControls();
+    close();
+}
+
 void VideoForm::closeEvent(QCloseEvent *event)
 {
-    Q_UNUSED(event)
-    auto device = qsc::IDeviceManage::getInstance().getDevice(m_serial);
-    if (!device) {
-        return;
-    }
-    Config::getInstance().setRect(device->getSerial(), geometry());
-    device->disconnectDevice();
+    event->accept();
+    hideProjectionControls();
+    if(m_sessionEnding)return;
+    m_sessionEnding=true;
+    saveWindowGeometry();
+    emit sessionCloseRequested(m_serial);
 }
 
 void VideoForm::dragEnterEvent(QDragEnterEvent *event)

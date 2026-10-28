@@ -8,6 +8,8 @@
 #include <QSystemTrayIcon>
 #include <QListWidget>
 #include <QTimer>
+#include <QHash>
+#include <QSet>
 
 
 #include "adbprocess.h"
@@ -20,6 +22,7 @@ namespace Ui
     class Widget;
 }
 
+class VideoForm;
 class QYUVOpenGLWidget;
 class QComboBox;
 class QLineEdit;
@@ -34,6 +37,11 @@ class Dialog : public QWidget
 public:
     explicit Dialog(QWidget *parent = 0);
     ~Dialog();
+    void hideWorkspace();
+    void endProjection(const QString &serial);
+    void shutdownSessions();
+    void requestQuit();
+    bool isShuttingDown() const { return m_shuttingDown; }
 
     void outLog(const QString &log, bool newLine = true);
     bool filterLog(const QString &log);
@@ -85,6 +93,14 @@ private slots:
     void showIpEditMenu(const QPoint &pos);
 
 private:
+    void initWorkspaceUi();
+    void cancelPendingStarts(const QString &serial = QString());
+    bool m_workspaceReady = false;
+    bool m_shuttingDown = false;
+    QHash<QString,QPointer<VideoForm>> m_projectionWindows;
+    bool m_wirelessSwitching = false;
+    QHash<QString, QString> m_wirelessHardwareIds;
+    QSet<QString> m_pendingHardwareIds;
     bool checkAdbRun();
     void initUI();
     void updateBootConfig(bool toView = true);

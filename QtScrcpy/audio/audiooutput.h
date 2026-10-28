@@ -1,11 +1,15 @@
 #ifndef AUDIOOUTPUT_H
 #define AUDIOOUTPUT_H
 
-#include <QThread>
+#include "pcmbuffer.h"
 #include <QProcess>
 #include <QPointer>
 #include <QVector>
+#include <QTimer>
+#include <QThread>
+class AudioStream;
 
+class QTcpSocket;
 class QAudioSink;
 class QAudioOutput;
 class QIODevice;
@@ -18,29 +22,28 @@ public:
 
     bool start(const QString& serial, int port);
     void stop();
+    void stopForDevice(const QString &serial);
+    bool isActive() const { return m_running||m_starting; }
+    bool isStarting() const { return m_starting; }
+    QString serial() const { return m_serial; }
+
+signals:
+    void stateChanged();
+
+public:
     void installonly(const QString& serial, int port);
 
 private:
-    bool runSndcpyProcess(const QString& serial, int port, bool wait = true);
-    void startAudioOutput();
-    void stopAudioOutput();
-    void startRecvData(int port);
-    void stopRecvData();
-
-signals:
-    void connectTo(int port);
-
-private:
-    QPointer<QIODevice> m_outputDevice;
-    QThread m_workerThread;
+    bool runSndcpyProcess(const QString& serial, int port);
+    QThread m_audioThread;
+    AudioStream *m_stream = nullptr;
     QProcess m_sndcpy;
-    QVector<char> m_buffer;
     bool m_running = false;
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    QAudioOutput* m_audioOutput = nullptr;
-#else
-    QAudioSink *m_audioSink = nullptr;
-#endif
+    QString m_serial;
+    bool m_starting = false;
+    int m_pendingPort = 28200;
+    QTimer m_startTimeout;
+
 };
 
 #endif // AUDIOOUTPUT_H

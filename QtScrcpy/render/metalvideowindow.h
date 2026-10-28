@@ -18,7 +18,9 @@ public:
     QPaintEngine* paintEngine() const override { return nullptr; }
 
 protected:
-    void paintEvent(QPaintEvent *) override {}
+    void paintEvent(QPaintEvent *) override;
+    void resizeEvent(QResizeEvent *) override;
+    void showEvent(QShowEvent *) override;
 
 private:
     struct Impl;

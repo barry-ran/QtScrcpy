@@ -13,20 +13,75 @@
 
 #include "audiooutput.h"
 
+class AudioStream : public QObject {
+public:
+    AudioStream() {
+        m_pumpTimer.setParent(this);
+        m_pumpTimer.setInterval(5);
+        m_pumpTimer.setTimerType(Qt::PreciseTimer);
+        connect(&m_pumpTimer, &QTimer::timeout, this, &AudioStream::pumpAudio);
+    }
+    void start(int port) { startAudioOutput(); startRecvData(port); }
+    void stop() { stopRecvData(); stopAudioOutput(); }
+private:
+    void startAudioOutput();
+    void stopAudioOutput();
+    void startRecvData(int port);
+    void stopRecvData();
+    void pumpAudio();
+    QPointer<QIODevice> m_outputDevice;
+    QPointer<QTcpSocket> m_audioSocket;
+    QTimer m_pumpTimer;
+    PcmBuffer m_pcm;
+    bool m_prebuffered = false;
+    bool m_hasPlayed = false;
+    int m_underflows = 0;
+    QElapsedTimer m_reportClock;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    QAudioOutput *m_audioOutput = nullptr;
+#else
+    QAudioSink *m_audioSink = nullptr;
+#endif
+};
+
 AudioOutput::AudioOutput(QObject *parent)
     : QObject(parent)
 {
     m_running = false;
-#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
-    m_audioOutput = nullptr;
-#else
-    m_audioSink = nullptr;
-#endif
+    m_stream = new AudioStream;
+    m_stream->moveToThread(&m_audioThread);
+    connect(&m_audioThread, &QThread::finished, m_stream, &QObject::deleteLater);
+    m_audioThread.start(QThread::HighPriority);
     connect(&m_sndcpy, &QProcess::readyReadStandardOutput, this, [this]() {
         qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardOutput());
     });
     connect(&m_sndcpy, &QProcess::readyReadStandardError, this, [this]() {
         qInfo() << QString("AudioOutput::") << QString(m_sndcpy.readAllStandardError());
+    });
+    m_startTimeout.setSingleShot(true);
+    connect(&m_startTimeout, &QTimer::timeout, this, [this]() {
+        m_starting = false;emit stateChanged();
+        m_sndcpy.kill();
+        qWarning() << "音频启动超时，请检查手机授权；投屏保持运行。";
+    });
+    connect(&m_sndcpy, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+            [this](int code, QProcess::ExitStatus status) {
+        m_startTimeout.stop();
+        if (!m_starting) return;
+        m_starting = false;emit stateChanged();
+        if (code != 0 || status != QProcess::NormalExit) {
+            qWarning() << "音频启动失败；投屏保持运行。";
+            return;
+        }
+        const int port = m_pendingPort;
+        QMetaObject::invokeMethod(m_stream, [this, port]() { m_stream->start(port); }, Qt::QueuedConnection);
+        m_running = true;emit stateChanged();
+    });
+    connect(&m_sndcpy, &QProcess::errorOccurred, this, [this](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart) {
+            m_starting = false;emit stateChanged(); m_startTimeout.stop();
+            qWarning() << "无法启动音频脚本。";
+        }
     });
 }
 
@@ -36,46 +91,47 @@ AudioOutput::~AudioOutput()
         m_sndcpy.kill();
     }
     stop();
+    m_audioThread.quit();
+    m_audioThread.wait();
 }
 
 bool AudioOutput::start(const QString& serial, int port)
 {
-    if (m_running) {
-        stop();
+    if (m_starting || m_sndcpy.state() != QProcess::NotRunning) {
+        qWarning() << "音频正在启动，请等待手机授权。";
+        return false;
     }
-
-    QElapsedTimer timeConsumeCount;
-    timeConsumeCount.start();
-    bool ret = runSndcpyProcess(serial, port);
-    qInfo() << "AudioOutput::run sndcpy cost:" << timeConsumeCount.elapsed() << "milliseconds";
-    if (!ret) {
-        return ret;
-    }
-
-    startAudioOutput();
-    startRecvData(port);
-
-    m_running = true;
+    stop();
+    m_pendingPort = port;
+    m_serial=serial;
+    m_starting = true;emit stateChanged();
+    runSndcpyProcess(serial, port);
+    m_startTimeout.start(20000);
     return true;
+}
+
+void AudioOutput::stopForDevice(const QString &serial)
+{
+    if(!serial.isEmpty()&&m_serial==serial)stop();
 }
 
 void AudioOutput::stop()
 {
-    if (!m_running) {
-        return;
+    m_starting=false;m_running=false;m_startTimeout.stop();
+    if(m_sndcpy.state()!=QProcess::NotRunning) {
+        m_sndcpy.kill();m_sndcpy.waitForFinished(1000);
     }
-    m_running = false;
-
-    stopRecvData();
-    stopAudioOutput();
+    if(m_audioThread.isRunning())
+        QMetaObject::invokeMethod(m_stream,[this](){m_stream->stop();},Qt::BlockingQueuedConnection);
+    m_serial.clear();emit stateChanged();
 }
 
 void AudioOutput::installonly(const QString &serial, int port)
 {
-    runSndcpyProcess(serial, port, false);
+    runSndcpyProcess(serial, port);
 }
 
-bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
+bool AudioOutput::runSndcpyProcess(const QString &serial, int port)
 {
     if (QProcess::NotRunning != m_sndcpy.state()) {
         m_sndcpy.kill();
@@ -90,23 +146,10 @@ bool AudioOutput::runSndcpyProcess(const QString &serial, int port, bool wait)
     m_sndcpy.start("bash", params);
 #endif
 
-    if (!wait) {
-        return true;
-    }
-
-    if (!m_sndcpy.waitForStarted()) {
-        qWarning() << "AudioOutput::start sndcpy process failed";
-        return false;
-    }
-    if (!m_sndcpy.waitForFinished()) {
-        qWarning() << "AudioOutput::sndcpy process crashed";
-        return false;
-    }
-
     return true;
 }
 
-void AudioOutput::startAudioOutput()
+void AudioStream::startAudioOutput()
 {
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     if (m_audioOutput) {
@@ -148,6 +191,13 @@ void AudioOutput::startAudioOutput()
         return;
     }
     m_audioSink = new QAudioSink(defaultDevice, format, this);
+    m_audioSink->setBufferSize(192 * 80);
+    connect(m_audioSink, &QAudioSink::stateChanged, this, [this](QtAudio::State state) {
+        if (state == QtAudio::IdleState && m_hasPlayed) {
+            ++m_underflows;
+            m_prebuffered = false;
+        }
+    });
     m_outputDevice = m_audioSink->start();
     if (!m_outputDevice) {
         qWarning() << "AudioOutput::audio output device not available, cannot play audio.";
@@ -158,7 +208,7 @@ void AudioOutput::startAudioOutput()
 #endif
 }
 
-void AudioOutput::stopAudioOutput()
+void AudioStream::stopAudioOutput()
 {
 #if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
     if (m_audioOutput) {
@@ -176,62 +226,61 @@ void AudioOutput::stopAudioOutput()
     m_outputDevice = nullptr;
 }
 
-void AudioOutput::startRecvData(int port)
+void AudioStream::startRecvData(int port)
 {
-    if (m_workerThread.isRunning()) {
-        stopRecvData();
-    }
-
-    auto audioSocket = new QTcpSocket();
-    audioSocket->moveToThread(&m_workerThread);
-    connect(&m_workerThread, &QThread::finished, audioSocket, &QObject::deleteLater);
-
-    connect(this, &AudioOutput::connectTo, audioSocket, [audioSocket](int port) {
-        audioSocket->connectToHost(QHostAddress::LocalHost, port);
-        if (!audioSocket->waitForConnected(500)) {
-            qWarning("AudioOutput::audio socket connect failed");
-            return;
-        }
-        qInfo("AudioOutput::audio socket connect success");
+    stopRecvData();
+    // Socket, queue and QAudioSink all belong to this thread.
+    m_audioSocket = new QTcpSocket(this);
+    auto *socket = m_audioSocket.data();
+    socket->setReadBufferSize(192 * 250);
+    connect(socket, &QTcpSocket::connected, this, [socket]() {
+        socket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
+        qInfo() << "音频连接成功：48 kHz / 16-bit / stereo，80 ms 播放缓冲";
     });
-    connect(audioSocket, &QIODevice::readyRead, audioSocket, [this, audioSocket]() {
-        qint64 recv = audioSocket->bytesAvailable();
-        //qDebug() << "AudioOutput::recv data:" << recv;
-
-        if (!m_outputDevice) {
-            return;
-        }
-        if (m_buffer.capacity() < recv) {
-            m_buffer.reserve(recv);
-        }
-
-        qint64 count = audioSocket->read(m_buffer.data(), recv);
-        m_outputDevice->write(m_buffer.data(), count);
+    connect(socket, &QIODevice::readyRead, this, [this, socket]() {
+        m_pcm.append(socket->readAll());
+        pumpAudio();
     });
-    connect(audioSocket, &QTcpSocket::stateChanged, audioSocket, [](QAbstractSocket::SocketState state) {
-        qInfo() << "AudioOutput::audio socket state changed:" << state;
-
+    connect(socket, &QTcpSocket::disconnected, this, [this]() {
+        m_pcm.clear(); m_prebuffered = false;
+        qWarning() << "音频连接断开。";
     });
-#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    connect(audioSocket, &QTcpSocket::errorOccurred, audioSocket, [](QAbstractSocket::SocketError error) {
-        qInfo() << "AudioOutput::audio socket error occurred:" << error;
+    connect(socket, &QTcpSocket::errorOccurred, this, [](QAbstractSocket::SocketError error) {
+        qWarning() << "音频连接错误：" << error;
     });
-#else
-    connect(audioSocket, QOverload<QAbstractSocket::SocketError>::of(&QAbstractSocket::error), audioSocket, [](QAbstractSocket::SocketError error) {
-        qInfo() << "AudioOutput::audio socket error occurred:" << error;
-    });
-#endif
-
-    m_workerThread.start();
-    emit connectTo(port);
+    socket->connectToHost(QHostAddress::LocalHost, port);
+    m_hasPlayed = false; m_underflows = 0; m_reportClock.start();
+    m_pumpTimer.start();
 }
 
-void AudioOutput::stopRecvData()
+void AudioStream::pumpAudio()
 {
-    if (!m_workerThread.isRunning()) {
-        return;
+    if (m_reportClock.elapsed() >= 10000) {
+        qInfo() << "Audio playback: underflows=" << m_underflows << "queuedMs=" << m_pcm.size() / 192;
+        m_reportClock.restart();
     }
 
-    m_workerThread.quit();
-    m_workerThread.wait();
+    if (!m_outputDevice) return;
+    if (!m_prebuffered) {
+        if (m_pcm.size() < 192 * 40) return;
+        m_prebuffered = true;
+    }
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    const qint64 freeBytes = m_audioOutput ? m_audioOutput->bytesFree() : 0;
+#else
+    const qint64 freeBytes = m_audioSink ? m_audioSink->bytesFree() : 0;
+#endif
+    if (m_pcm.drain(m_outputDevice, freeBytes) > 0) m_hasPlayed = true;
+}
+
+void AudioStream::stopRecvData()
+{
+    m_pumpTimer.stop();
+    if (m_audioSocket) {
+        m_audioSocket->disconnect(this);
+        m_audioSocket->abort();
+        m_audioSocket->deleteLater();
+        m_audioSocket = nullptr;
+    }
+    m_pcm.clear(); m_prebuffered = false;
 }

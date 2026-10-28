@@ -49,20 +49,14 @@ void KeepRatioWidget::adjustSubWidget()
     QPoint pos(0, 0);
     int width = 0;
     int height = 0;
-    if (m_widthHeightRatio > 1.0f) {
-        // base width
-        width = curSize.width();
-        height = curSize.width() / m_widthHeightRatio;
-        pos.setY((curSize.height() - height) / 2);
-    } else if (m_widthHeightRatio > 0.0f) {
-        // base height
-        height = curSize.height();
-        width = curSize.height() * m_widthHeightRatio;
-        pos.setX((curSize.width() - width) / 2);
-    } else {
-        // full widget
-        height = curSize.height();
-        width = curSize.width();
-    }
+    if(m_widthHeightRatio>0.0f){
+        if(curSize.width()/m_widthHeightRatio>curSize.height()){
+            height=curSize.height();width=qRound(height*m_widthHeightRatio);
+        }else{width=curSize.width();height=qRound(width/m_widthHeightRatio);}
+        // Fit both axes; never allow the rendered child to overflow its host.
+        if(width>curSize.width()){width=curSize.width();height=qRound(width/m_widthHeightRatio);}
+        if(height>curSize.height()){height=curSize.height();width=qRound(height*m_widthHeightRatio);}
+        pos=QPoint((curSize.width()-width)/2,(curSize.height()-height)/2);
+    }else{width=curSize.width();height=curSize.height();}
     m_subWidget->setGeometry(pos.x(), pos.y(), width, height);
 }

@@ -33,14 +33,18 @@ $ADB $serial forward tcp:$SNDCPY_PORT localabstract:sndcpy
 echo Start $SNDCPY_APK...
 $ADB $serial shell am start com.rom1v.sndcpy/.MainActivity
 
-while ((1))
+for attempt in {1..50}
 do
     echo Waiting $SNDCPY_APK start...
     sleep 0.1
-    sndcpy_started=$($ADB shell 'ps | grep com.rom1v.sndcpy')
+    sndcpy_started=$($ADB $serial shell pidof com.rom1v.sndcpy)
     if [[ $sndcpy_started != "" ]]; then
         break
     fi
 done
 
+if [[ $sndcpy_started == "" ]]; then
+    echo "sndcpy did not start; check phone authorization" >&2
+    exit 1
+fi
 echo Ready playing...

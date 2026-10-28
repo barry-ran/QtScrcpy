@@ -179,6 +179,7 @@ set(QC_UI_SOURCES
     ui/videoform.h
     ui/videoform.cpp
     ui/videoform.ui
+    ui/workspace.cpp
     ui/dialog.cpp
     ui/dialog.h
     ui/dialog.ui
@@ -337,7 +338,9 @@ endif()
 # MacOS
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     # qt6 need 10.15 or later
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15")
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
+    endif()
 
     # copy bundle file
     get_target_property(MACOS_BUNDLE_PATH ${PROJECT_NAME} RUNTIME_OUTPUT_DIRECTORY)
@@ -411,3 +414,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${LINK_LIBS}
     QtScrcpyCore
 )
+
+# Internal protocol harness used by --smoke-test-keymap.
+target_include_directories(${PROJECT_NAME} PRIVATE QtScrcpyCore/src/device/controller/inputconvert QtScrcpyCore/src/device/android QtScrcpyCore/src/common)

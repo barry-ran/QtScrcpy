@@ -1,4 +1,5 @@
-﻿#include <QDebug>
+#include <QMenuBar>
+#include <QDebug>
 #include <QAbstractItemView>
 #include <QDesktopServices>
 #include <QCheckBox>
@@ -15,10 +16,13 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QProcess>
 #include <QRandomGenerator>
 #include <QRegularExpression>
 #include <QSizePolicy>
 #include <QScreen>
+#include <QSettings>
+#include <QSignalBlocker>
 #include <QScrollArea>
 #include <QSet>
 #include <QStandardPaths>
@@ -103,6 +107,8 @@ void initializeKeyMapDirectory()
 Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    m_audioOutput.setParent(this);
+    m_audioOutput.setObjectName("SessionAudioOutput");
     initializeKeyMapDirectory();
     initUI();
 
@@ -153,12 +159,56 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
         case qsc::AdbProcess::AER_SUCCESS_EXEC:
             //log = m_adb.getStdOut();
             if (args.contains("devices")) {
-                QStringList devices = m_adb.getDevicesSerialFromStdOut();
-                ui->serialBox->clear();
-                ui->connectedPhoneList->clear();
-                for (auto &item : devices) {
-                    ui->serialBox->addItem(item);
-                    ui->connectedPhoneList->addItem(Config::getInstance().getNickName(item) + "-" + item);
+                const QStringList transports = m_adb.getDevicesSerialFromStdOut();
+                for (auto it = m_wirelessHardwareIds.begin(); it != m_wirelessHardwareIds.end();) {
+                    if (!transports.contains(it.key())) it = m_wirelessHardwareIds.erase(it);
+                    else ++it;
+                }
+                for (const QString &transport : transports) {
+                    if (!transport.contains(QLatin1Char(':')) || m_wirelessHardwareIds.contains(transport)
+                        || m_pendingHardwareIds.contains(transport)) continue;
+                    m_pendingHardwareIds.insert(transport);
+                    auto *query = new QProcess(this);
+                    connect(query, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+                            [this, query, transport](int code, QProcess::ExitStatus status) {
+                        if (m_shuttingDown) { query->deleteLater(); return; }
+                        m_pendingHardwareIds.remove(transport);
+                        m_wirelessHardwareIds.insert(transport,
+                            code == 0 && status == QProcess::NormalExit
+                                ? QString::fromUtf8(query->readAllStandardOutput()).trimmed() : QString());
+                        query->deleteLater();
+                        QTimer::singleShot(0, this, &Dialog::on_updateDevice_clicked);
+                    });
+                    query->start(QCoreApplication::applicationDirPath() + QStringLiteral("/adb"),
+                                 {QStringLiteral("-s"), transport, QStringLiteral("shell"),
+                                  QStringLiteral("getprop"), QStringLiteral("ro.serialno")});
+                    QTimer::singleShot(3000, query, [query]() {
+                        if (query->state() != QProcess::NotRunning) query->kill();
+                    });
+                }
+                QStringList devices;
+                for (const QString &transport : transports) {
+                    const QString hardwareId = m_wirelessHardwareIds.value(transport);
+                    // A USB serial is the hardware serial; hide only a proven duplicate.
+                    if (transport.contains(QLatin1Char(':')) && !hardwareId.isEmpty()
+                        && transports.contains(hardwareId)) continue;
+                    devices.append(transport);
+                }
+                QStringList previous;
+                for (int i = 0; i < ui->serialBox->count(); ++i) previous << ui->serialBox->itemText(i);
+                if (previous != devices) {
+                    const QString selected = ui->serialBox->currentText();
+                    ui->serialBox->clear();
+                    ui->connectedPhoneList->clear();
+                    for (const auto &item : devices) {
+                        ui->serialBox->addItem(item);
+                        ui->connectedPhoneList->addItem(Config::getInstance().getNickName(item) + "-" + item);
+                    }
+                    const int restored = ui->serialBox->findText(selected);
+                    if (restored >= 0) ui->serialBox->setCurrentIndex(restored);
+                }
+                for (int i = 0; i < devices.size(); ++i) {
+                    ui->connectedPhoneList->item(i)->setText(Config::getInstance().getNickName(devices[i]) + "-" + devices[i]);
                 }
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
@@ -189,39 +239,54 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
         }
     });
 
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &Dialog::shutdownSessions);
     m_hideIcon = new QSystemTrayIcon(this);
     m_hideIcon->setIcon(QIcon(":/image/tray/logo.png"));
     m_menu = new QMenu(this);
     m_quit = new QAction(this);
     m_showWindow = new QAction(this);
-    m_showWindow->setText(tr("show"));
-    m_quit->setText(tr("quit"));
+    m_showWindow->setText(QStringLiteral("打开主界面"));
+    m_quit->setText(QStringLiteral("完全退出"));
+    m_quit->setMenuRole(QAction::QuitRole);
+    m_quit->setShortcut(QKeySequence::Quit);
+    m_quit->setShortcutContext(Qt::ApplicationShortcut);
+#ifdef Q_OS_MACOS
+    auto *applicationMenuBar=new QMenuBar(this);applicationMenuBar->setNativeMenuBar(true);
+    auto *applicationMenu=applicationMenuBar->addMenu(QStringLiteral("QtScrcpy"));
+    applicationMenu->addAction(m_showWindow);applicationMenu->addAction(m_quit);
+#endif
     m_menu->addAction(m_showWindow);
     m_menu->addAction(m_quit);
     m_hideIcon->setContextMenu(m_menu);
     m_hideIcon->show();
-    connect(m_showWindow, &QAction::triggered, this, &Dialog::show);
-    connect(m_quit, &QAction::triggered, this, [this]() {
-        m_hideIcon->hide();
-        qApp->quit();
-    });
+    connect(m_showWindow, &QAction::triggered, this, &Dialog::bringToFront);
+    connect(m_quit,&QAction::triggered,this,&Dialog::requestQuit);
     connect(m_hideIcon, &QSystemTrayIcon::activated, this, &Dialog::slotActivated);
 
     connect(&qsc::IDeviceManage::getInstance(), &qsc::IDeviceManage::deviceConnected, this, &Dialog::onDeviceConnected);
     connect(&qsc::IDeviceManage::getInstance(), &qsc::IDeviceManage::deviceDisconnected, this, &Dialog::onDeviceDisconnected);
+    initWorkspaceUi();
 }
 
 Dialog::~Dialog()
 {
     qDebug() << "~Dialog()";
+    shutdownSessions();
+    for (auto *process : findChildren<QProcess*>()) {
+        disconnect(process, nullptr, this, nullptr);
+    }
+    // The list model emits modelReset while QWidget destroys its children.
+    // Disconnect before deleting the UI wrapper used by these callbacks.
+    disconnect(ui->connectedPhoneList->model(), nullptr, this, nullptr);
+    disconnect(ui->serialBox, nullptr, this, nullptr);
+    disconnect(ui->connectedPhoneList, nullptr, this, nullptr);
     updateBootConfig(false);
-    qsc::IDeviceManage::getInstance().disconnectAllDevice();
     delete ui;
 }
 
 void Dialog::initUI()
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    setAttribute(Qt::WA_DeleteOnClose, false);
     //setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowCloseButtonHint | Qt::CustomizeWindowHint);
 
     setWindowTitle(Config::getInstance().getTitle());
@@ -619,7 +684,9 @@ void Dialog::updateBootConfig(bool toView)
         ui->useSingleModeCheck->setChecked(config.simpleMode);
         ui->autoUpdatecheckBox->setChecked(config.autoUpdateDevice);
         ui->showToolbar->setChecked(config.showToolbar);
-        ui->quitOnCloseCheck->setChecked(config.quitOnClose);
+        ui->quitOnCloseCheck->setChecked(false);
+        ui->quitOnCloseCheck->setEnabled(false);
+        ui->quitOnCloseCheck->setToolTip(QStringLiteral("关闭主窗口后继续运行；使用菜单退出结束全部服务"));
         ui->decodeModeBox->setCurrentIndex(config.decodeMode);
         ui->codecModeBox->setCurrentIndex(config.codecModeIndex);
 
@@ -663,7 +730,7 @@ void Dialog::updateBootConfig(bool toView)
         config.simpleMode = ui->useSingleModeCheck->isChecked();
         config.autoUpdateDevice = ui->autoUpdatecheckBox->isChecked();
         config.showToolbar = ui->showToolbar->isChecked();
-        config.quitOnClose = ui->quitOnCloseCheck->isChecked();
+        config.quitOnClose = false;
         config.decodeMode = ui->decodeModeBox->currentIndex();
         config.codecModeIndex = ui->codecModeBox->currentIndex();
 
@@ -748,9 +815,7 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 {
     switch (reason) {
     case QSystemTrayIcon::Trigger:
-#ifdef Q_OS_WIN32
-        this->show();
-#endif
+        bringToFront();
         break;
     default:
         break;
@@ -760,32 +825,88 @@ void Dialog::slotActivated(QSystemTrayIcon::ActivationReason reason)
 void Dialog::bringToFront()
 {
     show();
+    if (QScreen *screen = QGuiApplication::primaryScreen()) {
+        bool onScreen = false;
+        for (auto *candidate : QGuiApplication::screens()) onScreen |= candidate->availableGeometry().intersects(frameGeometry());
+        if (!onScreen) move(screen->availableGeometry().center() - rect().center());
+    }
     setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     raise();
     activateWindow();
 }
 
+void Dialog::hideWorkspace()
+{
+    if(m_shuttingDown)return;
+    updateBootConfig(false);
+    hide();m_hideIcon->show();
+    qInfo()<<"Workspace hidden; projection and audio sessions preserved";
+}
+
 void Dialog::closeEvent(QCloseEvent *event)
 {
-    if (ui->quitOnCloseCheck->isChecked()) {
-        // The user opted out of the system tray: closing the window quits the app.
-        // Ignore the event (instead of accepting it) so WA_DeleteOnClose does not
-        // delete this dialog here; main() deletes it after the event loop returns.
-        m_hideIcon->hide();
-        event->ignore();
-        qApp->quit();
-        return;
-    }
-
-    this->hide();
-    if (!Config::getInstance().getTrayMessageShown()) {
-        Config::getInstance().setTrayMessageShown(true);
-        m_hideIcon->showMessage(tr("Notice"),
-                                tr("Hidden here!"),
-                                QSystemTrayIcon::Information,
-                                3000);
-    }
+    if(m_shuttingDown){event->accept();return;}
     event->ignore();
+    hideWorkspace();
+}
+
+void Dialog::cancelPendingStarts(const QString &serial)
+{
+    for(auto *task:findChildren<qsc::AdbProcess*>()) {
+        const auto owner=task->property("sessionSerial").toString();
+        if(owner.isEmpty()||(!serial.isEmpty()&&owner!=serial))continue;
+        disconnect(task,nullptr,this,nullptr);task->kill();task->deleteLater();
+    }
+    for(auto *task:findChildren<QProcess*>(QString(),Qt::FindDirectChildrenOnly)) {
+        const auto owner=task->property("sessionSerial").toString();
+        if(owner.isEmpty()||(!serial.isEmpty()&&owner!=serial))continue;
+        if(task->property("wirelessSwitch").toBool()) {
+            m_wirelessSwitching=false;ui->wifiConnectBtn->setEnabled(true);
+            if(!m_shuttingDown&&ui->autoUpdatecheckBox->isChecked())m_autoUpdatetimer.start(5000);
+        }
+        disconnect(task,nullptr,this,nullptr);
+        if(task->state()!=QProcess::NotRunning){task->kill();task->waitForFinished(500);}
+        task->deleteLater();
+    }
+}
+
+void Dialog::endProjection(const QString &serial)
+{
+    if(serial.isEmpty())return;
+    cancelPendingStarts(serial);
+    m_audioOutput.stopForDevice(serial);
+    qsc::IDeviceManage::getInstance().disconnectDevice(serial);
+    if(m_projectionWindows.contains(serial))onDeviceDisconnected(serial);
+}
+
+void Dialog::shutdownSessions()
+{
+    if(m_shuttingDown)return;
+    m_shuttingDown=true;
+    m_autoUpdatetimer.stop();
+    cancelPendingStarts();
+    for(auto *task:findChildren<qsc::AdbProcess*>()){disconnect(task,nullptr,this,nullptr);task->kill();}
+    disconnect(&m_adb,nullptr,this,nullptr);
+    updateBootConfig(false);
+    m_audioOutput.stop();
+    // Device teardown drains decoding and finalizes the recorder container.
+    qsc::IDeviceManage::getInstance().disconnectAllDevice();
+    const auto remaining=m_projectionWindows.keys();
+    for(const auto &serial:remaining)onDeviceDisconnected(serial);
+    // Stop only commands created by this process, never the shared adb server.
+    m_adb.kill();
+    for(auto *process:findChildren<QProcess*>()) {
+        disconnect(process,nullptr,this,nullptr);
+        if(process->state()!=QProcess::NotRunning){process->kill();process->waitForFinished(500);}
+    }
+    m_hideIcon->hide();
+    qInfo()<<"All local sessions stopped; recording finalization completed";
+}
+
+void Dialog::requestQuit()
+{
+    shutdownSessions();
+    qApp->quit();
 }
 
 void Dialog::on_updateDevice_clicked()
@@ -822,6 +943,7 @@ void Dialog::on_videoSourceBox_currentIndexChanged(int)
 
 void Dialog::on_startServerBtn_clicked()
 {
+    if(m_shuttingDown)return;
     outLog("start server...", false);
 
     // this is ok that "original" toUshort is 0
@@ -934,6 +1056,7 @@ void Dialog::on_startServerBtn_clicked()
     }
 
     auto *versionAdb = new qsc::AdbProcess(this);
+    versionAdb->setProperty("sessionSerial",params.serial);
     connect(versionAdb, &qsc::AdbProcess::adbProcessResult, this,
             [this, versionAdb, camera, params](qsc::AdbProcess::ADB_EXEC_RESULT result) {
         if (result == qsc::AdbProcess::AER_SUCCESS_EXEC) {
@@ -1123,9 +1246,7 @@ void Dialog::refreshApps()
 
 void Dialog::on_stopServerBtn_clicked()
 {
-    if (qsc::IDeviceManage::getInstance().disconnectDevice(ui->serialBox->currentText().trimmed())) {
-        outLog("stop server");
-    }
+    endProjection(ui->serialBox->currentText().trimmed());
 }
 
 void Dialog::on_wirelessConnectBtn_clicked()
@@ -1261,6 +1382,15 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
     }
     auto videoForm = new VideoForm(ui->framelessCheck->isChecked(), Config::getInstance().getSkin(), ui->showToolbar->isChecked(), ui->decodeModeBox->currentIndex());
     videoForm->setSerial(serial);
+    m_projectionWindows.insert(serial,videoForm);
+    connect(videoForm,&VideoForm::sessionCloseRequested,this,&Dialog::endProjection);
+    auto syncAudio=[this,videoForm,serial](){videoForm->setAudioState(m_audioOutput.serial()==serial&&m_audioOutput.isActive(),m_audioOutput.serial()==serial&&m_audioOutput.isStarting());};
+    connect(&m_audioOutput,&AudioOutput::stateChanged,videoForm,syncAudio);
+    connect(videoForm,&VideoForm::audioToggleRequested,this,[this,serial](){
+        if(m_audioOutput.serial()==serial&&m_audioOutput.isActive())m_audioOutput.stop();
+        else m_audioOutput.start(serial,28200);
+    });
+    syncAudio();
 
     qsc::IDeviceManage::getInstance().getDevice(serial)->setUserData(static_cast<void*>(videoForm));
     qsc::IDeviceManage::getInstance().getDevice(serial)->registerDeviceObserver(videoForm);
@@ -1285,6 +1415,10 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
 
     bool deviceVer = size.height() > size.width();
     QRect rc = Config::getInstance().getRect(serial);
+    if(rc.isValid()&&QSettings().value("projection/geometryVersion/"+serial,0).toInt()<2) {
+        rc.setSize(videoForm->windowSizeForPhone(rc.size()));
+        rc.translate(-videoForm->phoneRect().topLeft());
+    }
     bool rcVer = rc.height() > rc.width();
     // same width/height rate
     if (rc.isValid() && (deviceVer == rcVer)) {
@@ -1298,23 +1432,34 @@ void Dialog::onDeviceConnected(bool success, const QString &serial, const QStrin
     QTimer::singleShot(200, videoForm, [videoForm](){videoForm->show();});
 #endif
 
+    videoForm->ensureOnScreen();
+    QTimer::singleShot(0, videoForm, [videoForm](){videoForm->ensureOnScreen();});
+
     GroupController::instance().addDevice(serial);
+    if (QSettings().value(QStringLiteral("audio/startWithProjection"), false).toBool()) {
+        // Defer until the connected callback has finished creating the projection window.
+        QTimer::singleShot(0, this, [this, serial]() {
+            if (m_shuttingDown || !qsc::IDeviceManage::getInstance().getDevice(serial)) return;
+            if (!QSettings().value(QStringLiteral("audio/startWithProjection"), false).toBool()) return;
+            outLog(QStringLiteral("投屏已连接，正在开启音频…"));
+            m_audioOutput.start(serial, 28200);
+        });
+    }
 }
 
 void Dialog::onDeviceDisconnected(QString serial)
 {
+    m_audioOutput.stopForDevice(serial);
     GroupController::instance().removeDevice(serial);
-    auto device = qsc::IDeviceManage::getInstance().getDevice(serial);
-    if (!device) {
-        return;
+    auto window=m_projectionWindows.take(serial);
+    auto device=qsc::IDeviceManage::getInstance().getDevice(serial);
+    if(device) {
+        if(!window)window=static_cast<VideoForm*>(device->getUserData());
+        if(window)device->deRegisterDeviceObserver(window);
+        device->setUserData(nullptr);
     }
-    auto data = device->getUserData();
-    if (data) {
-        VideoForm* vf = static_cast<VideoForm*>(data);
-        qsc::IDeviceManage::getInstance().getDevice(serial)->deRegisterDeviceObserver(vf);
-        vf->close();
-        vf->deleteLater();
-    }
+    if(window){window->finishSession();window->deleteLater();}
+    // Disconnects never reopen a workspace the user chose to hide.
 }
 
 void Dialog::on_wirelessDisConnectBtn_clicked()
@@ -1360,12 +1505,21 @@ void Dialog::on_clearOut_clicked()
 
 void Dialog::on_stopAllServerBtn_clicked()
 {
+    cancelPendingStarts();
+    m_audioOutput.stop();
     qsc::IDeviceManage::getInstance().disconnectAllDevice();
+    const auto remaining=m_projectionWindows.keys();
+    for(const auto &serial:remaining)onDeviceDisconnected(serial);
 }
 
 void Dialog::on_refreshGameScriptBtn_clicked()
 {
+    const QString previous = ui->gameBox->currentText();
+    const QSignalBlocker blocker(ui->gameBox);
+    ui->gameBox->hidePopup();
     ui->gameBox->clear();
+    ui->gameBox->addItem(QString());
+    ui->gameBox->setPlaceholderText(QStringLiteral("选择按键映射（留空为常规操作）"));
     initializeKeyMapDirectory();
     const QDir userDir(getKeyMapPath());
     const QDir defaultDir(getDefaultKeyMapPath());
@@ -1384,6 +1538,9 @@ void Dialog::on_refreshGameScriptBtn_clicked()
             }
         }
     }
+    const int selected = ui->gameBox->findText(previous);
+    ui->gameBox->setCurrentIndex(selected >= 0 ? selected : 0);
+    outLog(QStringLiteral("按键映射已刷新：%1 个配置").arg(ui->gameBox->count() - 1));
 }
 
 void Dialog::on_applyScriptBtn_clicked()
@@ -1452,39 +1609,79 @@ int Dialog::findDeviceFromeSerialBox(bool wifi)
 
 void Dialog::on_wifiConnectBtn_clicked()
 {
-    on_stopAllServerBtn_clicked();
-    delayMs(200);
-
-    on_updateDevice_clicked();
-    delayMs(200);
-
-    int firstUsbDevice = findDeviceFromeSerialBox(false);
-    if (-1 == firstUsbDevice) {
-        qWarning() << "No use device is found!";
+    if (m_wirelessSwitching || m_shuttingDown) return;
+    const int usbIndex = findDeviceFromeSerialBox(false);
+    if (usbIndex < 0) {
+        outLog(QStringLiteral("切换无线连接：请先通过 USB 连接并授权手机。"));
         return;
     }
-    ui->serialBox->setCurrentIndex(firstUsbDevice);
-
-    on_getIPBtn_clicked();
-    delayMs(200);
-
-    on_startAdbdBtn_clicked();
-    delayMs(1000);
-
-    on_wirelessConnectBtn_clicked();
-    delayMs(2000);
-
-    on_updateDevice_clicked();
-    delayMs(200);
-
-    int firstWifiDevice = findDeviceFromeSerialBox(true);
-    if (-1 == firstWifiDevice) {
-        qWarning() << "No wifi device is found!";
-        return;
-    }
-    ui->serialBox->setCurrentIndex(firstWifiDevice);
-
-    on_startServerBtn_clicked();
+    const QString serial = ui->serialBox->itemText(usbIndex);
+    m_wirelessSwitching = true;
+    m_autoUpdatetimer.stop();
+    ui->wifiConnectBtn->setEnabled(false);
+    auto *process = new QProcess(this);
+    process->setProperty("sessionSerial",serial);process->setProperty("wirelessSwitch",true);
+    auto *timeout = new QTimer(process);
+    timeout->setSingleShot(true);
+    auto finish = [this, process, timeout](const QString &message) {
+        timeout->stop();
+        outLog(message);
+        m_wirelessSwitching = false;
+        ui->wifiConnectBtn->setEnabled(true);
+        if (ui->autoUpdatecheckBox->isChecked()) m_autoUpdatetimer.start(5000);
+        process->deleteLater();
+    };
+    connect(timeout, &QTimer::timeout, process, [process]() { process->kill(); });
+    connect(process, &QProcess::errorOccurred, this, [finish](QProcess::ProcessError error) {
+        if (error == QProcess::FailedToStart) finish(QStringLiteral("无线切换失败：无法启动 ADB。"));
+    });
+    connect(process, qOverload<int, QProcess::ExitStatus>(&QProcess::finished), this,
+        [this, process, timeout, finish, serial, stage = 0, address = QString()](int code, QProcess::ExitStatus status) mutable {
+        timeout->stop();
+        const QString output = QString::fromUtf8(process->readAllStandardOutput());
+        const QString error = QString::fromUtf8(process->readAllStandardError());
+        if (status != QProcess::NormalExit || code != 0) {
+            finish(QStringLiteral("无线切换失败（保留 USB 投屏）：") + error + output);
+            return;
+        }
+        QStringList args;
+        if (stage == 0) {
+            const auto match = QRegularExpression(QStringLiteral("inet\\s+(\\d+\\.\\d+\\.\\d+\\.\\d+)/")).match(output);
+            if (!match.hasMatch()) {
+                finish(QStringLiteral("无线切换失败：手机未获得 Wi-Fi IPv4 地址。"));
+                return;
+            }
+            ui->deviceIpEdt->setEditText(match.captured(1));
+            ui->devicePortEdt->setEditText(QStringLiteral("5555"));
+            address = match.captured(1) + QStringLiteral(":5555");
+            args = {QStringLiteral("-s"), serial, QStringLiteral("tcpip"), QStringLiteral("5555")};
+        } else if (stage == 1) {
+            args = {QStringLiteral("connect"), address};
+        } else {
+            if (!output.contains(QStringLiteral("connected to ") + address)) {
+                finish(QStringLiteral("无线连接未成功：") + output + error);
+                return;
+            }
+            m_wirelessHardwareIds.insert(address, serial);
+            const bool usbAvailable = ui->serialBox->findText(serial) >= 0;
+            if (!usbAvailable && ui->serialBox->findText(address) < 0) {
+                ui->serialBox->addItem(address);
+                ui->connectedPhoneList->addItem(Config::getInstance().getNickName(serial) + "-" + address);
+            }
+            ui->serialBox->setCurrentText(usbAvailable ? serial : address);
+            finish(QStringLiteral("无线连接已建立：") + address);
+            QTimer::singleShot(0, this, &Dialog::on_startServerBtn_clicked);
+            return;
+        }
+        ++stage;
+        process->start(QCoreApplication::applicationDirPath() + QStringLiteral("/adb"), args);
+        timeout->start(15000);
+    });
+    outLog(QStringLiteral("正在切换无线连接：获取手机地址…"));
+    process->start(QCoreApplication::applicationDirPath() + QStringLiteral("/adb"),
+                   {QStringLiteral("-s"), serial, QStringLiteral("shell"), QStringLiteral("ip"),
+                    QStringLiteral("-4"), QStringLiteral("addr"), QStringLiteral("show"), QStringLiteral("wlan0")});
+    timeout->start(15000);
 }
 
 void Dialog::on_connectedPhoneList_itemDoubleClicked(QListWidgetItem *item)
@@ -1513,6 +1710,7 @@ void Dialog::on_updateNameBtn_clicked()
 
 void Dialog::on_useSingleModeCheck_clicked()
 {
+    if (m_workspaceReady) return;
     if (ui->useSingleModeCheck->isChecked()) {
         ui->rightWidget->hide();
     } else {

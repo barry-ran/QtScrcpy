@@ -4,6 +4,29 @@
         <file>image/videoform/phone-h.png</file>
         <file>image/videoform/phone-v.png</file>
         <file>qss/psblack.css</file>
+        <file>qss/modern-arrow.svg</file>
+        <file>qss/modern-check.svg</file>
+        <file>image/tools/fullScreenBtn.svg</file>
+        <file>image/tools/menuBtn.svg</file>
+        <file>image/tools/homeBtn.svg</file>
+        <file>image/tools/returnBtn.svg</file>
+        <file>image/tools/appSwitchBtn.svg</file>
+        <file>image/tools/volumeUpBtn.svg</file>
+        <file>image/tools/volumeDownBtn.svg</file>
+        <file>image/tools/openScreenBtn.svg</file>
+        <file>image/tools/closeScreenBtn.svg</file>
+        <file>image/tools/powerBtn.svg</file>
+        <file>image/tools/expandNotifyBtn.svg</file>
+        <file>image/tools/expandSettingsBtn.svg</file>
+        <file>image/tools/rotateBtn.svg</file>
+        <file>image/tools/screenShotBtn.svg</file>
+        <file>image/tools/touchBtn.svg</file>
+        <file>image/tools/groupControlBtn.svg</file>
+        <file>image/tools/clipboardBtn.svg</file>
+        <file>image/tools/cameraTorchBtn.svg</file>
+        <file>image/tools/cameraZoomOutBtn.svg</file>
+        <file>image/tools/cameraZoomInBtn.svg</file>
+
         <file>qss/psblack/add_bottom.png</file>
         <file>qss/psblack/add_left.png</file>
         <file>qss/psblack/add_right.png</file>

@@ -12,17 +12,25 @@ namespace Ui
     class ToolForm;
 }
 
+class QGridLayout;
+class QPushButton;
 class Device;
-class ToolForm : public MagneticWidget
+class ToolForm : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ToolForm(QWidget *adsorbWidget, AdsorbPositions adsorbPos);
+    explicit ToolForm(QWidget *adsorbWidget, MagneticWidget::AdsorbPositions adsorbPos);
     ~ToolForm();
 
     void setSerial(const QString& serial);
+    void setHorizontal(bool horizontal);
+    void setFullscreenMode(bool fullscreen);
     bool isHost();
+    void setAudioState(bool active, bool starting);
+
+signals:
+    void audioToggleRequested();
 
 protected:
     void mousePressEvent(QMouseEvent *event);
@@ -56,11 +64,22 @@ private slots:
 
 private:
     void initStyle();
+    void togglePanel(int panel);
+    void resetPanel();
     void updateGroupControl();
     void updateCameraMode();
 
 private:
     Ui::ToolForm *ui;
+    QGridLayout *m_compactGrid = nullptr;
+    QList<QPushButton*> m_compactButtons;
+    QList<QPushButton*> m_extraButtons;
+    int m_openPanel = 0; // Last panel requested by this toolbar; Android supplies no state feedback.
+    bool m_horizontal = false;
+    bool m_fullscreen = false;
+    bool m_audioActive=false,m_audioStarting=false;
+    bool m_layoutReady=false;
+    QPushButton *m_audioButton=nullptr;
     QPoint m_dragPosition;
     QString m_serial;
     bool m_showTouch = false;
