@@ -13,6 +13,10 @@ namespace Ui
 }
 
 class Device;
+class QLabel;
+class QMenu;
+class QSlider;
+class VideoForm;
 class ToolForm : public MagneticWidget
 {
     Q_OBJECT
@@ -33,6 +37,8 @@ protected:
     void hideEvent(QHideEvent *event);
 
 private slots:
+    void on_opacityBtn_clicked();
+    void on_autoHideBtn_toggled(bool enabled);
     void on_fullScreenBtn_clicked();
     void on_returnBtn_clicked();
     void on_homeBtn_clicked();
@@ -56,11 +62,17 @@ private slots:
 
 private:
     void initStyle();
+    void initPrivacyControls();
+    void updateOpacityControls(int percent);
     void updateGroupControl();
     void updateCameraMode();
 
 private:
     Ui::ToolForm *ui;
+    QPointer<VideoForm> m_videoForm;
+    QMenu *m_opacityMenu = nullptr;
+    QSlider *m_opacitySlider = nullptr;
+    QLabel *m_opacityLabel = nullptr;
     QPoint m_dragPosition;
     QString m_serial;
     bool m_showTouch = false;

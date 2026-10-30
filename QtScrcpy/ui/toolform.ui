@@ -17,9 +17,36 @@
    <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <property name="topMargin">
-    <number>30</number>
-   </property>
+   <item>
+    <widget class="QPushButton" name="opacityBtn">
+     <property name="toolTip">
+      <string>Adjust the opacity of the video window and toolbar</string>
+     </property>
+     <property name="accessibleName">
+      <string>Adjust opacity</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="autoHideBtn">
+     <property name="toolTip">
+      <string>Automatically hide 300 ms after the pointer leaves, and restore after hovering for 300 ms.
+The hidden windows still receive mouse input. Dragging and menu interactions keep them visible.</string>
+     </property>
+     <property name="accessibleName">
+      <string>Automatically hide on mouse leave</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QPushButton" name="groupControlBtn">
      <property name="toolTip">
