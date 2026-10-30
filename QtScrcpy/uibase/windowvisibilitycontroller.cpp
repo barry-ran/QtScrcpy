@@ -24,6 +24,11 @@ namespace {
 constexpr int VisibilityDelayMs = 300;
 constexpr int OutsideMargin = 12;
 constexpr qreal HiddenOpacity = 1.0 / 255.0;
+#ifdef Q_OS_WIN
+constexpr DWORD ImeShowEvent = 0x8027;
+constexpr DWORD ImeHideEvent = 0x8028;
+constexpr DWORD ImeChangeEvent = 0x8029;
+#endif
 }
 
 struct WindowVisibilityController::NativeState
@@ -113,13 +118,13 @@ struct WindowVisibilityController::NativeState
         if (!state || !window)
             return;
         const bool compatibility = hook == state->windowHook;
-        const bool hiding = event == EVENT_OBJECT_HIDE || event == 0x8028; // EVENT_OBJECT_IME_HIDE
+        const bool hiding = event == EVENT_OBJECT_HIDE || event == ImeHideEvent;
         if (compatibility) {
             if (object != OBJID_WINDOW || child != CHILDID_SELF
                 || (event != EVENT_OBJECT_SHOW && event != EVENT_OBJECT_HIDE)
                 || (!hiding && !isCompatibilityCandidate(window)))
                 return;
-        } else if (event < 0x8027 || event > 0x8029) { // IME_SHOW, IME_HIDE, IME_CHANGE
+        } else if (event < ImeShowEvent || event > ImeChangeEvent) {
             return;
         }
         state->pruneCandidates();
@@ -151,8 +156,13 @@ struct WindowVisibilityController::NativeState
 
     void start()
     {
+        // IME candidate windows can belong to another process, outside this
+        // QWidget group. Selecting a candidate must not count as leaving the
+        // mirror and hide it during composition. These hooks observe window
+        // visibility events, not keystrokes; candidates only exempt the group
+        // while it still owns keyboard focus and the foreground window.
         if (!imeHook) {
-            imeHook = SetWinEventHook(0x8027, 0x8029, nullptr, imeEvent, 0, 0,
+            imeHook = SetWinEventHook(ImeShowEvent, ImeChangeEvent, nullptr, imeEvent, 0, 0,
                                      WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
             if (imeHook)
                 hooks().insert(imeHook, this);
@@ -240,11 +250,16 @@ void WindowVisibilityController::addWindow(QWidget *window)
 
 void WindowVisibilityController::setOpacityPercent(int percent)
 {
-    percent = qBound(10, percent, 100);
+    percent = qBound(0, percent, 100);
     if (m_opacityPercent == percent)
         return;
+    const bool wasZero = m_opacityPercent == 0;
     m_opacityPercent = percent;
-    applyOpacity();
+    if (percent == 0 || wasZero)
+        resetVisibility(percent == 0 && interactionInProgress());
+    else
+        applyOpacity();
+    updateMonitoring();
     emit opacityPercentChanged(percent);
 }
 
@@ -258,15 +273,22 @@ void WindowVisibilityController::setAutoHideEnabled(bool enabled)
     if (m_autoHideEnabled == enabled)
         return;
     m_autoHideEnabled = enabled;
-    resetVisibility();
-    if (enabled) {
+    resetVisibility(m_opacityPercent == 0 && !m_autoHidden);
+    updateMonitoring();
+    emit autoHideEnabledChanged(enabled);
+}
+
+void WindowVisibilityController::updateMonitoring()
+{
+    // A zero setting still needs a way back to the opacity controls even
+    // when automatic hiding is disabled.
+    if (m_autoHideEnabled || m_opacityPercent == 0) {
         m_native->start();
         m_timer.start();
     } else {
         m_timer.stop();
         m_native->stop();
     }
-    emit autoHideEnabledChanged(enabled);
 }
 
 bool WindowVisibilityController::autoHideEnabled() const
@@ -373,7 +395,11 @@ void WindowVisibilityController::applyOpacity(QWidget *window)
     m_applying = true;
     if (!m_appliedWindows.contains(window))
         m_appliedWindows.append(window);
-    const qreal opacity = m_autoHidden ? HiddenOpacity : m_opacityPercent / 100.0;
+    // A fully transparent native window can lose mouse hit testing. Keep
+    // the smallest nonzero alpha at 0%, then temporarily reveal on hover
+    // so the user can reach the controls without changing the saved value.
+    const qreal visibleOpacity = m_opacityPercent == 0 ? 1.0 : m_opacityPercent / 100.0;
+    const qreal opacity = m_autoHidden ? HiddenOpacity : visibleOpacity;
     window->setWindowOpacity(opacity);
     m_applying = false;
 }
@@ -384,9 +410,9 @@ void WindowVisibilityController::applyOpacity()
         applyOpacity(window);
 }
 
-void WindowVisibilityController::resetVisibility()
+void WindowVisibilityController::resetVisibility(bool revealZeroOpacity)
 {
-    m_autoHidden = false;
+    m_autoHidden = m_opacityPercent == 0 && !revealZeroOpacity;
     m_lastNear = m_clock.elapsed();
     m_revealStarted = -1;
     applyOpacity();
@@ -395,9 +421,13 @@ void WindowVisibilityController::resetVisibility()
 void WindowVisibilityController::tick()
 {
     const qint64 now = m_clock.elapsed();
-    if (!m_autoHideEnabled || !m_host || !m_host->isVisible() || m_host->isMinimized()
-        || interactionInProgress()) {
+    if ((!m_autoHideEnabled && m_opacityPercent != 0)
+        || !m_host || !m_host->isVisible() || m_host->isMinimized()) {
         resetVisibility();
+        return;
+    }
+    if (interactionInProgress()) {
+        resetVisibility(true);
         return;
     }
     if (m_autoHidden) {
@@ -405,7 +435,7 @@ void WindowVisibilityController::tick()
             if (m_revealStarted < 0)
                 m_revealStarted = now;
             else if (now - m_revealStarted >= VisibilityDelayMs)
-                resetVisibility();
+                resetVisibility(true);
         } else {
             m_revealStarted = -1;
         }

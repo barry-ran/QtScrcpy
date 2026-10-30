@@ -69,8 +69,8 @@ struct SyntheticYuv
         painter.drawText(QRect(24, 80, FrameWidth - 48, 30), "SYNTHETIC YUV VIDEO FRAME");
         painter.setPen(QColor("#342f29"));
         painter.setFont(QFont("Microsoft YaHei", 19));
-        painter.drawText(QRect(26, 165, FrameWidth - 52, 55), QStringLiteral("手动调节透明度"));
-        painter.drawText(QRect(26, 235, FrameWidth - 52, 55), QStringLiteral("鼠标离开自动隐身"));
+        painter.drawText(QRect(26, 165, FrameWidth - 52, 55), QStringLiteral("Adjust window opacity"));
+        painter.drawText(QRect(26, 235, FrameWidth - 52, 55), QStringLiteral("Hide on mouse leave"));
         painter.setFont(QFont("Segoe UI", 12));
         painter.drawText(QRect(26, 340, FrameWidth - 52, 90), Qt::TextWordWrap,
                          "Real VideoForm + ToolForm\nNo phone connection required");
@@ -189,7 +189,7 @@ void VisibilityUiTest::titledWindowControlsAndPersistence()
     const QString serial = QStringLiteral("synthetic-visibility-test");
     std::unique_ptr<VideoForm> video(new VideoForm(false, false, true));
     video->setSerial(serial);
-    video->setWindowTitle(QStringLiteral("QtScrcpy · 真实投屏窗口功能验证"));
+    video->setWindowTitle(QStringLiteral("QtScrcpy - Window visibility integration check"));
     QCOMPARE(video->opacityPercent(), 100);
     QVERIFY(!video->autoHideEnabled());
     video->show();
@@ -226,7 +226,7 @@ void VisibilityUiTest::titledWindowControlsAndPersistence()
     auto valueLabel = toolbar->findChild<QLabel *>("opacityValueLabel");
     QVERIFY(opacityButton && autoHideButton && slider && menu && valueLabel);
     QVERIFY(autoHideButton->isCheckable());
-    QCOMPARE(slider->minimum(), 10);
+    QCOMPARE(slider->minimum(), 0);
     QCOMPARE(slider->maximum(), 100);
     QSignalSpy opacityChanges(video.get(), &VideoForm::opacityPercentChanged);
     QCursor::setPos(opacityButton->mapToGlobal(opacityButton->rect().center()));
@@ -235,9 +235,9 @@ void VisibilityUiTest::titledWindowControlsAndPersistence()
     QCOMPARE(slider->value(), 100);
     slider->setFocus();
     QTest::keyClick(slider, Qt::Key_Home);
-    QCOMPARE(video->opacityPercent(), 10);
+    QCOMPARE(video->opacityPercent(), 0);
     QTest::keyClick(slider, Qt::Key_PageUp);
-    QCOMPARE(video->opacityPercent(), 20);
+    QCOMPARE(video->opacityPercent(), 10);
     QVERIFY(menu->isVisible());
 
     // Exercise the real slider handle, rather than only setValue().

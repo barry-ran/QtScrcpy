@@ -20,10 +20,10 @@
    <item>
     <widget class="QPushButton" name="opacityBtn">
      <property name="toolTip">
-      <string>手动调节透明度，同时调整投屏窗口与右侧工具栏</string>
+      <string>Adjust the opacity of the video window and toolbar</string>
      </property>
      <property name="accessibleName">
-      <string>调节透明度</string>
+      <string>Adjust opacity</string>
      </property>
      <property name="text">
       <string/>
@@ -33,11 +33,11 @@
    <item>
     <widget class="QPushButton" name="autoHideBtn">
      <property name="toolTip">
-      <string>鼠标离开自动隐身：离开 300ms 后隐身，移回停留 300ms 后恢复。
-隐藏区域保留鼠标占位；拖动或操作菜单时保持显示。</string>
+      <string>Automatically hide 300 ms after the pointer leaves, and restore after hovering for 300 ms.
+The hidden windows still receive mouse input. Dragging and menu interactions keep them visible.</string>
      </property>
      <property name="accessibleName">
-      <string>鼠标离开自动隐身</string>
+      <string>Automatically hide on mouse leave</string>
      </property>
      <property name="text">
       <string/>

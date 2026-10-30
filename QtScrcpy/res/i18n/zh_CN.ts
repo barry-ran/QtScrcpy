@@ -353,6 +353,42 @@
 <context>
     <name>ToolForm</name>
     <message>
+        <source>Adjust the opacity of the video window and toolbar</source>
+        <translation>手动调节透明度，同时调整投屏窗口与右侧工具栏</translation>
+    </message>
+    <message>
+        <source>Adjust opacity</source>
+        <translation>调节透明度</translation>
+    </message>
+    <message>
+        <source>Automatically hide 300 ms after the pointer leaves, and restore after hovering for 300 ms.
+The hidden windows still receive mouse input. Dragging and menu interactions keep them visible.</source>
+        <translation>鼠标离开 300 毫秒后自动隐身，移回停留 300 毫秒后恢复。
+隐藏窗口仍接收鼠标输入；拖动或操作菜单时保持显示。</translation>
+    </message>
+    <message>
+        <source>Automatically hide on mouse leave</source>
+        <translation>鼠标离开自动隐身</translation>
+    </message>
+    <message>
+        <source>Window opacity</source>
+        <translation>窗口不透明度</translation>
+    </message>
+    <message>
+        <source>At 0%, hover over the window for 300 ms to temporarily show it.</source>
+        <translation>不透明度为 0% 时，在窗口上悬停 300 毫秒即可临时显示。</translation>
+    </message>
+    <message>
+        <source>Window opacity: %1%</source>
+        <translation>窗口不透明度：%1%</translation>
+    </message>
+    <message>
+        <source>Adjust opacity (current opacity: %1%)
+Applies to the video window and toolbar</source>
+        <translation>手动调节透明度（当前不透明度：%1%）
+同时调整投屏窗口与右侧工具栏</translation>
+    </message>
+    <message>
         <source>Tool</source>
         <translation>工具</translation>
     </message>

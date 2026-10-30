@@ -122,15 +122,16 @@ void ToolForm::initPrivacyControls()
 
     m_opacitySlider = new QSlider(Qt::Horizontal, content);
     m_opacitySlider->setObjectName("opacitySlider");
-    m_opacitySlider->setRange(10, 100);
+    m_opacitySlider->setRange(0, 100);
     m_opacitySlider->setSingleStep(1);
     m_opacitySlider->setPageStep(10);
     m_opacitySlider->setTracking(true);
-    m_opacitySlider->setAccessibleName(tr("窗口不透明度"));
+    m_opacitySlider->setAccessibleName(tr("Window opacity"));
     m_opacityLabel->setBuddy(m_opacitySlider);
     layout->addWidget(m_opacitySlider);
 
-    auto hint = new QLabel(tr("10% 更透明，100% 完全不透明"), content);
+    auto hint = new QLabel(tr("At 0%, hover over the window for 300 ms to temporarily show it."), content);
+    hint->setWordWrap(true);
     layout->addWidget(hint);
     action->setDefaultWidget(content);
     m_opacityMenu->addAction(action);
@@ -153,8 +154,8 @@ void ToolForm::updateOpacityControls(int percent)
     }
     const QSignalBlocker blocker(m_opacitySlider);
     m_opacitySlider->setValue(percent);
-    m_opacityLabel->setText(tr("窗口不透明度：%1%").arg(percent));
-    ui->opacityBtn->setToolTip(tr("手动调节透明度（当前不透明度：%1%）\n同时调整投屏窗口与右侧工具栏").arg(percent));
+    m_opacityLabel->setText(tr("Window opacity: %1%").arg(percent));
+    ui->opacityBtn->setToolTip(tr("Adjust opacity (current opacity: %1%)\nApplies to the video window and toolbar").arg(percent));
 }
 
 void ToolForm::on_opacityBtn_clicked()

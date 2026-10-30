@@ -348,7 +348,7 @@ void Config::setWindowVisibility(const QString &serial, const WindowVisibilityCo
         return;
     }
     m_userData->beginGroup(serial);
-    m_userData->setValue("WindowOpacityPercent", qBound(10, config.opacityPercent, 100));
+    m_userData->setValue("WindowOpacityPercent", qBound(0, config.opacityPercent, 100));
     m_userData->setValue("WindowAutoHideEnabled", config.autoHideEnabled);
     m_userData->endGroup();
     m_userData->sync();
@@ -361,7 +361,7 @@ WindowVisibilityConfig Config::getWindowVisibility(const QString &serial)
         return config;
     }
     m_userData->beginGroup(serial);
-    config.opacityPercent = qBound(10, m_userData->value("WindowOpacityPercent", 100).toInt(), 100);
+    config.opacityPercent = qBound(0, m_userData->value("WindowOpacityPercent", 100).toInt(), 100);
     config.autoHideEnabled = m_userData->value("WindowAutoHideEnabled", false).toBool();
     m_userData->endGroup();
     return config;

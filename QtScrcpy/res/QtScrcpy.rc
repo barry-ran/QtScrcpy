@@ -1,8 +1,10 @@
 #include "winres.h"
 
+#ifndef VERSION_RC_STR
 #define VERSION_STRINGIFY_IMPL(value) #value
 #define VERSION_STRINGIFY(value) VERSION_STRINGIFY_IMPL(value)
 #define VERSION_RC_STR VERSION_STRINGIFY(VERSION_MAJOR) "." VERSION_STRINGIFY(VERSION_MINOR) "." VERSION_STRINGIFY(VERSION_PATCH)
+#endif
 
 IDI_ICON1       ICON      "QtScrcpy.ico"
 // GB2312编码的话，在中文系统上打包FileDescription可以显示中文

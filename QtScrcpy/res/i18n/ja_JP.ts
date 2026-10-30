@@ -353,6 +353,40 @@
 <context>
     <name>ToolForm</name>
     <message>
+        <source>Adjust the opacity of the video window and toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically hide 300 ms after the pointer leaves, and restore after hovering for 300 ms.
+The hidden windows still receive mouse input. Dragging and menu interactions keep them visible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically hide on mouse leave</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>At 0%, hover over the window for 300 ms to temporarily show it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window opacity: %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Adjust opacity (current opacity: %1%)
+Applies to the video window and toolbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Tool</source>
         <translation>ツール</translation>
     </message>

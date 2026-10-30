@@ -263,6 +263,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         VERSION_MINOR=${PROJECT_VERSION_MINOR}
         VERSION_PATCH=${PROJECT_VERSION_PATCH}
     )
+    # Preserve the CMake version string for Microsoft's resource compiler.
+    # windres constructs it in the .rc file to avoid command-line quote escaping.
+    if(NOT MINGW)
+        add_compile_definitions(VERSION_RC_STR="${PROJECT_VERSION}")
+    endif()
     set(QC_PLANTFORM_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.rc"
     )

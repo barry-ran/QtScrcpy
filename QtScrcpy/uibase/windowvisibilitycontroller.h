@@ -42,7 +42,8 @@ private:
     bool interactionInProgress() const;
     void applyOpacity();
     void applyOpacity(QWidget *window);
-    void resetVisibility();
+    void updateMonitoring();
+    void resetVisibility(bool revealZeroOpacity = false);
     void tick();
 
     QPointer<QWidget> m_host;

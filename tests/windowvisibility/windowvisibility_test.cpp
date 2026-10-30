@@ -84,9 +84,48 @@ private slots:
         controller.setOpacityPercent(55);
         QCOMPARE(opacitySpy.count(), 1);
         controller.setOpacityPercent(0);
-        QCOMPARE(controller.opacityPercent(), 10);
+        QCOMPARE(controller.opacityPercent(), 0);
+        QVERIFY(host.windowOpacity() > 0.0);
+        QVERIFY(opacityIs(host, 1.0 / 255.0));
+        controller.setOpacityPercent(-1);
+        QCOMPARE(controller.opacityPercent(), 0);
         controller.setOpacityPercent(101);
         QCOMPARE(controller.opacityPercent(), 100);
+    }
+
+    void zeroOpacityCanBeRevealedWithoutAutoHide()
+    {
+        TestWindows windows;
+        QVERIFY(QTest::qWaitForWindowExposed(&windows.host));
+        windows.moveAway();
+        windows.controller.setOpacityPercent(0);
+        QCOMPARE(windows.controller.opacityPercent(), 0);
+        QVERIFY(!windows.controller.autoHideEnabled());
+        QVERIFY(windows.host.windowOpacity() > 0.0);
+        QVERIFY(windows.host.windowOpacity() < 0.01);
+
+        QCursor::setPos(windows.tool.frameGeometry().center());
+        QTRY_VERIFY_WITH_TIMEOUT(opacityIs(windows.host, 1.0), 1500);
+        QVERIFY(opacityIs(windows.tool, 1.0));
+        QCOMPARE(windows.controller.opacityPercent(), 0);
+
+        QMenu menu(&windows.tool);
+        menu.addAction(QStringLiteral("Test action"));
+        menu.popup(windows.tool.frameGeometry().bottomLeft());
+        QVERIFY(QTest::qWaitForWindowExposed(&menu));
+        windows.moveAway();
+        QTest::qWait(450);
+        QVERIFY(opacityIs(windows.host, 1.0));
+        QVERIFY(opacityIs(menu, 1.0));
+        QCOMPARE(windows.controller.opacityPercent(), 0);
+
+        menu.hide();
+        QTRY_VERIFY_WITH_TIMEOUT(windows.host.windowOpacity() < 0.01, 1500);
+        QVERIFY(windows.tool.windowOpacity() < 0.01);
+        QCOMPARE(windows.controller.opacityPercent(), 0);
+        windows.controller.setOpacityPercent(45);
+        QVERIFY(opacityIs(windows.host, 0.45));
+        QVERIFY(opacityIs(windows.tool, 0.45));
     }
 
     void leaveDelayRevealDelayAndDisableRestore()
