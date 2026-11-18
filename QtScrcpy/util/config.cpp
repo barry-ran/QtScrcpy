@@ -136,6 +136,11 @@
 #define PORT_HISTORY_DEF ""
 #define PORT_HISTORY_MAX 10
 
+// 完整地址历史（ip:port）
+#define ADDR_HISTORY_KEY "AddrHistory"
+#define ADDR_HISTORY_DEF ""
+#define ADDR_HISTORY_MAX 10
+
 QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
@@ -556,5 +561,41 @@ QStringList Config::getPortHistory()
 void Config::clearPortHistory()
 {
     m_userData->remove(PORT_HISTORY_KEY);
+    m_userData->sync();
+}
+
+void Config::saveAddrHistory(const QString &addr)
+{
+    if (addr.trimmed().isEmpty()) {
+        return;
+    }
+
+    QStringList addrList = getAddrHistory();
+
+    // 移除已存在的相同地址（避免重复）
+    addrList.removeAll(addr);
+
+    // 将新地址添加到开头
+    addrList.prepend(addr);
+
+    // 限制历史记录数量
+    while (addrList.size() > ADDR_HISTORY_MAX) {
+        addrList.removeLast();
+    }
+
+    m_userData->setValue(ADDR_HISTORY_KEY, addrList);
+    m_userData->sync();
+}
+
+QStringList Config::getAddrHistory()
+{
+    QStringList addrList = m_userData->value(ADDR_HISTORY_KEY, ADDR_HISTORY_DEF).toStringList();
+    addrList.removeAll("");
+    return addrList;
+}
+
+void Config::clearAddrHistory()
+{
+    m_userData->remove(ADDR_HISTORY_KEY);
     m_userData->sync();
 }

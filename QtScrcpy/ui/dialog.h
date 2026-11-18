@@ -52,6 +52,8 @@ private slots:
     void on_startAdbdBtn_clicked();
     void on_getIPBtn_clicked();
     void on_wirelessDisConnectBtn_clicked();
+    void on_discoverBtn_clicked();
+    void on_pairBtn_clicked();
     void on_selectRecordPathBtn_clicked();
     void on_recordPathEdt_textChanged(const QString &arg1);
     void on_adbCommandBtn_clicked();
@@ -103,10 +105,18 @@ private:
     void updateVideoSourceUi();
     void initAdvancedDisplayUi();
     void updateAdvancedDisplayUi();
-    void loadIpHistory();
-    void saveIpHistory(const QString &ip);
     void loadPortHistory();
     void savePortHistory(const QString &port);
+    void loadAddrHistory();
+    void saveAddrHistory(const QString &addr);
+    // 探测目标端口TCP是否可达，用于区分"端口不通"与"配对失效"
+    bool probeTcp(const QString &host, quint16 port, int timeoutMs = 800);
+    // 解析adb输出，给出可读结论
+    void handleMdnsOutput(const QString &stdOut);
+    void handlePairOutput(const QString &stdOut, const QString &errorOut);
+    void handleConnectOutput(const QString &stdOut, const QString &errorOut, const QString &addr);
+    // 发起无线连接；若上一条adb命令尚未收尾则稍后重试，避免链式调用被 checkAdbRun 拦截
+    void requestWirelessConnect(int retry = 3);
 
     void showPortEditMenu(const QPoint &pos);
     void syncPresetLevelToUi();
@@ -148,6 +158,8 @@ private:
     QTimer m_autoUpdatetimer;
     quint32 m_prevBitRate = 2000000;
     int m_prevMaxSizeIndex = 0;
+    // 最近一次无线连接使用的地址，用于连接失败后做端口探测与原因归类
+    QString m_lastConnectAddr;
     QPointer<PresetConfigDialog> m_presetDialog;
 };
 

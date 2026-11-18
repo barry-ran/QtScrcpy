@@ -17,6 +17,7 @@
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QSizePolicy>
 #include <QScreen>
 #include <QScrollArea>
@@ -25,6 +26,7 @@
 #include <QStyledItemDelegate>
 #include <QSpinBox>
 #include <QTabWidget>
+#include <QTcpSocket>
 #include <QTime>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -145,6 +147,11 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
             //log = m_adb.getErrorOut();
             if (args.contains("ifconfig") && args.contains("wlan0")) {
                 getIPbyIp();
+            } else if (args.contains("connect")) {
+                // adb connect 失败时退出码可能非0，同样交给统一处理
+                handleConnectOutput(m_adb.getStdOut(), m_adb.getErrorOut(), m_lastConnectAddr);
+            } else if (args.contains("pair")) {
+                handlePairOutput(m_adb.getStdOut(), m_adb.getErrorOut());
             }
             break;
         case qsc::AdbProcess::AER_ERROR_MISSING_BINARY:
@@ -160,6 +167,12 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
                     ui->serialBox->addItem(item);
                     ui->connectedPhoneList->addItem(Config::getInstance().getNickName(item) + "-" + item);
                 }
+            } else if (args.contains("mdns") && args.contains("services")) {
+                handleMdnsOutput(m_adb.getStdOut());
+            } else if (args.contains("pair")) {
+                handlePairOutput(m_adb.getStdOut(), m_adb.getErrorOut());
+            } else if (args.contains("connect")) {
+                handleConnectOutput(m_adb.getStdOut(), m_adb.getErrorOut(), m_lastConnectAddr);
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
                 if (ip.isEmpty()) {
@@ -282,11 +295,14 @@ void Dialog::initUI()
     ui->decodeModeBox->removeItem(1);
 #endif
 
-    // 加载IP历史记录
-    loadIpHistory();
+    // 加载完整地址历史记录（ip:port），兼容旧版本的纯IP历史
+    loadAddrHistory();
 
     // 加载端口历史记录
     loadPortHistory();
+
+    // 配对码只允许输入数字
+    ui->pairCodeEdt->setValidator(new QRegularExpressionValidator(QRegularExpression("\\d{0,6}"), this));
 
     // 为deviceIpEdt添加右键菜单
     if (ui->deviceIpEdt->lineEdit()) {
@@ -691,10 +707,10 @@ void Dialog::updateBootConfig(bool toView)
             }
         }
 
-        // 保存当前IP到历史记录
-        QString currentIp = ui->deviceIpEdt->currentText().trimmed();
-        if (!currentIp.isEmpty()) {
-            saveIpHistory(currentIp);
+        // 保存当前无线地址到历史记录（完整 ip:port，避免IP与端口错配）
+        QString currentAddr = ui->deviceIpEdt->currentText().trimmed();
+        if (!currentAddr.isEmpty()) {
+            saveAddrHistory(currentAddr);
         }
 
         Config::getInstance().setUserBootConfig(config);
@@ -1135,32 +1151,30 @@ void Dialog::on_wirelessConnectBtn_clicked()
     }
     QString addr = ui->deviceIpEdt->currentText().trimmed();
     if (addr.isEmpty()) {
-        outLog("error: device ip is null", false);
+        outLog(tr("error: device ip is null"), false);
         return;
     }
 
-    if (!ui->devicePortEdt->currentText().isEmpty()) {
-        addr += ":";
-        addr += ui->devicePortEdt->currentText().trimmed();
-    } else if (!ui->devicePortEdt->lineEdit()->placeholderText().isEmpty()) {
-        addr += ":";
-        addr += ui->devicePortEdt->lineEdit()->placeholderText().trimmed();
-    } else {
-        outLog("error: device port is null", false);
-        return;
+    // IP输入框允许直接填入完整地址（ip:port），例如从手机无线调试页面直接抄下来的地址。
+    // 只有在没有带端口时才去拼接端口输入框的值。
+    if (!addr.contains(':')) {
+        if (!ui->devicePortEdt->currentText().isEmpty()) {
+            addr += ":";
+            addr += ui->devicePortEdt->currentText().trimmed();
+        } else if (!ui->devicePortEdt->lineEdit()->placeholderText().isEmpty()) {
+            addr += ":";
+            addr += ui->devicePortEdt->lineEdit()->placeholderText().trimmed();
+        } else {
+            outLog("error: device port is null", false);
+            return;
+        }
     }
 
-    // 保存IP历史记录 - 只保存IP部分,不包含端口
-    QString ip = addr.split(":").first();
-    if (!ip.isEmpty()) {
-        saveIpHistory(ip);
-    }
-    
-    // 保存端口历史记录
-    QString port = addr.split(":").last();
-    if (!port.isEmpty() && port != ip) {
-        savePortHistory(port);
-    }
+    // 记录本次连接的完整地址，连接失败后据此做端口探测与原因归类
+    m_lastConnectAddr = addr;
+
+    // 保存完整地址历史（ip:port），避免IP与端口分别保存后错配
+    saveAddrHistory(addr);
 
     outLog("wireless connect...", false);
     QStringList adbArgs;
@@ -1328,6 +1342,150 @@ void Dialog::on_wirelessDisConnectBtn_clicked()
     adbArgs << "disconnect";
     adbArgs << addr;
     m_adb.execute("", adbArgs);
+}
+
+void Dialog::on_discoverBtn_clicked()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+    outLog(tr("discovering devices on the LAN..."), false);
+    QStringList adbArgs;
+    adbArgs << "mdns";
+    adbArgs << "services";
+    m_adb.execute("", adbArgs);
+}
+
+void Dialog::on_pairBtn_clicked()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+
+    QString ip = ui->deviceIpEdt->currentText().trimmed();
+    // IP输入框可能填的是完整地址（ip:port），配对时只取IP部分
+    if (ip.contains(':')) {
+        ip = ip.split(':').first();
+    }
+    if (ip.isEmpty()) {
+        outLog(tr("error: device ip is null"), false);
+        return;
+    }
+
+    QString pairPort = ui->pairPortEdt->text().trimmed();
+    QString pairCode = ui->pairCodeEdt->text().trimmed();
+    if (pairPort.isEmpty() || pairCode.isEmpty()) {
+        outLog(tr("error: pairing port and pairing code are both required"), false);
+        return;
+    }
+
+    outLog(tr("pairing..."), false);
+    QStringList adbArgs;
+    adbArgs << "pair";
+    adbArgs << (ip + ":" + pairPort);
+    adbArgs << pairCode;
+    m_adb.execute("", adbArgs);
+}
+
+void Dialog::handleMdnsOutput(const QString &stdOut)
+{
+    // adb mdns services 的输出形如：
+    // adb-3412702d-xgZLql	_adb-tls-connect._tcp.	192.168.9.65:39633
+    static const QRegularExpression re(
+        "_adb-tls-connect\\._tcp\\.[\\s]+(\\d{1,3}(?:\\.\\d{1,3}){3}:\\d{1,5})");
+    QRegularExpressionMatch match = re.match(stdOut);
+    if (!match.hasMatch()) {
+        outLog(tr("no wireless device found, make sure wireless debugging is enabled "
+                  "and the phone is on the same network"), false);
+        return;
+    }
+
+    QString addr = match.captured(1);
+    QStringList parts = addr.split(':');
+    ui->deviceIpEdt->setEditText(addr);
+    if (parts.size() == 2) {
+        ui->devicePortEdt->setEditText(parts.at(1));
+    }
+    outLog(tr("device found: ") + addr, false);
+
+    // 延迟到本轮adb回调结束后再发起连接，避免同一个AdbProcess实例被重入
+    requestWirelessConnect();
+}
+
+void Dialog::handlePairOutput(const QString &stdOut, const QString &errorOut)
+{
+    QString output = stdOut + errorOut;
+    if (output.contains("Successfully paired", Qt::CaseInsensitive)
+        || output.contains("Already paired", Qt::CaseInsensitive)) {
+        outLog(tr("paired successfully, connecting..."), false);
+        ui->pairCodeEdt->clear();
+        requestWirelessConnect();
+        return;
+    }
+
+    outLog(tr("pairing failed, reopen \"pair device with pairing code\" on the phone: "
+              "the port and the code change every time the dialog is reopened"), false);
+    QString detail = output.trimmed();
+    if (!detail.isEmpty()) {
+        outLog(detail);
+    }
+}
+
+void Dialog::handleConnectOutput(const QString &stdOut, const QString &errorOut, const QString &addr)
+{
+    QString output = stdOut + errorOut;
+    if (output.contains("connected to", Qt::CaseInsensitive)) {
+        outLog(tr("connected."), false);
+        return;
+    }
+
+    // 连接失败分两种，原因完全不同，必须区分开
+    QStringList parts = addr.split(':');
+    bool ok = false;
+    quint16 port = (parts.size() == 2) ? parts.at(1).toUShort(&ok) : 0;
+    if (!ok) {
+        outLog(tr("connect failed: invalid address ") + addr, false);
+        return;
+    }
+
+    if (!probeTcp(parts.at(0), port)) {
+        outLog(tr("connect failed: port unreachable. the address or port is stale, wireless "
+                  "debugging is off, or the phone switched network"), false);
+        outLog(tr("click \"discover\" to fetch the current address from the phone"), false);
+        return;
+    }
+
+    // TCP 端口是通的，但 adb upgrade 到 TLS 后被手机拒绝 —— Android 11+ 的配对失效
+    outLog(tr("connect failed: the phone rejected this computer's key, pairing is required"),
+           false);
+    outLog(tr("on the phone: developer options -> wireless debugging -> pair device with "
+              "pairing code, then fill the port and code below"), false);
+    ui->pairPortEdt->setFocus();
+    ui->pairPortEdt->selectAll();
+}
+
+bool Dialog::probeTcp(const QString &host, quint16 port, int timeoutMs)
+{
+    QTcpSocket socket;
+    socket.connectToHost(host, port);
+    return socket.waitForConnected(timeoutMs);
+}
+
+void Dialog::requestWirelessConnect(int retry)
+{
+    if (m_adb.isRuning()) {
+        if (retry <= 0) {
+            outLog(tr("adb is busy, please click \"wireless connect\" again"), false);
+            return;
+        }
+        // 上一条adb命令尚未收尾，稍后重试
+        QTimer::singleShot(120, this, [this, retry]() {
+            requestWirelessConnect(retry - 1);
+        });
+        return;
+    }
+
+    on_wirelessConnectBtn_clicked();
 }
 
 void Dialog::on_selectRecordPathBtn_clicked()
@@ -1579,33 +1737,6 @@ void Dialog::on_autoUpdatecheckBox_toggled(bool checked)
     }
 }
 
-void Dialog::loadIpHistory()
-{
-    QStringList ipList = Config::getInstance().getIpHistory();
-    ui->deviceIpEdt->clear();
-    ui->deviceIpEdt->addItems(ipList);
-
-    if (ui->deviceIpEdt->lineEdit()) {
-        ui->deviceIpEdt->lineEdit()->setFrame(false);
-        ui->deviceIpEdt->lineEdit()->setTextMargins(0, 0, 0, 0);
-        ui->deviceIpEdt->lineEdit()->setMaxLength(128);
-        ui->deviceIpEdt->lineEdit()->setPlaceholderText("192.168.0.1");
-    }
-}
-
-void Dialog::saveIpHistory(const QString &ip)
-{
-    if (ip.isEmpty()) {
-        return;
-    }
-    
-    Config::getInstance().saveIpHistory(ip);
-    
-    // 更新ComboBox
-    loadIpHistory();
-    ui->deviceIpEdt->setCurrentText(ip);
-}
-
 void Dialog::showIpEditMenu(const QPoint &pos)
 {
     QMenu *menu = ui->deviceIpEdt->lineEdit()->createStandardContextMenu();
@@ -1614,7 +1745,8 @@ void Dialog::showIpEditMenu(const QPoint &pos)
     QAction *clearHistoryAction = new QAction(tr("Clear History"), menu);
     connect(clearHistoryAction, &QAction::triggered, this, [this]() {
         Config::getInstance().clearIpHistory();
-        loadIpHistory();
+        Config::getInstance().clearAddrHistory();
+        loadAddrHistory();
     });
     
     menu->addAction(clearHistoryAction);
@@ -1647,6 +1779,38 @@ void Dialog::savePortHistory(const QString &port)
     // 更新ComboBox
     loadPortHistory();
     ui->devicePortEdt->setCurrentText(port);
+}
+
+void Dialog::loadAddrHistory()
+{
+    QStringList addrList = Config::getInstance().getAddrHistory();
+    if (addrList.isEmpty()) {
+        // 兼容旧版本：老数据只保存了IP，没有端口
+        addrList = Config::getInstance().getIpHistory();
+    }
+
+    ui->deviceIpEdt->clear();
+    ui->deviceIpEdt->addItems(addrList);
+
+    if (ui->deviceIpEdt->lineEdit()) {
+        ui->deviceIpEdt->lineEdit()->setFrame(false);
+        ui->deviceIpEdt->lineEdit()->setTextMargins(0, 0, 0, 0);
+        ui->deviceIpEdt->lineEdit()->setMaxLength(128);
+        ui->deviceIpEdt->lineEdit()->setPlaceholderText("192.168.0.1:5555");
+    }
+}
+
+void Dialog::saveAddrHistory(const QString &addr)
+{
+    if (addr.isEmpty()) {
+        return;
+    }
+
+    Config::getInstance().saveAddrHistory(addr);
+
+    // 更新ComboBox
+    loadAddrHistory();
+    ui->deviceIpEdt->setCurrentText(addr);
 }
 
 void Dialog::showPortEditMenu(const QPoint &pos)
