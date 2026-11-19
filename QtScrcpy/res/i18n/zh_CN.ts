@@ -299,6 +299,102 @@
         <source>Open directory failed</source>
         <translation>打开目录失败</translation>
     </message>
+    <message>
+        <source>error: device ip is null</source>
+        <translation>错误：设备 IP 为空</translation>
+    </message>
+    <message>
+        <source>discovering devices on the LAN...</source>
+        <translation>正在局域网内搜索设备...</translation>
+    </message>
+    <message>
+        <source>error: pairing port and pairing code are both required</source>
+        <translation>错误：配对端口和配对码都必须填写</translation>
+    </message>
+    <message>
+        <source>pairing...</source>
+        <translation>正在配对...</translation>
+    </message>
+    <message>
+        <source>no wireless device found, make sure wireless debugging is enabled and the phone is on the same network</source>
+        <translation>未发现无线设备，请确认手机已开启无线调试并与电脑在同一网络</translation>
+    </message>
+    <message>
+        <source>device found: </source>
+        <translation>发现设备：</translation>
+    </message>
+    <message>
+        <source>paired successfully, connecting...</source>
+        <translation>配对成功，正在连接...</translation>
+    </message>
+    <message>
+        <source>pairing failed, reopen &quot;pair device with pairing code&quot; on the phone: the port and the code change every time the dialog is reopened</source>
+        <translation>配对失败，请在手机上重新打开“使用配对码配对设备”：端口和配对码每次打开窗口都会变</translation>
+    </message>
+    <message>
+        <source>connected.</source>
+        <translation>已连接。</translation>
+    </message>
+    <message>
+        <source>connect failed: invalid address </source>
+        <translation>连接失败：地址格式无效 </translation>
+    </message>
+    <message>
+        <source>connect failed: port unreachable. the address or port is stale, wireless debugging is off, or the phone switched network</source>
+        <translation>连接失败：端口不可达。地址或端口已失效、无线调试已关闭，或手机切换了网络</translation>
+    </message>
+    <message>
+        <source>click &quot;discover&quot; to fetch the current address from the phone</source>
+        <translation>点击“发现”按钮自动获取手机当前地址</translation>
+    </message>
+    <message>
+        <source>connect failed: the phone rejected this computer&apos;s key, pairing is required</source>
+        <translation>连接失败：手机拒绝了本机密钥，需要重新配对</translation>
+    </message>
+    <message>
+        <source>on the phone: developer options -&gt; wireless debugging -&gt; pair device with pairing code, then fill the port and code below</source>
+        <translation>请在手机上：开发者选项 -&gt; 无线调试 -&gt; 使用配对码配对设备，然后把端口和配对码填入下方</translation>
+    </message>
+    <message>
+        <source>adb is busy, please click &quot;wireless connect&quot; again</source>
+        <translation>adb 正忙，请稍后重新点击“无线连接”</translation>
+    </message>
+    <message>
+        <source>port is not specified, looking it up on the LAN...</source>
+        <translation>端口为空，正在局域网内查询该设备的当前端口...</translation>
+    </message>
+    <message>
+        <source>port not found on the LAN. if the device uses the legacy tcpip mode, fill 5555 in the port box</source>
+        <translation>未在局域网内找到该设备的无线调试端口。若设备使用旧的 tcpip 模式，请在端口框填入 5555</translation>
+    </message>
+    <message>
+        <source>adb is busy, please try again</source>
+        <translation>adb 正忙，请稍后再试</translation>
+    </message>
+    <message>
+        <source>adb server restarted, discovering again...</source>
+        <translation>adb 服务已重启，正在重新发现设备...</translation>
+    </message>
+    <message>
+        <source>auto</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <source>port is not reachable, it may have changed. looking up the current port on the LAN...</source>
+        <translation>端口不可达，可能已经变化。正在局域网内查询当前端口...</translation>
+    </message>
+    <message>
+        <source>discovered port is stale, ignoring: </source>
+        <translation>发现的服务记录已过期，忽略：</translation>
+    </message>
+    <message>
+        <source>no usable mdns result, restarting the adb server and retrying...</source>
+        <translation>没有可用的 mDNS 结果，正在重启 adb 服务后重试...</translation>
+    </message>
+    <message>
+        <source>the address discovered on the LAN is stale: wireless debugging may be off, or the phone switched network</source>
+        <translation>局域网内发现的服务记录已过期：无线调试可能已关闭，或手机切换了网络</translation>
+    </message>
 </context>
 <context>
     <name>PresetConfigDialog</name>
@@ -675,6 +771,34 @@
     <message>
         <source>Encoder Settings...</source>
         <translation>编码器设置...</translation>
+    </message>
+    <message>
+        <source>Scan the LAN for devices advertising adb wireless debugging (adb mdns services)</source>
+        <translation>扫描局域网内正在广播 adb 无线调试的设备（adb mdns services）</translation>
+    </message>
+    <message>
+        <source>discover</source>
+        <translation>发现</translation>
+    </message>
+    <message>
+        <source>Port shown in the pairing dialog on the phone. It is NOT the connect port.</source>
+        <translation>手机上配对弹窗显示的端口。注意：它不是连接端口。</translation>
+    </message>
+    <message>
+        <source>pair port</source>
+        <translation>配对端口</translation>
+    </message>
+    <message>
+        <source>code</source>
+        <translation>配对码</translation>
+    </message>
+    <message>
+        <source>Run adb pair with the code above, then connect automatically</source>
+        <translation>使用上方配对码执行 adb pair，成功后自动连接</translation>
+    </message>
+    <message>
+        <source>pair</source>
+        <translation>配对</translation>
     </message>
 </context>
 </TS>

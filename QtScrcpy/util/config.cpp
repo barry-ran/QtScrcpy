@@ -136,6 +136,11 @@
 #define PORT_HISTORY_DEF ""
 #define PORT_HISTORY_MAX 10
 
+// 完整地址历史（ip:port）
+#define ADDR_HISTORY_KEY "AddrHistory"
+#define ADDR_HISTORY_DEF ""
+#define ADDR_HISTORY_MAX 10
+
 QString Config::s_configPath = "";
 
 Config::Config(QObject *parent) : QObject(parent)
@@ -556,5 +561,63 @@ QStringList Config::getPortHistory()
 void Config::clearPortHistory()
 {
     m_userData->remove(PORT_HISTORY_KEY);
+    m_userData->sync();
+}
+
+// 历史记录只保留主机部分。无线调试的端口每次开启都会重新随机分配，
+// 把端口一起存下来，下次拿去连接必然是过期地址。
+static QString toHostOnly(const QString &addr)
+{
+    QString host = addr.trimmed();
+    // 只有一个冒号才当作 ip:port 处理，避免误伤 IPv6 字面量
+    if (host.count(':') == 1) {
+        host = host.left(host.indexOf(':'));
+    }
+    return host;
+}
+
+void Config::saveAddrHistory(const QString &addr)
+{
+    QString host = toHostOnly(addr);
+    if (host.isEmpty()) {
+        return;
+    }
+
+    QStringList addrList = getAddrHistory();
+
+    // 移除已存在的相同地址（避免重复）
+    addrList.removeAll(host);
+
+    // 将新地址添加到开头
+    addrList.prepend(host);
+
+    // 限制历史记录数量
+    while (addrList.size() > ADDR_HISTORY_MAX) {
+        addrList.removeLast();
+    }
+
+    m_userData->setValue(ADDR_HISTORY_KEY, addrList);
+    m_userData->sync();
+}
+
+QStringList Config::getAddrHistory()
+{
+    QStringList rawList = m_userData->value(ADDR_HISTORY_KEY, ADDR_HISTORY_DEF).toStringList();
+
+    // 读取时统一去掉端口：老版本存的是 ip:port，这里顺带迁移
+    QStringList addrList;
+    for (const QString &addr : rawList) {
+        QString host = toHostOnly(addr);
+        if (host.isEmpty() || addrList.contains(host)) {
+            continue;
+        }
+        addrList << host;
+    }
+    return addrList;
+}
+
+void Config::clearAddrHistory()
+{
+    m_userData->remove(ADDR_HISTORY_KEY);
     m_userData->sync();
 }

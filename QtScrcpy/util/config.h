@@ -93,6 +93,11 @@ public:
     QStringList getPortHistory(); 
     void clearPortHistory();
 
+    // 完整地址历史（ip:port），避免IP与端口分别保存后错配
+    void saveAddrHistory(const QString &addr);
+    QStringList getAddrHistory();
+    void clearAddrHistory();
+
 private:
     explicit Config(QObject *parent = nullptr);
     const QString &getConfigPath();

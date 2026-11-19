@@ -249,11 +249,13 @@ set(QC_MAIN_SOURCES
 # plantform file
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # Define VERSION macros for .rc file
+    # VERSION_RC_STR must use PROJECT_VERSION_* variables:
+    # VERSION_MAJOR/... above are only compile definitions, they do not exist as CMake variables.
     add_compile_definitions(
         VERSION_MAJOR=${PROJECT_VERSION_MAJOR}
         VERSION_MINOR=${PROJECT_VERSION_MINOR}
         VERSION_PATCH=${PROJECT_VERSION_PATCH}
-        VERSION_RC_STR="${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
+        VERSION_RC_STR="${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH}"
     )
     set(QC_PLANTFORM_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/res/${PROJECT_NAME}.rc"

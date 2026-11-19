@@ -17,6 +17,7 @@
 #include <QPushButton>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QSizePolicy>
 #include <QScreen>
 #include <QScrollArea>
@@ -25,6 +26,7 @@
 #include <QStyledItemDelegate>
 #include <QSpinBox>
 #include <QTabWidget>
+#include <QTcpSocket>
 #include <QTime>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -145,6 +147,11 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
             //log = m_adb.getErrorOut();
             if (args.contains("ifconfig") && args.contains("wlan0")) {
                 getIPbyIp();
+            } else if (args.contains("connect")) {
+                // adb connect 失败时退出码可能非0，同样交给统一处理
+                handleConnectOutput(m_adb.getStdOut(), m_adb.getErrorOut(), m_lastConnectAddr);
+            } else if (args.contains("pair")) {
+                handlePairOutput(m_adb.getStdOut(), m_adb.getErrorOut());
             }
             break;
         case qsc::AdbProcess::AER_ERROR_MISSING_BINARY:
@@ -160,6 +167,12 @@ Dialog::Dialog(QWidget *parent) : QWidget(parent), ui(new Ui::Widget)
                     ui->serialBox->addItem(item);
                     ui->connectedPhoneList->addItem(Config::getInstance().getNickName(item) + "-" + item);
                 }
+            } else if (args.contains("mdns") && args.contains("services")) {
+                handleMdnsOutput(m_adb.getStdOut());
+            } else if (args.contains("pair")) {
+                handlePairOutput(m_adb.getStdOut(), m_adb.getErrorOut());
+            } else if (args.contains("connect")) {
+                handleConnectOutput(m_adb.getStdOut(), m_adb.getErrorOut(), m_lastConnectAddr);
             } else if (args.contains("show") && args.contains("wlan0")) {
                 QString ip = m_adb.getDeviceIPFromStdOut();
                 if (ip.isEmpty()) {
@@ -282,24 +295,20 @@ void Dialog::initUI()
     ui->decodeModeBox->removeItem(1);
 #endif
 
-    // 加载IP历史记录
-    loadIpHistory();
+    // 加载地址历史记录（只存主机IP，端口不缓存）
+    loadAddrHistory();
 
-    // 加载端口历史记录
+    // 端口输入框配置（端口不做历史，见 loadPortHistory 里的说明）
     loadPortHistory();
+
+    // 配对码只允许输入数字
+    ui->pairCodeEdt->setValidator(new QRegularExpressionValidator(QRegularExpression("\\d{0,6}"), this));
 
     // 为deviceIpEdt添加右键菜单
     if (ui->deviceIpEdt->lineEdit()) {
         ui->deviceIpEdt->lineEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(ui->deviceIpEdt->lineEdit(), &QWidget::customContextMenuRequested,
                 this, &Dialog::showIpEditMenu);
-    }
-    
-    // 为devicePortEdt添加右键菜单
-    if (ui->devicePortEdt->lineEdit()) {
-        ui->devicePortEdt->lineEdit()->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(ui->devicePortEdt->lineEdit(), &QWidget::customContextMenuRequested,
-                this, &Dialog::showPortEditMenu);
     }
     initAdvancedDisplayUi();
 
@@ -691,10 +700,10 @@ void Dialog::updateBootConfig(bool toView)
             }
         }
 
-        // 保存当前IP到历史记录
-        QString currentIp = ui->deviceIpEdt->currentText().trimmed();
-        if (!currentIp.isEmpty()) {
-            saveIpHistory(currentIp);
+        // 保存当前无线地址到历史记录（完整 ip:port，避免IP与端口错配）
+        QString currentAddr = ui->deviceIpEdt->currentText().trimmed();
+        if (!currentAddr.isEmpty()) {
+            saveAddrHistory(currentAddr);
         }
 
         Config::getInstance().setUserBootConfig(config);
@@ -1133,34 +1142,40 @@ void Dialog::on_wirelessConnectBtn_clicked()
     if (checkAdbRun()) {
         return;
     }
+    // 手动点一次连接就是一次新的尝试，允许再走一轮"端口过期 -> 重新解析"
+    m_portRetried = false;
     QString addr = ui->deviceIpEdt->currentText().trimmed();
     if (addr.isEmpty()) {
-        outLog("error: device ip is null", false);
+        outLog(tr("error: device ip is null"), false);
         return;
     }
 
-    if (!ui->devicePortEdt->currentText().isEmpty()) {
+    // IP输入框允许直接填入完整地址（ip:port），例如从手机无线调试页面直接抄下来的地址。
+    // 只有在没有带端口时才去拼接端口输入框的值。
+    if (!addr.contains(':')) {
+        QString port = ui->devicePortEdt->currentText().trimmed();
+        if (port.isEmpty()) {
+            // 端口留空表示"自动"。旧实现会退回 placeholder 的 5555，而无线调试的端口
+            // 每次开启都重新随机分配，那个默认值几乎必然连不上。这里改为现场问 mDNS。
+            m_pendingConnectHost = addr;
+            m_mdnsRecovered = false;
+            outLog(tr("port is not specified, looking it up on the LAN..."), false);
+            QStringList mdnsArgs;
+            mdnsArgs << "mdns";
+            mdnsArgs << "services";
+            m_adb.execute("", mdnsArgs);
+            return;
+        }
         addr += ":";
-        addr += ui->devicePortEdt->currentText().trimmed();
-    } else if (!ui->devicePortEdt->lineEdit()->placeholderText().isEmpty()) {
-        addr += ":";
-        addr += ui->devicePortEdt->lineEdit()->placeholderText().trimmed();
-    } else {
-        outLog("error: device port is null", false);
-        return;
+        addr += port;
     }
+    m_pendingConnectHost.clear();
 
-    // 保存IP历史记录 - 只保存IP部分,不包含端口
-    QString ip = addr.split(":").first();
-    if (!ip.isEmpty()) {
-        saveIpHistory(ip);
-    }
-    
-    // 保存端口历史记录
-    QString port = addr.split(":").last();
-    if (!port.isEmpty() && port != ip) {
-        savePortHistory(port);
-    }
+    // 记录本次连接的完整地址，连接失败后据此做端口探测与原因归类
+    m_lastConnectAddr = addr;
+
+    // 保存完整地址历史（ip:port），避免IP与端口分别保存后错配
+    saveAddrHistory(addr);
 
     outLog("wireless connect...", false);
     QStringList adbArgs;
@@ -1328,6 +1343,305 @@ void Dialog::on_wirelessDisConnectBtn_clicked()
     adbArgs << "disconnect";
     adbArgs << addr;
     m_adb.execute("", adbArgs);
+}
+
+void Dialog::on_discoverBtn_clicked()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+    // 手动点击「发现」：这是一轮新的发现流程，重置自愈状态
+    m_pendingConnectHost.clear();
+    m_mdnsRecovered = false;
+    m_portRetried = false;
+    outLog(tr("discovering devices on the LAN..."), false);
+    QStringList adbArgs;
+    adbArgs << "mdns";
+    adbArgs << "services";
+    m_adb.execute("", adbArgs);
+}
+
+void Dialog::on_pairBtn_clicked()
+{
+    if (checkAdbRun()) {
+        return;
+    }
+
+    QString ip = ui->deviceIpEdt->currentText().trimmed();
+    // IP输入框可能填的是完整地址（ip:port），配对时只取IP部分
+    if (ip.contains(':')) {
+        ip = ip.split(':').first();
+    }
+    if (ip.isEmpty()) {
+        outLog(tr("error: device ip is null"), false);
+        return;
+    }
+
+    QString pairPort = ui->pairPortEdt->text().trimmed();
+    QString pairCode = ui->pairCodeEdt->text().trimmed();
+    if (pairPort.isEmpty() || pairCode.isEmpty()) {
+        outLog(tr("error: pairing port and pairing code are both required"), false);
+        return;
+    }
+
+    outLog(tr("pairing..."), false);
+    QStringList adbArgs;
+    adbArgs << "pair";
+    adbArgs << (ip + ":" + pairPort);
+    adbArgs << pairCode;
+    m_adb.execute("", adbArgs);
+}
+
+void Dialog::handleMdnsOutput(const QString &stdOut)
+{
+    // adb mdns services 的输出形如（一台设备一行）：
+    // adb-3412702d-xgZLql	_adb-tls-connect._tcp.	192.168.9.65:39633
+    static const QRegularExpression re(
+        "_adb-tls-connect\\._tcp\\.[\\s]+(\\d{1,3}(?:\\.\\d{1,3}){3}:\\d{1,5})");
+
+    QStringList addrs;
+    QRegularExpressionMatchIterator it = re.globalMatch(stdOut);
+    while (it.hasNext()) {
+        addrs << it.next().captured(1);
+    }
+
+    // 情况一：这次查询是为了给指定主机补全端口（用户只填了 IP 就点了连接）
+    // adb 的 mDNS 结果来自它自己的缓存，可能是旧的：手机重开无线调试或重新配对后端口
+    // 会变，缓存里那条记录的端口已经没人监听，拿去连就是"目标计算机积极拒绝"。
+    // 所以先用 TCP 探一次，确认端口真的在监听才拿它去连。
+    auto applyAddr = [this](const QString &found) {
+        const QStringList parts = found.split(':');
+        bool ok = false;
+        const quint16 port = (parts.size() == 2) ? parts.at(1).toUShort(&ok) : 0;
+        if (ok && !probeTcp(parts.at(0), port)) {
+            outLog(tr("discovered port is stale, ignoring: ") + found, false);
+            return false;
+        }
+        outLog(tr("device found: ") + found, false);
+        // 历史里只留主机：端口每次开启无线调试都会重随，存下来必然是过期的
+        ui->deviceIpEdt->setEditText(parts.at(0));
+        saveAddrHistory(parts.at(0));
+        if (parts.size() == 2) {
+            ui->devicePortEdt->setEditText(parts.at(1));
+        }
+        return true;
+    };
+
+    bool staleFound = false;
+    if (!m_pendingConnectHost.isEmpty()) {
+        for (const QString &found : addrs) {
+            if (found.split(':').first() != m_pendingConnectHost) {
+                continue;
+            }
+            if (!applyAddr(found)) {
+                staleFound = true;
+                break;
+            }
+            m_pendingConnectHost.clear();
+            requestWirelessConnect();
+            return;
+        }
+    } else if (!addrs.isEmpty()) {
+        // 情况二：普通的设备发现，取第一台端口真的在监听的
+        for (const QString &found : addrs) {
+            if (applyAddr(found)) {
+                // 延迟到本轮adb回调结束后再发起连接，避免同一个AdbProcess实例被重入
+                requestWirelessConnect();
+                return;
+            }
+            staleFound = true;
+        }
+    }
+
+    // 没有拿到可用结果，有两种可能：
+    // 1) 列表为空 —— adb server 的 mDNS 客户端在启动时加入多播组，之后网络变化
+    //    （手机掉线重连、网卡 IP/接口索引变化）不会重新加入，于是永远返回空；
+    // 2) 拿到的记录全过期 —— 缓存里的旧端口已经没人监听。
+    // 两者都能靠重启一次 adb server 解决（mDNS 客户端与缓存一起重建）。
+    // 有设备连着时不动 server，否则会直接掐断投屏会话。
+    if ((addrs.isEmpty() || staleFound) && !m_mdnsRecovered && !hasConnectedDevice()) {
+        m_mdnsRecovered = true;
+        outLog(tr("no usable mdns result, restarting the adb server and retrying..."), false);
+        recoverAdbMdns(0);
+        return;
+    }
+
+    if (staleFound) {
+        m_pendingConnectHost.clear();
+        outLog(tr("the address discovered on the LAN is stale: wireless debugging may be off, "
+                  "or the phone switched network"), false);
+        return;
+    }
+
+    if (!m_pendingConnectHost.isEmpty()) {
+        m_pendingConnectHost.clear();
+        outLog(tr("port not found on the LAN. if the device uses the legacy tcpip mode, "
+                  "fill 5555 in the port box"), false);
+        return;
+    }
+
+    outLog(tr("no wireless device found, make sure wireless debugging is enabled "
+              "and the phone is on the same network"), false);
+}
+
+void Dialog::handlePairOutput(const QString &stdOut, const QString &errorOut)
+{
+    QString output = stdOut + errorOut;
+    if (output.contains("Successfully paired", Qt::CaseInsensitive)
+        || output.contains("Already paired", Qt::CaseInsensitive)) {
+        outLog(tr("paired successfully, connecting..."), false);
+        // 配对端口与配对码都是一次性的：每次打开手机上的配对弹窗都会重随，留着只会误导
+        ui->pairCodeEdt->clear();
+        ui->pairPortEdt->clear();
+        // 配对会重建手机的无线调试服务，连接端口往往跟着变。端口框里存的是配对前的
+        // 旧端口，直接拿去连必然"目标计算机积极拒绝"。清空后按 IP 走 mDNS 现场解析；
+        // 稍等一会儿再查，给手机端把新的服务广播出来。
+        ui->devicePortEdt->setEditText(QString());
+        QTimer::singleShot(800, this, [this]() {
+            requestWirelessConnect();
+        });
+        return;
+    }
+
+    outLog(tr("pairing failed, reopen \"pair device with pairing code\" on the phone: "
+              "the port and the code change every time the dialog is reopened"), false);
+    QString detail = output.trimmed();
+    if (!detail.isEmpty()) {
+        outLog(detail);
+    }
+}
+
+void Dialog::handleConnectOutput(const QString &stdOut, const QString &errorOut, const QString &addr)
+{
+    QString output = stdOut + errorOut;
+    if (output.contains("connected to", Qt::CaseInsensitive)) {
+        outLog(tr("connected."), false);
+        m_portRetried = false;
+        return;
+    }
+
+    // 连接失败分两种，原因完全不同，必须区分开
+    QStringList parts = addr.split(':');
+    bool ok = false;
+    quint16 port = (parts.size() == 2) ? parts.at(1).toUShort(&ok) : 0;
+    if (!ok) {
+        outLog(tr("connect failed: invalid address ") + addr, false);
+        return;
+    }
+
+    if (!probeTcp(parts.at(0), port)) {
+        // 端口不通最常见的原因就是它已经过期（重开无线调试、重新配对后都会重随）。
+        // 手里有 IP 就直接按 IP 重新问一次 mDNS，省掉用户再点「发现」这一步。
+        // 只自动补一次；有设备正在投屏时不动，避免打断会话。
+        if (!m_portRetried && !hasConnectedDevice()) {
+            m_portRetried = true;
+            outLog(tr("port is not reachable, it may have changed. looking up the current "
+                      "port on the LAN..."), false);
+            retryWithFreshPort(parts.at(0));
+            return;
+        }
+        outLog(tr("connect failed: port unreachable. the address or port is stale, wireless "
+                  "debugging is off, or the phone switched network"), false);
+        outLog(tr("click \"discover\" to fetch the current address from the phone"), false);
+        return;
+    }
+
+    // TCP 端口是通的，但 adb upgrade 到 TLS 后被手机拒绝 —— Android 11+ 的配对失效
+    outLog(tr("connect failed: the phone rejected this computer's key, pairing is required"),
+           false);
+    outLog(tr("on the phone: developer options -> wireless debugging -> pair device with "
+              "pairing code, then fill the port and code below"), false);
+    ui->pairPortEdt->setFocus();
+    ui->pairPortEdt->selectAll();
+}
+
+bool Dialog::probeTcp(const QString &host, quint16 port, int timeoutMs)
+{
+    QTcpSocket socket;
+    socket.connectToHost(host, port);
+    return socket.waitForConnected(timeoutMs);
+}
+
+void Dialog::requestWirelessConnect(int retry)
+{
+    if (m_adb.isRuning()) {
+        if (retry <= 0) {
+            outLog(tr("adb is busy, please click \"wireless connect\" again"), false);
+            return;
+        }
+        // 上一条adb命令尚未收尾，稍后重试
+        QTimer::singleShot(120, this, [this, retry]() {
+            requestWirelessConnect(retry - 1);
+        });
+        return;
+    }
+
+    on_wirelessConnectBtn_clicked();
+}
+
+bool Dialog::hasConnectedDevice() const
+{
+    // serialBox 由 `adb devices` 的结果填充。有设备时不能重启 adb server，
+    // 否则正在投屏的会话会被直接掐断。
+    return ui->serialBox->count() > 0;
+}
+
+void Dialog::execAdbWhenIdle(const QStringList &args, int retry)
+{
+    if (m_adb.isRuning()) {
+        if (retry <= 0) {
+            outLog(tr("adb is busy, please try again"), false);
+            return;
+        }
+        QTimer::singleShot(120, this, [this, args, retry]() {
+            execAdbWhenIdle(args, retry - 1);
+        });
+        return;
+    }
+    m_adb.execute("", args);
+}
+
+void Dialog::recoverAdbMdns(int step)
+{
+    if (step == 0) {
+        QStringList adbArgs;
+        adbArgs << "kill-server";
+        execAdbWhenIdle(adbArgs);
+        // 等 5037 端口释放；kill-server 失败也继续走下一步
+        QTimer::singleShot(800, this, [this]() {
+            recoverAdbMdns(1);
+        });
+        return;
+    }
+
+    if (step == 1) {
+        QStringList adbArgs;
+        adbArgs << "start-server";
+        execAdbWhenIdle(adbArgs);
+        // 给新的 server 一点时间把它自己的 mDNS 客户端拉起来
+        QTimer::singleShot(1500, this, [this]() {
+            recoverAdbMdns(2);
+        });
+        return;
+    }
+
+    outLog(tr("adb server restarted, discovering again..."), false);
+    QStringList adbArgs;
+    adbArgs << "mdns";
+    adbArgs << "services";
+    execAdbWhenIdle(adbArgs);
+}
+
+void Dialog::retryWithFreshPort(const QString &host)
+{
+    // 端口框里现在是过期值，清掉后才能走"端口为空 -> 现场向 mDNS 解析"这条路
+    ui->devicePortEdt->setEditText(QString());
+    m_pendingConnectHost = host;
+    m_mdnsRecovered = false;
+    QStringList adbArgs;
+    adbArgs << "mdns";
+    adbArgs << "services";
+    execAdbWhenIdle(adbArgs);
 }
 
 void Dialog::on_selectRecordPathBtn_clicked()
@@ -1579,33 +1893,6 @@ void Dialog::on_autoUpdatecheckBox_toggled(bool checked)
     }
 }
 
-void Dialog::loadIpHistory()
-{
-    QStringList ipList = Config::getInstance().getIpHistory();
-    ui->deviceIpEdt->clear();
-    ui->deviceIpEdt->addItems(ipList);
-
-    if (ui->deviceIpEdt->lineEdit()) {
-        ui->deviceIpEdt->lineEdit()->setFrame(false);
-        ui->deviceIpEdt->lineEdit()->setTextMargins(0, 0, 0, 0);
-        ui->deviceIpEdt->lineEdit()->setMaxLength(128);
-        ui->deviceIpEdt->lineEdit()->setPlaceholderText("192.168.0.1");
-    }
-}
-
-void Dialog::saveIpHistory(const QString &ip)
-{
-    if (ip.isEmpty()) {
-        return;
-    }
-    
-    Config::getInstance().saveIpHistory(ip);
-    
-    // 更新ComboBox
-    loadIpHistory();
-    ui->deviceIpEdt->setCurrentText(ip);
-}
-
 void Dialog::showIpEditMenu(const QPoint &pos)
 {
     QMenu *menu = ui->deviceIpEdt->lineEdit()->createStandardContextMenu();
@@ -1614,7 +1901,8 @@ void Dialog::showIpEditMenu(const QPoint &pos)
     QAction *clearHistoryAction = new QAction(tr("Clear History"), menu);
     connect(clearHistoryAction, &QAction::triggered, this, [this]() {
         Config::getInstance().clearIpHistory();
-        loadIpHistory();
+        Config::getInstance().clearAddrHistory();
+        loadAddrHistory();
     });
     
     menu->addAction(clearHistoryAction);
@@ -1624,47 +1912,49 @@ void Dialog::showIpEditMenu(const QPoint &pos)
 
 void Dialog::loadPortHistory()
 {
-    QStringList portList = Config::getInstance().getPortHistory();
+    // 端口不做历史记录：无线调试的端口每次开启都会重新随机分配，
+    // 旧端口留着只会误导。端口留空时由 mDNS 现场补全（见 on_wirelessConnectBtn_clicked）。
     ui->devicePortEdt->clear();
-    ui->devicePortEdt->addItems(portList);
 
     if (ui->devicePortEdt->lineEdit()) {
         ui->devicePortEdt->lineEdit()->setFrame(false);
         ui->devicePortEdt->lineEdit()->setTextMargins(0, 0, 0, 0);
-        ui->devicePortEdt->lineEdit()->setMaxLength(6);
-        ui->devicePortEdt->lineEdit()->setPlaceholderText("5555");
+        ui->devicePortEdt->lineEdit()->setMaxLength(5);
+        ui->devicePortEdt->lineEdit()->setPlaceholderText(tr("auto"));
     }
 }
 
-void Dialog::savePortHistory(const QString &port)
+void Dialog::loadAddrHistory()
 {
-    if (port.isEmpty()) {
+    QStringList addrList = Config::getInstance().getAddrHistory();
+    if (addrList.isEmpty()) {
+        // 兼容旧版本：老数据只保存了IP，没有端口
+        addrList = Config::getInstance().getIpHistory();
+    }
+
+    ui->deviceIpEdt->clear();
+    ui->deviceIpEdt->addItems(addrList);
+
+    if (ui->deviceIpEdt->lineEdit()) {
+        ui->deviceIpEdt->lineEdit()->setFrame(false);
+        ui->deviceIpEdt->lineEdit()->setTextMargins(0, 0, 0, 0);
+        ui->deviceIpEdt->lineEdit()->setMaxLength(128);
+        ui->deviceIpEdt->lineEdit()->setPlaceholderText("192.168.0.1");
+    }
+}
+
+void Dialog::saveAddrHistory(const QString &addr)
+{
+    if (addr.isEmpty()) {
         return;
     }
-    
-    Config::getInstance().savePortHistory(port);
-    
+
+    Config::getInstance().saveAddrHistory(addr);
+
     // 更新ComboBox
-    loadPortHistory();
-    ui->devicePortEdt->setCurrentText(port);
+    loadAddrHistory();
+    ui->deviceIpEdt->setCurrentText(addr);
 }
-
-void Dialog::showPortEditMenu(const QPoint &pos)
-{
-    QMenu *menu = ui->devicePortEdt->lineEdit()->createStandardContextMenu();
-    menu->addSeparator();
-    
-    QAction *clearHistoryAction = new QAction(tr("Clear History"), menu);
-    connect(clearHistoryAction, &QAction::triggered, this, [this]() {
-        Config::getInstance().clearPortHistory();
-        loadPortHistory();
-    });
-    
-    menu->addAction(clearHistoryAction);
-    menu->exec(ui->devicePortEdt->lineEdit()->mapToGlobal(pos));
-    delete menu;
-}
-
 
 void Dialog::on_codecModeBox_currentIndexChanged(int index)
 {
