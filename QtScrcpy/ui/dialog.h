@@ -121,6 +121,8 @@ private:
     void execAdbWhenIdle(const QStringList &args, int retry = 20);
     // adb 的 mDNS 客户端在网络变化后会失效，kill-server + start-server 后重新查询
     void recoverAdbMdns(int step);
+    // 端口已过期（手机重开无线调试/重新配对后端口会变）时，清掉端口框并重新向 mDNS 解析
+    void retryWithFreshPort(const QString &host);
     // 当前是否有设备连接（有则不允许重启 adb server）
     bool hasConnectedDevice() const;
 
@@ -169,6 +171,8 @@ private:
     QString m_pendingConnectHost;
     // 本轮发现流程是否已经重启过 adb server，避免反复重启
     bool m_mdnsRecovered = false;
+    // 本次连接是否已经因端口过期自动重解析过一次，避免无限重试
+    bool m_portRetried = false;
     QPointer<PresetConfigDialog> m_presetDialog;
 };
 

@@ -364,10 +364,6 @@
         <translation>端口为空，正在局域网内查询该设备的当前端口...</translation>
     </message>
     <message>
-        <source>no mdns response from adb, restarting the adb server and retrying...</source>
-        <translation>adb 未收到 mDNS 响应，正在重启 adb 服务后重试...</translation>
-    </message>
-    <message>
         <source>port not found on the LAN. if the device uses the legacy tcpip mode, fill 5555 in the port box</source>
         <translation>未在局域网内找到该设备的无线调试端口。若设备使用旧的 tcpip 模式，请在端口框填入 5555</translation>
     </message>
@@ -382,6 +378,22 @@
     <message>
         <source>auto</source>
         <translation>自动</translation>
+    </message>
+    <message>
+        <source>port is not reachable, it may have changed. looking up the current port on the LAN...</source>
+        <translation>端口不可达，可能已经变化。正在局域网内查询当前端口...</translation>
+    </message>
+    <message>
+        <source>discovered port is stale, ignoring: </source>
+        <translation>发现的服务记录已过期，忽略：</translation>
+    </message>
+    <message>
+        <source>no usable mdns result, restarting the adb server and retrying...</source>
+        <translation>没有可用的 mDNS 结果，正在重启 adb 服务后重试...</translation>
+    </message>
+    <message>
+        <source>the address discovered on the LAN is stale: wireless debugging may be off, or the phone switched network</source>
+        <translation>局域网内发现的服务记录已过期：无线调试可能已关闭，或手机切换了网络</translation>
     </message>
 </context>
 <context>

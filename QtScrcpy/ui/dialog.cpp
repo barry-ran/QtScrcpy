@@ -1142,6 +1142,8 @@ void Dialog::on_wirelessConnectBtn_clicked()
     if (checkAdbRun()) {
         return;
     }
+    // 手动点一次连接就是一次新的尝试，允许再走一轮"端口过期 -> 重新解析"
+    m_portRetried = false;
     QString addr = ui->deviceIpEdt->currentText().trimmed();
     if (addr.isEmpty()) {
         outLog(tr("error: device ip is null"), false);
@@ -1351,6 +1353,7 @@ void Dialog::on_discoverBtn_clicked()
     // 手动点击「发现」：这是一轮新的发现流程，重置自愈状态
     m_pendingConnectHost.clear();
     m_mdnsRecovered = false;
+    m_portRetried = false;
     outLog(tr("discovering devices on the LAN..."), false);
     QStringList adbArgs;
     adbArgs << "mdns";
@@ -1403,45 +1406,70 @@ void Dialog::handleMdnsOutput(const QString &stdOut)
     }
 
     // 情况一：这次查询是为了给指定主机补全端口（用户只填了 IP 就点了连接）
-    if (!m_pendingConnectHost.isEmpty()) {
-        for (const QString &found : addrs) {
-            QStringList parts = found.split(':');
-            if (parts.first() != m_pendingConnectHost) {
-                continue;
-            }
-            m_pendingConnectHost.clear();
-            outLog(tr("device found: ") + found, false);
-            // 历史里只留主机：端口每次开启无线调试都会重随，存下来必然是过期的
-            ui->deviceIpEdt->setEditText(parts.at(0));
-            saveAddrHistory(parts.at(0));
-            if (parts.size() == 2) {
-                ui->devicePortEdt->setEditText(parts.at(1));
-            }
-            requestWirelessConnect();
-            return;
+    // adb 的 mDNS 结果来自它自己的缓存，可能是旧的：手机重开无线调试或重新配对后端口
+    // 会变，缓存里那条记录的端口已经没人监听，拿去连就是"目标计算机积极拒绝"。
+    // 所以先用 TCP 探一次，确认端口真的在监听才拿它去连。
+    auto applyAddr = [this](const QString &found) {
+        const QStringList parts = found.split(':');
+        bool ok = false;
+        const quint16 port = (parts.size() == 2) ? parts.at(1).toUShort(&ok) : 0;
+        if (ok && !probeTcp(parts.at(0), port)) {
+            outLog(tr("discovered port is stale, ignoring: ") + found, false);
+            return false;
         }
-    } else if (!addrs.isEmpty()) {
-        // 情况二：普通的设备发现，取第一台
-        const QString found = addrs.first();
-        QStringList parts = found.split(':');
         outLog(tr("device found: ") + found, false);
+        // 历史里只留主机：端口每次开启无线调试都会重随，存下来必然是过期的
         ui->deviceIpEdt->setEditText(parts.at(0));
         saveAddrHistory(parts.at(0));
         if (parts.size() == 2) {
             ui->devicePortEdt->setEditText(parts.at(1));
         }
-        // 延迟到本轮adb回调结束后再发起连接，避免同一个AdbProcess实例被重入
-        requestWirelessConnect();
+        return true;
+    };
+
+    bool staleFound = false;
+    if (!m_pendingConnectHost.isEmpty()) {
+        for (const QString &found : addrs) {
+            if (found.split(':').first() != m_pendingConnectHost) {
+                continue;
+            }
+            if (!applyAddr(found)) {
+                staleFound = true;
+                break;
+            }
+            m_pendingConnectHost.clear();
+            requestWirelessConnect();
+            return;
+        }
+    } else if (!addrs.isEmpty()) {
+        // 情况二：普通的设备发现，取第一台端口真的在监听的
+        for (const QString &found : addrs) {
+            if (applyAddr(found)) {
+                // 延迟到本轮adb回调结束后再发起连接，避免同一个AdbProcess实例被重入
+                requestWirelessConnect();
+                return;
+            }
+            staleFound = true;
+        }
+    }
+
+    // 没有拿到可用结果，有两种可能：
+    // 1) 列表为空 —— adb server 的 mDNS 客户端在启动时加入多播组，之后网络变化
+    //    （手机掉线重连、网卡 IP/接口索引变化）不会重新加入，于是永远返回空；
+    // 2) 拿到的记录全过期 —— 缓存里的旧端口已经没人监听。
+    // 两者都能靠重启一次 adb server 解决（mDNS 客户端与缓存一起重建）。
+    // 有设备连着时不动 server，否则会直接掐断投屏会话。
+    if ((addrs.isEmpty() || staleFound) && !m_mdnsRecovered && !hasConnectedDevice()) {
+        m_mdnsRecovered = true;
+        outLog(tr("no usable mdns result, restarting the adb server and retrying..."), false);
+        recoverAdbMdns(0);
         return;
     }
 
-    // 一台都没找到。adb server 的 mDNS 客户端在启动时加入多播组，之后网络变化
-    // （手机掉线重连、网卡 IP/接口索引变化）不会重新加入，于是永远返回空列表。
-    // 这里重启一次 server 再查；有设备连着时不动 server，否则会直接掐断投屏会话。
-    if (!m_mdnsRecovered && !hasConnectedDevice()) {
-        m_mdnsRecovered = true;
-        outLog(tr("no mdns response from adb, restarting the adb server and retrying..."), false);
-        recoverAdbMdns(0);
+    if (staleFound) {
+        m_pendingConnectHost.clear();
+        outLog(tr("the address discovered on the LAN is stale: wireless debugging may be off, "
+                  "or the phone switched network"), false);
         return;
     }
 
@@ -1465,7 +1493,13 @@ void Dialog::handlePairOutput(const QString &stdOut, const QString &errorOut)
         // 配对端口与配对码都是一次性的：每次打开手机上的配对弹窗都会重随，留着只会误导
         ui->pairCodeEdt->clear();
         ui->pairPortEdt->clear();
-        requestWirelessConnect();
+        // 配对会重建手机的无线调试服务，连接端口往往跟着变。端口框里存的是配对前的
+        // 旧端口，直接拿去连必然"目标计算机积极拒绝"。清空后按 IP 走 mDNS 现场解析；
+        // 稍等一会儿再查，给手机端把新的服务广播出来。
+        ui->devicePortEdt->setEditText(QString());
+        QTimer::singleShot(800, this, [this]() {
+            requestWirelessConnect();
+        });
         return;
     }
 
@@ -1482,6 +1516,7 @@ void Dialog::handleConnectOutput(const QString &stdOut, const QString &errorOut,
     QString output = stdOut + errorOut;
     if (output.contains("connected to", Qt::CaseInsensitive)) {
         outLog(tr("connected."), false);
+        m_portRetried = false;
         return;
     }
 
@@ -1495,6 +1530,16 @@ void Dialog::handleConnectOutput(const QString &stdOut, const QString &errorOut,
     }
 
     if (!probeTcp(parts.at(0), port)) {
+        // 端口不通最常见的原因就是它已经过期（重开无线调试、重新配对后都会重随）。
+        // 手里有 IP 就直接按 IP 重新问一次 mDNS，省掉用户再点「发现」这一步。
+        // 只自动补一次；有设备正在投屏时不动，避免打断会话。
+        if (!m_portRetried && !hasConnectedDevice()) {
+            m_portRetried = true;
+            outLog(tr("port is not reachable, it may have changed. looking up the current "
+                      "port on the LAN..."), false);
+            retryWithFreshPort(parts.at(0));
+            return;
+        }
         outLog(tr("connect failed: port unreachable. the address or port is stale, wireless "
                   "debugging is off, or the phone switched network"), false);
         outLog(tr("click \"discover\" to fetch the current address from the phone"), false);
@@ -1581,6 +1626,18 @@ void Dialog::recoverAdbMdns(int step)
     }
 
     outLog(tr("adb server restarted, discovering again..."), false);
+    QStringList adbArgs;
+    adbArgs << "mdns";
+    adbArgs << "services";
+    execAdbWhenIdle(adbArgs);
+}
+
+void Dialog::retryWithFreshPort(const QString &host)
+{
+    // 端口框里现在是过期值，清掉后才能走"端口为空 -> 现场向 mDNS 解析"这条路
+    ui->devicePortEdt->setEditText(QString());
+    m_pendingConnectHost = host;
+    m_mdnsRecovered = false;
     QStringList adbArgs;
     adbArgs << "mdns";
     adbArgs << "services";
