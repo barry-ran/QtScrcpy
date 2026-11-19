@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QListWidget>
+#include <QStringList>
 #include <QTimer>
 
 
@@ -106,7 +107,6 @@ private:
     void initAdvancedDisplayUi();
     void updateAdvancedDisplayUi();
     void loadPortHistory();
-    void savePortHistory(const QString &port);
     void loadAddrHistory();
     void saveAddrHistory(const QString &addr);
     // 探测目标端口TCP是否可达，用于区分"端口不通"与"配对失效"
@@ -117,8 +117,13 @@ private:
     void handleConnectOutput(const QString &stdOut, const QString &errorOut, const QString &addr);
     // 发起无线连接；若上一条adb命令尚未收尾则稍后重试，避免链式调用被 checkAdbRun 拦截
     void requestWirelessConnect(int retry = 3);
+    // adb空闲后再执行命令，避免被单实例拦截
+    void execAdbWhenIdle(const QStringList &args, int retry = 20);
+    // adb 的 mDNS 客户端在网络变化后会失效，kill-server + start-server 后重新查询
+    void recoverAdbMdns(int step);
+    // 当前是否有设备连接（有则不允许重启 adb server）
+    bool hasConnectedDevice() const;
 
-    void showPortEditMenu(const QPoint &pos);
     void syncPresetLevelToUi();
 
 protected:
@@ -160,6 +165,10 @@ private:
     int m_prevMaxSizeIndex = 0;
     // 最近一次无线连接使用的地址，用于连接失败后做端口探测与原因归类
     QString m_lastConnectAddr;
+    // 非空表示本次 mDNS 查询是为了补全该主机的端口，而不是做设备发现
+    QString m_pendingConnectHost;
+    // 本轮发现流程是否已经重启过 adb server，避免反复重启
+    bool m_mdnsRecovered = false;
     QPointer<PresetConfigDialog> m_presetDialog;
 };
 

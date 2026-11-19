@@ -1443,9 +1443,6 @@
              <property name="maxLength">
               <number>5</number>
              </property>
-             <property name="placeholderText">
-              <string>42567</string>
-             </property>
             </widget>
            </item>
            <item>
@@ -1471,9 +1468,6 @@
              </property>
              <property name="maxLength">
               <number>6</number>
-             </property>
-             <property name="placeholderText">
-              <string>491978</string>
              </property>
             </widget>
            </item>

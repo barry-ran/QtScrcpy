@@ -359,6 +359,30 @@
         <source>adb is busy, please click &quot;wireless connect&quot; again</source>
         <translation>adb 正忙，请稍后重新点击“无线连接”</translation>
     </message>
+    <message>
+        <source>port is not specified, looking it up on the LAN...</source>
+        <translation>端口为空，正在局域网内查询该设备的当前端口...</translation>
+    </message>
+    <message>
+        <source>no mdns response from adb, restarting the adb server and retrying...</source>
+        <translation>adb 未收到 mDNS 响应，正在重启 adb 服务后重试...</translation>
+    </message>
+    <message>
+        <source>port not found on the LAN. if the device uses the legacy tcpip mode, fill 5555 in the port box</source>
+        <translation>未在局域网内找到该设备的无线调试端口。若设备使用旧的 tcpip 模式，请在端口框填入 5555</translation>
+    </message>
+    <message>
+        <source>adb is busy, please try again</source>
+        <translation>adb 正忙，请稍后再试</translation>
+    </message>
+    <message>
+        <source>adb server restarted, discovering again...</source>
+        <translation>adb 服务已重启，正在重新发现设备...</translation>
+    </message>
+    <message>
+        <source>auto</source>
+        <translation>自动</translation>
+    </message>
 </context>
 <context>
     <name>PresetConfigDialog</name>
@@ -753,16 +777,8 @@
         <translation>配对端口</translation>
     </message>
     <message>
-        <source>42567</source>
-        <translation>42567</translation>
-    </message>
-    <message>
         <source>code</source>
         <translation>配对码</translation>
-    </message>
-    <message>
-        <source>491978</source>
-        <translation>491978</translation>
     </message>
     <message>
         <source>Run adb pair with the code above, then connect automatically</source>
